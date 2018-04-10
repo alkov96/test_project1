@@ -1,0 +1,17 @@
+{
+  "site1": {
+  "mainurl": "https://stage-bet-site1.tsed.orglot.office/",
+  "login": "0304888test@mailinator.com",
+  "password": "Qazxsw23"
+  },
+  "site2": {
+    "mainurl": "https://stage-bet-site2.tsed.orglot.office/",
+    "login": "bladekeeper@ya.ru",
+    "password": "1qwert2ASDF"
+  },
+  "888.ru":{
+    "mainurl": "https://888.ru/",
+    "login": "bladekeeper@ya.ru",
+    "password": " 1qwert2ASDF"
+  }
+}
