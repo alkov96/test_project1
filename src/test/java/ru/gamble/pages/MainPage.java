@@ -34,15 +34,15 @@ public class MainPage extends AbstractPage {
     private WebElement pageTitle;
 
 
-    @ElementTitle("РЕГИСТРАЦИЯ")
+    @ElementTitle("Регистрация")
     @FindBy(id = "register")
     private WebElement registrationButton;
 
-    @ElementTitle("ВХОД")
+    @ElementTitle("Вход")
     @FindBy(id = "log-in")
     private WebElement enterButton;
 
-    @ElementTitle("ПРЕМАТЧ")
+    @ElementTitle("Прематч")
     @FindBy(id = "prematch")
     private WebElement prematchButton;
 

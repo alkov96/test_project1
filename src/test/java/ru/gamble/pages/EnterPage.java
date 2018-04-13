@@ -36,7 +36,7 @@ public class EnterPage extends AbstractPage {
     @FindBy(name = "password")
     private WebElement inputPassword;
 
-    @ElementTitle("ВОЙТИ")
+    @ElementTitle("Войти")
     @FindBy(id = "log-in-button")
 //    @RedirectTo(page = EnterPage.class)
     private WebElement enterButton;
@@ -60,6 +60,6 @@ public class EnterPage extends AbstractPage {
         fillField(inputLogin,login);
         fillField(inputPassword,password);
 
-        CommonStepDefs.pressButton("ВОЙТИ");
+        CommonStepDefs.pressButton("Войти");
     }
 }
