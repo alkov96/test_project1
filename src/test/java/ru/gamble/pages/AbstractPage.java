@@ -19,7 +19,6 @@ public abstract class AbstractPage extends Page {
     @ActionTitle("stop")
     public static void stop(){
         LOG.info("STOP");
-        System.out.printf("STOP");
     }
 
     @ActionTitle("закрываем браузер")
