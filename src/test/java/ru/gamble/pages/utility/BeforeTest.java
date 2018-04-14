@@ -14,6 +14,7 @@ public class BeforeTest {
     private static final Logger LOG = LoggerFactory.getLogger(BeforeTest.class);
 
 
+
     public static TestDataObject getData() {
             try {
                 data = new JsonDataObjectAdaptor("src/test/resources/", "data");

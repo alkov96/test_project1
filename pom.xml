@@ -16,7 +16,12 @@
         <dependency>
             <groupId>ru.sbtqa.tag</groupId>
             <artifactId>page-factory</artifactId>
-            <version>1.8.1</version>
+            <version>1.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.sbtqa.tag.parsers</groupId>
+            <artifactId>core</artifactId>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -40,6 +45,13 @@
             <version>3.9.1</version>
             <scope>test</scope>
         </dependency>
+        <!--Работает и без этой зависимости-->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+        <!--Конец-->
     </dependencies>
     <build>
         <plugins>
