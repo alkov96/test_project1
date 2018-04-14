@@ -40,7 +40,8 @@ public class EventViewerPage extends AbstractPage {
     @ActionTitle("выбирает время")
     public void chooseTime(String param){
         selectPeriod.click();
-        selectPeriod.findElement(By.xpath("//*[contains(text(),'" + param + "')]")).click();
+        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(selectPeriod));
+            selectPeriod.findElement(By.xpath("//*[contains(text(),'" + param + "')]")).click();
     }
 
 }
