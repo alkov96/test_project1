@@ -49,10 +49,6 @@ public class MainPage extends AbstractPage {
 
     public MainPage() {
         WebDriver driver = PageFactory.getDriver();
-
-        LOG.info(String.valueOf(driver.manage().window().getSize()));
-        driver.manage().window().maximize();
-        LOG.info(String.valueOf(driver.manage().window().getSize()));
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
