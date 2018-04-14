@@ -11,6 +11,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
         format ={"pretty"},
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.pagefactory.stepdefs"},
         features = {"src/test/resources/features/"},
+        plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
         tags = {"@1"})
 
 public class CucumberTest {
