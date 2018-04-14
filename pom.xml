@@ -59,13 +59,12 @@
                 <version>2.21.0</version>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
-
                     <junitArtifactName>junit:junit</junitArtifactName>
                     <testFailureIgnore>false</testFailureIgnore>
                     <skipTests>false</skipTests>
                     <argLine>
-                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.9.0/aspectjweaver-1.9.0.jar
-                        -Dcucumber.options="--plugin ru.yandex.qatools.allure.cucumberjvm.AllureReporter"
+                         "-javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.9.0/aspectjweaver-1.9.0.jar
+                          -Dcucumber.options="--plugin ru.yandex.qatools.allure.cucumberjvm.AllureReporter"
                     </argLine>
                 </configuration>
                 <dependencies>
