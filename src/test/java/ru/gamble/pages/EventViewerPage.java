@@ -58,9 +58,7 @@ public class EventViewerPage extends AbstractPage {
         }else{
             valuePeriod = param;
         }
-
-        int i = 0;
-
+        LOG.info(param);
     }
 
 }
