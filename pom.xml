@@ -19,21 +19,16 @@
             <version>1.9.2</version>
         </dependency>
         <dependency>
+            <groupId>ru.sbtqa.tag.datajack.adaptors</groupId>
+            <artifactId>datajack-json-adaptor</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.20</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>ru.sbtqa.tag.datajack.adaptors</groupId>
-            <artifactId>datajack-json-adaptor</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <!--<dependency>-->
-            <!--<groupId>ru.yandex.qatools.allure</groupId>-->
-            <!--<artifactId>allure-cucumber-jvm-adaptor</artifactId>-->
-            <!--<version>1.6.4</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber-jvm</artifactId>
@@ -48,12 +43,6 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>3.9.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.14.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -80,7 +69,7 @@
                     <skipTests>false</skipTests>
                     <argLine>
                              -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.9.0/aspectjweaver-1.9.0.jar
-                              -Dcucumber.options="--plugin ru.sbtqa.tag.pagefactory.support.TagPFAllureReporter --plugin pretty"
+                             -Dcucumber.options="--plugin ru.sbtqa.tag.pagefactory.support.TagPFAllureReporter --plugin pretty"
                               <!-- -Dcucumber.options="&#45;&#45;plugin ru.yandex.qatools.allure.cucumberjvm.AllureReporter"-->
                               <!-- -Dcucumber.options="&#45;&#45;plugin io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"-->
                     </argLine>
@@ -104,9 +93,6 @@
         <excludeDefaults>true</excludeDefaults>
         <plugins>
             <plugin>
-                <!--<groupId>ru.yandex.qatools.allure</groupId>-->
-                <!--<artifactId>allure-maven-plugin</artifactId>-->
-                <!--<version>2.6</version>-->
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
                 <version>2.9</version>
