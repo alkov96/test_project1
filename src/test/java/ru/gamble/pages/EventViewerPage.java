@@ -17,6 +17,8 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.util.List;
+
 import static ru.gamble.pages.utility.Constants.PERIOD;
 
 @Slf4j
@@ -53,12 +55,65 @@ public class EventViewerPage extends AbstractPage {
     @ActionTitle("проверяет время игр и")
     public void checkGamesWithPeriod(String param){
         String valuePeriod = "";
+        String rowDateTame = "";
         if(param.equals(PERIOD)){
             valuePeriod = Stash.getValue(param);
         }else{
             valuePeriod = param;
         }
-        LOG.info(param);
+
+        List<WebElement> leftOpenMenuArrows = PageFactory.getDriver().findElements(By.xpath("//li[@class = 'left-menu__list-item-sport ng-scope active']"));
+        if(leftOpenMenuArrows.size()>0){
+            for (WebElement openArrow:leftOpenMenuArrows) {
+                List<WebElement> countriesList = openArrow.findElements(By.xpath("//left-menu__list-item-region ng-scope"));
+                if(countriesList.size()>0){
+                    for (WebElement country: countriesList){
+                        country.click();
+                        List<WebElement> gamesList = PageFactory.getWebDriver().findElements(By.className("ng-binding"));
+                        if (gamesList.size()>0){
+                            for (WebElement game:gamesList) {
+                                game.click();
+                                rowDateTame = PageFactory.getWebDriver().findElement(By.xpath("//div[@class='prematch-competition-games__item-date ng-binding']")).getText();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        List<WebElement> leftMenuArrows = PageFactory.getWebDriver().findElements(By.xpath("//li[@class = 'left-menu__list-item-sport ng-scope']"));
+        if(leftMenuArrows.size()>0){
+            for (WebElement arrow: leftMenuArrows) {
+
+                arrow.click();
+
+            }
+        }else {
+        LOG.info("В период времени [" + param + "] нет игр.");
+        }
+
+    }
+
+    private void openArrowAndCheckGameTime(List<WebElement> list, String expectedValue){
+        String rowDateTame = "";
+        List<WebElement> leftOpenMenuArrows = PageFactory.getDriver().findElements(By.xpath("//li[@class = 'left-menu__list-item-sport ng-scope active']"));
+        if(leftOpenMenuArrows.size()>0){
+            for (WebElement openArrow:leftOpenMenuArrows) {
+                List<WebElement> countriesList = openArrow.findElements(By.xpath("//left-menu__list-item-region ng-scope"));
+                if(countriesList.size()>0){
+                    for (WebElement country: countriesList){
+                        country.click();
+                        List<WebElement> gamesList = PageFactory.getWebDriver().findElements(By.className("ng-binding"));
+                        if (gamesList.size()>0){
+                            for (WebElement game:gamesList) {
+                                game.click();
+                                rowDateTame = PageFactory.getWebDriver().findElement(By.xpath("//div[@class='prematch-competition-games__item-date ng-binding']")).getText();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
