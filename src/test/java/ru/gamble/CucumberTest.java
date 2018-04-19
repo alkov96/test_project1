@@ -11,11 +11,9 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -26,15 +24,19 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.pagefactory.stepdefs"},
         features = {"src/test/resources/features/"},
         plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
-        tags = {"@2"})
+        tags = {"@smoke"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
 
     @BeforeClass
     public static void setUp() {
-        PageFactory.getWebDriver().manage().window().maximize();
-    }
+        PageFactory.getWebDriver().manage().window().setSize(new Dimension(1920, 1080));
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("--headless");
+//        options.addArguments("start-maximized");
+//        WebDriver driver = new ChromeDriver(options);
+   }
 
 
     @Rule
