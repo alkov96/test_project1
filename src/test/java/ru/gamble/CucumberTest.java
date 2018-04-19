@@ -4,12 +4,16 @@ import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 import io.qameta.allure.Attachment;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -24,6 +28,16 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
+
+    @Before
+    public static void setUp(){
+        System.setProperty("webdriver.chrome.driver", "webdrivers/chromedriver");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("start-maximized");
+        WebDriver driver = new ChromeDriver(options);
+    }
+
 
     @Rule
     public TestWatcher watchman = new TestWatcher() {
