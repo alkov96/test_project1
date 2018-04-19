@@ -2,9 +2,11 @@ package ru.gamble;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
+import io.github.bonigarcia.wdm.ChromeDriverManager;
 import io.qameta.allure.Attachment;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -29,13 +31,9 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
 
-    @Before
-    public static void setUp(){
-        System.setProperty("webdriver.chrome.driver", "webdrivers/chromedriver");
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-        options.addArguments("start-maximized");
-        WebDriver driver = new ChromeDriver(options);
+    @BeforeClass
+    public static void setUp() {
+        PageFactory.getWebDriver().manage().window().maximize();
     }
 
 
