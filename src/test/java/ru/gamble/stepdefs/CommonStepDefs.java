@@ -1,24 +1,16 @@
 package ru.gamble.stepdefs;
 
-
-import com.thoughtworks.selenium.webdriven.commands.WaitForPageToLoad;
 import cucumber.api.DataTable;
-import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.utility.BeforeTest;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
-
 import java.util.List;
 
 @Slf4j

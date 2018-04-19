@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.gamble.pages.utility.Constants.PERIOD;
 
 @Slf4j
@@ -41,7 +42,14 @@ public class EventViewerPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(expandСollapseMenusButton));
+            new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandСollapseMenusButton));
+            checkMenuIsOpen();
+    }
+
+    private void checkMenuIsOpen(){
+        if(expandСollapseMenusButton.getAttribute("title").contains("Показать всё")){
+            expandСollapseMenusButton.click();
+        }
     }
 
     @ActionTitle("выбирает время")
@@ -104,9 +112,7 @@ public class EventViewerPage extends AbstractPage {
 
     private void openArrowAndCheckGameTime(List<WebElement> list, String expectedValue){
         String rowDateTame = "";
-        List<WebElement> leftOpenMenuArrows = PageFactory.getDriver().findElements(By.xpath("//li[@class = 'left-menu__list-item-sport ng-scope active']"));
-        if(leftOpenMenuArrows.size()>0){
-            for (WebElement openArrow:leftOpenMenuArrows) {
+            for (WebElement openArrow:list) {
                 List<WebElement> countriesList = openArrow.findElements(By.xpath("//left-menu__list-item-region ng-scope"));
                 if(countriesList.size()>0){
                     for (WebElement country: countriesList){
@@ -121,8 +127,39 @@ public class EventViewerPage extends AbstractPage {
                     }
                 }
             }
-        }
+
     }
+
+//    private void clickOnGameAndCheckDateTime(List<WebElement> gamesList,String xpath1, String expectedValue){
+//        String xpath = "//left-menu__list-item-region ng-scope";
+//        String rowDateTame = "";
+//        for (WebElement openArrow:gamesList) {
+//            List<WebElement> countriesList = openArrow.findElements(By.xpath(xpath));
+//            if(countriesList.size()>0){
+//                for (WebElement country: countriesList){
+//                    country.click();
+//                    List<WebElement> gamesList = PageFactory.getWebDriver().findElements(By.className("ng-binding"));
+//                    if (gamesList.size()>0){
+//                        for (WebElement game:gamesList) {
+//                            game.click();
+//                            rowDateTame = PageFactory.getWebDriver().findElement(By.xpath("//div[@class='prematch-competition-games__item-date ng-binding']")).getText();
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//    }
+
+//    private void checkDateTime(int diapason, String currentGameDateTime){
+//        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm - dd MMM yyyy");
+//
+//        Date currentDateTime = new Date(System.currentTimeMillis());
+//        Date gameDateTime = formatter.parse(currentGameDateTime);
+//        Date dateTimePlusPeriod = new Date(System.currentTimeMillis() + diapason * 3600 * 1000);
+//
+//        assertThat(gameDateTime.after(currentDateTime)&& gameDateTime.before(dateTimePlusPeriod)).as("Дата-время [] вне диапазона []");
+//    }
 
 //    private void checkDateTime(WebElement webElement) {
 //        Date dateGame;
