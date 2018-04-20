@@ -33,9 +33,9 @@ import ru.sbtqa.tag.pagefactory.drivers.TagWebDriver;
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
 
-    @BeforeClass
-    public static void setUp() {
-        TagWebDriver.getDriver().manage().window().setSize(new Dimension(1920, 1080));
+//    @BeforeClass
+//    public static void setUp() {
+//        TagWebDriver.getDriver().manage().window().setSize(new Dimension(1920, 1080));
 //        ChromeOptions options = new ChromeOptions();
 //        options.addArguments("--headless");
 //        options.addArguments("start-maximized");
@@ -50,7 +50,7 @@ public class CucumberTest {
 //        options.addArguments("--headless");
 //        options.addArguments("start-maximized");
 //        WebDriver driver = new ChromeDriver(options);
-   }
+//   }
 
 
     @Rule
