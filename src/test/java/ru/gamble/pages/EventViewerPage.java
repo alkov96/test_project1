@@ -1,6 +1,5 @@
 package ru.gamble.pages;
 
-import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -25,7 +24,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.gamble.pages.utility.Constants.PERIOD;
 
-@Slf4j
 @PageEntry(title = "Просмотр событий")
 public class EventViewerPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(EventViewerPage.class);

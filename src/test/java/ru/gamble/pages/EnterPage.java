@@ -1,7 +1,6 @@
 package ru.gamble.pages;
 
 import cucumber.api.DataTable;
-import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -21,7 +20,6 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.util.Map;
 
-@Slf4j
 @PageEntry(title = "Вход")
 public class EnterPage extends AbstractPage {
 

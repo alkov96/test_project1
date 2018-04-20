@@ -24,12 +24,6 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.20</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber-jvm</artifactId>
             <version>2.6.0</version>
@@ -44,16 +38,6 @@
             <artifactId>assertj-core</artifactId>
             <version>3.9.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>3.11.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>24.1-jre</version>
         </dependency>
     </dependencies>
     <build>
@@ -80,8 +64,6 @@
                     <argLine>
                              -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.9.0/aspectjweaver-1.9.0.jar
                              -Dcucumber.options="--plugin ru.sbtqa.tag.pagefactory.support.TagPFAllureReporter --plugin pretty"
-                              <!-- -Dcucumber.options="&#45;&#45;plugin ru.yandex.qatools.allure.cucumberjvm.AllureReporter"-->
-                              <!-- -Dcucumber.options="&#45;&#45;plugin io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"-->
                     </argLine>
                 </configuration>
                 <dependencies>

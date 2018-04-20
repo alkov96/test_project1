@@ -1,6 +1,5 @@
 package ru.gamble.pages;
 
-import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -15,7 +14,7 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-@Slf4j
+
 @PageEntry(title = "Авторизованная Главная страница")
 public class AutotentificationMainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(AutotentificationMainPage.class);

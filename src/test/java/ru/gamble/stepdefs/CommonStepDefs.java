@@ -2,7 +2,6 @@ package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.ru.Когда;
-import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import java.util.List;
 
-@Slf4j
 public class CommonStepDefs {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
