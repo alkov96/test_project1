@@ -2,10 +2,8 @@ package ru.gamble;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
-import io.github.bonigarcia.wdm.ChromeDriverManager;
 import io.qameta.allure.Attachment;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
@@ -15,12 +13,11 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.drivers.TagWebDriver;
+
+import java.util.concurrent.TimeUnit;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(monochrome = true,
@@ -28,10 +25,18 @@ import ru.sbtqa.tag.pagefactory.drivers.TagWebDriver;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.pagefactory.stepdefs"},
         features = {"src/test/resources/features/"},
         plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
-        tags = {"@smoke"})
+        tags = {"@2"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
+
+    @BeforeClass
+    public static void openBrowser(){
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().window().maximize();
+    }
+
 
     @Rule
     public TestWatcher watchman = new TestWatcher() {
