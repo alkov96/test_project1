@@ -14,12 +14,14 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -75,92 +77,137 @@ public class EventViewerPage extends AbstractPage {
         }
         int valueLimit = Integer.parseInt(Stash.getValue(limit));
 
+        String xpathMainCategoriesOfEvents = "//a[@class='left-menu__list-item-sport-link ng-binding']";
 
-        String xpathOfSports = "//*[contains(@class,'left-menu__list-item-sport ng-scope')]";
         String xpathCountries = "";
+        WebElement isOpenMenu;
 
-        LOG.info("Ищем виды спорта.");
-        List<WebElement> listOfSports = getWebDriver().findElements(By.xpath(xpathOfSports))
-                .stream().filter(e -> e.isDisplayed()).limit(valueLimit).collect(Collectors.toList());
-        LOG.info("Найдено видов спорта::" + listOfSports.size());
-        for (WebElement info:listOfSports) {
+        LOG.info("Ищем главные категории событий.");
+        // Ожидание появения хотя-бы одного события
 
-            LOG.info(info.findElement(By.xpath("./*")).getText());
-        }
+        List<WebElement> listMainCategoriesOfEvents = getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents))
+                .stream().filter(e -> e.isDisplayed() && !(e.getText().isEmpty())).limit(valueLimit).collect(Collectors.toList());
+        LOG.info("Найдено видов категорий событий::" + listMainCategoriesOfEvents.size());
 
-        for(WebElement sport: listOfSports){
-            boolean populate = false;
-           if(!sport.getAttribute("class").contains("active")){ sport.findElement(By.xpath("./a")).click(); }
+        if(listMainCategoriesOfEvents.size()>0) {
+            for (WebElement event : listMainCategoriesOfEvents) {
+                LOG.info(event.getText());
+                boolean populate = false;
+                boolean nullMarge = false;
 
-            LOG.info("Ищем страны.");
-           if(sport.findElement(By.xpath("./*")).getText().contains("ПОПУЛЯРНЫЕ СОРЕВНОВАНИЯ")){
-               xpathCountries = "./ul/li/div";
-               populate = true;
-           }else { xpathCountries = "ul/li";}
-
-            List<WebElement> listCountries = sport.findElements(By.xpath(xpathCountries))
-                    .stream().filter(e -> e.isDisplayed()).limit(valueLimit).collect(Collectors.toList());
-            LOG.info("Найдено стран::" + listCountries.size());
-
-            if(populate){
-                clickGameAndCheckDateTime(listCountries,valuePeriod,valueLimit);
-            }else {
-                for (WebElement country : listCountries) {
-                    if (!country.getAttribute("class").contains("active")) {
-                        country.findElement(By.xpath("./a")).click();
-                    }
-                    LOG.info(country.toString());
-                    clickGameAndCheck(country, valuePeriod, valueLimit);
+                // Если главные категории не открыты, то открываем
+                isOpenMenu = event.findElement(By.xpath(".."));
+                if (!isOpenMenu.getAttribute("class").contains("active")) {
+                    event.click();
                 }
-            }
-        }
-    }
 
-    private void clickGameAndCheckDateTime(List<WebElement> listCountries, String valuePeriod, int valueLimit){
-        String xpathDateTimeGames = "//div[@class='prematch-competition-games__item-date ng-binding']";
-        String rowDateTime;
-        for (WebElement game: listCountries) {
-                //Нажимаем на ссылку каждой игры и проверяем время
-                LOG.info("::" + game.getText());
-                game.click();
-                List<WebElement> listDateTime = PageFactory.getWebDriver().findElements(By.xpath(xpathDateTimeGames))
+                String match = event.getText();
+
+                if (match.contains("ПОПУЛЯРНЫЕ СОРЕВНОВАНИЯ")) {
+                    xpathCountries = "../ul/li/div";
+                    populate = true;
+                } else if (match.contains("НУЛЕВАЯ МАРЖА")) {
+                    xpathCountries = "../ul/li/ul";
+                    nullMarge = true;
+                } else {
+                    xpathCountries = "..//*[@class='left-menu__list-item-region-link']";
+                }
+
+                List<WebElement> listSubIvents = event.findElements(By.xpath(xpathCountries))
                         .stream().filter(e -> e.isDisplayed()).limit(valueLimit).collect(Collectors.toList());
-                //Проверяем все строки с датой и временем
-                for (WebElement row : listDateTime) {
-                    rowDateTime = row.getText();
-                    int period;
-                    if(valuePeriod.contains("Любое время")){
-                        period = 0;
-                    }else {
-                        period = Integer.parseInt(valuePeriod.replaceAll("[\\D]+", ""));
+                LOG.info("Найдено подсобытий::" + listSubIvents.size());
+
+                // Для популряных соревнований
+                if (populate) {
+                    clickCompetitionsAndCheckGamesDateTime(listSubIvents, valuePeriod, valueLimit);
+                    // Для нулевой маржи
+                } else if (nullMarge) {
+                    String xpathCountry = "..//*[@class='left-menu__list-item-region ng-scope']/a";
+
+                    for (WebElement sport : listSubIvents) {
+                        isOpenMenu = sport.findElement(By.xpath("..//*[contains(@class,'left-menu__list-item-sport ng-scope')]"));
+                        if (!isOpenMenu.getAttribute("class").contains("active")) {
+                            sport.click();
+                        }
+
+                        List<WebElement> listCountries = sport.findElements(By.xpath(xpathCountry))
+                                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                        if (listCountries.size() > 0) {
+                            clickCompetitionsAndCheckGamesDateTime(listCountries, valuePeriod, valueLimit);
+                        }
                     }
-                    checkDateTime(period, rowDateTime);
+                    // Для всего остального
+                } else {
+                    if (!event.findElement(By.xpath("..")).getAttribute("class").contains("active")) {
+                        event.click();
+                    }
+
+                    List<WebElement> listCountries = event.findElements(By.xpath(xpathCountries))
+                            .stream().filter(el -> el.isDisplayed()).limit(valueLimit).collect(Collectors.toList());
+
+                    if (listCountries.size() > 0) {
+                        clickCompetitionsAndCheckGamesDateTime(listCountries, valuePeriod, valueLimit);
+                    }
                 }
+            }
+        }else {
+            LOG.error("Не загрузилось меню списка событий!::" + listMainCategoriesOfEvents.size());
+            throw new AutotestError("Не загрузилось меню списка событий!::"+ String.valueOf(listMainCategoriesOfEvents.size()));
         }
     }
 
-
-    private void clickGameAndCheck(WebElement country,String valuePeriod, int valueLimit){
-        String xpathGames = "./following-sibling::*[1]/*";
+    private void clickCompetitionsAndCheckGamesDateTime(List<WebElement> listCompetitions, String valuePeriod, int valueLimit){
+        String xpathGames = "..//div[@class='left-menu__list-item-region-compitition compitition-b ng-scope ng-isolate-scope']";
         String xpathDateTimeGames = "//div[@class='prematch-competition-games__item-date ng-binding']";
-        String rowDateTime;
-
-        List<WebElement> listGames = country.findElements(By.xpath(xpathGames))
-                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-        //Нажимаем на ссылку каждой игры и проверяем время
-        for (WebElement game:listGames){
-            LOG.info(country.getText() + "::" + game.getText());
-            game.click();
-            List<WebElement> listDateTime = PageFactory.getWebDriver().findElements(By.xpath(xpathDateTimeGames))
-                    .stream().filter(e -> e.isDisplayed()).limit(valueLimit).collect(Collectors.toList());
-            //Проверяем все строки с датой и временем
-            for (WebElement row:listDateTime){
-                rowDateTime = row.getText();
-                checkDateTime(Integer.parseInt(valuePeriod.replaceAll("[\\D]+","")),rowDateTime);
+        for (WebElement country: listCompetitions) {
+            LOG.info(country.getText());
+            // Если меню страны не открыта, то открываем
+            if(!country.findElement(By.xpath("..")).getAttribute("class").contains("active")){ country.click();}
+            // Ищем список игровых событий в данной стране
+            List<WebElement> listGames = country.findElements(By.xpath(xpathGames))
+                    .stream().filter(el -> el.isDisplayed()).limit(valueLimit).collect(Collectors.toList());
+            if (listGames.size() > 0) {
+                for (WebElement gameItem : listGames) {
+                    LOG.info(gameItem.getText());
+                    gameItem.click();
+                    checkGames(country, valuePeriod, valueLimit);
+                }
+            }else {
+                checkGames(country, valuePeriod, valueLimit);
             }
         }
     }
 
+    private void checkGames(WebElement country, String valuePeriod, int valueLimit){
+        String xpathDateTimeGames = "//div[@class='prematch-competition-games__item-date ng-binding']";
+        String rowDateTime;
+        // Ожидание появения хотя-бы одной игры в меню стран
+        new WebDriverWait(getWebDriver(), 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathDateTimeGames)));
+
+        List<WebElement> listRow = country.findElements(By.xpath(xpathDateTimeGames))
+                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        // Здесть обрезаем большой список до последних строк valueLimit
+        List<WebElement> listDateTime;
+        if (listRow.size() > valueLimit) {
+            listDateTime = listRow.stream().skip(listRow.size() - valueLimit).collect(Collectors.toList());
+        } else {
+            listDateTime = listRow;
+        }
+
+        if (listDateTime.size() > 0) {
+            for (WebElement game : listDateTime) {
+                LOG.info(game.findElement(By.xpath("../../../*")).getText().replaceAll("\n", " "));
+                rowDateTime = game.getText();
+                int period;
+                if (valuePeriod.contains("Любое время")) {
+                    period = 0;
+                } else {
+                    period = Integer.parseInt(valuePeriod.replaceAll("[\\D]+", ""));
+                }
+                checkDateTime(period, rowDateTime);
+            }
+        }
+    }
 
     private void checkDateTime(int diapason, String currentGameDateTime){
         Date currentDateTime = new Date(System.currentTimeMillis());
@@ -176,8 +223,8 @@ public class EventViewerPage extends AbstractPage {
 
         if(diapason == 0){
             assertThat(gameDateTime.after(currentDateTime))
-                    .as("Ошибка!!! Дата-время [" + gameDateTime.toString() + "] не позже [" + currentDateTime.toString() + "]");
-            LOG.info("Дата-время [" + gameDateTime.toString() + "] больше [" + currentDateTime.toString() + "]");
+                    .as("Ошибка!!! Дата-время [" + gameDateTime.toString() + "] < [" + currentDateTime.toString() + "]");
+            LOG.info("Дата-время [" + gameDateTime.toString() + "] > [" + currentDateTime.toString() + "]");
 
         }else {
             Date dateTimePlusPeriod = new Date(System.currentTimeMillis() + diapason * 3600 * 1000);
@@ -188,23 +235,4 @@ public class EventViewerPage extends AbstractPage {
         }
     }
 
-
-    private void openArrowAndCheckGameTime(List<WebElement> list, String expectedValue){
-        String rowDateTame = "";
-            for (WebElement openArrow:list) {
-                List<WebElement> countriesList = openArrow.findElements(By.xpath("//left-menu__list-item-region ng-scope"));
-                if(countriesList.size()>0){
-                    for (WebElement country: countriesList){
-                        country.click();
-                        List<WebElement> gamesList = getWebDriver().findElements(By.className("ng-binding"));
-                        if (gamesList.size()>0){
-                            for (WebElement game:gamesList) {
-                                game.click();
-                                rowDateTame = getWebDriver().findElement(By.xpath("//div[@class='prematch-competition-games__item-date ng-binding']")).getText();
-                            }
-                        }
-                    }
-                }
-            }
-    }
 }
