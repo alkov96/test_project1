@@ -13,16 +13,20 @@ import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
+import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.properties.Props;
 
+import javax.print.DocFlavor;
+import java.net.URL;
 import java.util.List;
 
 public class CommonStepDefs{
 
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
 
+    @ActionTitle("нажимает на кнопку")
     public static void pressButton(String param){
         Page page = null;
         WebElement button = null;
@@ -35,7 +39,10 @@ public class CommonStepDefs{
             LOG.error(e1.getMessage());
         }
         if(button.isDisplayed()){
-            button.click();
+            if(!button.getAttribute("href").isEmpty()){
+                String url = button.getAttribute("href");
+                PageFactory.getWebDriver().get(url);
+            }else { button.click();}
             workWithPreloader();
         }
     }
