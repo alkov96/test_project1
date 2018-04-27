@@ -36,7 +36,6 @@ public class EnterPage extends AbstractPage {
 
     @ElementTitle("Войти")
     @FindBy(id = "log-in-button")
-//    @RedirectTo(page = EnterPage.class)
     private WebElement enterButton;
 
     public EnterPage() {

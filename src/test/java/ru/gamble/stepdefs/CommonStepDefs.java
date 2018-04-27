@@ -15,6 +15,8 @@ import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
+import ru.sbtqa.tag.qautils.properties.Props;
+
 import java.util.List;
 
 public class CommonStepDefs{
@@ -51,31 +53,25 @@ public class CommonStepDefs{
     public static void workWithPreloader(){
        String xpathPreloader = "//*[contains(@class,'preloader__container')]";
        waitShowElement(By.xpath(xpathPreloader));
-       waitHideElement(By.xpath(xpathPreloader));
     }
 
     // Ожидание появления элемента на странице
     public static void waitShowElement(By by){
         WebDriver driver = PageFactory.getWebDriver();
-        WebDriverWait driverWait = new WebDriverWait(driver, 1, 500);
+        WebDriverWait driverWait = new WebDriverWait(driver, 3, 250);
         try{
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
-            LOG.info("Прелоадер появился");
+            List<WebElement> preloaders = driver.findElements(by);
+            LOG.info("Найдено прелоадеров::" + preloaders.size());
+            driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
         }catch (TimeoutException te){
             LOG.info("Прелоадер НЕ появился");
         }
     }
 
-    // Ожидание исчезновения элемента на странице
-    public static void waitHideElement (By by){
-        WebDriver driver = PageFactory.getWebDriver();
-        WebDriverWait driverWait = new WebDriverWait(driver, 1, 500);
-        try {
-            driverWait.until(ExpectedConditions.invisibilityOfElementLocated(by));
-            LOG.info("Прелоадер изчез");
-        }catch (TimeoutException te){
-            LOG.info("Прелоадер НЕ изчез");
-        }
-
+    // Метод перехода на главную страницу
+    @Когда("^переходит на главную страницу$")
+    public static void goToMainPage(){
+        PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
     }
 }
