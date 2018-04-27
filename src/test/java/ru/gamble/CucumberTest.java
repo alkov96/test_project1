@@ -3,6 +3,7 @@ package ru.gamble;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 import io.qameta.allure.Attachment;
+import net.sf.cglib.core.Local;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
 import java.time.LocalTime;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 @RunWith(Cucumber.class)
@@ -40,6 +42,7 @@ public class CucumberTest {
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.manage().window().setSize(new Dimension(1920, 1080));
         final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
+        Locale.setDefault(new Locale("ru"));
     }
 
     @Rule
