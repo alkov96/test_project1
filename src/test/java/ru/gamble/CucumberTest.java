@@ -39,7 +39,7 @@ public class CucumberTest {
         WebDriver driver = PageFactory.getWebDriver();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.manage().window().setSize(new Dimension(1920, 1080));
-//        final Wait<WebDriver> wait = new WebDriverWait(driver, 3, 500);
+        final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
     }
 
     @Rule
