@@ -54,6 +54,7 @@ public class EventViewerPage extends AbstractPage {
     private void checkMenuIsOpen(){
         if(expandСollapseMenusButton.getAttribute("title").contains("Показать всё")){
             expandСollapseMenusButton.click();
+            workWithPreloader();
         }
     }
 
