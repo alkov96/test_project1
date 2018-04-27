@@ -32,7 +32,10 @@ public class CommonStepDefs{
         } catch (PageException e1) {
             LOG.error(e1.getMessage());
         }
-        if(button.isDisplayed()){ button.click();}
+        if(button.isDisplayed()){
+            button.click();
+            workWithPreloader();
+        }
     }
 
     @Когда("^сохраняем в память$")
