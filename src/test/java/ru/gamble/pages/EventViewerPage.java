@@ -197,6 +197,7 @@ public class EventViewerPage extends AbstractPage {
         List<WebElement> listRow = country.findElements(By.xpath(xpathDateTimeGames))
                 .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
         // Здесть обрезаем большой список до последних строк valueLimit
+
         List<WebElement> listDateTime;
         if (listRow.size() > valueLimit) {
             listDateTime = listRow.stream().skip(listRow.size() - valueLimit).collect(Collectors.toList());
@@ -216,7 +217,9 @@ public class EventViewerPage extends AbstractPage {
                 }
                 checkDateTime(period, rowDateTime);
             }
-        }
+        }else {
+            LOG.error("Не надено время игры!!!");
+            throw new AutotestError("Не надено время игры!!!");}
     }
 
     private void checkDateTime(int diapason, String currentGameDateTime){
