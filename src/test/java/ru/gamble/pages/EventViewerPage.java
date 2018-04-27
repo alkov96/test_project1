@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.gamble.pages.utility.Constants.PERIOD;
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 @PageEntry(title = "Просмотр событий")
@@ -65,6 +66,8 @@ public class EventViewerPage extends AbstractPage {
 
         selectPeriod.click();
         selectPeriod.findElement(By.xpath("//*[contains(text(),'" + value + "')]")).click();
+        workWithPreloader();
+
     }
 
     @ActionTitle("проверяет время игр")
@@ -83,8 +86,8 @@ public class EventViewerPage extends AbstractPage {
         WebElement isOpenMenu;
 
         LOG.info("Ищем главные категории событий.");
-        // Ожидание появения хотя-бы одного события
 
+        // Ожидание появения хотя-бы одного события
         List<WebElement> listMainCategoriesOfEvents = getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents))
                 .stream().filter(e -> e.isDisplayed() && !(e.getText().isEmpty())).limit(valueLimit).collect(Collectors.toList());
         LOG.info("Найдено видов категорий событий::" + listMainCategoriesOfEvents.size());
@@ -99,6 +102,7 @@ public class EventViewerPage extends AbstractPage {
                 isOpenMenu = event.findElement(By.xpath(".."));
                 if (!isOpenMenu.getAttribute("class").contains("active")) {
                     event.click();
+                    workWithPreloader();
                 }
 
                 String match = event.getText();
@@ -128,6 +132,7 @@ public class EventViewerPage extends AbstractPage {
                         isOpenMenu = sport.findElement(By.xpath("..//*[contains(@class,'left-menu__list-item-sport ng-scope')]"));
                         if (!isOpenMenu.getAttribute("class").contains("active")) {
                             sport.click();
+//                            workWithPreloader();
                         }
 
                         List<WebElement> listCountries = sport.findElements(By.xpath(xpathCountry))
@@ -140,6 +145,7 @@ public class EventViewerPage extends AbstractPage {
                 } else {
                     if (!event.findElement(By.xpath("..")).getAttribute("class").contains("active")) {
                         event.click();
+//                        workWithPreloader();
                     }
 
                     List<WebElement> listCountries = event.findElements(By.xpath(xpathCountries))
@@ -162,7 +168,10 @@ public class EventViewerPage extends AbstractPage {
         for (WebElement country: listCompetitions) {
             LOG.info(country.getText());
             // Если меню страны не открыта, то открываем
-            if(!country.findElement(By.xpath("..")).getAttribute("class").contains("active")){ country.click();}
+            if(!country.findElement(By.xpath("..")).getAttribute("class").contains("active")){
+                country.click();
+                workWithPreloader();
+            }
             // Ищем список игровых событий в данной стране
             List<WebElement> listGames = country.findElements(By.xpath(xpathGames))
                     .stream().filter(el -> el.isDisplayed()).limit(valueLimit).collect(Collectors.toList());
@@ -170,6 +179,7 @@ public class EventViewerPage extends AbstractPage {
                 for (WebElement gameItem : listGames) {
                     LOG.info(gameItem.getText());
                     gameItem.click();
+                    workWithPreloader();
                     checkGames(country, valuePeriod, valueLimit);
                 }
             }else {
