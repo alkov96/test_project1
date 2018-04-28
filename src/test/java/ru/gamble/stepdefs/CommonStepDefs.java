@@ -39,11 +39,8 @@ public class CommonStepDefs{
             LOG.error(e1.getMessage());
         }
         if(button.isDisplayed()){
-            if(!button.getAttribute("href").isEmpty()){
-                String url = button.getAttribute("href");
-                PageFactory.getWebDriver().get(url);
-            }else { button.click();}
-            workWithPreloader();
+        button.click();
+        workWithPreloader();
         }
     }
 
