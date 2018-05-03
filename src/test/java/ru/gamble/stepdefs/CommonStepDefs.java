@@ -21,6 +21,8 @@ import ru.sbtqa.tag.qautils.properties.Props;
 import javax.print.DocFlavor;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class CommonStepDefs{
 
@@ -41,6 +43,8 @@ public class CommonStepDefs{
         if(button.isDisplayed()){
         button.click();
         workWithPreloader();
+        }else {
+            LOG.error("ОШИБКА! Кнопка невидима.");
         }
     }
 
@@ -62,14 +66,14 @@ public class CommonStepDefs{
     // Ожидание появления элемента на странице
     public static void waitShowElement(By by){
         WebDriver driver = PageFactory.getWebDriver();
-        WebDriverWait driverWait = new WebDriverWait(driver, 3, 250);
+        WebDriverWait driverWait = new WebDriverWait(driver,1);
         try{
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
             LOG.info("Найдено прелоадеров::" + preloaders.size());
             driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
+            LOG.info("Прелоадеры закрылись");
         }catch (TimeoutException te){
-            LOG.info("Прелоадер НЕ появился");
         }
     }
 
@@ -77,5 +81,12 @@ public class CommonStepDefs{
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage(){
         PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
+    }
+
+    @Когда("^сохраняем в память таблицу$")
+    public static void saveKeyValueTable(DataTable dataTable){
+        Map<String, String> date = dataTable.asMap(String.class, String.class);
+        int birthDay, birthMonth, birthYear;
+        String berthdayDate;
     }
 }

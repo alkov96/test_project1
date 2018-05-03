@@ -1,6 +1,5 @@
 package ru.gamble.pages;
 
-import gherkin.lexer.Pa;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -21,13 +20,11 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.gamble.pages.utility.Constants.PERIOD;
+import static ru.gamble.utility.Constants.PERIOD;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
@@ -133,7 +130,6 @@ public class EventViewerPage extends AbstractPage {
                         isOpenMenu = sport.findElement(By.xpath("..//*[contains(@class,'left-menu__list-item-sport ng-scope')]"));
                         if (!isOpenMenu.getAttribute("class").contains("active")) {
                             sport.click();
-//                            workWithPreloader();
                         }
 
                         List<WebElement> listCountries = sport.findElements(By.xpath(xpathCountry))
@@ -146,7 +142,6 @@ public class EventViewerPage extends AbstractPage {
                 } else {
                     if (!event.findElement(By.xpath("..")).getAttribute("class").contains("active")) {
                         event.click();
-//                        workWithPreloader();
                     }
 
                     List<WebElement> listCountries = event.findElements(By.xpath(xpathCountries))
