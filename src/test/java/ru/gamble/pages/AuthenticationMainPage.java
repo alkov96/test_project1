@@ -16,8 +16,8 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 
 @PageEntry(title = "Авторизованная Главная страница")
-public class AutotentificationMainPage extends AbstractPage {
-    private static final Logger LOG = LoggerFactory.getLogger(AutotentificationMainPage.class);
+public class AuthenticationMainPage extends AbstractPage {
+    private static final Logger LOG = LoggerFactory.getLogger(AuthenticationMainPage.class);
 
     @FindBy(id = "topPanelWalletBalance")
     private WebElement pageTitle;
@@ -26,10 +26,10 @@ public class AutotentificationMainPage extends AbstractPage {
     @FindBy(id = "user-icon")
     private WebElement userIconButton;
 
-    public AutotentificationMainPage() {
+    public AuthenticationMainPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 }
