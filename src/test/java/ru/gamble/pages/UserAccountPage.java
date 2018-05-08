@@ -1,11 +1,13 @@
 package ru.gamble.pages;
 
+import cucumber.api.DataTable;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.utility.Generators;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -15,11 +17,11 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import static ru.gamble.utility.Constants.PASSWORD;
-import static ru.gamble.utility.Constants.RANDOM;
+import static ru.gamble.utility.Constants.*;
 
 @PageEntry(title = "Учетная запись")
 public class UserAccountPage extends AbstractPage{
@@ -28,17 +30,7 @@ public class UserAccountPage extends AbstractPage{
     @FindBy(xpath = "//*[text()='Учетная запись']")
     private WebElement pageTitle;
 
-    @ElementTitle("День")
-    @FindBy(className = "inpD")
-    protected WebElement fieldDay;
 
-    @ElementTitle("Месяц")
-    @FindBy(className = "inpM")
-    protected WebElement fieldMonth;
-
-    @ElementTitle("Год")
-    @FindBy(className = "inpY")
-    protected WebElement fieldYear;
 
     @ElementTitle("Фамилия")
     @FindBy(id = "surname")
@@ -92,50 +84,34 @@ public class UserAccountPage extends AbstractPage{
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
+    @ActionTitle("заполняет форму с")
+    public void fillsForm(DataTable dataTable){
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
 
-    /**
-     * Метод ввода даты рождения
-     *
-     * @param date  - строка либо с датой формата 'DD.MM.YYYY', либо 'random'
-     *              случайной генерации даты
-     */
-    @ActionTitle("вводит дату рождения")
-    public void inputBerthdayDate(String date){
+        enterDate(data.get(DATEOFBIRTH));
 
-        if(date.contains(RANDOM)){
-            LOG.info("Вводим случайную дату рождения");
-            selectMenu(fieldDay);
-            selectMenu(fieldMonth);
-            selectMenu(fieldYear);
+        if(data.get(FIO).contains(RANDOM)){
+            LOG.info("Вводим случайные ФИО");
+            fillField(inputSurname,Generators.randomString(25));
+            fillField(inputName,Generators.randomString(25));
+            fillField(inputPatronymic,Generators.randomString(25));
         }else{
-            String[] tmp = date.split(".");
-            LOG.info("Вводим дату рождения");
-            selectMenu(fieldDay,Integer.parseInt(tmp[0]));
-            selectMenu(fieldMonth,Integer.parseInt(tmp[1]));
-            selectMenu(fieldYear,Integer.parseInt(tmp[2]));
+            String[] tmp = data.get(FIO).split("\\s");
+            LOG.info("Вводим ФИО");
+            fillField(inputSurname,tmp[0]);
+            fillField(inputName,tmp[1]);
+            fillField(inputPatronymic,tmp[2]);
         }
-    }
 
+        LOG.info("Вводим e-mail");
+        fillField(inputEmail, Stash.getValue(data.get(EMAIL)));
+        LOG.info("Вводим пароль");
+        String password = data.get(PASSWORD);
+        fillField(passwordInput, password);
+        LOG.info("Вводим подтверждения пароля");
+        fillField(confirmPasswordInput, password);
 
-    /**
-     * Открывает выпадающий список и выбирает оттуда пункт случайным образом
-     *
-     * @param element  - поле где ждем выпадающий список
-     * @param max - максимальный пункт, который можно выбрать (включая этот max). Второго параметра может и не быть. тогда максимум - это длина всего списка
-     * @return Возвращает номер пункта который был выбран
-     */
-    private int selectMenu(WebElement element, int max) {
-        WebDriver driver = PageFactory.getWebDriver();
-        int menuSize = element.findElements(By.xpath("custom-select/div[2]/div")).size();
-        menuSize -= (max + 1);
-        int select = 1 + (int) (Math.random() * menuSize);
-        element.findElement(By.xpath("custom-select")).click();
-        element.findElement(By.xpath("custom-select/div[2]/div[" + select + "]")).click();
-        return select;
-    }
-
-    private int selectMenu(WebElement element) {
-        return selectMenu(element, 0);
+        enterSellphone(data.get(NUMBERPHONE));
     }
 
     /**
@@ -149,9 +125,9 @@ public class UserAccountPage extends AbstractPage{
 
         if(fio.contains(RANDOM)){
             LOG.info("Вводим случайные ФИО");
-            fillField(inputSurname,randomString(25).toString());
-            fillField(inputName,randomString(25).toString());
-            fillField(inputPatronymic,randomString(25).toString());
+            fillField(inputSurname,Generators.randomString(25));
+            fillField(inputName,Generators.randomString(25));
+            fillField(inputPatronymic,Generators.randomString(25));
         }else{
             String[] tmp = fio.split("\\s");
             LOG.info("Вводим ФИО");
@@ -160,23 +136,6 @@ public class UserAccountPage extends AbstractPage{
             fillField(inputPatronymic,tmp[2]);
         }
     }
-
-    /**
-     * Случайная строка русских символов (и большие и маленькие буквы сразу)
-     *
-     * @param len - максимальная длина строки. но может быть и меньше
-     * @return возвращает получившуюся строку
-     */
-    private StringBuilder randomString(int len) {
-
-        StringBuilder result = new StringBuilder();
-        int count = (int) (1 + Math.random() * len);
-        for (int i = 0; i <= count; i++) {
-            result.append((char) ('А' + new Random().nextInt(64)));
-        }
-        return result;
-    }
-
 
     /**
      * Метод ввода поле email
@@ -195,15 +154,14 @@ public class UserAccountPage extends AbstractPage{
      *
      * @param value вводимое значение
      */
-    @ActionTitle("вводит номер тел")
-    public void enterSellphone(String value){
+    private void enterSellphone(String value){
         WebDriver driver = PageFactory.getWebDriver();
         String phone;
         int count = 1;
         do {
             if(value.contains(RANDOM)) {
                 LOG.info("Вводим случайный номер телефона");
-                phone = "0" + randomNumber(10);
+                phone = "0" + Generators.randomNumber(10);
                 fillField(cellFoneInput,phone);
             }else {
                 LOG.info("Вводим номер телефона");
@@ -241,8 +199,6 @@ public class UserAccountPage extends AbstractPage{
         LOG.info("Вводим полученный SMS-код : " + code);
 
         fillField(cellFoneConformationInput,code);
-
-        //private final String password = "Parol123";
     }
 
     /**

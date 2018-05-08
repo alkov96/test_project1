@@ -13,24 +13,22 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-@PageEntry(title = "Поздравляем!")
-public class CongratulationPage extends AbstractPage{
+@PageEntry(title = "Видеозвонок")
+public class VideocallPage extends AbstractPage{
+    private static final Logger LOG = LoggerFactory.getLogger(INNorSNILSPage.class);
 
-    private static final Logger LOG = LoggerFactory.getLogger(CongratulationPage.class);
-
-    @FindBy(xpath = "//div[@class='modal__title' and text()='Поздравляем!']")
+    @FindBy(xpath = "//*[text()='Видеозвонок']")
     private WebElement pageTitle;
 
-    @ElementTitle("Ок")
-    @FindBy(xpath = "//div[@class='modal__btn-row']/button[text()='Ок']")
-    private WebElement oKButton;
+    @ElementTitle("Продолжить регистрацию")
+    @FindBy(id = "continue-registration")
+    private WebElement continueRegistrtationButton;
 
-    public CongratulationPage() {
+
+    public VideocallPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
-
-
 }

@@ -13,24 +13,24 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-@PageEntry(title = "Поздравляем!")
-public class CongratulationPage extends AbstractPage{
+import java.time.LocalTime;
 
-    private static final Logger LOG = LoggerFactory.getLogger(CongratulationPage.class);
+@PageEntry(title = "Лайв")
+public class LivePage extends AbstractPage{
+    private static final Logger LOG = LoggerFactory.getLogger(LivePage.class);
 
-    @FindBy(xpath = "//div[@class='modal__title' and text()='Поздравляем!']")
-    private WebElement pageTitle;
+    @ElementTitle("Лайв-обзор")
+    @FindBy(id = "live-overview")
+    private WebElement liveOverviewLink;
 
-    @ElementTitle("Ок")
-    @FindBy(xpath = "//div[@class='modal__btn-row']/button[text()='Ок']")
-    private WebElement oKButton;
+    @ElementTitle("Мультимонитор")
+    @FindBy(id = "multimonitor")
+    private WebElement multimonitorLink;
 
-    public CongratulationPage() {
+    public LivePage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(liveOverviewLink));
     }
-
-
 }
