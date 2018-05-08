@@ -160,11 +160,11 @@ public class UserAccountPage extends AbstractPage{
         int count = 1;
         do {
             if(value.contains(RANDOM)) {
-                LOG.info("Вводим случайный номер телефона");
                 phone = "0" + Generators.randomNumber(10);
+                LOG.info("Вводим случайный номер телефона::" + phone);
                 fillField(cellFoneInput,phone);
             }else {
-                LOG.info("Вводим номер телефона");
+                LOG.info("Вводим номер телефона::" + value);
                 fillField(cellFoneInput,value);
             }
 
