@@ -135,11 +135,9 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     private static void workWithDB(String sqlRequest){
-
         Connection con = DBUtils.getConnection();
         PreparedStatement ps = null;
         int rs;
-
         try {
             con.setAutoCommit(false);
             ps = con.prepareStatement(sqlRequest);

@@ -72,7 +72,5 @@ public class EnterPage extends AbstractPage {
 
         fillField(inputLogin,login);
         fillField(inputPassword,password);
-
-        CommonStepDefs.pressButton("Войти");
     }
 }

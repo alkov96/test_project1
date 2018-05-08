@@ -20,7 +20,7 @@ public class AutotentificationMainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(AutotentificationMainPage.class);
 
     @FindBy(id = "topPanelWalletBalance")
-    private static WebElement pageTitle;
+    private WebElement pageTitle;
 
     @ElementTitle("Иконка юзера")
     @FindBy(id = "user-icon")
