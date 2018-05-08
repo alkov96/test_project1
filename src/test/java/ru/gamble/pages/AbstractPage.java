@@ -32,9 +32,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.DATEOFBIRTH;
 import static ru.gamble.utility.Constants.RANDOM;
-import static ru.gamble.utility.Generators.randomNumber;
 import static ru.gamble.utility.Generators.randomString;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 

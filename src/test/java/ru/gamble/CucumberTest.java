@@ -9,9 +9,12 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -36,8 +39,8 @@ public class CucumberTest {
 //        LOG.info(LocalTime.now().toString());
         WebDriver driver = PageFactory.getWebDriver();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-//        driver.manage().window().setSize(new Dimension(1920, 1080));
-//        final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
+        driver.manage().window().setSize(new Dimension(1920, 1080));
+       final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
         Locale.setDefault(new Locale("ru"));
     }
 
