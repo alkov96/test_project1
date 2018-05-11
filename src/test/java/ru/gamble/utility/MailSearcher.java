@@ -37,63 +37,63 @@ public class MailSearcher {
         return null;
     }
 
-    private String linkSearcher(String mail, Properties properties) throws Exception {
+    private String linkSearcher(String mail, Properties properties)  {
+        Store store = null;
+        Folder inbox;
+        String link = "";
+        Message message;
 
         //Получить почтовую сессию
         Session session = Session.getInstance(properties);
-
         session.setDebug(false);
 
-        Store store = session.getStore(properties.get(PROTOCOL).toString());
-
-        //подключаемся к почтовому серверу
-        store.connect(properties.get(HOST).toString(), properties.get(USER).toString(), properties.get(PASS).toString());
-
-        //получаем папку с входящими сообщениями
-        Folder inbox = store.getFolder("INBOX");
-        //открываем её для чтения и записи
-        inbox.open(Folder.READ_WRITE);
-
-        int count = 5;
-
-        while (inbox.getMessageCount() == 0 && count >= 0) {
-            if (count == 0) {
-                LOG.info("Время ожидания истекло. Письмо не было доставлено.");
-                return null;
-            }
-            LOG.info("Нет новых писем. Количество попыток : " + count);
-            Thread.sleep(5000);
-            count--;
-        }
-
-        LOG.info("Получено писем : " + String.valueOf(inbox.getMessageCount()));
-
-        String link = null;
-        Message message;
-
-        //Ищем в коллекции письмо с нужным адресатом
-        for (int i = 1; i <= inbox.getMessageCount(); i++) {
-            message = inbox.getMessage(i);
-
-            if (mail.equals(message.getHeader("To")[0])) {
-                LOG.info("Письмо получено");
-                link = getVerifyLink(message);
-
-                if (!Strings.isNullOrEmpty(link)) {
-                    LOG.info("Параметр для аутентификации : " + link);
-                    message.setFlag(Flags.Flag.DELETED, true);
-                    break;
+        try {
+            store = session.getStore(properties.get(PROTOCOL).toString());
+            //подключаемся к почтовому серверу
+            store.connect(properties.get(HOST).toString(), properties.get(USER).toString(), properties.get(PASS).toString());
+            //открываем её для чтения и записи
+            inbox = store.getFolder("INBOX");
+            inbox.open(Folder.READ_WRITE);
+            int count = 5;
+            while (inbox.getMessageCount() == 0 && count >= 0) {
+                if (count == 0) {
+                    LOG.info("Время ожидания истекло. Письмо не было доставлено.");
+                    return null;
                 }
-                LOG.info("Link is null or empty. Return null");
-                message.setFlag(Flags.Flag.DELETED, true);
-                continue;
+                LOG.info("Нет новых писем. Количество попыток : " + count);
+                Thread.sleep(5000);
+                count--;
             }
 
-            LOG.info("Письмо адресовано к " + message.getHeader("To")[0] + ". Письмо будет удалено после окончания сессии");
-            message.setFlag(Flags.Flag.DELETED, true);
+            //Ищем в коллекции письмо с нужным адресатом
+            for (int i = 1; i <= inbox.getMessageCount(); i++) {
+                message = inbox.getMessage(i);
+                if (mail.equals(message.getHeader("To")[0])) {
+                    LOG.info("Письмо получено");
+                    link = getVerifyLink(message);
+                    if (!Strings.isNullOrEmpty(link)) {
+                        LOG.info("Параметр для аутентификации : " + link);
+                        message.setFlag(Flags.Flag.DELETED, true);
+                        break;
+                    }
+                    LOG.info("Link is null or empty. Return null");
+                    message.setFlag(Flags.Flag.DELETED, true);
+                    continue;
+                }
+                LOG.info("Письмо адресовано к " + message.getHeader("To")[0] + ". Письмо будет удалено после окончания сессии");
+                message.setFlag(Flags.Flag.DELETED, true);
+            }
+            LOG.info("Получено писем::" + String.valueOf(inbox.getMessageCount()));
+            inbox.close(true);
+        } catch (NoSuchProviderException nspe) {
+            nspe.printStackTrace();
+        } catch (MessagingException me) {
+            me.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        inbox.close(true);
-
         return link;
     }
 
