@@ -2,13 +2,11 @@ package ru.gamble.utility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.RegistrationPages.PassportDataPage;
-import ru.sbtqa.tag.datajack.exceptions.DataException;
 
 import java.sql.*;
 
 public class DBUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(PassportDataPage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DBUtils.class);
 
 
     public static Connection getConnection(){

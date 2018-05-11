@@ -1,4 +1,4 @@
-package ru.gamble.pages.RegistrationPages;
+package ru.gamble.pages.registrationPages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,24 +14,21 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-@PageEntry(title = "Поздравляем!")
-public class CongratulationPage extends AbstractPage{
+@PageEntry(title = "Учётная запись подтверждена")
+public class AccountСonfirmedPage extends AbstractPage {
+    private static final Logger LOG = LoggerFactory.getLogger(AccountСonfirmedPage.class);
 
-    private static final Logger LOG = LoggerFactory.getLogger(CongratulationPage.class);
-
-    @FindBy(xpath = "//div[@class='modal__title' and text()='Поздравляем!']")
+    @FindBy(xpath = "//*[contains(text(),'Чтобы начать заключать пари, введите')]")
     private WebElement pageTitle;
 
-    @ElementTitle("Ок")
-    @FindBy(xpath = "//div[@class='modal__btn-row']/button[text()='Ок']")
-    private WebElement oKButton;
+    @ElementTitle("Продолжить")
+    @FindBy(xpath = "//a[@class = 'btn_important' and text()='продолжить']")
+    private WebElement continueButton;
 
-    public CongratulationPage() {
+    public AccountСonfirmedPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
-
-
 }

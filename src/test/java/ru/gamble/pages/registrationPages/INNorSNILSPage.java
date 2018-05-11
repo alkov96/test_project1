@@ -1,4 +1,4 @@
-package ru.gamble.pages.RegistrationPages;
+package ru.gamble.pages.registrationPages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
