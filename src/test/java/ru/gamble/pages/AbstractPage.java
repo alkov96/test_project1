@@ -256,15 +256,6 @@ public abstract class AbstractPage extends Page {
         workWithPreloader();
     }
 
-
-    @ActionTitle("убирает события из купона, пока их не станет")
-    public void removeEventsFromCoupon(String param){
-        int count = Integer.parseInt(param);
-        while (PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']")).size()>count){
-            PageFactory.getWebDriver().findElement(By.xpath("//span[@ng-click='removeBet(bet)']")).click();
-        }
-    }
-
     public void fillCouponFinal(int count, String ifForExperss, By findCoeffs) {
         if (ifForExperss == "correct") {
             List<WebElement> eventsInCoupon;
@@ -279,20 +270,27 @@ public abstract class AbstractPage extends Page {
                 clickElement(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
                 if (eventsInCoupon.size() == count) {
-                        break;
+                    break;
                 }
             }
         }
         if (ifForExperss == "incorrect") {
             List<WebElement> eventsInCoupon;
-            List<WebElement> correctMarkets;
+            List<WebElement> inCorrectMarkets = null;
             waitForElementPresent(findCoeffs,1000);
+            List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
+            int tryPage = 0;
             do {
-                correctMarkets = getWebDriver().findElements(findCoeffs)
-                        .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) < 1.25)
-                        .limit(count+20).collect(Collectors.toList());
-            }  while (correctMarkets.size() < count);
-            for (WebElement coefficient : correctMarkets) {
+                try {
+                    inCorrectMarkets = getWebDriver().findElements(findCoeffs)
+                            .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) < 1.25)
+                            .limit(count+3).collect(Collectors.toList());
+                } catch (StaleElementReferenceException e){
+                    tryPage ++;
+                    allDaysPages.get(tryPage).click();
+                }
+            }  while (inCorrectMarkets.size() < count && tryPage < allDaysPages.size()-1);
+            for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
                 if (eventsInCoupon.size() == count) {
@@ -302,14 +300,6 @@ public abstract class AbstractPage extends Page {
         }
         if (ifForExperss == "no") {
 
-        }
-    }
-
-    @ActionTitle("очищает купон")
-    public void clearCoupon(){
-        WebElement clearAllBottom = PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']"));
-        if (clearAllBottom.isDisplayed()){ //очистка купона
-            PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).click();
         }
     }
 

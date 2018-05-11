@@ -1,6 +1,7 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
+import cucumber.api.java.ru.И;
 import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -155,5 +156,11 @@ public class CommonStepDefs extends GenericStepDefs {
                 PageFactory.getWebDriver().switchTo().window(windowHandle);
             }
         PageFactory.getInstance().getPage(title);
+    }
+
+//    @Override
+    @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
+    public void changeFocusOnPage(String title) throws PageInitializationException {
+        super.openPage(title);
     }
 }

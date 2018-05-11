@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.CouponPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
@@ -72,27 +73,6 @@ public class LiveCalendarPage extends AbstractPage {
         fillCouponFinal(Integer.parseInt(value), "incorrect", By.xpath("//div[contains(@class,'livecal-table__coefficient')]"));
     }
 
-    @ActionTitle("проверяет отсутствие ссылки О бонусах к экспрессу и текста о бонусе")
-    public void checkBonusFalse(){
-        checkBonus(false);
-    }
-
-    @ActionTitle("проверяет корректность ссылки О бонусах к экспрессу и текста о бонусе")
-    public void checkBonusTrue(){
-        checkBonus(true);
-    }
-
-    public void checkBonus(boolean except){
-        if (!except){
-            WebElement couponBonusInfo = PageFactory.getWebDriver().findElement(By.xpath("//span[@ng-bind='getExpressBonusPercent()']"));
-            assertThat(false, equalTo(couponBonusInfo.isDisplayed()));
-            WebElement couponBonusInfoLink = PageFactory.getWebDriver().findElement(By.xpath("//div[@class='coupon-bonus-info coupon-bonus-info-link']"));
-            assertThat(false, equalTo(couponBonusInfoLink.isDisplayed()));
-            } else {
-            assertThat("о бонусах к экспрессу", equalTo(PageFactory.getWebDriver().findElement(By.xpath("//a[@href='/rules/express-bonus']")).getText())); // проверка корректности ссылки
-            assertThat(PageFactory.getWebDriver().findElements(By.xpath("//ul[contains(@class, 'coupon-bet-list')]")).size() + 1 + "% к выигрышу за еще одно событие\nс коэффициентом от 1.25", equalTo(PageFactory.getWebDriver().findElement(By.xpath("//div[@class='coupon-bonus-info']")).getText())); // проверка корректности текста
-        }
-    }
 
 
 }
