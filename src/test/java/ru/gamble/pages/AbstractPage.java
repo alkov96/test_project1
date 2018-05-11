@@ -255,7 +255,7 @@ public abstract class AbstractPage extends Page {
         LOG.info("Получили и перешли по ссылке::"+link);
         workWithPreloader();
     }
-}
+
 
     @ActionTitle("убирает события из купона, пока их не станет")
     public void removeEventsFromCoupon(String param){

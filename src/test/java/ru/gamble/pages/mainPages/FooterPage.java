@@ -1,32 +1,25 @@
-package ru.gamble.pages;
+package ru.gamble.pages.mainPages;
 
-import cucumber.api.DataTable;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
-import ru.sbtqa.tag.pagefactory.exceptions.PageException;
-import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
-import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @PageEntry(title = "Подвал сайта")
-public class FooterPage extends AbstractPage{
+public class FooterPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FooterPage.class);
 
     @FindBy(xpath = "//*[contains(@class,'f_logo')]")

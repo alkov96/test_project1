@@ -1,4 +1,4 @@
-package ru.gamble.pages;
+package ru.gamble.pages.RegistrationPages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -7,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -19,7 +20,7 @@ import java.util.Random;
 
 
 @PageEntry(title = "ИНН или СНИЛС")
-public class INNorSNILSPage extends AbstractPage{
+public class INNorSNILSPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(INNorSNILSPage.class);
 
     @FindBy(xpath = "//*[text()='ИНН или СНИЛС']")

@@ -7,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.gamble.pages.userProfilePages.UserAccountPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -15,7 +16,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 @PageEntry(title = "Учётная запись подтверждена")
-public class AccountСonfirmedPage extends AbstractPage{
+public class AccountСonfirmedPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(AccountСonfirmedPage.class);
 
     @FindBy(xpath = "//*[contains(text(),'Чтобы начать заключать пари, введите')]")
