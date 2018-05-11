@@ -1,4 +1,4 @@
-package ru.gamble.pages;
+package ru.gamble.pages.userProfilePages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
@@ -6,6 +6,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -22,7 +23,7 @@ import static ru.gamble.utility.Constants.PASSWORD;
 import static ru.gamble.utility.Constants.RANDOM;
 
 @PageEntry(title = "Учетная запись")
-public class UserAccountPage extends AbstractPage{
+public class UserAccountPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(UserAccountPage.class);
 
     @FindBy(xpath = "//*[text()='Учетная запись']")

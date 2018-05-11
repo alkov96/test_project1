@@ -1,6 +1,5 @@
-package ru.gamble.pages;
+package ru.gamble.pages.RegistrationPages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -8,24 +7,31 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
-import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-@PageEntry(title = "Учётная запись подтверждена")
-public class AccountСonfirmedPage extends UserAccountPage{
-    private static final Logger LOG = LoggerFactory.getLogger(AccountСonfirmedPage.class);
+public class PassportDataPage extends AbstractPage {
+    private static final Logger LOG = LoggerFactory.getLogger(PassportDataPage.class);
 
-    @FindBy(xpath = "//*[contains(text(),'Чтобы начать заключать пари, введите')]")
+    @FindBy(xpath = "//*[text()='Паспортные данные']")
     private WebElement pageTitle;
 
-    @ElementTitle("Продолжить")
-    @FindBy(xpath = "//a[@class = 'btn_important' and text()='продолжить']")
-    private WebElement continueButton;
+    @ElementTitle("Серия")
+    @FindBy(id = "passpserial")
+    private WebElement passpSerialInput;
 
-    public AccountСonfirmedPage() {
+    @ElementTitle("Номер")
+    @FindBy(id = "passpserialnum")
+    private WebElement passpNumberInput;
+
+
+
+
+
+    public PassportDataPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);

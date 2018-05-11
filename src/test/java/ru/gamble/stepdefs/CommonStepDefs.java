@@ -81,6 +81,7 @@ public class CommonStepDefs{
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage(){
         PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
+        WebDriver driver = PageFactory.getWebDriver();
     }
 
     @Когда("^сохраняем в память таблицу$")
