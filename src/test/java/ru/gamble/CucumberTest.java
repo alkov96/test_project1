@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.pagefactory.stepdefs"},
         features = {"src/test/resources/features/"},
         plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
-        tags = {"@smoke"})
+        tags = {"@5"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
@@ -37,9 +37,9 @@ public class CucumberTest {
     @BeforeClass
     public static void openBrowser(){
 //        WebDriver driver = PageFactory.getWebDriver();
-//        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+//        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 //        driver.manage().window().setSize(new Dimension(1920, 1080));
-//       final Wait<WebDriver> wait = new WebDriverWait(driver, 10, 500);
+//       final Wait<WebDriver> wait = new WebDriverWait(driver, 1, 250);
         Locale.setDefault(new Locale("ru"));
     }
 

@@ -2,7 +2,6 @@ package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.ru.Когда;
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -19,15 +18,15 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.pagefactory.stepdefs.GenericStepDefs;
+import ru.sbtqa.tag.pagefactory.support.Environment;
 import ru.sbtqa.tag.qautils.properties.Props;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 public class CommonStepDefs extends GenericStepDefs {
 
@@ -60,6 +59,7 @@ public class CommonStepDefs extends GenericStepDefs {
         key = data.get(0);
         value = data.get(1);
         Stash.put(key,value);
+        LOG.info("key:" + key + "| value::" + value);
     }
 
     // Метод ожидания появления и изчезновения прелоадера при методе click()
@@ -71,7 +71,7 @@ public class CommonStepDefs extends GenericStepDefs {
     // Ожидание появления элемента на странице
     public static void waitShowElement(By by){
         WebDriver driver = PageFactory.getWebDriver();
-        WebDriverWait driverWait = new WebDriverWait(driver,6, 250);
+        WebDriverWait driverWait = new WebDriverWait(driver,1, 250);
         try{
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
@@ -95,16 +95,6 @@ public class CommonStepDefs extends GenericStepDefs {
         String berthdayDate;
     }
 
-    @ActionTitle("переходим по ссылке")
-    public static void goesByReference(String param)throws PageInitializationException,PageException{
-        Page page = null;
-        WebElement element = null;
-        page = PageFactory.getInstance().getCurrentPage();
-        String link =  page.getElementByTitle(param).getAttribute("href");
-        PageFactory.getWebDriver().get(link);
-        workWithPreloader();
-    }
-
     /**
      * Генератор e-mail
      *
@@ -113,7 +103,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда ("^генерим email в \"([^\"]*)\"$")
     public static void generateEmailAndSave(String key){
         String value = "testregistrator+" + System.currentTimeMillis() + "@yandex.ru";
-        LOG.info("Сохраняем в память (ключ):" + key + ":(значение)::" + value);
+        LOG.info("Сохраняем в память key:" + key + "|value::" + value);
         Stash.put(key,value);
     }
 
@@ -148,5 +138,21 @@ public class CommonStepDefs extends GenericStepDefs {
         }finally {
             DBUtils.closeAll(con,ps,null);
         }
+    }
+
+
+    /**
+     * Инициализируйте страницу с соответствующим заголовком (определенным через
+     * {@link ru.sbtqa.tag.pagefactory.annotations.PageEntry} аннотация)
+     * Пользователь|Он ключевые слова являются необязательными
+     *
+     * @param title название страницы для инициализации
+     * @throws PageInitializationException при неудачной инициализации страницы
+     */
+    public void openPage(String title) throws PageInitializationException {
+            for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
+                PageFactory.getWebDriver().switchTo().window(windowHandle);
+            }
+        PageFactory.getInstance().getPage(title);
     }
 }

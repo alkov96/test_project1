@@ -1,8 +1,6 @@
 package ru.gamble.pages;
 
 import cucumber.api.DataTable;
-import cucumber.api.java.en.When;
-import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -24,6 +22,8 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
+import ru.sbtqa.tag.pagefactory.stepdefs.en.StepDefs;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 
 import java.util.List;
 import java.util.Map;
@@ -65,7 +65,7 @@ public abstract class AbstractPage extends Page {
     public void saveKeyValue(DataTable dataTable){ CommonStepDefs.saveValueToKey(dataTable); }
 
     @ActionTitle("нажимает кнопку")
-    public static void pressButton(String param){
+    public static void pressButtonAP(String param){
         CommonStepDefs.pressButton(param);
         workWithPreloader();
     }
@@ -113,25 +113,6 @@ public abstract class AbstractPage extends Page {
         driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
     }
 
-
-     @ActionTitle("проверяет ссылки")
-     public void checkElementsOfFooter(DataTable dataTable) throws PageInitializationException,PageException {
-         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-         String linkTitle, expextedUrl;
-         String currentUrl = PageFactory.getWebDriver().getCurrentUrl();
-
-         for(int i = 0; i < table.size(); i++) {
-             linkTitle = table.get(0).get("Ссылка");
-
-             CommonStepDefs.goesByReference(linkTitle);
-             PageFactory.getWebDriver().getCurrentUrl();
-             LOG.info("Переходим по ссылке");
-
-
-             expextedUrl = table.get(0).get("Соответсвует");
-         }
-    }
-
     /**
      * Открывает выпадающий список и выбирает оттуда пункт случайным образом
      *
@@ -155,17 +136,18 @@ public abstract class AbstractPage extends Page {
 
     protected void enterDate(String value){
         if(value.equals(RANDOM)){
-            LOG.info("Вводим случайную дату");
+
             do {
-                selectMenu(fieldDay);
-                selectMenu(fieldMonth);
                 selectMenu(fieldYear);
+                selectMenu(fieldMonth);
+                selectMenu(fieldDay);
+                LOG.info("Вводим случайную дату::" );
             } while (PageFactory.getWebDriver().findElement(By.className("inpErrText")).isDisplayed());
         }else {
             String[] tmp = value.split(".");
             LOG.info("Вводим дату");
-            selectMenu(fieldDay,Integer.parseInt(tmp[0]));
             selectMenu(fieldMonth,Integer.parseInt(tmp[1]));
+            selectMenu(fieldDay,Integer.parseInt(tmp[0]));
             selectMenu(fieldYear,Integer.parseInt(tmp[2]));
         }
     }
@@ -208,5 +190,21 @@ public abstract class AbstractPage extends Page {
         List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath("//*[text()='" + text + "']"))
                 .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
         assertThat(!list.isEmpty()).as("Ошибка.Не найден::[" + text+ " ]").isTrue();
+    }
+
+
+    /**
+     * Метод который по имени WebElement находит его на текущей странице,
+     * достаёт его ссылку и переходит по ней
+     * @param param - имя WebElement
+     */
+    @ActionTitle("переходит по ссылке")
+    public static void goesByReference(String param)throws PageInitializationException,PageException{
+        Page page = null;
+        page = PageFactory.getInstance().getCurrentPage();
+        String link =  page.getElementByTitle(param).getAttribute("href");
+        PageFactory.getWebDriver().get(link);
+        LOG.info("Получили и перешли по ссылке::"+link);
+        workWithPreloader();
     }
 }

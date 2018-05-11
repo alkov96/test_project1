@@ -1,8 +1,7 @@
 package ru.gamble.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import cucumber.api.DataTable;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -12,12 +11,18 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.pagefactory.exceptions.PageException;
+import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @PageEntry(title = "Подвал сайта")
@@ -75,6 +80,10 @@ public class FooterPage extends AbstractPage{
     @FindBy(xpath = "//a[@href='/hockey']")
     private WebElement onHockeyLink;
 
+    @ElementTitle("На волейбол")
+    @FindBy(xpath = "//a[@href='/volleyball']")
+    private WebElement onVollayballLink;
+
     @ElementTitle("На баскетбол")
     @FindBy(xpath = "//a[@href='/basketball']")
     private WebElement onBasketballLink;
@@ -82,6 +91,10 @@ public class FooterPage extends AbstractPage{
     @ElementTitle("На теннис")
     @FindBy(xpath = "//a[@href='/tennis']")
     private WebElement onTennisLink;
+
+    @ElementTitle("На киберспорт")
+    @FindBy(xpath = "//a[@href='/cybersport']")
+    private WebElement onCybersporLink;
 
     @ElementTitle("Студии Артемия Лебедева")
     @FindBy(xpath = "//a[contains(.,'Лебедева')]")
@@ -117,6 +130,71 @@ public class FooterPage extends AbstractPage{
 
     public final static By partner_title = By.xpath("//div[@class='footer__inner']/div[@class='f2']/div[@class='footer-partners__title']");
     public final static By partners = By.xpath("//div[@class='footer__inner']/div[@class='f2']/div[@class='footer-partners']");
+
+
+//    @ActionTitle("проверяет ссылки c")
+//    public void checkElementsOfFooter(DataTable dataTable) throws PageInitializationException,PageException {
+//        WebDriver driver = PageFactory.getWebDriver();
+//        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+//        String linkTitle, expectedText;
+//        String link = "";
+//        String currentHandle = driver.getWindowHandle();
+//
+//        for(int i = 0; i < table.size(); i++) {
+//            linkTitle = table.get(i).get("Ссылка");
+//            expectedText = table.get(i).get("Соответсвует");
+//
+//            link = PageFactory.getInstance().getCurrentPage().getElementByTitle(linkTitle).getAttribute("href");
+//
+//            JavascriptExecutor js = (JavascriptExecutor) driver;
+//
+//            js.executeScript("second_window = window.open('" + link + "')");
+//            LOG.info("Получили и перешли по ссылке::"+link);
+//
+//            Set<String> windows = driver.getWindowHandles();
+//            windows.remove(currentHandle);
+//            String newWindow = windows.toArray()[0].toString();
+//
+//            driver.switchTo().window(newWindow);
+//            workWithPreloader();
+//            List<WebElement> list;
+//
+//
+//            WebElement requiredElement;
+//            String xpath = ""
+//
+//            new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("bar")));
+//
+//            for(int j = 0; j < 10; j++) {
+//                try {
+//                    new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(requiredElement));
+//                    requiredElement = driver.findElement(By.xpath("//*[contains(text(),'" + expectedText + "')]"));
+//
+//                    LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + list.get(0).getText());
+//                } catch (NoSuchElementException e) {
+//                    driver.navigate().refresh();
+//                }
+//            }
+//
+//            while (driver.findElements(By.xpath("//*[contains(text(),'" + expectedText + "')]")).isEmpty() && j < 10);{
+//                driver.navigate().refresh();
+//
+//                workWithPreloader();
+//                j++;
+//            }
+//            if(j >= 10){
+//                throw new AutotestError("Ошибка! Что-то не так со ссылкой.");
+//            } else {
+//                list = driver.findElements(By.xpath("//*[contains(text(),'" + expectedText + "')]")).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
+//                if(list.isEmpty())
+//                LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + list.get(0).getText());
+//                driver.switchTo().window(currentHandle);
+//                js.executeScript("second_window.close()");
+//            }
+//
+//        }
+//    }
+
 
 
     @ActionTitle("проверяет что число платёжных систем")
