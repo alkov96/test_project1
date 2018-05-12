@@ -1,5 +1,5 @@
 # language: ru
-@ExpressBonus(C39773)
+@ExpressBonus_C39773
 Функционал: Экспресс бонус
   @correct
   Сценарий: Позитивный кейс

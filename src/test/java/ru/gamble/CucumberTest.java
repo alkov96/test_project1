@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.pagefactory.stepdefs"},
         features = {"src/test/resources/features/"},
         plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
-        tags = {"@4"})
+        tags = {"@ExpressBonus_C39773"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
