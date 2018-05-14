@@ -1,6 +1,7 @@
 package ru.gamble.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -13,13 +14,8 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.time.LocalTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 /**
  * @author p.sivak.
@@ -35,13 +31,17 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//span[@class='coupon-clear-all__text ng-binding']")
     private WebElement clearCoupon;
 
-/*    @ActionTitle("очищает купон")
-    public void clearCoupon(){
-        WebElement clearAllBottom = PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']"));
-        if (clearAllBottom.isDisplayed()){ //очистка купона
-            PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).click();
-        }
-    }*/
+    @ElementTitle("экспресс-бонус ссылка")
+    @FindBy(xpath = "//div[@class='coupon-bonus-info coupon-bonus-info-link']")
+    private WebElement expressBonusLink;
+
+    @ElementTitle("текст экспресс бонуса")
+    @FindBy(xpath = "//div[@class='coupon-bonus-info']")
+    private WebElement expressBonusText;
+
+    @ElementTitle("бонус к возможному выйгрышу")
+    @FindBy(xpath = "//p[@class='betting-result-info__total-bonus']")
+    private WebElement bonus;
 
     @ActionTitle("убирает события из купона, пока их не станет")
     public void removeEventsFromCoupon(String param){
@@ -53,23 +53,48 @@ public class CouponPage extends AbstractPage {
 
     @ActionTitle("проверяет отсутствие ссылки О бонусах к экспрессу и текста о бонусе")
     public void checkBonusFalse(){
-        checkBonus(false);
+        checkExpressBonus(false);
     }
 
     @ActionTitle("проверяет корректность ссылки О бонусах к экспрессу и текста о бонусе")
     public void checkBonusTrue(){
-        checkBonus(true);
+        checkExpressBonus(true);
     }
 
-    public void checkBonus(boolean except){
+    @ActionTitle("заполняет сумму для ставки")
+    public void fillSumm(String param1, String param2) {
+        if (param1.equals("Экспресс")) {
+            PageFactory.getWebDriver().findElement(By.xpath("//input[@id='express-bet-input']")).clear();
+            PageFactory.getWebDriver().findElement(By.xpath("//input[@id='express-bet-input']")).sendKeys(param2);
+        }
+    }
+
+    @ActionTitle("проверяет наличие бонуса к возможному выйгрышу")
+    public void checkBonusPresent() {
+        assertThat(true, equalTo(checkBonus()));
+    }
+
+    @ActionTitle("проверяет отсутствие бонуса к возможному выйгрышу")
+    public void checkBonusNotPresent() {
+        assertThat(false, equalTo(checkBonus()));
+    }
+
+    public boolean checkBonus(){
+        try {
+            bonus.isDisplayed();
+            return true;
+        } catch (NoSuchElementException e){
+            return false;
+        }
+    }
+
+    public void checkExpressBonus(boolean except){
         if (!except){
-            WebElement couponBonusInfo = PageFactory.getWebDriver().findElement(By.xpath("//span[@ng-bind='getExpressBonusPercent()']"));
-            assertThat(false, equalTo(couponBonusInfo.isDisplayed()));
-            WebElement couponBonusInfoLink = PageFactory.getWebDriver().findElement(By.xpath("//div[@class='coupon-bonus-info coupon-bonus-info-link']"));
-            assertThat(false, equalTo(couponBonusInfoLink.isDisplayed()));
+            assertThat(false, equalTo(expressBonusLink.isDisplayed()));
+            assertThat(false, equalTo(expressBonusText.isDisplayed()));
         } else {
-            assertThat("о бонусах к экспрессу", equalTo(PageFactory.getWebDriver().findElement(By.xpath("//a[@href='/rules/express-bonus']")).getText())); // проверка корректности ссылки
-            assertThat(PageFactory.getWebDriver().findElements(By.xpath("//ul[contains(@class, 'coupon-bet-list')]")).size() + 1 + "% к выигрышу за еще одно событие\nс коэффициентом от 1.25", equalTo(PageFactory.getWebDriver().findElement(By.xpath("//div[@class='coupon-bonus-info']")).getText())); // проверка корректности текста
+            assertThat("о бонусах к экспрессу", equalTo(expressBonusLink.findElement(By.xpath("a[@href='/rules/express-bonus']")).getText())); // проверка корректности ссылки
+            assertThat(PageFactory.getWebDriver().findElements(By.xpath("//ul[contains(@class, 'coupon-bet-list')]")).size() + 1 + "% к выигрышу за еще одно событие\nс коэффициентом от 1.25", equalTo(expressBonusText.getText())); // проверка корректности текста
         }
     }
 
