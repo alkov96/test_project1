@@ -38,7 +38,7 @@ public class CucumberTest {
     public static void openBrowser(){
 //        LOG.info(LocalTime.now().toString());
         WebDriver driver = PageFactory.getWebDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 //        driver.manage().window().setSize(new Dimension(1920, 1080));
 //        final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
         Locale.setDefault(new Locale("ru"));

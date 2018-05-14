@@ -48,6 +48,5 @@ public class MainPage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOf(pageTitle));
-        LOG.info(LocalTime.now().toString());
     }
 }
