@@ -28,7 +28,6 @@ public class Generators {
         return result.toString();
     }
 
-
     /**
      * Генератор даты рождения
      *
@@ -75,6 +74,18 @@ public class Generators {
      */
     public static String randomCity(){
         return Constants.cities.get(new Random().nextInt(Constants.cities.size()));
+    }
+
+    /**
+     * Генератор e-mail
+     *
+     * @param key - ключ по которому сохраняем е-mail в памяти.
+     */
+    @ActionTitle("генерит email в")
+    public void generateEmailAndSave(String key){
+        String value = "testregistrator+" + System.currentTimeMillis() + "@yandex.ru";
+        LOG.info("Сохраняем в память (ключ):" + key + ":(значение)::" + value);
+        Stash.put(key,value);
     }
 
 }

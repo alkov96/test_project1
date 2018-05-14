@@ -8,12 +8,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
+import ru.sbtqa.tag.pagefactory.stepdefs.GenericStepDefs;
+import ru.sbtqa.tag.pagefactory.stepdefs.ru.StepDefs;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
@@ -220,6 +223,13 @@ public class FooterPage extends AbstractPage {
         js.executeScript("second_window.close()");
     }
 
+    @ActionTitle("проверяет присутствие ссылки")
+    public void checkSportsbook_888ru(String param){
+        String expected = "https://888.ru/webdav/sportsbook-888ru.apk";
+        String actual = PageFactory.getWebDriver().findElement(By.xpath("//a[contains(.,'" + param + "')]")).getAttribute("href");
+        assertThat(actual)
+              .as("Не найдена ссылка::" + expected).isEqualTo(expected);
+    }
 
     @ActionTitle("проверяет что число платёжных систем")
     public void checkNumberPaymentSystem(String number){

@@ -2,14 +2,10 @@ package ru.gamble.pages;
 
 import cucumber.api.DataTable;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import cucumber.api.java.en.When;
-import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -27,22 +23,13 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
-import ru.sbtqa.tag.pagefactory.stepdefs.en.StepDefs;
-import ru.sbtqa.tag.qautils.errors.AutotestError;
-import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
-
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.RANDOM;
 import static ru.gamble.utility.Generators.randomString;
-import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 
@@ -100,34 +87,6 @@ public abstract class AbstractPage extends Page {
             PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).click();
         }
     }*/
-
-
-    /**
-     * Генератор
-     *
-     * @param len - максимальная длина строки.
-     * @return возвращает получившуюся строку
-     */
-    public String randomNumber(int len) {
-
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < len; i++) {
-            result.append(new Random().nextInt(10));
-        }
-        return result.toString();
-    }
-
-    /**
-     * Генератор e-mail
-     *
-     * @param key - ключ по которому сохраняем е-mail в памяти.
-     */
-    @ActionTitle("генерит email в")
-    public void generateEmailAndSave(String key){
-        String value = "testregistrator+" + System.currentTimeMillis() + "@yandex.ru";
-        LOG.info("Сохраняем в память (ключ):" + key + ":(значение)::" + value);
-        Stash.put(key,value);
-    }
 
     /**
      * Метод получения письма и перехода по ссылке для завершения регистрации на сайте
