@@ -44,6 +44,7 @@
             <artifactId>mail</artifactId>
             <version>1.4.7</version>
         </dependency>
+
         <!--<dependency>-->
             <!--<groupId>org.seleniumhq.selenium</groupId>-->
             <!--<artifactId>selenium-java</artifactId>-->
@@ -109,10 +110,10 @@
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
                 <version>2.9</version>
-                <configuration>
-                    <resultsPattern>target/allure-results</resultsPattern>
-                    <reportVersion>2.6</reportVersion>
-                </configuration>
+                <!--<configuration>-->
+                    <!--<resultsPattern>target/allure-results</resultsPattern>-->
+                    <!--<reportVersion>2.6</reportVersion>-->
+                <!--</configuration>-->
             </plugin>
         </plugins>
     </reporting>

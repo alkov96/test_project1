@@ -1,4 +1,4 @@
-package ru.gamble.pages;
+package ru.gamble.pages.userProfilePages;
 
 import cucumber.api.DataTable;
 import org.openqa.selenium.*;
@@ -7,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.gamble.utility.BeforeTest;
 import ru.gamble.utility.Generators;
 import ru.sbtqa.tag.datajack.Stash;

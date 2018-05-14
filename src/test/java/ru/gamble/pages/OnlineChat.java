@@ -13,22 +13,27 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-@PageEntry(title = "Видеозвонок")
-public class VideocallPage extends AbstractPage{
-    private static final Logger LOG = LoggerFactory.getLogger(INNorSNILSPage.class);
+import java.time.LocalTime;
 
-    @FindBy(xpath = "//*[text()='Видеозвонок']")
-    private WebElement pageTitle;
+/**
+ * @author p.sivak.
+ * @since 11.05.2018.
+ */
+@PageEntry(title = "Онлайн-чат")
+public class OnlineChat extends AbstractPage {
+    private static final Logger LOG = LoggerFactory.getLogger(OnlineChat.class);
 
-    @ElementTitle("Продолжить регистрацию")
-    @FindBy(id = "continue-registration")
-    private WebElement continueRegistrtationButton;
+    @FindBy(xpath = "//div[@id='chat-links']")
+    private WebElement header;
 
+    @ElementTitle("Свернуть")
+    @FindBy(xpath = "//div[@id='webim-chat-close']")
+    private WebElement closeChat;
 
-    public VideocallPage() {
+    public OnlineChat() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
     }
 }

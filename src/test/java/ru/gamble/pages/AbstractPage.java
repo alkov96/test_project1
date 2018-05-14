@@ -2,10 +2,11 @@ package ru.gamble.pages;
 
 import cucumber.api.DataTable;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -22,14 +23,9 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
-import ru.sbtqa.tag.pagefactory.stepdefs.en.StepDefs;
-import ru.sbtqa.tag.qautils.errors.AutotestError;
-
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.RANDOM;
@@ -39,6 +35,10 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 public abstract class AbstractPage extends Page {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
+
+    @ElementTitle("Бургер")
+    @FindBy(id = "service-list")
+    private WebElement burgerBottom;
 
     @ElementTitle("День")
     @FindBy(className = "inpD")
@@ -78,8 +78,15 @@ public abstract class AbstractPage extends Page {
     @ActionTitle("закрываем браузер")
     public static void closeBrowser(){
         getWebDriver().close();
+        PageFactory.getWebDriver().close();
     }
 
+ /*   @ActionTitle("Очищает купон")
+    public void crearCoupon(){
+        if (PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).isDisplayed()){ //очистка купона
+            PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).click();
+        }
+    }*/
 
     /**
      * Метод получения письма и перехода по ссылке для завершения регистрации на сайте
@@ -207,4 +214,68 @@ public abstract class AbstractPage extends Page {
         LOG.info("Получили и перешли по ссылке::"+link);
         workWithPreloader();
     }
+
+    public void fillCouponFinal(int count, String ifForExperss, By findCoeffs) {
+        if (ifForExperss == "correct") {
+            List<WebElement> eventsInCoupon;
+            List<WebElement> correctMarkets;
+            waitForElementPresent(findCoeffs,1000);
+            correctMarkets = getWebDriver().findElements(findCoeffs)
+                        .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.26)
+                        .limit(count+20).collect(Collectors.toList());
+            for (WebElement coefficient : correctMarkets) {
+                clickElement(coefficient);
+                eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
+                if (eventsInCoupon.size() == count) {
+                    break;
+                }
+            }
+        }
+        if (ifForExperss == "incorrect") {
+            List<WebElement> eventsInCoupon;
+            List<WebElement> inCorrectMarkets = null;
+            waitForElementPresent(findCoeffs,1000);
+            List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
+            int tryPage = 0;
+            do {
+                try {
+                    inCorrectMarkets = getWebDriver().findElements(findCoeffs)
+                            .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) < 1.25)
+                            .limit(count+3).collect(Collectors.toList());
+                } catch (StaleElementReferenceException e){
+                    tryPage ++;
+                    allDaysPages.get(tryPage).click();
+                }
+            }  while (inCorrectMarkets.size() < count && tryPage < allDaysPages.size()-1);
+            for (WebElement coefficient : inCorrectMarkets) {
+                clickElement(coefficient);
+                eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
+                if (eventsInCoupon.size() == count) {
+                    break;
+                }
+            }
+        }
+        if (ifForExperss == "no") {
+
+        }
+    }
+
+    public static void clickElement ( final WebElement element ) {
+        WebElement myDynamicElement = ( new WebDriverWait(PageFactory.getWebDriver(), 10))
+                .until( ExpectedConditions.elementToBeClickable( element ) );
+        myDynamicElement.click();
+    }
+
+    public void waitForElementPresent(final By by, int timeout){
+        WebDriverWait wait = (WebDriverWait)new WebDriverWait(PageFactory.getWebDriver(),timeout)
+                .ignoring(StaleElementReferenceException.class);
+        wait.until(new ExpectedCondition<Boolean>(){
+            @Override
+            public Boolean apply(WebDriver webDriver) {
+                WebElement element = webDriver.findElement(by);
+                return element != null && element.isDisplayed();
+            }
+        });
+    }
 }
+

@@ -34,6 +34,9 @@ public class Constants {
     public static final String FALSE = "false";
     public static final String INN = "ИНН";
     public static final String SNILS = "СНИЛС";
+    public static final String LINK = "ССЫЛКА";
+    public static final String TEXT = "ТЕКСТ";
+    public static final String ELEMENT = "ЭЛЕМЕНТ";
 
 
     public static final List<String> cities = Arrays.asList("Москва","Санкт-Петербург","Новосибирск","Екатеринбург","Нижний Новгород","Казань","Челябинск","Омск","Самара","Ростов-на-Дону","Уфа","Красноярск","Пермь","Воронеж","Волгоград");
