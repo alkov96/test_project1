@@ -261,14 +261,12 @@ public abstract class AbstractPage extends Page {
             List<WebElement> eventsInCoupon;
             List<WebElement> correctMarkets;
             waitForElementPresent(findCoeffs,1000);
-            do {
-                correctMarkets = getWebDriver().findElements(findCoeffs)
+            correctMarkets = getWebDriver().findElements(findCoeffs)
                         .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.26)
                         .limit(count+20).collect(Collectors.toList());
-            }  while (correctMarkets.size() < count);
             for (WebElement coefficient : correctMarkets) {
                 clickElement(coefficient);
-                eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
+                eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
