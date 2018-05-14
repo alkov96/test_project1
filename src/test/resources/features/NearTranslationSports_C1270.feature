@@ -1,7 +1,9 @@
 # language: ru
 Функционал: Проверка работы виджета Ближайшие трансляции
+
+  @ExpressBonus_C39773
   @NearTransltionSports_C1270
-  Сценарий: NearTransltion-sports
+  Сценарий: NearTransltionSports_C1270
     #Шаг 1
 
     * переходит на главную страницу
