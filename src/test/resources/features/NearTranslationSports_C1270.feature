@@ -1,6 +1,6 @@
 # language: ru
 Функционал: Проверка работы виджета Ближайшие трансляции
-  @NearTransltion-sports
+  @NearTransltionSports_C1270
   Сценарий: NearTransltion-sports
     #Шаг 1
 
