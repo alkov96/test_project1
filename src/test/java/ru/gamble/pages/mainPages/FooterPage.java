@@ -114,30 +114,6 @@ public class FooterPage extends AbstractPage {
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    public final static By live_events = By.id("live-events"); // Лайв - Просмотр событий
-    public final static By day_events = By.id("day-events"); // События дня
-    public final static By live_overview = By.id("live-overview"); // Лайв-обзор
-    public final static By multimonitor = By.id("multimonitor"); // Мультимонитор
-    public final static By prematch_events = By.id("prematch-events"); //Прематч - Просмотр событий
-    public final static By calendar = By.id("live-calendar"); // Лайв-календарь
-    public final static By stats = By.id("stats"); // Статистика
-    public final static By results = By.id("results"); //Результаты
-
-
-    public final static By logo = By.xpath("//div[@class='footer6__inner']//div[contains(@class,'f_logo')]");
-    public final static By menu = By.xpath("//div[@class='footer6__inner']//a[@class='f_menu-link']/..");
-    public final static By social = By.xpath("//div[@class='footer6__inner']//div[contains(@class,'footer6__block-social')]");
-    public final static By mobile = By.xpath("//div[@class='footer6__inner']//div[contains(@class,'footer6__block-mobile')]");
-    public final static By forecast = By.xpath("//div[@class='footer6__inner']//div[contains(@class,'footer6__block-forecast')]/div[2]");
-
-    public final static By chat = By.xpath("//div[@class='js-open-chat']/a");
-    public final static By under_menu = By.xpath("//div[@class='footer6__block-hdr-sign']/..");
-    public final static By lebedev = By.xpath("//div[@class='footer6__block footer6__block-lebedev']");
-
-    public final static By partner_title = By.xpath("//div[@class='footer__inner']/div[@class='f2']/div[@class='footer-partners__title']");
-    public final static By partners = By.xpath("//div[@class='footer__inner']/div[@class='f2']/div[@class='footer-partners']");
-
-
     @ActionTitle("проверяем ТЕКСТ при переходе по ссылке с")
     public void checkTextWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
         WebDriver driver = PageFactory.getWebDriver();
@@ -208,6 +184,7 @@ public class FooterPage extends AbstractPage {
             for(int j = 0; j < 10; j++) {
                 try {
                     requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                    LOG.info("Текущая страница::" + driver.getCurrentUrl());
                     if(!requiredElements.isEmpty()){
                         LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getText());
                         break;

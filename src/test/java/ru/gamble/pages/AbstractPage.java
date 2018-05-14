@@ -36,6 +36,10 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 public abstract class AbstractPage extends Page {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
+    @ElementTitle("На главную")
+    @FindBy(id = "main-logo")
+    protected WebElement onMainPageButton;
+
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
     private WebElement burgerBottom;
@@ -55,10 +59,6 @@ public abstract class AbstractPage extends Page {
     @ElementTitle("Подвал")
     @FindBy(xpath = "//*[@class='footer__pin']")
     protected WebElement footerButton;
-
-    @ElementTitle("На главную страницу")
-    @FindBy(xpath = "//a[@class = 'btn btn_important']")
-    protected WebElement onMainPageButton;
 
 
     @ActionTitle("сохраняет с")
@@ -196,7 +196,7 @@ public abstract class AbstractPage extends Page {
     public void checksPresenceOfText(String text){
         List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath("//*[text()='" + text + "']"))
                 .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
-        assertThat(!list.isEmpty()).as("Ошибка.Не найден::[" + text+ " ]").isTrue();
+        assertThat(!list.isEmpty()).as("Ошибка.Не найден::[" + text + " ]").isTrue();
     }
 
 
@@ -211,7 +211,7 @@ public abstract class AbstractPage extends Page {
         page = PageFactory.getInstance().getCurrentPage();
         String link =  page.getElementByTitle(param).getAttribute("href");
         PageFactory.getWebDriver().get(link);
-        LOG.info("Получили и перешли по ссылке::"+link);
+        LOG.info("Получили и перешли по ссылке::" + link);
         workWithPreloader();
     }
 

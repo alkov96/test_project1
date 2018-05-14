@@ -23,7 +23,7 @@ import java.time.LocalTime;
 public class MainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MainPage.class);
 
-    @FindBy(xpath = "//span[@class='topLogo888__link topLogo888__link_show']")
+    @FindBy(xpath = "//*[@class='topLogo888__link topLogo888__link_show']")
     private WebElement pageTitle;
 
 
