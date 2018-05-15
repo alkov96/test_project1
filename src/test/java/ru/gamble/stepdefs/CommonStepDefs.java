@@ -1,12 +1,12 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.И;
 import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.concurrent.TimeUnit;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -87,10 +88,10 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){
+    public void goToMainPage(){
         PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
-        WebDriver driver = PageFactory.getWebDriver();
     }
+
 
     @Когда("^сохраняем в память таблицу$")
     public static void saveKeyValueTable(DataTable dataTable){
@@ -160,9 +161,75 @@ public class CommonStepDefs extends GenericStepDefs {
         PageFactory.getInstance().getPage(title);
     }
 
-//    @Override
+
+    /**
+     * ожидание пока аттрибут без учета регистра будет содержать подстроку
+     * @param locator
+     * @param attribute
+     * @param value
+     * @return
+     */
+    public static ExpectedCondition<Boolean> attributeContainsLowerCase(final By locator,
+                                                                        final String attribute,
+                                                                        final String value) {
+        return new ExpectedCondition<Boolean>() {
+            private String currentValue = null;
+
+            @Override
+            public Boolean apply(WebDriver driver) {
+                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+            }
+
+            @Override
+            public String toString() {
+                return String.format("value to contain \"%s\". Current value: \"%s\"", value, currentValue);
+            }
+        };
+    }
+
+
+    public static void waitOfPreloader() throws InterruptedException {
+        waitOfPreloader(60);
+    }
+    public static void waitOfPreloader(int num) throws InterruptedException {
+        LOG.debug("Проверка на наличие бесконечных прелоадеров");
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> list = driver.findElements(By.cssSelector("div.preloader__container"));
+        int count = num;
+        try {
+            do {
+                //todo del . soup
+                System.out.println(count);
+                LOG.debug("List size is " + list.size());
+                for (WebElement preloader : list) {
+                    if (preloader.isDisplayed()) {
+                        LOG.debug("Данный прелоадер виден");
+                        count--;
+                        Thread.sleep(500);
+                        count--;
+                        continue;
+                    } else {
+                        LOG.debug("Данный прелоадер не виден");
+                        list.remove(preloader);
+                    }
+                    if (list.isEmpty()) {
+                        LOG.debug("List is empty");
+                    }
+                    break;
+                }
+            } while (!list.isEmpty() && count > 0);
+        } catch (org.openqa.selenium.StaleElementReferenceException e) {
+            LOG.error(""+e);
+        }
+        if (count <= 0) {
+            LOG.error("Количество попыток исчерпано. Прелоадер всё ещё виден");
+            throw new AssertionError();
+        }
+        LOG.debug("Проверка успешно выполнена");
+    }
+
     @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
-    public void changeFocusOnPage(String title) throws PageInitializationException {
+    public void changeFocusOnPage(String title) throws PageInitializationException{
         super.openPage(title);
     }
 

@@ -41,7 +41,6 @@ public class DayEventsPage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(widget));
-        LOG.info(LocalTime.now().toString());
     }
 
     @ActionTitle("добавляет событие с баннера в купон")
