@@ -240,7 +240,7 @@ public class CommonStepDefs extends GenericStepDefs {
      *
      * @param oldName - название игры, которое удем преобразовывать
      */
-    public String parseString(String oldName) {
+    public static String stringParse(String oldName) {
         String nameGame;
         Pattern p = Pattern.compile("(?u)[^а-яА-Я0-9a-zA-Z]");
         Matcher m = p.matcher(oldName);
@@ -273,19 +273,19 @@ public class CommonStepDefs extends GenericStepDefs {
                 assert false;
             }
             if (!(sportName.toLowerCase()).equals(sportis.toLowerCase())) {
-                LOG.error("Из Ближайших трансляций переход на неправильный спорт. Игра " + parseString(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
+                LOG.error("Из Ближайших трансляций переход на неправильный спорт. Игра " + stringParse(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
                 assert false;
             }
             if (driver.findElement(By.xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
                 ;
                 //  if (driver.findElements(By.xpath("//div[@class='field-switcher']/div[contains(@class,'field-switcher__item_icon-video')]")).isEmpty()) {
-                LOG.error("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + parseString(team1 + team2));
+                LOG.error("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + stringParse(team1 + team2));
                 assert false;
             }
         } else {
             String gameName = driver.findElement(By.xpath("//div[contains(@class,'live-container')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("title");
-            if (!parseString(gameName).equals(parseString(team1 + team2))) {
-                LOG.error("Из виджета переход на неправильную игру. Вместо " + parseString(team1 + team2) + "перешли на " + parseString(gameName));
+            if (!stringParse(gameName).equals(stringParse(team1 + team2))) {
+                LOG.error("Из виджета переход на неправильную игру. Вместо " + stringParse(team1 + team2) + "перешли на " + stringParse(gameName));
                 assert false;
             }
         }
