@@ -27,6 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -85,8 +86,23 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){
+    public void goToMainPage(){
         PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
+        mainPageOk();
+    }
+
+
+    // Метод три раза пытается обновить главную страницу
+    private void mainPageOk(){
+        WebDriver driver = PageFactory.getWebDriver();
+        //driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);// это значит что формироавние непустого списка будет до 10 секунд
+        int count=0;
+        while(driver.findElements(By.xpath("//div[@class='index-widgets ng-scope']")).isEmpty() && count!=3){
+            LOG.info("Главная страница не загрузилась полностью. Перезагрузка");
+            driver.navigate().refresh();
+            count++;
+
+        }
     }
 
     @Когда("^сохраняем в память таблицу$")
