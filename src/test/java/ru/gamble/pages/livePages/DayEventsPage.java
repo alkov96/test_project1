@@ -45,6 +45,7 @@ public class DayEventsPage extends AbstractPage {
 
     @ActionTitle("добавляет событие с баннера в купон")
     public void addEventToCoupon(){
+        CommonStepDefs.workWithPreloader();
         WebDriver driver = PageFactory.getDriver();
         WebElement event = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[2]"));
         LOG.info("Нажали на событие  "+ event.getText());
