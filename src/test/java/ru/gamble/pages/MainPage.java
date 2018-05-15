@@ -84,6 +84,5 @@ public class MainPage extends AbstractPage {
                 LOG.error("В ближайших трансляциях есть вкладка спорта " + sportName + ", но список для него пустой");
             }
         }
-        //   Stash.put(result,flag);
     }
 }

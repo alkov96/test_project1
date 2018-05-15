@@ -88,22 +88,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^переходит на главную страницу$")
     public void goToMainPage(){
         PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
-        mainPageOk();
     }
 
-
-    // Метод три раза пытается обновить главную страницу
-    private void mainPageOk(){
-        WebDriver driver = PageFactory.getWebDriver();
-        //driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);// это значит что формироавние непустого списка будет до 10 секунд
-        int count=0;
-        while(driver.findElements(By.xpath("//div[@class='index-widgets ng-scope']")).isEmpty() && count!=10){
-            LOG.info("Главная страница не загрузилась полностью. Перезагрузка");
-            driver.navigate().refresh();
-            count++;
-
-        }
-    }
 
     @Когда("^сохраняем в память таблицу$")
     public static void saveKeyValueTable(DataTable dataTable){
