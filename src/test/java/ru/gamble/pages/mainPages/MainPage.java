@@ -122,6 +122,8 @@ public class MainPage extends AbstractPage {
         } while (number <= allSport.size() - 1);
         if (games.isEmpty()){
             LOG.info("Подходящей игры не найдено");
+        }else {
+                LOG.info("Игра найдена.");
         }
         Stash.put("listGameBT",games);
         Stash.put("haveButtonKey",haveButton);
@@ -141,6 +143,7 @@ public class MainPage extends AbstractPage {
             games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[position()=1 and @ng-click]"));
             boolean haveButton = Stash.getValue("haveButtonKey");//и сменем флаг haveButton на противоположный
             haveButton = !haveButton;
+            LOG.info("Игра не была найдена, поэтому возьмем первую игру из вообще существующих в виджете БТ");
             Stash.put("haveButtonKey",haveButton);
 
         }
@@ -149,6 +152,7 @@ public class MainPage extends AbstractPage {
         String team1 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).getAttribute("title").trim();
         String team2 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div[1]")).getAttribute("title").trim();
         String sportName = selectGame.findElement(By.xpath("ancestor::div[contains(@class,'bets-widget-table__inner active')]")).getAttribute("class").split("active-")[1].toLowerCase();
+        LOG.info("Игра, на которой будем проверять переход из виджета БТ: " + team1 + " - " + team2 + ". Спорт - " + sportName);
         selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).click();
         Stash.put("team1BTkey",team1);
         Stash.put("team2BTkey",team2);
