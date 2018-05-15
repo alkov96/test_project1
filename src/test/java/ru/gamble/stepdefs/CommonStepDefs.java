@@ -291,5 +291,9 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
+    public void changeFocusOnPage(String title) throws PageInitializationException{
+        super.openPage(title);
+    }
 
 }
