@@ -97,7 +97,7 @@ public class CommonStepDefs extends GenericStepDefs {
         WebDriver driver = PageFactory.getWebDriver();
         //driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);// это значит что формироавние непустого списка будет до 10 секунд
         int count=0;
-        while(driver.findElements(By.xpath("//div[@class='index-widgets ng-scope']")).isEmpty() && count!=3){
+        while(driver.findElements(By.xpath("//div[@class='index-widgets ng-scope']")).isEmpty() && count!=10){
             LOG.info("Главная страница не загрузилась полностью. Перезагрузка");
             driver.navigate().refresh();
             count++;

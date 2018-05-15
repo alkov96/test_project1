@@ -91,7 +91,7 @@ public class PassportDataPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        new WebDriverWait(PageFactory.getDriver(), 30).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
 
