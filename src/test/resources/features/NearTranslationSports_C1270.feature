@@ -1,7 +1,7 @@
 # language: ru
 Функционал: Проверка работы виджета Ближайшие трансляции
 
-  @ExpressBonus_C39773
+  @smoke
   @NearTransltionSports_C1270
   Сценарий: NearTransltionSports_C1270
     #Шаг 1
