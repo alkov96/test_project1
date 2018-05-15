@@ -77,7 +77,7 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("закрываем браузер")
     public static void closeBrowser(){
-        getWebDriver().close();
+        //getWebDriver().close();
         PageFactory.getWebDriver().close();
     }
 
