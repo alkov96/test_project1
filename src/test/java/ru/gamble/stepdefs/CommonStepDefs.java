@@ -27,6 +27,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -162,5 +164,18 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
     public void changeFocusOnPage(String title) throws PageInitializationException {
         super.openPage(title);
+    }
+
+    /**
+     * Преобразовывает название игры к виду "team1 - team2".
+     *
+     * @param oldName - название игры, которое удем преобразовывать
+     */
+    public static String stringParse(String oldName) {
+        String nameGame;
+        Pattern p = Pattern.compile("(?u)[^а-яА-Я0-9a-zA-Z]");
+        Matcher m = p.matcher(oldName);
+        nameGame = m.replaceAll("");
+        return nameGame;
     }
 }
