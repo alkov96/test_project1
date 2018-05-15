@@ -23,6 +23,8 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
+
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -59,6 +61,26 @@ public abstract class AbstractPage extends Page {
     @ElementTitle("Подвал")
     @FindBy(xpath = "//*[@class='footer__pin']")
     protected WebElement footerButton;
+
+
+    // Метод три раза пытается обновить главную страницу
+
+    public void tryingLoadPage(WebElement element, int count){
+        WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
+
+        for(int j = 0; j < count; j++) {
+            try {
+                new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(element));
+                break;
+            } catch (Exception e){
+                driver.navigate().refresh();
+            }
+            if(j >= count - 1){
+                throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
+            }
+        }
+    }
 
 
     @ActionTitle("сохраняет с")

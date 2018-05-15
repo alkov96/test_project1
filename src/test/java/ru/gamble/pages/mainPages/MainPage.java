@@ -53,7 +53,7 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOf(pageTitle));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
     @ActionTitle("переключение видов спорта")

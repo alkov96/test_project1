@@ -124,6 +124,5 @@ public class Burger extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOf(subMenuArea));
-        LOG.info(LocalTime.now().toString());
     }
 }
