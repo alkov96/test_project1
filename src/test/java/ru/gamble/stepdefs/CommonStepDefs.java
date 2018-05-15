@@ -2,10 +2,7 @@ package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.ru.Когда;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -27,7 +24,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -86,10 +84,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public void goToMainPage(){
+    public static void goToMainPage(){
         PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
     }
-
 
     @Когда("^сохраняем в память таблицу$")
     public static void saveKeyValueTable(DataTable dataTable){
@@ -226,8 +223,73 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.debug("Проверка успешно выполнена");
     }
 
-    @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
-    public void changeFocusOnPage(String title) throws PageInitializationException{
-        super.openPage(title);
+
+    /**
+     * Провкрутка страницы на х и y
+     * @param x прокрутка по горизонтали
+     * @param y прокрутка по вертикали
+     */
+    public static void scrollPage(int x, int y){
+        WebDriver driver = PageFactory.getDriver();
+        ((JavascriptExecutor)driver).executeScript("window.scroll(" + x + ","
+                + y + ");");
     }
+
+    /**
+     * Преобразовывает название игры к виду "team1 - team2".
+     *
+     * @param oldName - название игры, которое удем преобразовывать
+     */
+    public String parseString(String oldName) {
+        String nameGame;
+        Pattern p = Pattern.compile("(?u)[^а-яА-Я0-9a-zA-Z]");
+        Matcher m = p.matcher(oldName);
+        nameGame = m.replaceAll("");
+        return nameGame;
+    }
+
+
+    /**
+     * проверка что из Ближвйших трансляци переход на правильную игру
+     * сравнивает на совпадение название спорта, команд и првоеряет есть ли видео если страница Лайв
+     * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
+     * @throws Exception
+     */
+    @ActionTitle("проверяет что переход удался")
+    public void checkLinkToGame() throws Exception {
+        workWithPreloader();
+        boolean flag = true;
+        boolean haveButton = Stash.getValue("haveButtonKey");
+        String team1 = Stash.getValue("team1BTkey");
+        String team2 = Stash.getValue("team2BTkey");
+        String sportName = Stash.getValue("sportKey");
+        WebDriver driver = PageFactory.getDriver();
+        if (haveButton) {
+            String sportis = driver.findElement(By.xpath("//div[@class='live-game-summary']/div[1]/div[1]/div[1]/div[contains(@class,'game-info')]")).getAttribute("class").replace("game-info game-info_", "");
+            String team1name = driver.findElement(By.xpath("//div[@class='live-game-summary']//div[contains(@class,'game-info')]/ng-include[1]//div[contains(@class,'team-1')]//p")).getAttribute("title").trim();
+            String team2name = driver.findElement(By.xpath("//div[@class='live-game-summary']//div[contains(@class,'game-info')]/ng-include[1]//div[contains(@class,'team-2')]//p")).getAttribute("title").trim();
+            if (!team1.equals(team1name) || !team2.equals(team2name)) {
+                LOG.error("Из Ближайших трансляций переход на неправильную игру. Вместо " + team1 + " " + team2 + "перешли на " + team1name + " " + team2name);
+                assert false;
+            }
+            if (!(sportName.toLowerCase()).equals(sportis.toLowerCase())) {
+                LOG.error("Из Ближайших трансляций переход на неправильный спорт. Игра " + parseString(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
+                assert false;
+            }
+            if (driver.findElement(By.xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
+                ;
+                //  if (driver.findElements(By.xpath("//div[@class='field-switcher']/div[contains(@class,'field-switcher__item_icon-video')]")).isEmpty()) {
+                LOG.error("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + parseString(team1 + team2));
+                assert false;
+            }
+        } else {
+            String gameName = driver.findElement(By.xpath("//div[contains(@class,'live-container')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("title");
+            if (!parseString(gameName).equals(parseString(team1 + team2))) {
+                LOG.error("Из виджета переход на неправильную игру. Вместо " + parseString(team1 + team2) + "перешли на " + parseString(gameName));
+                assert false;
+            }
+        }
+    }
+
+
 }
