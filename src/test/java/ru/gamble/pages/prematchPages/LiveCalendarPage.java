@@ -41,7 +41,6 @@ public class LiveCalendarPage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(centralMarkets));
-        LOG.info(LocalTime.now().toString());
     }
 
     @ActionTitle("ищет событие с коэффициентом")

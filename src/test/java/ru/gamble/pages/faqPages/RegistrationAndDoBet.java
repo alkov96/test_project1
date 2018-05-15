@@ -31,6 +31,5 @@ public class RegistrationAndDoBet extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
-        LOG.info(LocalTime.now().toString());
     }
 }

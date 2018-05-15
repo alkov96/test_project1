@@ -13,6 +13,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class CucumberTest {
 //        LOG.info(LocalTime.now().toString());
         WebDriver driver = PageFactory.getWebDriver();
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-//        driver.manage().window().setSize(new Dimension(1920, 1080));
+        driver.manage().window().setSize(new Dimension(1920, 1080));
 //        final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
         Locale.setDefault(new Locale("ru"));
     }

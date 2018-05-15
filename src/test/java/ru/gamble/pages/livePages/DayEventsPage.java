@@ -31,6 +31,5 @@ import java.time.LocalTime;
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(widget));
-        LOG.info(LocalTime.now().toString());
     }
 }
