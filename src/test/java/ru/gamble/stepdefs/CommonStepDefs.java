@@ -8,8 +8,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.utility.BeforeTest;
 import ru.gamble.utility.DBUtils;
 import ru.sbtqa.tag.datajack.Stash;
+import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -24,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +37,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @ActionTitle("нажимает на кнопку")
     public static void pressButton(String param){
+        WebDriver driver = PageFactory.getWebDriver();
         Page page = null;
         WebElement button = null;
         try {
@@ -45,8 +49,13 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.error(e1.getMessage());
         }
         if(button.isDisplayed()){
-        button.click();
-        workWithPreloader();
+
+            // Код который пытается ещё раз нажать на кнопку, если WindowHandle не сменился после нажатия
+            String currentHandle = driver.getWindowHandle();
+            String newHandle = "";
+            LOG.info("Текущий идентификатор страницы::" + currentHandle);
+            button.click();
+            workWithPreloader();
         }else {
             LOG.error("ОШИБКА! Кнопка невидима.");
         }

@@ -21,15 +21,16 @@ import java.time.LocalTime;
  */
 @PageEntry(title = "Лайв-обзор")
 public class LiveViewPage extends AbstractPage {
-    private static final Logger LOG = LoggerFactory.getLogger(DayEventsPage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LiveViewPage.class);
 
     @FindBy(xpath = "//div[@class='centr-market-contain']")
-    private WebElement centrMarket;
+    private WebElement pageTitle;
 
     public LiveViewPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(centrMarket));
+        tryingLoadPage(pageTitle,10);
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 }

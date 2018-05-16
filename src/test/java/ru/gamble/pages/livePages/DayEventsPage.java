@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.userProfilePages.FavouritePage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -98,6 +99,15 @@ public class DayEventsPage extends AbstractPage {
 
     }
 
+    @ActionTitle("добавляет событие в избранное")
+    public void addEventToFavourite() throws Exception {
+        WebDriver driver = PageFactory.getDriver();
+        FavouritePage.clearFavouriteGames();
+        List<WebElement> stars = driver.findElements(By.xpath("//tr[@class='bets-widget-table__bets ng-scope']/td[10]//span[contains(@class,'favorite-icon-dashboard')]"));
+        LOG.info("Все иконки избранного на странице обнаружены");
+        stars.get(3).click();
+        LOG.info("Добавили в Избранное событие");
+    }
 }
 
 
