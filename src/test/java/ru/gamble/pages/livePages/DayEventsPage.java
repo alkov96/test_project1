@@ -60,6 +60,7 @@ public class DayEventsPage extends AbstractPage {
         String team1 = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[1]/span[1]")).getAttribute("title");//Сохраняем название команды1 на банере
         Stash.put("team1key", team1);
         Stash.put("team2key", team2);
+
     }
 
     @ActionTitle("проверяет, совпадают ли названия событий на кнопках на баннере и сверху")
@@ -105,6 +106,7 @@ public class DayEventsPage extends AbstractPage {
         FavouritePage.clearFavouriteGames();
         List<WebElement> stars = driver.findElements(By.xpath("//tr[@class='bets-widget-table__bets ng-scope']/td[10]//span[contains(@class,'favorite-icon-dashboard')]"));
         LOG.info("Все иконки избранного на странице обнаружены");
+        wait.until(ExpectedConditions.attributeContains(stars.get(3), "class", "icon"));
         stars.get(3).click();
         LOG.info("Добавили в Избранное событие");
     }
