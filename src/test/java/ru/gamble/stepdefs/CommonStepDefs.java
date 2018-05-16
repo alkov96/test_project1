@@ -54,24 +54,8 @@ public class CommonStepDefs extends GenericStepDefs {
             String currentHandle = driver.getWindowHandle();
             String newHandle = "";
             LOG.info("Текущий идентификатор страницы::" + currentHandle);
-            int count = 0;
-            do {
-
-                try {
-                    button.click();
-                    count++;
-                    workWithPreloader();
-                    newHandle = driver.getWindowHandle();
-                    LOG.info("Новый идентификатор страницы::" + newHandle);
-                }catch (Exception e) {
-                  LOG.error("Ошибка!Кнопка не найдена.");
-                }
-               if(count == 3){
-                    break;
-               }
-
-            }while (currentHandle.equals(newHandle));
-
+            button.click();
+            workWithPreloader();
         }else {
             LOG.error("ОШИБКА! Кнопка невидима.");
         }
