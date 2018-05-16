@@ -85,16 +85,19 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){goToMainPage("site2");}
+    public static void goToMainPage(){goToMainPage("url2");}
 
     @Когда("^переходит на главную страницу '(.+)'$")
     public static void goToMainPage(String site){
         switch (site){
             case "site1":
-                PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
+                PageFactory.getWebDriver().get(Props.get("webdriver.starting.url1"));
+                break;
+            case "site2":
+                PageFactory.getWebDriver().get(Props.get("webdriver.starting.url2"));
                 break;
             default:
-                PageFactory.getWebDriver().get(Props.get("webdriver.starting.url2"));
+                PageFactory.getWebDriver().get(site);
                 break;
         }
 
