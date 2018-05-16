@@ -86,9 +86,9 @@ public class MainPage extends AbstractPage {
     }
 
     /**
-     * поиск на виджете Ближайшие трансляции игры с (без) кнопки Смотреть.
+     * поиск на виджете Ближайшие трансляции игры с (без) кнопки Смотреть. Если игры по кнопк не найдено, то берется просто первая попавшаяся
      * @param param - параметр, указывающий ищем ли мы игру с кнопкой, или без
-     * в Stash сохраняет список подходящих игр. ключ - "listGameBT"
+     * в Stash сохраняет найденную игру. ключ - "gameBT"
      */
     @ActionTitle("ищет игру на БТ")
     public  void searchVideoGameBT(String param) throws InterruptedException {
@@ -103,7 +103,7 @@ public class MainPage extends AbstractPage {
                 ngclick = "command";
             }
         }
-        CommonStepDefs.workWithPreloader();
+        CommonStepDefs.waitOfPreloader();
         int x = driver.findElement(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item')]/../li[last()]")).getLocation().getX();
         int y = driver.findElement(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item')]/../li[last()]")).getLocation().getY();
         CommonStepDefs.scrollPage(x, y);
@@ -121,11 +121,13 @@ public class MainPage extends AbstractPage {
             number++;
         } while (number <= allSport.size() - 1);
         if (games.isEmpty()){
-            LOG.info("Подходящей игры не найдено");
+            LOG.info("Подходящей игры не найдено. Придется брать просто первую попавшуюся из БТ");
+            games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[position()=1 and @ng-click]"));
+            haveButton = !haveButton;
         }else {
-                LOG.info("Игра найдена.");
+                LOG.info("Игра " + param + " найдена ");
         }
-        Stash.put("listGameBT",games);
+        Stash.put("gameBT",games.get(0).findElement(By.xpath("ancestor::tr")));
         Stash.put("haveButtonKey",haveButton);
     }
 
@@ -137,17 +139,7 @@ public class MainPage extends AbstractPage {
     @ActionTitle("переходит на игру из виджета БТ")
     public void lala(){
         WebDriver driver = PageFactory.getDriver();
-        List <WebElement> games = Stash.getValue("listGameBT");
-        if (games.isEmpty()){
-            //если игра не была найдена с/без кнопки, то будет переход на ту игру, которая есть. поэтому заново формируем список игр, но без учета ng-click
-            games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[position()=1 and @ng-click]"));
-            boolean haveButton = Stash.getValue("haveButtonKey");//и сменем флаг haveButton на противоположный
-            haveButton = !haveButton;
-            LOG.info("Игра не была найдена, поэтому возьмем первую игру из вообще существующих в виджете БТ");
-            Stash.put("haveButtonKey",haveButton);
-
-        }
-        WebElement selectGame = games.get(0).findElement(By.xpath("ancestor::tr"));
+        WebElement selectGame = Stash.getValue("gameBT");
         //запоминаем названия команд
         String team1 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).getAttribute("title").trim();
         String team2 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div[1]")).getAttribute("title").trim();
@@ -164,5 +156,10 @@ public class MainPage extends AbstractPage {
     public void openGame() throws Exception {
         CommonStepDefs commonStepDefs = new CommonStepDefs();
         commonStepDefs.checkLinkToGame();
+    }
+
+    @ActionTitle("добавляет коэф в купон")
+    public void addToCouponFromBT(){
+        LOG.info("d");
     }
 }

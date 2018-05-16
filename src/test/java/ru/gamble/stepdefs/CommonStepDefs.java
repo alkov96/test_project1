@@ -257,13 +257,15 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     @ActionTitle("проверяет что переход удался")
     public void checkLinkToGame() throws Exception {
+        WebDriver driver = PageFactory.getDriver();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         workWithPreloader();
         boolean flag = true;
         boolean haveButton = Stash.getValue("haveButtonKey");
         String team1 = Stash.getValue("team1BTkey");
         String team2 = Stash.getValue("team2BTkey");
         String sportName = Stash.getValue("sportKey");
-        WebDriver driver = PageFactory.getDriver();
+
         if (haveButton) {
             String sportis = driver.findElement(By.xpath("//div[@class='live-game-summary']/div[1]/div[1]/div[1]/div[contains(@class,'game-info')]")).getAttribute("class").replace("game-info game-info_", "");
             String team1name = driver.findElement(By.xpath("//div[@class='live-game-summary']//div[contains(@class,'game-info')]/ng-include[1]//div[contains(@class,'team-1')]//p")).getAttribute("title").trim();
@@ -277,19 +279,21 @@ public class CommonStepDefs extends GenericStepDefs {
                 LOG.error("Из Ближайших трансляций переход на неправильный спорт. Игра " + stringParse(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
                 assert false;
             }
-            LOG.info("Проверка что у игры есть видео");
             if (driver.findElement(By.xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
                 ;
                 //  if (driver.findElements(By.xpath("//div[@class='field-switcher']/div[contains(@class,'field-switcher__item_icon-video')]")).isEmpty()) {
                 LOG.error("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + stringParse(team1 + team2));
                 assert false;
             }
+            LOG.info("У игры, у которой на виджете БТ есть кнопка Смотреть действительно есть видео. Проверка Успешна");
         } else {
             String gameName = driver.findElement(By.xpath("//div[contains(@class,'live-container')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("title");
+            LOG.info("Перешли на игру. Ее название в линии: " + gameName);
             if (!stringParse(gameName).equals(stringParse(team1 + team2))) {
                 LOG.error("Из виджета переход на неправильную игру. Вместо " + stringParse(team1 + team2) + "перешли на " + stringParse(gameName));
                 assert false;
             }
+            LOG.info("Название игры в линии совпадает с тем, что ыбло на виджете БТ. Переход прошел успешно");
         }
     }
 
