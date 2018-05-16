@@ -89,7 +89,6 @@ public abstract class AbstractPage extends Page {
     @ActionTitle("нажимает кнопку")
     public static void pressButtonAP(String param){
         CommonStepDefs.pressButton(param);
-        workWithPreloader();
     }
 
     @ActionTitle("stop")
@@ -99,7 +98,6 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("закрываем браузер")
     public static void closeBrowser(){
-        getWebDriver().close();
         PageFactory.getWebDriver().close();
     }
 

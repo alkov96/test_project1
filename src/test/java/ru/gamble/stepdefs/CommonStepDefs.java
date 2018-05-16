@@ -2,17 +2,16 @@ package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.ru.Когда;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.utility.BeforeTest;
 import ru.gamble.utility.DBUtils;
 import ru.sbtqa.tag.datajack.Stash;
+import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -27,9 +26,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.concurrent.TimeUnit;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -38,6 +37,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @ActionTitle("нажимает на кнопку")
     public static void pressButton(String param){
+        WebDriver driver = PageFactory.getWebDriver();
         Page page = null;
         WebElement button = null;
         try {
@@ -49,8 +49,13 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.error(e1.getMessage());
         }
         if(button.isDisplayed()){
-        button.click();
-        workWithPreloader();
+
+            // Код который пытается ещё раз нажать на кнопку, если WindowHandle не сменился после нажатия
+            String currentHandle = driver.getWindowHandle();
+            String newHandle = "";
+            LOG.info("Текущий идентификатор страницы::" + currentHandle);
+            button.click();
+            workWithPreloader();
         }else {
             LOG.error("ОШИБКА! Кнопка невидима.");
         }
@@ -88,10 +93,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public void goToMainPage(){
+    public static void goToMainPage(){
         PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
     }
-
 
     @Когда("^сохраняем в память таблицу$")
     public static void saveKeyValueTable(DataTable dataTable){
@@ -228,9 +232,16 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.debug("Проверка успешно выполнена");
     }
 
-    @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
-    public void changeFocusOnPage(String title) throws PageInitializationException{
-        super.openPage(title);
+
+    /**
+     * Провкрутка страницы на х и y
+     * @param x прокрутка по горизонтали
+     * @param y прокрутка по вертикали
+     */
+    public static void scrollPage(int x, int y){
+        WebDriver driver = PageFactory.getDriver();
+        ((JavascriptExecutor)driver).executeScript("window.scroll(" + x + ","
+                + y + ");");
     }
 
     /**
@@ -245,4 +256,55 @@ public class CommonStepDefs extends GenericStepDefs {
         nameGame = m.replaceAll("");
         return nameGame;
     }
+
+
+    /**
+     * проверка что из Ближвйших трансляци переход на правильную игру
+     * сравнивает на совпадение название спорта, команд и првоеряет есть ли видео если страница Лайв
+     * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
+     * @throws Exception
+     */
+    @ActionTitle("проверяет что переход удался")
+    public void checkLinkToGame() throws Exception {
+        workWithPreloader();
+        boolean flag = true;
+        boolean haveButton = Stash.getValue("haveButtonKey");
+        String team1 = Stash.getValue("team1BTkey");
+        String team2 = Stash.getValue("team2BTkey");
+        String sportName = Stash.getValue("sportKey");
+        WebDriver driver = PageFactory.getDriver();
+        if (haveButton) {
+            String sportis = driver.findElement(By.xpath("//div[@class='live-game-summary']/div[1]/div[1]/div[1]/div[contains(@class,'game-info')]")).getAttribute("class").replace("game-info game-info_", "");
+            String team1name = driver.findElement(By.xpath("//div[@class='live-game-summary']//div[contains(@class,'game-info')]/ng-include[1]//div[contains(@class,'team-1')]//p")).getAttribute("title").trim();
+            String team2name = driver.findElement(By.xpath("//div[@class='live-game-summary']//div[contains(@class,'game-info')]/ng-include[1]//div[contains(@class,'team-2')]//p")).getAttribute("title").trim();
+            LOG.info("Перешли на игру. Ее название в линии: " + team1name + " - " + team2name + ". Спорт: " + sportis);
+            if (!team1.equals(team1name) || !team2.equals(team2name)) {
+                LOG.error("Из Ближайших трансляций переход на неправильную игру. Вместо " + team1 + " " + team2 + "перешли на " + team1name + " " + team2name);
+                assert false;
+            }
+            if (!(sportName.toLowerCase()).equals(sportis.toLowerCase())) {
+                LOG.error("Из Ближайших трансляций переход на неправильный спорт. Игра " + stringParse(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
+                assert false;
+            }
+            LOG.info("Проверка что у игры есть видео");
+            if (driver.findElement(By.xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
+                ;
+                //  if (driver.findElements(By.xpath("//div[@class='field-switcher']/div[contains(@class,'field-switcher__item_icon-video')]")).isEmpty()) {
+                LOG.error("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + stringParse(team1 + team2));
+                assert false;
+            }
+        } else {
+            String gameName = driver.findElement(By.xpath("//div[contains(@class,'live-container')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("title");
+            if (!stringParse(gameName).equals(stringParse(team1 + team2))) {
+                LOG.error("Из виджета переход на неправильную игру. Вместо " + stringParse(team1 + team2) + "перешли на " + stringParse(gameName));
+                assert false;
+            }
+        }
+    }
+
+    @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
+    public void changeFocusOnPage(String title) throws PageInitializationException{
+        super.openPage(title);
+    }
+
 }
