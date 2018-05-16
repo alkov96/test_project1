@@ -131,11 +131,7 @@ public class MainPage extends AbstractPage {
         Stash.put("haveButtonKey",haveButton);
     }
 
-
-    /**
-     * переход на игру из виджета Ближайшие Трансляции
-     * если
-     */
+//переходит на игру нажатием на название первой команды в виджете
     @ActionTitle("переходит на игру из виджета БТ")
     public void lala(){
         WebDriver driver = PageFactory.getDriver();
@@ -158,8 +154,38 @@ public class MainPage extends AbstractPage {
         commonStepDefs.checkLinkToGame();
     }
 
-    @ActionTitle("добавляет коэф в купон")
+    //добавление коэфа победы первой команды в виджете БТ
+    @ActionTitle("добавляет коэф с виджета в купон")
     public void addToCouponFromBT(){
-        LOG.info("d");
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> games = new ArrayList<>();
+        List<WebElement> allSport = driver.findElements(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете БТ
+        int number = 0;
+        do {
+            games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[contains(@class,'bets-item_k1')]/div[not(contains(@class,'blocked'))]"));
+            if (!games.isEmpty()) {
+                break;
+            }
+            allSport.get(number).click();
+
+            CommonStepDefs.workWithPreloader();
+
+            number++;
+        } while (number <= allSport.size() - 1);
+
+        WebElement selectGame = games.get(0).findElement(By.xpath("ancestor::tr"));
+        String team1 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).getAttribute("title").trim();
+        String team2 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div[1]")).getAttribute("title").trim();
+        float p1 = Float.valueOf(selectGame.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div[1]/span")).getText());
+        LOG.info("Игра, на которой будем проверять добавление в купон из виджета БТ: " + team1 + " - " + team2);
+        LOG.info("Коэффициент победы первой команды = " + p1);
+        selectGame.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div[1]/span")).click();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
+        CommonStepDefs.workWithPreloader();
+        Stash.put("team1key",team1);
+        Stash.put("team2key",team2);
+        Stash.put("ishodKey",team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
+        Stash.put("coefKey",p1);
     }
+
 }
