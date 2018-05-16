@@ -58,8 +58,11 @@ public class DayEventsPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String team2 = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[1]")).getAttribute("title");//Сохраняем название команды2 на банере
         String team1 = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[1]/span[1]")).getAttribute("title");//Сохраняем название команды1 на банере
+        float coef = Float.valueOf(driver.findElement(By.xpath("//div[@class='event-widget-coef__item' and contains(@ng-click,'P2')]/span[2]")).getText());
         Stash.put("team1key", team1);
         Stash.put("team2key", team2);
+        Stash.put("ishodKey", team2);
+        Stash.put("coefKey", coef);
     }
 
     @ActionTitle("проверяет, совпадают ли названия событий на кнопках на баннере и сверху")
