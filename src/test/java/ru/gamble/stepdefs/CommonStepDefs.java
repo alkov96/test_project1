@@ -85,7 +85,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){goToMainPage("url2");}
+    public static void goToMainPage(){goToMainPage("site2");}
 
     @Когда("^переходит на главную страницу '(.+)'$")
     public static void goToMainPage(String site){
