@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.stepdefs.CommonStepDefs;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
@@ -70,10 +71,8 @@ public class FavouritePage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         driver.findElement(By.id("elected")).click();//нажали на кнопку избранного
         String electedGame = driver.findElement(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")).getAttribute("title");  //игра в избранном
-        List<WebElement> team1 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who1']//span[contains(@class,'market-info-b market-name-j')]"));//название 1 команды в списке
-        String team1name = team1.get(3).getAttribute("title");
-        List<WebElement> team2 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who2']//span[contains(@class,'market-info-b market-name-j')]"));//название 2 команды в списке
-        String team2name = team2.get(3).getAttribute("title");
+        String team1name = Stash.getValue("team1nameKey");
+        String team2name = Stash.getValue("team2nameKey");
         if (!CommonStepDefs.stringParse(team1name+team2name).equals(CommonStepDefs.stringParse(electedGame))) {
             fail("Названия команд в списке и в блоке Избранное не совпадают: " + team1name+"-"+team2name +"="+electedGame);
         }
