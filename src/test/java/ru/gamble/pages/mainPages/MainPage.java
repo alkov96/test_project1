@@ -1,6 +1,7 @@
 package ru.gamble.pages.mainPages;
 
 
+import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -57,7 +58,17 @@ public class MainPage extends AbstractPage {
     }
 
     @ActionTitle("переключение видов спорта")
-    public static void checkChangeSport() {
+    public void checkChangeSport(String widget) {
+        String path;
+        switch (widget) {
+            case "Горячие ставки":
+                path = "//div[@class='bets-widget lastMinutesBets']";
+                break;
+            default:
+                path = "//div[@class='bets-widget nearestBroadcasts']";
+                break;
+        }
+
         //boolean flag = true;
         // DemoSingleton allError = DemoSingleton.getInstance();
         WebDriver driver = PageFactory.getDriver();
@@ -70,15 +81,18 @@ public class MainPage extends AbstractPage {
         }
         LOG.info("Смотрим что страницы в виджете переключаются и содержимое контейнера соответсвует выбранному виду спорта");
         String sportName;
-        List<WebElement> allSport = driver.findElements(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
+        //    List<WebElement> allSport = driver.findElements(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
+        List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
+
         for (WebElement selectSport : allSport) {
             selectSport.click();
             sportName = selectSport.findElement(By.xpath("i")).getAttribute("class").replace("sport-tabs__icon sport-icon icon-", "");
             LOG.info(sportName);
+            path.toString();
             wait.until(CommonStepDefs.attributeContainsLowerCase(
-                    By.xpath("//div[@class='bets-widget nearestBroadcasts']//div[contains(@class,'bets-widget-table__inner')]"),"class",sportName));
+                    By.xpath(path + "//div[contains(@class,'bets-widget-table__inner')]"),"class",sportName));
 
-            if (driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']//div[contains(@class,'bets-widget-table__inner')]/table[1]/tbody/tr")).size() == 1) {
+            if (driver.findElements(By.xpath(path + "//div[contains(@class,'bets-widget-table__inner')]/table[1]/tbody/tr")).size() == 1) {
                 LOG.error("В ближайших трансляциях есть вкладка спорта " + sportName + ", но список для него пустой");
             }
         }
@@ -125,13 +139,13 @@ public class MainPage extends AbstractPage {
             games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[position()=1 and @ng-click]"));
             haveButton = !haveButton;
         }else {
-                LOG.info("Игра " + param + " найдена ");
+            LOG.info("Игра " + param + " найдена ");
         }
         Stash.put("gameBT",games.get(0).findElement(By.xpath("ancestor::tr")));
         Stash.put("haveButtonKey",haveButton);
     }
 
-//переходит на игру нажатием на название первой команды в виджете
+    //переходит на игру нажатием на название первой команды в виджете
     @ActionTitle("переходит на игру из виджета БТ")
     public void lala(){
         WebDriver driver = PageFactory.getDriver();

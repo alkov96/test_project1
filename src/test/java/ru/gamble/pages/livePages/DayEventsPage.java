@@ -54,6 +54,7 @@ public class DayEventsPage extends AbstractPage {
         teamsOnBannerAndCoupon();
     }
 
+
     public void teamsOnBannerAndCoupon(){
         WebDriver driver = PageFactory.getDriver();
         String team2 = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[1]")).getAttribute("title");//Сохраняем название команды2 на банере

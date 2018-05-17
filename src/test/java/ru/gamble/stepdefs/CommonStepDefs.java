@@ -179,7 +179,28 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param value
      * @return
      */
+
+
     public static ExpectedCondition<Boolean> attributeContainsLowerCase(final By locator,
+                                                                        final String attribute,
+                                                                        final String value) {
+             return new ExpectedCondition<Boolean>() {
+                private String currentValue = null;
+
+                @Override
+                public Boolean apply(WebDriver driver) {
+                    return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+                }
+
+                @Override
+                public String toString() {
+                    return String.format("value to contain \"%s\". Current value: \"%s\"", value, currentValue);
+                }
+            };
+    }
+
+
+    public static ExpectedCondition<Boolean> attributeContainsLowerCase(final WebElement element,
                                                                         final String attribute,
                                                                         final String value) {
         return new ExpectedCondition<Boolean>() {
@@ -187,7 +208,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
             @Override
             public Boolean apply(WebDriver driver) {
-                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+                return element.getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
             }
 
             @Override
