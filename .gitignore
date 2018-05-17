@@ -63,3 +63,5 @@ src/test/resources/webdrivers/chromedriver/chromedriver
 webdrivers/
 /src/test/resources/config/
 allure-results/
+!/src/test/resources/config/application.properties
+/src/test/resources/config/application.properties
