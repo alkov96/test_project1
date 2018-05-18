@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.openqa.selenium.By.xpath;
+
 
 public class CommonStepDefs extends GenericStepDefs {
 
@@ -342,6 +344,43 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
     public void changeFocusOnPage(String title) throws PageInitializationException{
         super.openPage(title);
+    }
+
+    /**
+     * Проверка что при нажатии на ссылку открывается нужная страница. Проверка идет по url, причем эти url очищаются от всех символов, кроме букв и цифр. т.е. слеши собого значения тут не имеют
+     * @param element - на какой элемент жмакать чтобы открылась ссылка
+     * @param pattern - сылка или ее часть, которая должна открыться
+     * @return true - если все ок.
+     */
+
+    public static boolean goLink(WebElement element, String pattern) {
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        LOG.info("Проверяем что откроется правильная ссылка " + pattern);
+        pattern=stringParse(pattern);
+        int CountWind = driver.getWindowHandles().size();
+        if (element.findElements(xpath("ancestor-or-self::*[@target='_blank']")).isEmpty()) {
+
+            ((JavascriptExecutor) driver)//открываем ссылку в новой вкладке
+                    .executeScript("window.open(arguments[0])", element);
+        }
+        else element.click();
+        CommonStepDefs.workWithPreloader();
+        driver.switchTo().window(driver.getWindowHandles().toArray()[driver.getWindowHandles().size() - 1].toString());
+        if ((CountWind + 1) != driver.getWindowHandles().size()) {
+            LOG.error("Не открылась ссылка");
+            return false;
+        }
+        LOG.info("Ссылка открылась");
+        driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind].toString());
+        String siteUrl = stringParse(driver.getCurrentUrl());
+        if (!siteUrl.contains(pattern)) {
+            flag = false;
+            LOG.error("Ссылка открылась, но не то, что надо. Вместо "+pattern +" открылось " + siteUrl);
+        }
+        driver.close();
+        driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind - 1].toString()); //мы знаем что поле открытия ссылки на скачивание количесвто ссылок будет на  больше, незачем переопрелеть CountWind.
+        return flag;
     }
 
 }
