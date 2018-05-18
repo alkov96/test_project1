@@ -1,7 +1,6 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.Дано;
 import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -17,12 +16,12 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.pagefactory.stepdefs.GenericStepDefs;
-import ru.sbtqa.tag.pagefactory.support.Environment;
 import ru.sbtqa.tag.qautils.properties.Props;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -317,4 +316,17 @@ public class CommonStepDefs extends GenericStepDefs {
         super.openPage(title);
     }
 
+
+    public static void addStash(String key,String value){
+        List<String> values = new ArrayList<>();
+        if (Stash.asMap().containsKey(key)){
+            values = Stash.getValue(key);
+            values.add(value);
+            Stash.asMap().replace(key,values);
+        }
+        else {
+            values.add(value);
+            Stash.put(key, values);
+        }
+    }
 }

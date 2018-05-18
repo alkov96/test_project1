@@ -83,6 +83,13 @@ public abstract class AbstractPage extends Page {
     }
 
 
+    @ActionTitle("открывает Избранное")
+    public static void openFavourite(){
+        LOG.info("vot");
+        WebDriver driver = PageFactory.getDriver();
+        driver.findElement(By.id("elected")).click();//нажали на кнопку избранного
+    }
+
     @ActionTitle("сохраняет с")
     public void saveKeyValue(DataTable dataTable){ CommonStepDefs.saveValueToKey(dataTable); }
 

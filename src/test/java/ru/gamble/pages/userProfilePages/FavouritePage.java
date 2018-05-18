@@ -11,7 +11,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.ls.LSException;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.livePages.VewingEventsPage;
+import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -20,6 +23,7 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.fail;
@@ -28,7 +32,8 @@ import static org.assertj.core.api.Assertions.fail;
 public class FavouritePage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FavouritePage.class);
 
-    @FindBy(id = "elected")
+    //@FindBy(id = "elected")
+    @FindBy(xpath = "//div[contains(@class,'subMenuArea_fullwidth') and contains(@class,'active')]")
     private WebElement pageTitle;
 
 
@@ -69,7 +74,6 @@ public class FavouritePage extends AbstractPage {
     @ActionTitle("сравнивает названия событий на странице и в избранном")
     public void compareEventsAndFav(){
         WebDriver driver = PageFactory.getDriver();
-        driver.findElement(By.id("elected")).click();//нажали на кнопку избранного
         String electedGame = driver.findElement(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")).getAttribute("title");  //игра в избранном
         String team1name = Stash.getValue("team1nameKey");
         String team2name = Stash.getValue("team2nameKey");
@@ -78,6 +82,60 @@ public class FavouritePage extends AbstractPage {
         }
         LOG.info("Названия команд в списке и в блоке Избранное совпадают: " + team1name+"-"+team2name +"="+electedGame);
 
+    }
+
+    @ActionTitle("проверяет что переходы с игр из Избранного работают верно")
+    public void goFromFavourite(){
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag=true;
+        List<WebElement> allMyGames = driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']"));
+        List<String> names = Stash.getValue("nameGameKey");
+        List<String> teams = new ArrayList<>();
+        names.forEach(name->teams.add(CommonStepDefs.stringParse(name)));
+        List<String> types = Stash.getValue("typeGameKey");
+        LOG.info("Переход из избранного на игры");
+        for (int MyGameN = 0; MyGameN < allMyGames.size(); MyGameN++) {
+            String nameMyGame = allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title");
+            int index;
+
+            try {
+                index = teams.indexOf(CommonStepDefs.stringParse(nameMyGame));
+            } catch (Exception e) {
+                LOG.info("Игра в Избранное не добавлялась. Игра " + CommonStepDefs.stringParse(nameMyGame) + "а в Избранном "+ teams);
+                LOG.error("Exception " + e);
+                return;
+            }
+            LOG.info("gameis" + allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title"));
+//переходим на игру из Избранного и ждем загрузки страницы
+            //driver.findElement(By.xpath("//*[@id='private_panel']/li[3]/div[1]/div[1]/div[2]/div[" + (MyGameN + 1) + "]")).click();
+            driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']//div[contains(@class,'elected__teams')]")).get(MyGameN).click();
+            CommonStepDefs.workWithPreloader();
+            //   switch(typeGame){
+            switch (types.get(index)) {
+                case "PrematchVnePeriod":
+                    flag&=EventViewerPage.pagePrematch(teams.get(index), "Любое время");
+                    break;
+                case "PrematchInPeriod":
+                    flag&=EventViewerPage.pagePrematch(teams.get(index),  "2 часа");
+                    break;
+                case "LiveWithVideo":
+                    flag&=VewingEventsPage.pageLive(teams.get(index),true);
+                    break;
+                case "LiveWithoutVideo":
+                    flag&=VewingEventsPage.pageLive(teams.get(index),  true);
+                    break;
+                default:
+                    flag=false;
+                    LOG.error("В избранном игра, для которой не сохранился тип");
+                    break;
+            }
+
+//            driver.findElement(By.className("topLogo888")).click();
+//            inspector.expectation();
+            driver.findElement(By.xpath("//*[@id='elected']")).click();
+            CommonStepDefs.workWithPreloader();
+//            inspector.expectation();
+        }
     }
 
 }

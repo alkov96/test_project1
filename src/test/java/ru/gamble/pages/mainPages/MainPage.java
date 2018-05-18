@@ -54,6 +54,7 @@ public class MainPage extends AbstractPage {
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(pageTitle,10);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[contains(@class,'main-slider__wrapper')]"))));
     }
 
     @ActionTitle("переключение видов спорта")
