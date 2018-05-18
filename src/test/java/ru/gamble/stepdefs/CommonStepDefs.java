@@ -89,6 +89,9 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage(){goToMainPage("site2");}
 
+    @Когда("^переходит в админку$")
+    public static void goToAdminPage(){goToMainPage("admin");}
+
     @Когда("^переходит на главную страницу '(.+)'$")
     public static void goToMainPage(String site){
         switch (site){
@@ -97,6 +100,9 @@ public class CommonStepDefs extends GenericStepDefs {
                 break;
             case "site2":
                 PageFactory.getWebDriver().get(Props.get("webdriver.starting.url2"));
+                break;
+            case "admin":
+                PageFactory.getWebDriver().get(Props.get("webdriver.starting.urla"));
                 break;
             default:
                 PageFactory.getWebDriver().get(site);
