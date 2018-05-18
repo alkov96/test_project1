@@ -53,8 +53,13 @@ public class LiveCalendarPage extends AbstractPage {
             waitForElementPresent(By.xpath("//div[contains(@class,'livecal-table__coefficient')]"),1000);
             List<WebElement> correctCoeffs = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(text(), '"+coeff+"')]"));
             if (correctCoeffs.size()>0) {
-                correctCoeffs.get(0).click();
-                isCoeffFound = true;
+                for(WebElement element : correctCoeffs){
+                    if (element.isDisplayed()){
+                        element.click();
+                        isCoeffFound = true;
+                        break;
+                    }
+                }
             } else {
                 tryPage++;
                 allDaysPages.get(tryPage).click();
