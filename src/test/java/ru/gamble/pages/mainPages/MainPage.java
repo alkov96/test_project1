@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+
 
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
@@ -55,6 +57,7 @@ public class MainPage extends AbstractPage {
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(pageTitle,10);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        workWithPreloader();
     }
 
     @ActionTitle("переключение видов спорта")
