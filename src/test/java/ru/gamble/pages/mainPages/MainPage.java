@@ -170,13 +170,22 @@ public class MainPage extends AbstractPage {
 
     //добавление коэфа победы первой команды в виджете БТ
     @ActionTitle("добавляет коэф с виджета в купон")
-    public void addToCouponFromBT(){
+    public void addToCouponFromBT(String widget){
+        String path;
+        switch (widget) {
+            case "Горячие ставки":
+                path = "//div[contains(@class,'lastMinutesBets')]";
+                break;
+            default:
+                path = "div[contains(@class,'nearestBroadcasts')]";
+                break;
+        }
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> games = new ArrayList<>();
-        List<WebElement> allSport = driver.findElements(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете БТ
+        List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете
         int number = 0;
         do {
-            games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[contains(@class,'bets-item_k1')]/div[not(contains(@class,'blocked'))]"));
+            games = driver.findElements(By.xpath(path + "/div[2]/div[1]/table[1]/tbody/tr/td[contains(@class,'bets-item_k1')]/div[not(contains(@class,'blocked'))]"));
             if (!games.isEmpty()) {
                 break;
             }
@@ -200,6 +209,23 @@ public class MainPage extends AbstractPage {
         Stash.put("team2key",team2);
         Stash.put("ishodKey",team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
         Stash.put("coefKey",p1);
+    }
+
+    @ActionTitle("осуществляет переход на страницу, проверяет, что открылась нужная страница")
+    public void widgetsOnMain(){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> attr = driver.findElements(By.xpath("//div[@class='benef__item']/a"));
+        boolean flag = true; //flag, который говорит что все ок. в конце программы смотрим, если он false - значит были ошибки и их выводим
+        for (WebElement element : attr) {
+            String link = element.getAttribute("href");
+            flag &= CommonStepDefs.goLink(element, link);
+            LOG.info("Ссылка " + link + " открылась");
+        }
+
+
+
+
+
     }
 
 }
