@@ -1,6 +1,7 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
+import cucumber.api.java.ru.Дано;
 import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -16,6 +17,7 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.pagefactory.stepdefs.GenericStepDefs;
+import ru.sbtqa.tag.pagefactory.support.Environment;
 import ru.sbtqa.tag.qautils.properties.Props;
 
 import java.sql.Connection;
@@ -26,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.openqa.selenium.By.xpath;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -86,6 +90,9 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage(){goToMainPage("site2");}
 
+    @Когда("^переходит в админку$")
+    public static void goToAdminPage(){goToMainPage("admin");}
+
     @Когда("^переходит на главную страницу '(.+)'$")
     public static void goToMainPage(String site){
         switch (site){
@@ -94,6 +101,9 @@ public class CommonStepDefs extends GenericStepDefs {
                 break;
             case "site2":
                 PageFactory.getWebDriver().get(Props.get("webdriver.starting.url2"));
+                break;
+            case "admin":
+                PageFactory.getWebDriver().get(Props.get("webdriver.starting.urla"));
                 break;
             default:
                 PageFactory.getWebDriver().get(site);
@@ -181,12 +191,31 @@ public class CommonStepDefs extends GenericStepDefs {
     public static ExpectedCondition<Boolean> attributeContainsLowerCase(final By locator,
                                                                         final String attribute,
                                                                         final String value) {
+             return new ExpectedCondition<Boolean>() {
+                private String currentValue = null;
+
+            @Override
+            public Boolean apply(WebDriver driver) {
+                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+            }
+
+                @Override
+                public String toString() {
+                    return String.format("value to contain \"%s\". Current value: \"%s\"", value, currentValue);
+                }
+            };
+    }
+
+
+    public static ExpectedCondition<Boolean> attributeContainsLowerCase(final WebElement element,
+                                                                        final String attribute,
+                                                                        final String value) {
         return new ExpectedCondition<Boolean>() {
             private String currentValue = null;
 
             @Override
             public Boolean apply(WebDriver driver) {
-                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+                return element.getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
             }
 
             @Override
@@ -329,4 +358,41 @@ public class CommonStepDefs extends GenericStepDefs {
             Stash.put(key, values);
         }
     }
+    /**
+     * Проверка что при нажатии на ссылку открывается нужная страница. Проверка идет по url, причем эти url очищаются от всех символов, кроме букв и цифр. т.е. слеши собого значения тут не имеют
+     * @param element - на какой элемент жмакать чтобы открылась ссылка
+     * @param pattern - сылка или ее часть, которая должна открыться
+     * @return true - если все ок.
+     */
+
+    public static boolean goLink(WebElement element, String pattern) {
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        LOG.info("Проверяем что откроется правильная ссылка " + pattern);
+        pattern=stringParse(pattern);
+        int CountWind = driver.getWindowHandles().size();
+        if (element.findElements(xpath("ancestor-or-self::*[@target='_blank']")).isEmpty()) {
+
+            ((JavascriptExecutor) driver)//открываем ссылку в новой вкладке
+                    .executeScript("window.open(arguments[0])", element);
+        }
+        else element.click();
+        CommonStepDefs.workWithPreloader();
+        driver.switchTo().window(driver.getWindowHandles().toArray()[driver.getWindowHandles().size() - 1].toString());
+        if ((CountWind + 1) != driver.getWindowHandles().size()) {
+            LOG.error("Не открылась ссылка");
+            return false;
+        }
+        LOG.info("Ссылка открылась");
+        driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind].toString());
+        String siteUrl = stringParse(driver.getCurrentUrl());
+        if (!siteUrl.contains(pattern)) {
+            flag = false;
+            LOG.error("Ссылка открылась, но не то, что надо. Вместо "+pattern +" открылось " + siteUrl);
+        }
+        driver.close();
+        driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind - 1].toString()); //мы знаем что поле открытия ссылки на скачивание количесвто ссылок будет на  больше, незачем переопрелеть CountWind.
+        return flag;
+    }
+
 }

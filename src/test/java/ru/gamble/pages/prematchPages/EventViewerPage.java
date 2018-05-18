@@ -1,6 +1,5 @@
 package ru.gamble.pages.prematchPages;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.stepdefs.CommonStepDefs;
+import ru.gamble.pages.CouponPage;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -48,25 +48,23 @@ public class EventViewerPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandСollapseMenusButton));
-        checkMenuIsOpen();
+            new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandСollapseMenusButton));
+            checkMenuIsOpen();
     }
 
-    private void checkMenuIsOpen() {
-        if (expandСollapseMenusButton.getAttribute("title").contains("Показать всё")) {
+    private void checkMenuIsOpen(){
+        if(expandСollapseMenusButton.getAttribute("title").contains("Показать всё")){
             expandСollapseMenusButton.click();
             workWithPreloader();
         }
     }
 
     @ActionTitle("выбирает время")
-    public void chooseTime(String key) {
+    public void chooseTime(String key){
         String value = "";
-        if (key.equals(PERIOD)) {
+        if(key.equals(PERIOD)){
             value = Stash.getValue(key);
-        } else {
-            value = key;
-        }
+        }else {value = key;}
 
         selectPeriod.click();
         selectPeriod.findElement(By.xpath("//*[contains(text(),'" + value + "')]")).click();
@@ -75,11 +73,11 @@ public class EventViewerPage extends AbstractPage {
     }
 
     @ActionTitle("проверяет время игр")
-    public void checkGamesWithPeriod(String period, String limit) {
+    public void checkGamesWithPeriod(String period, String limit){
         String valuePeriod = "";
-        if (period.equals(PERIOD)) {
+        if(period.equals(PERIOD)){
             valuePeriod = Stash.getValue(period);
-        } else {
+        }else{
             valuePeriod = period;
         }
         int valueLimit = Integer.parseInt(Stash.getValue(limit));
@@ -96,7 +94,7 @@ public class EventViewerPage extends AbstractPage {
                 .stream().filter(e -> e.isDisplayed() && !(e.getText().isEmpty())).limit(valueLimit).collect(Collectors.toList());
         LOG.info("Найдено видов категорий событий::" + listMainCategoriesOfEvents.size());
 
-        if (listMainCategoriesOfEvents.size() > 0) {
+        if(listMainCategoriesOfEvents.size()>0) {
             for (WebElement event : listMainCategoriesOfEvents) {
                 LOG.info(event.getText());
                 boolean populate = false;
@@ -158,19 +156,19 @@ public class EventViewerPage extends AbstractPage {
                     }
                 }
             }
-        } else {
+        }else {
             LOG.error("Не загрузилось меню списка событий!::" + listMainCategoriesOfEvents.size());
-            throw new AutotestError("Не загрузилось меню списка событий!::" + String.valueOf(listMainCategoriesOfEvents.size()));
+            throw new AutotestError("Не загрузилось меню списка событий!::"+ String.valueOf(listMainCategoriesOfEvents.size()));
         }
     }
 
-    private void clickCompetitionsAndCheckGamesDateTime(List<WebElement> listCompetitions, String valuePeriod, int valueLimit) {
+    private void clickCompetitionsAndCheckGamesDateTime(List<WebElement> listCompetitions, String valuePeriod, int valueLimit){
         String xpathGames = "..//div[@class='left-menu__list-item-region-compitition compitition-b ng-scope ng-isolate-scope']";
         String xpathDateTimeGames = "//div[@class='prematch-competition-games__item-date ng-binding']";
-        for (WebElement country : listCompetitions) {
+        for (WebElement country: listCompetitions) {
             LOG.info(country.getText());
             // Если меню страны не открыта, то открываем
-            if (!country.findElement(By.xpath("..")).getAttribute("class").contains("active")) {
+            if(!country.findElement(By.xpath("..")).getAttribute("class").contains("active")){
                 country.click();
                 workWithPreloader();
             }
@@ -184,13 +182,13 @@ public class EventViewerPage extends AbstractPage {
                     workWithPreloader();
                     checkGames(country, valuePeriod, valueLimit);
                 }
-            } else {
+            }else {
                 checkGames(country, valuePeriod, valueLimit);
             }
         }
     }
 
-    private void checkGames(WebElement country, String valuePeriod, int valueLimit) {
+    private void checkGames(WebElement country, String valuePeriod, int valueLimit){
         String xpathDateTimeGames = "//div[@class='prematch-competition-games__item-date ng-binding']";
         String rowDateTime;
         // Ожидание появения хотя-бы одной игры в меню стран
@@ -219,13 +217,12 @@ public class EventViewerPage extends AbstractPage {
                 }
                 checkDateTime(period, rowDateTime);
             }
-        } else {
+        }else {
             LOG.error("Не надено время игры!!!");
-            throw new AutotestError("Не надено время игры!!!");
-        }
+            throw new AutotestError("Не надено время игры!!!");}
     }
 
-    private void checkDateTime(int diapason, String currentGameDateTime) {
+    private void checkDateTime(int diapason, String currentGameDateTime){
         Date currentDateTime = new Date(System.currentTimeMillis());
 
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm - dd MMM yyyy");
@@ -237,12 +234,12 @@ public class EventViewerPage extends AbstractPage {
             LOG.error(pe.getMessage());
         }
 
-        if (diapason == 0) {
+        if(diapason == 0){
             assertThat(gameDateTime.after(currentDateTime))
                     .as("Ошибка!!! Дата-время [" + gameDateTime.toString() + "] < [" + currentDateTime.toString() + "]");
             LOG.info("Дата-время [" + gameDateTime.toString() + "] > [" + currentDateTime.toString() + "]");
 
-        } else {
+        }else {
             Date dateTimePlusPeriod = new Date(System.currentTimeMillis() + diapason * 3600 * 1000);
 
             assertThat(gameDateTime.after(currentDateTime) && gameDateTime.before(dateTimePlusPeriod))

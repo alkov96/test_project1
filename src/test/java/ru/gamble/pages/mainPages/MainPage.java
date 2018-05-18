@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+
 
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
@@ -54,11 +56,22 @@ public class MainPage extends AbstractPage {
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(pageTitle,10);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        workWithPreloader();
         new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[contains(@class,'main-slider__wrapper')]"))));
     }
 
     @ActionTitle("переключение видов спорта")
-    public static void checkChangeSport() {
+    public void checkChangeSport(String widget) {
+        String path;
+        switch (widget) {
+            case "Горячие ставки":
+                path = "//div[@class='bets-widget lastMinutesBets']";
+                break;
+            default:
+                path = "//div[@class='bets-widget nearestBroadcasts']";
+                break;
+        }
+
         //boolean flag = true;
         // DemoSingleton allError = DemoSingleton.getInstance();
         WebDriver driver = PageFactory.getDriver();
@@ -71,15 +84,18 @@ public class MainPage extends AbstractPage {
         }
         LOG.info("Смотрим что страницы в виджете переключаются и содержимое контейнера соответсвует выбранному виду спорта");
         String sportName;
-        List<WebElement> allSport = driver.findElements(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
+        //    List<WebElement> allSport = driver.findElements(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
+        List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
+
         for (WebElement selectSport : allSport) {
             selectSport.click();
             sportName = selectSport.findElement(By.xpath("i")).getAttribute("class").replace("sport-tabs__icon sport-icon icon-", "");
             LOG.info(sportName);
+            path.toString();
             wait.until(CommonStepDefs.attributeContainsLowerCase(
-                    By.xpath("//div[@class='bets-widget nearestBroadcasts']//div[contains(@class,'bets-widget-table__inner')]"),"class",sportName));
+                    By.xpath(path + "//div[contains(@class,'bets-widget-table__inner')]"),"class",sportName));
 
-            if (driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']//div[contains(@class,'bets-widget-table__inner')]/table[1]/tbody/tr")).size() == 1) {
+            if (driver.findElements(By.xpath(path + "//div[contains(@class,'bets-widget-table__inner')]/table[1]/tbody/tr")).size() == 1) {
                 LOG.error("В ближайших трансляциях есть вкладка спорта " + sportName + ", но список для него пустой");
             }
         }
@@ -126,13 +142,13 @@ public class MainPage extends AbstractPage {
             games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[position()=1 and @ng-click]"));
             haveButton = !haveButton;
         }else {
-                LOG.info("Игра " + param + " найдена ");
+            LOG.info("Игра " + param + " найдена ");
         }
         Stash.put("gameBT",games.get(0).findElement(By.xpath("ancestor::tr")));
         Stash.put("haveButtonKey",haveButton);
     }
 
-//переходит на игру нажатием на название первой команды в виджете
+    //переходит на игру нажатием на название первой команды в виджете
     @ActionTitle("переходит на игру из виджета БТ")
     public void lala(){
         WebDriver driver = PageFactory.getDriver();
@@ -157,13 +173,22 @@ public class MainPage extends AbstractPage {
 
     //добавление коэфа победы первой команды в виджете БТ
     @ActionTitle("добавляет коэф с виджета в купон")
-    public void addToCouponFromBT(){
+    public void addToCouponFromBT(String widget){
+        String path;
+        switch (widget) {
+            case "Горячие ставки":
+                path = "//div[contains(@class,'lastMinutesBets')]";
+                break;
+            default:
+                path = "div[contains(@class,'nearestBroadcasts')]";
+                break;
+        }
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> games = new ArrayList<>();
-        List<WebElement> allSport = driver.findElements(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете БТ
+        List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете
         int number = 0;
         do {
-            games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[contains(@class,'bets-item_k1')]/div[not(contains(@class,'blocked'))]"));
+            games = driver.findElements(By.xpath(path + "/div[2]/div[1]/table[1]/tbody/tr/td[contains(@class,'bets-item_k1')]/div[not(contains(@class,'blocked'))]"));
             if (!games.isEmpty()) {
                 break;
             }
@@ -187,6 +212,23 @@ public class MainPage extends AbstractPage {
         Stash.put("team2key",team2);
         Stash.put("ishodKey",team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
         Stash.put("coefKey",p1);
+    }
+
+    @ActionTitle("осуществляет переход на страницу, проверяет, что открылась нужная страница")
+    public void widgetsOnMain(){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> attr = driver.findElements(By.xpath("//div[@class='benef__item']/a"));
+        boolean flag = true; //flag, который говорит что все ок. в конце программы смотрим, если он false - значит были ошибки и их выводим
+        for (WebElement element : attr) {
+            String link = element.getAttribute("href");
+            flag &= CommonStepDefs.goLink(element, link);
+            LOG.info("Ссылка " + link + " открылась");
+        }
+
+
+
+
+
     }
 
 }

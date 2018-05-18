@@ -54,6 +54,27 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//p[@class='betting-result-info__total-bonus']")
     private WebElement bonus;
 
+    @ElementTitle("тип ставки")
+    @FindBy(xpath = "//span[@class='bs-type-switcher__title-text ng-binding']")
+    private WebElement betType;
+
+    @ElementTitle("бонусы")
+    @FindBy(xpath = "//div[@id='bonusmoney']")
+    private WebElement bonusSwitcher;
+
+    @ElementTitle("фрибет")
+    @FindBy(xpath = "//div[@class='coupon-clear-all__inner']")
+    private WebElement freebet;
+
+
+    public CouponPage() {
+        WebDriver driver = PageFactory.getDriver();
+        PageFactory.initElements(new HtmlElementDecorator(
+                new HtmlElementLocatorFactory(driver)), this);
+        tryingLoadPage(coupon,10);
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
+    }
+
     @ActionTitle("убирает события из купона, пока их не станет")
     public void removeEventsFromCoupon(String param) {
         int count = Integer.parseInt(param);
@@ -90,6 +111,25 @@ public class CouponPage extends AbstractPage {
         assertThat(false, equalTo(checkBonus()));
     }
 
+    @ActionTitle("выбирает тип ставки")
+    public void checkBonusNotPresent(String type) {
+        if (type.equals("Ординар")){
+            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
+                    "                            Ординар\n" +
+                    "                        ')]")).click();
+        }
+        if (type.equals("Экспресс")){
+            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
+                    "                            Экспресс\n" +
+                    "                        ')]")).click();
+        }
+        if (type.equals("Система")){
+            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
+                    "                            система\n" +
+                    "                        ')]")).click();
+        }
+    }
+
     public boolean checkBonus() {
         try {
             bonus.isDisplayed();
@@ -109,12 +149,7 @@ public class CouponPage extends AbstractPage {
         }
     }
 
-    public CouponPage() {
-        WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
-    }
+
 
     @ActionTitle("проверяет, добавилось ли событие в купон")
     public void checkListOfCoupon() {

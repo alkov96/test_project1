@@ -61,3 +61,5 @@ Would skip repository autotest888/
 src/test/resources/webdrivers/chromedriver/chromedriver
 /webdrivers/
 webdrivers/
+/src/test/resources/config/
+allure-results/

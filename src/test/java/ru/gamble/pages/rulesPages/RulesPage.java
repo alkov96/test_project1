@@ -33,7 +33,7 @@ public class RulesPage extends AbstractPage {
 
     @ActionTitle("проверяет, что перешел именно по ссылке Как получить выйгрыш")
     public void checkIfComeFromHowToGetMoney(){
-        assertThat("https://888.ru/rules#withdrawal", equalTo(PageFactory.getWebDriver().getCurrentUrl()));
+        assertThat(true, equalTo(PageFactory.getWebDriver().getCurrentUrl().contains("/rules#withdrawal")));
     }
 
     public RulesPage() {

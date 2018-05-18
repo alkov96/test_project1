@@ -44,7 +44,10 @@ public class FavouritePage extends AbstractPage {
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-
+    /**
+     * смотрит, есть ли какие-то события в избранном, если есть, то удаляет их
+     * @throws Exception
+     */
     public static void clearFavouriteGames() throws Exception {
         WebDriver driver = PageFactory.getDriver();
         int x = driver.findElement(By.xpath("//*[@id='elected']")).getLocation().getX() - 50;
