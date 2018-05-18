@@ -211,4 +211,21 @@ public class MainPage extends AbstractPage {
         Stash.put("coefKey",p1);
     }
 
+    @ActionTitle("осуществляет переход на страницу, проверяет, что открылась нужная страница")
+    public void widgetsOnMain(){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> attr = driver.findElements(By.xpath("//div[@class='benef__item']/a"));
+        boolean flag = true; //flag, который говорит что все ок. в конце программы смотрим, если он false - значит были ошибки и их выводим
+        for (WebElement element : attr) {
+            String link = element.getAttribute("href");
+            flag &= CommonStepDefs.goLink(element, link);
+            LOG.info("Ссылка " + link + " открылась");
+        }
+
+
+
+
+
+    }
+
 }
