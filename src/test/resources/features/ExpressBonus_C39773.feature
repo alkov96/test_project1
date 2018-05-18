@@ -1,6 +1,9 @@
 # language: ru
-@ExpressBonus_C39773
 Функционал: Экспресс бонус
+
+  @smoke
+  @ExpressBonus_C39773
+
   @correct
   Сценарий: Позитивный кейс
     * переходит на главную страницу

@@ -1,12 +1,10 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.И;
+import cucumber.api.java.ru.Дано;
 import cucumber.api.java.ru.Когда;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -27,6 +25,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -85,9 +85,22 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){
-        PageFactory.getWebDriver().get(Props.get("webdriver.starting.url"));
-        WebDriver driver = PageFactory.getWebDriver();
+    public static void goToMainPage(){goToMainPage("site2");}
+
+    @Когда("^переходит на главную страницу '(.+)'$")
+    public static void goToMainPage(String site){
+        switch (site){
+            case "site1":
+                PageFactory.getWebDriver().get(Props.get("webdriver.starting.url1"));
+                break;
+            case "site2":
+                PageFactory.getWebDriver().get(Props.get("webdriver.starting.url2"));
+                break;
+            default:
+                PageFactory.getWebDriver().get(site);
+                break;
+        }
+
     }
 
     @Когда("^сохраняем в память таблицу$")
@@ -158,9 +171,171 @@ public class CommonStepDefs extends GenericStepDefs {
         PageFactory.getInstance().getPage(title);
     }
 
-//    @Override
+
+    /**
+     * ожидание пока аттрибут без учета регистра будет содержать подстроку
+     * @param locator
+     * @param attribute
+     * @param value
+     * @return
+     */
+
+
+    public static ExpectedCondition<Boolean> attributeContainsLowerCase(final By locator,
+                                                                        final String attribute,
+                                                                        final String value) {
+             return new ExpectedCondition<Boolean>() {
+                private String currentValue = null;
+
+                @Override
+                public Boolean apply(WebDriver driver) {
+                    return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+                }
+
+                @Override
+                public String toString() {
+                    return String.format("value to contain \"%s\". Current value: \"%s\"", value, currentValue);
+                }
+            };
+    }
+
+
+    public static ExpectedCondition<Boolean> attributeContainsLowerCase(final WebElement element,
+                                                                        final String attribute,
+                                                                        final String value) {
+        return new ExpectedCondition<Boolean>() {
+            private String currentValue = null;
+
+            @Override
+            public Boolean apply(WebDriver driver) {
+                return element.getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+            }
+
+            @Override
+            public String toString() {
+                return String.format("value to contain \"%s\". Current value: \"%s\"", value, currentValue);
+            }
+        };
+    }
+
+
+    public static void waitOfPreloader() throws InterruptedException {
+        waitOfPreloader(60);
+    }
+    public static void waitOfPreloader(int num) throws InterruptedException {
+        LOG.debug("Проверка на наличие бесконечных прелоадеров");
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> list = driver.findElements(By.cssSelector("div.preloader__container"));
+        int count = num;
+        try {
+            do {
+                //todo del . soup
+                System.out.println(count);
+                LOG.debug("List size is " + list.size());
+                for (WebElement preloader : list) {
+                    if (preloader.isDisplayed()) {
+                        LOG.debug("Данный прелоадер виден");
+                        count--;
+                        Thread.sleep(500);
+                        count--;
+                        continue;
+                    } else {
+                        LOG.debug("Данный прелоадер не виден");
+                        list.remove(preloader);
+                    }
+                    if (list.isEmpty()) {
+                        LOG.debug("List is empty");
+                    }
+                    break;
+                }
+            } while (!list.isEmpty() && count > 0);
+        } catch (org.openqa.selenium.StaleElementReferenceException e) {
+            LOG.error(""+e);
+        }
+        if (count <= 0) {
+            LOG.error("Количество попыток исчерпано. Прелоадер всё ещё виден");
+            throw new AssertionError();
+        }
+        LOG.debug("Проверка успешно выполнена");
+    }
+
+
+    /**
+     * Провкрутка страницы на х и y
+     * @param x прокрутка по горизонтали
+     * @param y прокрутка по вертикали
+     */
+    public static void scrollPage(int x, int y){
+        WebDriver driver = PageFactory.getDriver();
+        ((JavascriptExecutor)driver).executeScript("window.scroll(" + x + ","
+                + y + ");");
+    }
+
+    /**
+     * Преобразовывает название игры к виду "team1 - team2".
+     *
+     * @param oldName - название игры, которое удем преобразовывать
+     */
+    public static String stringParse(String oldName) {
+        String nameGame;
+        Pattern p = Pattern.compile("(?u)[^а-яА-Я0-9a-zA-Z]");
+        Matcher m = p.matcher(oldName);
+        nameGame = m.replaceAll("");
+        return nameGame;
+    }
+
+
+    /**
+     * проверка что из Ближвйших трансляци переход на правильную игру
+     * сравнивает на совпадение название спорта, команд и првоеряет есть ли видео если страница Лайв
+     * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
+     * @throws Exception
+     */
+    @ActionTitle("проверяет что переход удался")
+    public void checkLinkToGame() throws Exception {
+        WebDriver driver = PageFactory.getDriver();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
+        workWithPreloader();
+        boolean flag = true;
+        boolean haveButton = Stash.getValue("haveButtonKey");
+        String team1 = Stash.getValue("team1BTkey");
+        String team2 = Stash.getValue("team2BTkey");
+        String sportName = Stash.getValue("sportKey");
+
+        if (haveButton) {
+            String sportis = driver.findElement(By.xpath("//div[@class='live-game-summary']/div[1]/div[1]/div[1]/div[contains(@class,'game-info')]")).getAttribute("class").replace("game-info game-info_", "");
+            String team1name = driver.findElement(By.xpath("//div[@class='live-game-summary']//div[contains(@class,'game-info')]/ng-include[1]//div[contains(@class,'team-1')]//p")).getAttribute("title").trim();
+            String team2name = driver.findElement(By.xpath("//div[@class='live-game-summary']//div[contains(@class,'game-info')]/ng-include[1]//div[contains(@class,'team-2')]//p")).getAttribute("title").trim();
+            LOG.info("Перешли на игру. Ее название в линии: " + team1name + " - " + team2name + ". Спорт: " + sportis);
+            if (!team1.equals(team1name) || !team2.equals(team2name)) {
+                LOG.error("Из Ближайших трансляций переход на неправильную игру. Вместо " + team1 + " " + team2 + "перешли на " + team1name + " " + team2name);
+                assert false;
+            }
+            if (!(sportName.toLowerCase()).equals(sportis.toLowerCase())) {
+                LOG.error("Из Ближайших трансляций переход на неправильный спорт. Игра " + stringParse(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
+                assert false;
+            }
+            if (driver.findElement(By.xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
+                ;
+                //  if (driver.findElements(By.xpath("//div[@class='field-switcher']/div[contains(@class,'field-switcher__item_icon-video')]")).isEmpty()) {
+                LOG.error("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + stringParse(team1 + team2));
+                assert false;
+            }
+            LOG.info("У игры, у которой на виджете БТ есть кнопка Смотреть действительно есть видео. Проверка Успешна");
+        } else {
+            String gameName = driver.findElement(By.xpath("//div[contains(@class,'live-container')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("title");
+            LOG.info("Перешли на игру. Ее название в линии: " + gameName);
+            if (!stringParse(gameName).equals(stringParse(team1 + team2))) {
+                LOG.error("Из виджета переход на неправильную игру. Вместо " + stringParse(team1 + team2) + "перешли на " + stringParse(gameName));
+                assert false;
+            }
+            LOG.info("Название игры в линии совпадает с тем, что ыбло на виджете БТ. Переход прошел успешно");
+        }
+    }
+
     @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
-    public void changeFocusOnPage(String title) throws PageInitializationException {
+    public void changeFocusOnPage(String title) throws PageInitializationException{
         super.openPage(title);
     }
+
 }

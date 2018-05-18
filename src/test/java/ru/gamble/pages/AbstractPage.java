@@ -23,6 +23,8 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
+
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -35,6 +37,10 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 public abstract class AbstractPage extends Page {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
+
+    @ElementTitle("На главную")
+    @FindBy(id = "main-logo")
+    protected WebElement onMainPageButton;
 
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
@@ -56,9 +62,25 @@ public abstract class AbstractPage extends Page {
     @FindBy(xpath = "//*[@class='footer__pin']")
     protected WebElement footerButton;
 
-    @ElementTitle("На главную страницу")
-    @FindBy(xpath = "//a[@class = 'btn btn_important']")
-    protected WebElement onMainPageButton;
+
+    // Метод три раза пытается обновить главную страницу
+
+    public void tryingLoadPage(WebElement element, int count){
+        WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
+
+        for(int j = 0; j < count; j++) {
+            try {
+                new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(element));
+                break;
+            } catch (Exception e){
+                driver.navigate().refresh();
+            }
+            if(j >= count - 1){
+                throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
+            }
+        }
+    }
 
 
     @ActionTitle("сохраняет с")
@@ -67,7 +89,6 @@ public abstract class AbstractPage extends Page {
     @ActionTitle("нажимает кнопку")
     public static void pressButtonAP(String param){
         CommonStepDefs.pressButton(param);
-        workWithPreloader();
     }
 
     @ActionTitle("stop")
@@ -77,7 +98,6 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("закрываем браузер")
     public static void closeBrowser(){
-        getWebDriver().close();
         PageFactory.getWebDriver().close();
     }
 
@@ -196,7 +216,7 @@ public abstract class AbstractPage extends Page {
     public void checksPresenceOfText(String text){
         List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath("//*[text()='" + text + "']"))
                 .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
-        assertThat(!list.isEmpty()).as("Ошибка.Не найден::[" + text+ " ]").isTrue();
+        assertThat(!list.isEmpty()).as("Ошибка.Не найден::[" + text + " ]").isTrue();
     }
 
 
@@ -211,7 +231,7 @@ public abstract class AbstractPage extends Page {
         page = PageFactory.getInstance().getCurrentPage();
         String link =  page.getElementByTitle(param).getAttribute("href");
         PageFactory.getWebDriver().get(link);
-        LOG.info("Получили и перешли по ссылке::"+link);
+        LOG.info("Получили и перешли по ссылке::" + link);
         workWithPreloader();
     }
 

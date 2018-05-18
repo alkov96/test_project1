@@ -22,6 +22,10 @@ public class LivePage extends AbstractPage {
     @FindBy(id = "live-overview")
     private WebElement liveOverviewLink;
 
+    @ElementTitle("События дня")
+    @FindBy(id = "day-events")
+    private WebElement dayEventLink;
+
     @ElementTitle("Мультимонитор")
     @FindBy(id = "multimonitor")
     private WebElement multimonitorLink;
