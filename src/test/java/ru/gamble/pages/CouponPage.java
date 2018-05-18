@@ -66,6 +66,15 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//div[@class='coupon-clear-all__inner']")
     private WebElement freebet;
 
+
+    public CouponPage() {
+        WebDriver driver = PageFactory.getDriver();
+        PageFactory.initElements(new HtmlElementDecorator(
+                new HtmlElementLocatorFactory(driver)), this);
+        tryingLoadPage(coupon,10);
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
+    }
+
     @ActionTitle("убирает события из купона, пока их не станет")
     public void removeEventsFromCoupon(String param) {
         int count = Integer.parseInt(param);
@@ -140,12 +149,7 @@ public class CouponPage extends AbstractPage {
         }
     }
 
-    public CouponPage() {
-        WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
-    }
+
 
     @ActionTitle("проверяет, добавилось ли событие в купон")
     public void checkListOfCoupon() {
