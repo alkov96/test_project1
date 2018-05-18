@@ -1,6 +1,6 @@
 # language: ru
 @smoke
-@NearTranslationCoupon_C1270
+@HotBetsCoupon_С1051
 Функционал: Главная страница. Добавление ставки в купон с виджета "Горячие ставки"
   Сценарий: HotBetsCoupon_С1051
     * переходит на главную страницу
