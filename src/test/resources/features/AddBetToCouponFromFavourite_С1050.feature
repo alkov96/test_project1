@@ -1,6 +1,6 @@
 # language: ru
 @smoke
-@LinkGameFromFavourite_C1050
+@AddBetToCouponFromFavourite_С1050
 Функционал: Избранное. Добавление ставки в купон из Избранного
   Сценарий: AddBetToCouponFromFavourite_С1050
 
