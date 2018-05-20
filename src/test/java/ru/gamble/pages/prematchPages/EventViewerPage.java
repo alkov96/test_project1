@@ -1,5 +1,6 @@
 package ru.gamble.pages.prematchPages;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -424,5 +425,53 @@ public class EventViewerPage extends AbstractPage {
         }
 
         return flag;
+    }
+
+
+
+    @ActionTitle("очищает избранное через левое меню")
+    public void clearFavouritePrematch(){
+        WebDriver driver = PageFactory.getDriver();
+
+//если меню свернуто - разворачиваем
+        WebElement menu = driver.findElement(By.id("menu-toggler"));
+        if (!menu.getAttribute("class").contains("collapsed"))
+        {
+            menu.click();
+            CommonStepDefs.workWithPreloader();
+        }
+
+//сворачиваем все виды спорта, а затем разворачиваем 'мои игры'
+        driver.findElement(By.id("sports-toggler")).click();
+        driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]")).click();
+        CommonStepDefs.workWithPreloader();
+        int myGamesCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
+
+        int sizeFavouriteUpdate;
+
+        for (int count = myGamesCount; count >0; count--) {
+            driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li[1]/div[1]/div[1]/div[2]")).click();//убираем игру из избранного в премтче
+
+            int countSec=0;
+            while (countSec<5)
+            {
+                sizeFavouriteUpdate = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
+                if (sizeFavouriteUpdate < myGamesCount) {
+                    break;
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                countSec++;
+                if (countSec==5){
+                    LOG.error("Не удалилась игра из избранного через левое меню. Было игр " + myGamesCount + ",осталось " + sizeFavouriteUpdate);
+                    assert false;
+                }
+            }
+
+            myGamesCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
+        }
     }
 }

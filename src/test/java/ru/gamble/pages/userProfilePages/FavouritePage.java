@@ -1,6 +1,7 @@
 package ru.gamble.pages.userProfilePages;
 
 
+import cucumber.api.java.en_old.Ac;
 import cucumber.runtime.junit.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.openqa.selenium.By.xpath;
 
 @PageEntry(title = "Избранное")
 public class FavouritePage extends AbstractPage {
@@ -141,5 +143,50 @@ public class FavouritePage extends AbstractPage {
         }
     }
 
+    @ActionTitle("добавляет ставку в купон")
+    public void addToCoupon(){
+        WebDriver driver = PageFactory.getDriver();
+        WebElement game = driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']")).get(0);//первая игра в списоке игр в избранном
+        String nameFavour = game.findElement(xpath("div//div[contains(@class,'elected__teams')]")).getAttribute("title");
+        float coefFavour = Float.valueOf(game.findElement(xpath("div//div[contains(@class,'elected-data__event-price')]")).getText());
+        String typeFavour = driver.findElement(xpath("//div[contains(@class,'elected-data__caption')]")).getAttribute("title").trim();
+        LOG.info("Добавляем в купон ставку из Избранного");
+        game.findElement(xpath("//div[contains(@class,'elected-data__event-price')]")).click();
+        CommonStepDefs.workWithPreloader();
+        String team1Name = nameFavour.split(" - ")[0];
+        String team2Name = nameFavour.split(" - ")[1].trim();
+        String ishod = game.findElement(xpath("div//div[contains(@class,'elected-data__event-content')]")).getAttribute("title").trim();
+        LOG.info("Название игры: " + team1Name + " - " + team2Name);
+        LOG.info("Название исхода: " + ishod);
+        Stash.put("team1key",team1Name);
+        Stash.put("team2key",team2Name);
+        Stash.put("ishodKey",ishod);
+        Stash.put("coefKey",coefFavour);
+    }
+
+
+    @ActionTitle("проверяет что в избранном все нужные игры")
+    public void checkFavourite(){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> allMyGames = driver.findElements(By.xpath("//*[@id='elected']/..//div[@class='elected ng-isolate-scope']"));
+        List<String> names = Stash.getValue("nameGameKey");
+        List<String> teams = new ArrayList<>();
+        names.forEach(name->teams.add(CommonStepDefs.stringParse(name)));
+        LOG.info("Проверка что в Избранном игр не больше, чем добавлялось");
+        if (teams.size() < allMyGames.size())
+        {
+            LOG.error("В избранном лишние игры");
+            assert false;
+        }
+        LOG.info("Проверка названий игр, которе оказались в Избранном по названию");
+        for (WebElement gameN : allMyGames){
+            String nameGameFull = gameN.findElement(By.xpath("div[1]/div[1]/div[1]/div[2]")).getAttribute("title");
+            LOG.info("В избранном еть игра: " + nameGameFull );
+            if (!teams.contains(CommonStepDefs.stringParse(nameGameFull))) {
+                LOG.error("В избранном неверная игра. Добавляли Игры " + teams.toString() + " а в избранном оказалась " +  CommonStepDefs.stringParse(nameGameFull));
+                assert false;
+            }
+        }
+    }
 }
 
