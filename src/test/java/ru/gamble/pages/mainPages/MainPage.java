@@ -31,9 +31,8 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 public class MainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MainPage.class);
 
-    @FindBy(xpath = "//*[@class='topLogo888__link topLogo888__link_show']")
+    @FindBy(xpath = "//div[contains(@class,'main-slider__wrapper')]")
     private WebElement pageTitle;
-
 
     @ElementTitle("Регистрация")
     @FindBy(id = "register")
@@ -58,7 +57,7 @@ public class MainPage extends AbstractPage {
         tryingLoadPage(pageTitle,10);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(enterButton));
         workWithPreloader();
-        new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[contains(@class,'main-slider__wrapper')]"))));
+        new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
     @ActionTitle("переключение видов спорта")
