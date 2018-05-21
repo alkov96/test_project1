@@ -22,6 +22,8 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import java.time.LocalTime;
 import java.util.List;
 
+import static org.openqa.selenium.By.xpath;
+
 /**
  * @author p.sivak.
  * @since 10.05.2018.
@@ -45,7 +47,7 @@ public class DayEventsPage extends AbstractPage {
     }
 
     @ActionTitle("добавляет событие с баннера в купон")
-    public void addEventToCoupon(){
+    public void addEventToCouponFromBanner(){
         CommonStepDefs.workWithPreloader();
         WebDriver driver = PageFactory.getDriver();
         WebElement event = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[2]"));
@@ -117,6 +119,20 @@ public class DayEventsPage extends AbstractPage {
         LOG.info("Все иконки избранного на странице обнаружены");
         stars.get(3).click();
         LOG.info("Добавили в Избранное событие");
+    }
+
+    @ActionTitle("добавляет несколько событий в купон")
+    public void addEventsToCoupon(){
+        int counter=0;
+        List<WebElement> allEvents = driver.findElements(xpath("//div[@class='bets-widget bets-widget_wide liveNow']//table[@class='full_width bets-widget-table']//tr/td[5]"));
+        for (WebElement event : allEvents) {
+            event.click();
+            event.getText();
+            LOG.info("Событие добавилось в купон");
+            counter++;
+            if (counter>=6) break;
+        }
+
     }
 }
 
