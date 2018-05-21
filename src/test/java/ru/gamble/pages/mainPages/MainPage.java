@@ -1,7 +1,6 @@
 package ru.gamble.pages.mainPages;
 
 
-import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -58,6 +57,7 @@ public class MainPage extends AbstractPage {
         tryingLoadPage(pageTitle,10);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
         workWithPreloader();
+        new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[contains(@class,'main-slider__wrapper')]"))));
     }
 
     @ActionTitle("переключение видов спорта")
