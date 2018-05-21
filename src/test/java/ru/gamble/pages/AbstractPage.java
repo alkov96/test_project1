@@ -62,6 +62,10 @@ public abstract class AbstractPage extends Page {
     @FindBy(xpath = "//*[@class='footer__pin']")
     protected WebElement footerButton;
 
+    @ElementTitle("Прематч")
+    @FindBy(id = "prematch")
+    private WebElement prematchBottom;
+
 
     // Метод три раза пытается обновить главную страницу
 
@@ -85,7 +89,6 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("открывает Избранное")
     public static void openFavourite(){
-        LOG.info("vot");
         WebDriver driver = PageFactory.getDriver();
         driver.findElement(By.id("elected")).click();//нажали на кнопку избранного
     }
@@ -253,6 +256,10 @@ public abstract class AbstractPage extends Page {
                         .limit(count+20).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 clickElement(coefficient);
+
+                correctMarkets.remove(coefficient);
+
+
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
                 if (eventsInCoupon.size() == count) {
                     break;
@@ -304,6 +311,13 @@ public abstract class AbstractPage extends Page {
                 return element != null && element.isDisplayed();
             }
         });
+    }
+
+    @ActionTitle("запоминает значение баланса")
+    public void rememberBalnce(String param){
+        By top_balance = param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
+        float balance = Float.valueOf(getWebDriver().findElement(top_balance).getText());
+        Stash.put("balanceKey",balance);
     }
 }
 
