@@ -43,17 +43,14 @@ public class CommonStepDefs extends GenericStepDefs {
         try {
             page = PageFactory.getInstance().getCurrentPage();
             button = page.getElementByTitle(param);
+                button.click();
+                workWithPreloader();
         } catch (PageInitializationException e) {
             LOG.error(e.getMessage());
         } catch (PageException e1) {
             LOG.error(e1.getMessage());
         }
-        if(button.isDisplayed()){
-        button.click();
-        workWithPreloader();
-        }else {
-            LOG.error("ОШИБКА! Кнопка невидима.");
-        }
+
     }
 
     @Когда("^сохраняем в память$")
