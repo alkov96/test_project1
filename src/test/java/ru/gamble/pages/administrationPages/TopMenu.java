@@ -1,4 +1,4 @@
-package ru.gamble.pages.AdministrationPages;
+package ru.gamble.pages.administrationPages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

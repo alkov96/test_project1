@@ -298,5 +298,16 @@ public abstract class AbstractPage extends Page {
             }
         });
     }
+
+    public void waitForElementPresent(final WebElement element, int timeout){
+        WebDriverWait wait = (WebDriverWait)new WebDriverWait(PageFactory.getWebDriver(),timeout)
+                .ignoring(StaleElementReferenceException.class);
+        wait.until(new ExpectedCondition<Boolean>(){
+            @Override
+            public Boolean apply(WebDriver webDriver) {
+                return element != null && element.isDisplayed();
+            }
+        });
+    }
 }
 

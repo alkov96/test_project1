@@ -1,0 +1,86 @@
+package ru.gamble.pages.administrationPages.servicesPages;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
+import ru.sbtqa.tag.pagefactory.PageFactory;
+import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
+import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
+import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * @author p.sivak.
+ * @since 18.05.2018.
+ */
+@PageEntry(title = "Сервисные сообщения")
+public class ServiceMessagesPage extends AbstractPage {
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceMessagesPage.class);
+
+    @FindBy(xpath = "//div[@id='tabpanel-1482-body']")
+    private WebElement table;
+
+    @ElementTitle("Последняя страница")
+    @FindBy(xpath = "//span[@id='button-1525-btnIconEl']")
+    private WebElement lastPage;
+
+    @ElementTitle("Предыдущая страница")
+    @FindBy(xpath = "//span[@id='button-1518-btnIconEl']")
+    private WebElement prePage;
+
+    @ElementTitle("Поле с количеством страниц")
+    @FindBy(xpath = "//div[@id='tbtext-1522']")
+    private WebElement maxPagesText;
+
+    @ElementTitle("Добавить сообщение")
+    @FindBy(xpath = "//span[@id='button-1539-btnIconEl']")
+    private WebElement newMessageBotton;
+
+    public ServiceMessagesPage() {
+        WebDriver driver = PageFactory.getDriver();
+        PageFactory.initElements(new HtmlElementDecorator(
+                new HtmlElementLocatorFactory(driver)), this);
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(table));
+    }
+
+    @ActionTitle("очищает все активные сообщения")
+    public void clearActives() throws InterruptedException {
+        if (lastPage.isDisplayed()) {
+            lastPage.click();
+        }
+        int pageCount = 0;
+        Pattern pat = Pattern.compile("[-]?[0-9]+(.[0-9]+)?");
+        Matcher matcher = pat.matcher(maxPagesText.getText());
+        while (matcher.find()) {
+            pageCount = Integer.parseInt(matcher.group());
+        }
+        for (int i = 0; i < pageCount; i++) {
+            waitForElementPresent(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"),1000);
+            List<WebElement> activeBoxes = PageFactory.getWebDriver().findElements(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"));//получение всех чекбоксов "Активное"
+            for (int z = 0; z < activeBoxes.size(); z++) {
+                waitForElementPresent(activeBoxes.get(z), 1000);
+                if (activeBoxes.get(z).findElement(By.xpath("div/img")).getAttribute("class").contains("checked")) {
+                    PageFactory.getActions().doubleClick(activeBoxes.get(z)).build().perform();
+                    String activeBottomId = PageFactory.getWebDriver().findElement(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-checkbox x-field-default x-anchor-form-item x-form-cb-checked x-form-dirty']")).getAttribute("id");
+                    PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + activeBottomId + "-inputEl']")).click();
+                    PageFactory.getWebDriver().findElement(By.xpath("//a[@class='x-btn x-unselectable x-box-item x-toolbar-item x-btn-default-small x-noicon x-btn-noicon x-btn-default-small-noicon']")).click();
+                    activeBoxes = PageFactory.getWebDriver().findElements(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"));
+                }
+            }
+            if (prePage.isDisplayed()) {
+                prePage.click();
+            }
+        }
+    }
+}
