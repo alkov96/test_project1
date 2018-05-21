@@ -1,6 +1,7 @@
 package ru.gamble.pages.mainPages;
 
 
+import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -180,7 +181,7 @@ public class MainPage extends AbstractPage {
                 path = "//div[contains(@class,'lastMinutesBets')]";
                 break;
             default:
-                path = "div[contains(@class,'nearestBroadcasts')]";
+                path = "//div[contains(@class,'nearestBroadcasts')]";
                 break;
         }
         WebDriver driver = PageFactory.getDriver();
