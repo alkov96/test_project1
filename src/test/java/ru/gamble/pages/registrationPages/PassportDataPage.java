@@ -108,7 +108,12 @@ public class PassportDataPage extends AbstractPage {
         LOG.info("Заполняем номер паспорта::" + number);
         fillField(passpNumberInput,number);
 
-        enterDate(data.get(DATEISSUE));
+        // делаем столько попыток ввести дату, пока не пропадёт ошибка
+        // "Дата выдачи не соответсвует дате обязательной  замены паспорта"
+        do {
+            enterDate(data.get(DATEISSUE));
+        } while(PageFactory.getWebDriver().findElement(By.xpath( "//div[@class='inpErrText__inner ng-binding ng-scope']")).isDisplayed());
+
 
         whoIssued = (data.get(ISSUEDBY).equals(RANDOM))? Generators.randomString(25) : data.get(ISSUEDBY);
         LOG.info("Заполняем кем выдан::" + whoIssued);
