@@ -1,4 +1,4 @@
-package ru.gamble.pages.userProfilePages;
+package ru.gamble.pages.registrationPages;
 
 import cucumber.api.DataTable;
 import org.openqa.selenium.*;
@@ -20,9 +20,7 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import static ru.gamble.utility.Constants.*;
@@ -33,8 +31,6 @@ public class UserAccountPage extends AbstractPage{
 
     @FindBy(xpath = "//*[text()='Учетная запись']")
     private WebElement pageTitle;
-
-
 
     @ElementTitle("Фамилия")
     @FindBy(id = "surname")

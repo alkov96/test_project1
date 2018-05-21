@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.openqa.selenium.By.xpath;
 import static ru.gamble.stepdefs.CommonStepDefs.*;
 
 /**
@@ -65,6 +66,19 @@ public class CouponPage extends AbstractPage {
     @ElementTitle("фрибет")
     @FindBy(xpath = "//div[@class='coupon-clear-all__inner']")
     private WebElement freebet;
+
+    @ElementTitle("параметры в купоне")
+    @FindBy(xpath = "//div[@class='list-bet-block-top']//div[@class='bs-type-switcher__wrapper']//i")
+    private WebElement button;
+
+
+    public CouponPage() {
+        WebDriver driver = PageFactory.getDriver();
+        PageFactory.initElements(new HtmlElementDecorator(
+                new HtmlElementLocatorFactory(driver)), this);
+        tryingLoadPage(coupon,10);
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
+    }
 
     @ActionTitle("убирает события из купона, пока их не станет")
     public void removeEventsFromCoupon(String param) {
@@ -140,12 +154,7 @@ public class CouponPage extends AbstractPage {
         }
     }
 
-    public CouponPage() {
-        WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
-    }
+
 
     @ActionTitle("проверяет, добавилось ли событие в купон")
     public void checkListOfCoupon() {
@@ -182,15 +191,45 @@ public class CouponPage extends AbstractPage {
     public void compareCoef() {
         WebDriver driver = PageFactory.getDriver();
         float coef = Stash.getValue("coefKey");
-        float coefCupon = Float.valueOf(driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice')]")).getText());//Кэфицент в купоне
+        float coefCoupon = Float.valueOf(driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice')]")).getText());//Кэфицент в купоне
         String oldString = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice_old')]")).getAttribute("class");//oldString - просто переменная, в которую сохраним класс, где лежит старый коэф.
         float coefOld;
         coefOld = oldString.contains("ng-hide") ? 0.0f : Float.valueOf(driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice_old')]")).getText());//Краткая запись цикла. ? - часть синтаксиса. Здесь показываем чему равен старый коэфицент. если скрыт, то 0.0.
-        if (coef != coefCupon && coef != coefOld) {
-            Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCupon + coef);
-        } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCupon +" - " + coef);
+        if (coef != coefCoupon && coef != coefOld) {
+            Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCoupon + coef);
+        } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon +" - " + coef);
 
     }
-}
+    @ActionTitle("устанавливает условие для принятия коэфицентов как 'Никогда'")
+    public void neverAccept() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        button.click();
+        driver.findElement(xpath("//label[@class='betslip-settings__option']")).click();
+        LOG.info("Установили условие 'Никогда'");
+        button.click();
+        Thread.sleep(5000);
+    }
+
+    @ActionTitle("проверяет, что после изменения условий в купоне появляется кнопка 'Принять' и информационное сообщение")
+    public void buttonAndMessageIsDisplayed(){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> oldCoef =  driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+        if (oldCoef.size()>0 && !driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()) {
+            Assertions.fail("Коэф изменился, однако сообщение не отображается.");
+        }
+        LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
+        if (!driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()
+                || !driver.findElement(xpath("//div[@class='coupon-confirm__btn']")).isDisplayed()) {
+            Assertions.fail("При изменении условий ставки не появилось сообщение или кнопка о принятии изменений.");
+        }
+        LOG.info("Появилось сообщение о принятии коэфицента и кнопка");
+
+        LOG.info("Проверка на принятие условия 'Никогда' в купоне прошла успешно.");
+
+        button.click();
+
+        }
+    }
+
 
 

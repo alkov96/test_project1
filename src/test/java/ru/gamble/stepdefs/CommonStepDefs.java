@@ -23,6 +23,7 @@ import ru.sbtqa.tag.qautils.properties.Props;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -42,17 +43,14 @@ public class CommonStepDefs extends GenericStepDefs {
         try {
             page = PageFactory.getInstance().getCurrentPage();
             button = page.getElementByTitle(param);
+                button.click();
+                workWithPreloader();
         } catch (PageInitializationException e) {
             LOG.error(e.getMessage());
         } catch (PageException e1) {
             LOG.error(e1.getMessage());
         }
-        if(button.isDisplayed()){
-        button.click();
-        workWithPreloader();
-        }else {
-            LOG.error("ОШИБКА! Кнопка невидима.");
-        }
+
     }
 
     @Когда("^сохраняем в память$")
@@ -187,18 +185,16 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param value
      * @return
      */
-
-
     public static ExpectedCondition<Boolean> attributeContainsLowerCase(final By locator,
                                                                         final String attribute,
                                                                         final String value) {
              return new ExpectedCondition<Boolean>() {
                 private String currentValue = null;
 
-                @Override
-                public Boolean apply(WebDriver driver) {
-                    return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
-                }
+            @Override
+            public Boolean apply(WebDriver driver) {
+                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+            }
 
                 @Override
                 public String toString() {
@@ -346,6 +342,19 @@ public class CommonStepDefs extends GenericStepDefs {
         super.openPage(title);
     }
 
+
+    public static void addStash(String key,String value){
+        List<String> values = new ArrayList<>();
+        if (Stash.asMap().containsKey(key)){
+            values = Stash.getValue(key);
+            values.add(value);
+            Stash.asMap().replace(key,values);
+        }
+        else {
+            values.add(value);
+            Stash.put(key, values);
+        }
+    }
     /**
      * Проверка что при нажатии на ссылку открывается нужная страница. Проверка идет по url, причем эти url очищаются от всех символов, кроме букв и цифр. т.е. слеши собого значения тут не имеют
      * @param element - на какой элемент жмакать чтобы открылась ссылка

@@ -35,15 +35,15 @@ import java.util.concurrent.TimeUnit;
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
 
-    @BeforeClass
-    public static void openBrowser(){
-//        LOG.info(LocalTime.now().toString());
-        WebDriver driver = PageFactory.getWebDriver();
-        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-        driver.manage().window().setSize(new Dimension(1920, 1080));
-//        final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
-        Locale.setDefault(new Locale("ru"));
-    }
+//    @BeforeClass
+//    public static void openBrowser(){
+////        LOG.info(LocalTime.now().toString());
+//        WebDriver driver = PageFactory.getWebDriver();
+////        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+////        driver.manage().window().setSize(new Dimension(1920, 1080));
+////        final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
+////        Locale.setDefault(new Locale("ru"));
+//    }
 
     @Rule
     public TestWatcher watchman = new TestWatcher() {

@@ -1,5 +1,6 @@
 # language: ru
   Функционал: Аутентификация на сайте и выход
+
     @smoke
     @AuthenticationOnSiteAndExit_1
     Сценарий: AuthenticationOnSiteAndExit_1
