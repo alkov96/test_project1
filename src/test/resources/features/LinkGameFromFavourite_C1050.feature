@@ -1,7 +1,8 @@
 # language: ru
-@smoke
-@LinkGameFromFavourite_C1050
 Функционал: Избранное. Переход из Избранного на игры ЛАЙВ и ПРЕМАТЧ
+
+  @smoke
+  @LinkGameFromFavourite_C1050
   Сценарий: LinkGameFromFavourite_C1050
 
     * переходит на главную страницу

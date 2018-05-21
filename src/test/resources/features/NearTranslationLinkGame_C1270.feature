@@ -1,7 +1,8 @@
 # language: ru
-  @smoke
-@NearTranslationLinkGame_C1270
 Функционал: Главная страница. Переход на игру с виджета "Ближайшие трансляции"
+
+  @smoke
+  @NearTranslationLinkGame_C1270
   Сценарий: NearTranslationLinkGame_C1270
 
     * переходит на главную страницу

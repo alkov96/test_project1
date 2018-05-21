@@ -1,7 +1,8 @@
 # language: ru
-@smoke
-@NearTranslationCoupon_C1270
 Функционал: Главная страница. Добавление ставки в купон с виджета "Ближайшие трансляции"
+
+  @smoke
+  @NearTranslationCoupon_C1270
   Сценарий: NearTranslationCoupon_C1270
     * переходит на главную страницу
     * открывается страница "Главная страница"
