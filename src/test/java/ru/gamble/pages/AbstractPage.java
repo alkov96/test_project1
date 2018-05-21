@@ -62,6 +62,10 @@ public abstract class AbstractPage extends Page {
     @FindBy(xpath = "//*[@class='footer__pin']")
     protected WebElement footerButton;
 
+    @ElementTitle("Прематч")
+    @FindBy(id = "prematch")
+    private WebElement prematchBottom;
+
 
     // Метод три раза пытается обновить главную страницу
 
