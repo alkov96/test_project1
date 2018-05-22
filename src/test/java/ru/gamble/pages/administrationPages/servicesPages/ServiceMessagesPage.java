@@ -55,7 +55,10 @@ public class ServiceMessagesPage extends AbstractPage {
     }
 
     @ActionTitle("очищает все активные сообщения")
-    public void clearActives() throws InterruptedException {
+    public void clearActives() {
+        WebDriver driver = PageFactory.getWebDriver();
+        //String xpath = "//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']";
+        String xpath = "//td[contains (@class,'x-grid-cell-checkcolumn-1533')]";
         if (lastPage.isDisplayed()) {
             lastPage.click();
         }
@@ -66,21 +69,41 @@ public class ServiceMessagesPage extends AbstractPage {
             pageCount = Integer.parseInt(matcher.group());
         }
         for (int i = 0; i < pageCount; i++) {
-            waitForElementPresent(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"),1000);
-            List<WebElement> activeBoxes = PageFactory.getWebDriver().findElements(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"));//получение всех чекбоксов "Активное"
+            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+            List<WebElement> activeBoxes = driver.findElements(By.xpath(xpath));//получение всех чекбоксов "Активное"
             for (int z = 0; z < activeBoxes.size(); z++) {
-                waitForElementPresent(activeBoxes.get(z), 1000);
+                new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
                 if (activeBoxes.get(z).findElement(By.xpath("div/img")).getAttribute("class").contains("checked")) {
                     PageFactory.getActions().doubleClick(activeBoxes.get(z)).build().perform();
                     String activeBottomId = PageFactory.getWebDriver().findElement(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-checkbox x-field-default x-anchor-form-item x-form-cb-checked x-form-dirty']")).getAttribute("id");
                     PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + activeBottomId + "-inputEl']")).click();
                     PageFactory.getWebDriver().findElement(By.xpath("//a[@class='x-btn x-unselectable x-box-item x-toolbar-item x-btn-default-small x-noicon x-btn-noicon x-btn-default-small-noicon']")).click();
-                    activeBoxes = PageFactory.getWebDriver().findElements(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"));
+                    activeBoxes = PageFactory.getWebDriver().findElements(By.xpath(xpath));
                 }
             }
             if (prePage.isDisplayed()) {
                 prePage.click();
             }
         }
+
+//        for (int i = 0; i < pageCount; i++) {
+//            waitForElementPresent(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"),1000);
+//            List<WebElement> activeBoxes = PageFactory.getWebDriver().findElements(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"));//получение всех чекбоксов "Активное"
+//            for (int z = 0; z < activeBoxes.size(); z++) {
+//                waitForElementPresent(activeBoxes.get(z), 1000);
+//                if (activeBoxes.get(z).findElement(By.xpath("div/img")).getAttribute("class").contains("checked")) {
+//                    PageFactory.getActions().doubleClick(activeBoxes.get(z)).build().perform();
+//                    String activeBottomId = PageFactory.getWebDriver().findElement(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-checkbox x-field-default x-anchor-form-item x-form-cb-checked x-form-dirty']")).getAttribute("id");
+//                    PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + activeBottomId + "-inputEl']")).click();
+//                    PageFactory.getWebDriver().findElement(By.xpath("//a[@class='x-btn x-unselectable x-box-item x-toolbar-item x-btn-default-small x-noicon x-btn-noicon x-btn-default-small-noicon']")).click();
+//                    activeBoxes = PageFactory.getWebDriver().findElements(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"));
+//                }
+//            }
+//            if (prePage.isDisplayed()) {
+//                prePage.click();
+//            }
+//        }
+
+
     }
 }

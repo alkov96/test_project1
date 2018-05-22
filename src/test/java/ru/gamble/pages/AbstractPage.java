@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.utility.BeforeTest;
+import ru.gamble.utility.JsonLoader;
 import ru.gamble.utility.YandexPostman;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
@@ -113,13 +113,6 @@ public abstract class AbstractPage extends Page {
         PageFactory.dispose();
     }
 
- /*   @ActionTitle("Очищает купон")
-    public void crearCoupon(){
-        if (PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).isDisplayed()){ //очистка купона
-            PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).click();
-        }
-    }*/
-
     /**
      * Метод получения письма и перехода по ссылке для завершения регистрации на сайте
      *
@@ -133,7 +126,7 @@ public abstract class AbstractPage extends Page {
         String url = "";
 
         try {
-            url = BeforeTest.getData().get("site1").get("mainurl").getValue();
+            url = JsonLoader.getData().get("site1").get("mainurl").getValue();
             link = YandexPostman.getLinkForAuthentication(email);
         }catch (DataException de){
             LOG.error("Ошибка! Не смогли получить ссылку сайта");

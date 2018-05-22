@@ -1,5 +1,6 @@
 package ru.gamble.pages;
 
+import org.apache.commons.logging.Log;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -10,6 +11,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.livePages.DayEventsPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -26,6 +28,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.stepdefs.CommonStepDefs.*;
 
 /**
  * @author p.sivak.
@@ -214,17 +217,19 @@ public class CouponPage extends AbstractPage {
         driver.findElement(xpath("//label[@class='betslip-settings__option']")).click();
         LOG.info("Установили условие 'Никогда'");
         button.click();
-        Thread.sleep(5000);
     }
 
-    @ActionTitle("проверяет, что после изменения условий в купоне появляется кнопка 'Принять' и информационное сообщение")
-    public void buttonAndMessageIsDisplayed(){
+    @ActionTitle("проверяет, что после изменения условий на 'Никогда' в купоне появляется кнопка 'Принять' и информационное сообщение")
+    public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         List<WebElement> oldCoef =  driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+        Thread.sleep(500);
         if (oldCoef.size()>0 && !driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()) {
             Assertions.fail("Коэф изменился, однако сообщение не отображается.");
         }
         LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
+        Thread.sleep(1000);
         if (!driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()
                 || !driver.findElement(xpath("//div[@class='coupon-confirm__btn']")).isDisplayed()) {
             Assertions.fail("При изменении условий ставки не появилось сообщение или кнопка о принятии изменений.");
@@ -233,7 +238,64 @@ public class CouponPage extends AbstractPage {
 
         LOG.info("Проверка на принятие условия 'Никогда' в купоне прошла успешно.");
 
+    }
+
+    /**
+     * функция проверяет, как изменился коэф для конкретной ставки
+     * @param param порядковый номер ставки в купоне
+     * @return возращает 0, если коэф не изменился, >0, если увеличился, и <0, если уменьшился
+     */
+    public float compareCoef(int param) {
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> allBets = driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        for (int i = 2; i >0; i--){
+            List<WebElement> oldCoef =  driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+            if (!oldCoef.isEmpty()) break;
+        }
+        float coefCoupon = Float.valueOf(allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice')]")).getText());
+        String oldString = allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice_old')]")).getAttribute("class");
+        float coefOld;
+        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice_old')]")).getText());
+        LOG.info("Старый коэф: " + coefOld);
+        LOG.info("Текущий коэф: " + coefCoupon);
+        float sum = coefCoupon - coefOld;
+        return sum;
+    }
+
+    @ActionTitle("проверяет изменения коэфицентов в купоне при условии 'Повышенные коэфиценты', удаляет из купона все события, кроме событий, у которых повысился коэфицент")
+    public void compareChangeCoef () throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
         button.click();
+        driver.findElement(xpath("//div[@class='betslip-settings ng-scope active']//label[2]")).click();
+        button.click();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        List<WebElement> allBets = driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
+        for (int i = allBets.size()-1; i >=0; i--) {
+            float s = compareCoef(i);
+            LOG.info("для " + i + " события результат = " + s);
+               if (s<=0){
+                   driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i+1) + "]//i[contains(@class,'icon-cross-close')]")).click();
+                    allBets = driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
+               }
+        }
+
+        if (allBets.size()==0){
+            LOG.info("Подходящей ставки не нашлось, поэтому заново добавляем события в купон, сравниваем коэфиценты и удаляем ненужные события");
+            DayEventsPage.addEventsToCouponF();
+            compareChangeCoef();
+            //  compareCoef(i);
+        }
+        LOG.info("Количество событий в купоне: " + driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]")).size());
+        if (driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()
+                || driver.findElement(xpath("//div[@class='coupon-confirm__btn']")).isDisplayed()) {
+            Assertions.fail("Отображается кнопка и сообщение, хотя не должны - в купоне одни лишь события с повышенным коэфицентом");
+        }
+        LOG.info("Не появилась кнопка 'Принять', в купоне события с повышенным коэфицентом");
 
     }
 

@@ -85,7 +85,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){goToMainPage("site2");}
+    public static void goToMainPage(){
+        cleanCookies();
+        goToMainPage("site2");}
 
     @Когда("^переходит в админку$")
     public static void goToAdminPage(){goToMainPage("admin");}
@@ -390,6 +392,15 @@ public class CommonStepDefs extends GenericStepDefs {
         driver.close();
         driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind - 1].toString()); //мы знаем что поле открытия ссылки на скачивание количесвто ссылок будет на  больше, незачем переопрелеть CountWind.
         return flag;
+    }
+
+    @Когда("^(пользователь |он) очищает cookies$")
+    public static void cleanCookies(){
+        try {
+            PageFactory.getWebDriver().manage().deleteAllCookies();
+        }catch (Exception e){
+            LOG.error(e.getMessage());
+        }
     }
 
 }
