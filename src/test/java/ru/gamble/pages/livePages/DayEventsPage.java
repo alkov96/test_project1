@@ -21,6 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.openqa.selenium.By.xpath;
 
@@ -121,17 +122,25 @@ public class DayEventsPage extends AbstractPage {
         LOG.info("Добавили в Избранное событие");
     }
 
-    @ActionTitle("добавляет несколько событий в купон")
-    public void addEventsToCoupon(){
+    public static void addEventsToCouponF () throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
         int counter=0;
-        List<WebElement> allEvents = driver.findElements(xpath("//div[@class='bets-widget bets-widget_wide liveNow']//table[@class='full_width bets-widget-table']//tr/td[5]"));
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        List<WebElement> allEvents = driver.findElements(xpath("//div[@class='bets-widget bets-widget_wide liveNow']//table[@class='full_width bets-widget-table']//tr/td[5]/div/span"));
         for (WebElement event : allEvents) {
+            Thread.sleep(1000);
             event.click();
             event.getText();
             LOG.info("Событие добавилось в купон");
             counter++;
             if (counter>=6) break;
         }
+
+    }
+
+    @ActionTitle("добавляет несколько событий в купон")
+    public void  addEventsToCoupon() throws InterruptedException {
+        addEventsToCouponF();
 
     }
 }
