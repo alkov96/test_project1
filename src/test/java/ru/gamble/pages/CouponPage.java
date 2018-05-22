@@ -24,6 +24,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
