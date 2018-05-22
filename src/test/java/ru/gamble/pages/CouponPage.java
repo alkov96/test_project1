@@ -1,6 +1,5 @@
 package ru.gamble.pages;
 
-import org.apache.commons.logging.Log;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -11,7 +10,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.livePages.DayEventsPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -21,12 +19,13 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.openqa.selenium.By.xpath;
-import static ru.gamble.stepdefs.CommonStepDefs.*;
 
 /**
  * @author p.sivak.
@@ -70,6 +69,14 @@ public class CouponPage extends AbstractPage {
     @ElementTitle("параметры в купоне")
     @FindBy(xpath = "//div[@class='list-bet-block-top']//div[@class='bs-type-switcher__wrapper']//i")
     private WebElement button;
+
+    @ElementTitle("заключить пари")
+    @FindBy(id="place-bet-button")
+    private WebElement coupon_bet_button;
+
+    @ElementTitle("поле суммы Экспресс-ставки")
+    @FindBy(id="express-bet-input")
+    private WebElement coupon_field;
 
 
     public CouponPage() {
@@ -116,24 +123,24 @@ public class CouponPage extends AbstractPage {
         assertThat(false, equalTo(checkBonus()));
     }
 
-    @ActionTitle("выбирает тип ставки")
-    public void checkBonusNotPresent(String type) {
-        if (type.equals("Ординар")){
-            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-                    "                            Ординар\n" +
-                    "                        ')]")).click();
-        }
-        if (type.equals("Экспресс")){
-            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-                    "                            Экспресс\n" +
-                    "                        ')]")).click();
-        }
-        if (type.equals("Система")){
-            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-                    "                            система\n" +
-                    "                        ')]")).click();
-        }
-    }
+//    @ActionTitle("выбирает тип ставки")
+//    public void checkBonusNotPresent(String type) {
+//        if (type.equals("Ординар")){
+//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
+//                    "                            Ординар\n" +
+//                    "                        ')]")).click();
+//        }
+//        if (type.equals("Экспресс")){
+//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
+//                    "                            Экспресс\n" +
+//                    "                        ')]")).click();
+//        }
+//        if (type.equals("Система")){
+//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
+//                    "                            система\n" +
+//                    "                        ')]")).click();
+//        }
+//    }
 
     public boolean checkBonus() {
         try {
@@ -228,8 +235,75 @@ public class CouponPage extends AbstractPage {
 
         button.click();
 
+    }
+
+    @ActionTitle("выбирает тип ставки")
+    public void selectTypeBet(String type){
+        WebDriver driver = PageFactory.getDriver();
+        type = type.toLowerCase();
+        if (driver.findElements(By.xpath("//div[@class='bs-type-switcher open']")).isEmpty()){//если переключатель типа ставки не открыт - открываем
+        LOG.info("Жмём на переключатель типов ставок");
+        driver.findElement(By.xpath("//div[contains(@class,'bs-type-switcher__title')]")).click();
+        }
+        WebElement selectType = driver.findElement(By.xpath("//li[contains(translate(text(),'ЯЧСМИТЬБЮФЫВАПРОЛДЖЭЙЦУКЕНГШЩЗХЪ', 'ячсмитьбюфывапролджэйцукенгшщзхъ'),'" + type + "')]"));
+                //driver.findElement(By.xpath("//li[contains(@class,'open-type-switcher__item') and contains(lower-case(text()),'"+type+"')]"));
+        LOG.info("Переключаем тип ставки на '" + selectType.getText() + "'");
+        selectType.click();
+    }
+
+    @ActionTitle("вводит сумму ставки Экспресс")
+    public void inputExpress(String sumBet){
+        WebDriver driver = PageFactory.getDriver();
+        coupon_field.sendKeys(String.valueOf(sumBet));
+        LOG.info("Вводим сумму ставки : " + sumBet);
+        float sum = Float.valueOf(sumBet.trim());
+        sum = (float)Stash.getValue("balanceKey") - sum;
+        Stash.put("balanceKey",sum);
+    }
+
+    @ActionTitle("заключает пари")
+    public void doBet(){
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("Жмём Заключить пари");
+        coupon_bet_button.click();
+        CommonStepDefs.workWithPreloader();
+        if (!driver.findElement(By.cssSelector("div.bet-accepted-noification")).isDisplayed()) {
+            LOG.warn("Сообщение об успешной ставке не найдено");
         }
     }
+
+    /**
+     * проверка что баланс изменился успешно. По параметру отепределяется проверка рублей или бонусов
+     * @param param если параметр = "бонусов", то проверка бонусов, иначе - првоерка рублевого баланса
+     */
+    @ActionTitle("проверяет изменение баланса")
+    public void balanceIsOK(String param){
+        WebDriver driver = PageFactory.getDriver();
+        float afterBalance;
+        By balance=param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть
+        int count = 30;
+        while (count >0){
+            afterBalance = Float.valueOf(driver.findElement(balance).getText());
+            afterBalance = new BigDecimal(afterBalance).setScale(2, RoundingMode.UP).floatValue();
+            float balanceExpected = Stash.getValue("balanceKey");
+            balanceExpected = new BigDecimal(balanceExpected).setScale(2, RoundingMode.UP).floatValue();
+            if ((balanceExpected<afterBalance-0.05) || (balanceExpected<afterBalance+0.05)) {
+                LOG.info("Баланс соответствует ожидаемому: " +afterBalance);
+                break;
+            }
+            count--;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (count==0){
+                LOG.error("Баланс не  соответствует ожидаемому. Баланс сейчас:" + afterBalance + ", ожидалось : " + balanceExpected);
+                assert false;
+            }
+        }
+    }
+}
 
 
 
