@@ -350,10 +350,11 @@ public class CouponPage extends AbstractPage {
             afterBalance = new BigDecimal(afterBalance).setScale(2, RoundingMode.UP).floatValue();
             float balanceExpected = Stash.getValue("balanceKey");
             balanceExpected = new BigDecimal(balanceExpected).setScale(2, RoundingMode.UP).floatValue();
-            if ((balanceExpected<afterBalance-0.05) || (balanceExpected<afterBalance+0.05)) {
+            if (Math.abs(balanceExpected-afterBalance)<0.05) {
                 LOG.info("Баланс соответствует ожидаемому: " +afterBalance);
                 break;
             }
+            LOG.info("тик-так");
             count--;
             try {
                 Thread.sleep(1000);
