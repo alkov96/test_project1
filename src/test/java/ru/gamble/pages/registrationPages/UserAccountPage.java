@@ -8,8 +8,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.utility.BeforeTest;
 import ru.gamble.utility.Generators;
+import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -193,7 +193,7 @@ public class UserAccountPage extends AbstractPage{
         String registrationUrl = "";
 
         try {
-            registrationUrl = BeforeTest.getData().get("site1").get("registrationUrl").getValue();
+            registrationUrl = JsonLoader.getData().get("site1").get("registrationUrl").getValue();
         } catch (DataException e) {
             e.printStackTrace();
         }
