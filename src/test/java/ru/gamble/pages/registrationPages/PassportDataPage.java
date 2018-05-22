@@ -19,6 +19,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static ru.gamble.utility.Constants.*;
 
@@ -110,9 +111,11 @@ public class PassportDataPage extends AbstractPage {
 
         // делаем столько попыток ввести дату, пока не пропадёт ошибка
         // "Дата выдачи не соответсвует дате обязательной  замены паспорта"
+        String errXpath = "//div[@class='inpErrText__inner ng-binding ng-scope']";
         do {
             enterDate(data.get(DATEISSUE));
-        } while(PageFactory.getWebDriver().findElement(By.xpath( "//div[@class='inpErrText__inner ng-binding ng-scope']")).isDisplayed());
+        } while(!PageFactory.getWebDriver().findElements(By.xpath(errXpath))
+                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).isEmpty());
 
 
         whoIssued = (data.get(ISSUEDBY).equals(RANDOM))? Generators.randomString(25) : data.get(ISSUEDBY);
