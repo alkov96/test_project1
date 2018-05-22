@@ -62,6 +62,10 @@ public abstract class AbstractPage extends Page {
     @FindBy(xpath = "//*[@class='footer__pin']")
     protected WebElement footerButton;
 
+    @ElementTitle("Прематч")
+    @FindBy(id = "prematch")
+    private WebElement prematchBottom;
+
 
     // Метод три раза пытается обновить главную страницу
 
@@ -301,17 +305,6 @@ public abstract class AbstractPage extends Page {
             @Override
             public Boolean apply(WebDriver webDriver) {
                 WebElement element = webDriver.findElement(by);
-                return element != null && element.isDisplayed();
-            }
-        });
-    }
-
-    public void waitForElementPresent(final WebElement element, int timeout){
-        WebDriverWait wait = (WebDriverWait)new WebDriverWait(PageFactory.getWebDriver(),timeout)
-                .ignoring(StaleElementReferenceException.class);
-        wait.until(new ExpectedCondition<Boolean>(){
-            @Override
-            public Boolean apply(WebDriver webDriver) {
                 return element != null && element.isDisplayed();
             }
         });
