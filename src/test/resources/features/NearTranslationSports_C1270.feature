@@ -2,8 +2,8 @@
 Функционал: Проверка работы виджета Ближайшие трансляции
 
   @smoke
-  @NearTransltionSports_C1270
-  Сценарий: NearTransltionSports_C1270
+  @NearTranslationSports_C1270
+  Сценарий: NearTranslationSports_C1270
     #Шаг 1
 
     * переходит на главную страницу
