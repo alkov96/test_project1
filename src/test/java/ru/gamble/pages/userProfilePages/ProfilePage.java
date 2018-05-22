@@ -9,29 +9,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+/**
+ * @author p.sivak.
+ * @since 21.05.2018.
+ */
+@PageEntry(title = "Профиль")
+public class ProfilePage extends AbstractPage {
+    private static final Logger LOG = LoggerFactory.getLogger(ProfilePage.class);
 
-@PageEntry(title = "Мини Личный Кабинет")
-public class PopUPLCPage extends AbstractPage {
-    private static final Logger LOG = LoggerFactory.getLogger(PopUPLCPage.class);
+    @FindBy(xpath = "//div[@class='user-profile__tab-wraper']")
+    private WebElement tabWraper;
 
-    @ElementTitle("адрес почты")
-    @FindBy(id ="user-profile")
-    private WebElement emailBotton;
-
-    @ElementTitle("Выйти")
-    @FindBy(id ="log-out-button")
-    private WebElement exitButton;
-
-    public PopUPLCPage() {
+    public ProfilePage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(exitButton));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(tabWraper));
     }
-
 }

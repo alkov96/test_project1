@@ -1,5 +1,6 @@
 # language: ru
 Функционал: Изменение условий в купоне
+
   @smoke
   @CouponAcceptChange_C1048
   Сценарий: CouponAcceptChange_C1048

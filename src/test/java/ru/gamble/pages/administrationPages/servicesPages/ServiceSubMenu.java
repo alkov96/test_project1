@@ -1,4 +1,4 @@
-package ru.gamble.pages.userProfilePages;
+package ru.gamble.pages.administrationPages.servicesPages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,24 +14,25 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+/**
+ * @author p.sivak.
+ * @since 18.05.2018.
+ */
+@PageEntry(title = "подменю Сервисы")
+public class ServiceSubMenu extends AbstractPage{
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceSubMenu.class);
 
-@PageEntry(title = "Мини Личный Кабинет")
-public class PopUPLCPage extends AbstractPage {
-    private static final Logger LOG = LoggerFactory.getLogger(PopUPLCPage.class);
+    @FindBy(xpath = "//div[@id='tabbar-1483-innerCt']")
+    private WebElement subMenu;
 
-    @ElementTitle("адрес почты")
-    @FindBy(id ="user-profile")
-    private WebElement emailBotton;
+    @ElementTitle("Сервисные сообщения")
+    @FindBy(xpath = "//span[@id='tab-1618-btnInnerEl']")
+    private WebElement serviceMessages;
 
-    @ElementTitle("Выйти")
-    @FindBy(id ="log-out-button")
-    private WebElement exitButton;
-
-    public PopUPLCPage() {
+    public ServiceSubMenu() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(exitButton));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(subMenu));
     }
-
 }

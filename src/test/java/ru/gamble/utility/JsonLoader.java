@@ -8,9 +8,9 @@ import ru.sbtqa.tag.datajack.exceptions.DataException;
 
 import java.io.File;
 
-public class BeforeTest {
+public class JsonLoader {
     private static TestDataObject data;
-    private static final Logger LOG = LoggerFactory.getLogger(BeforeTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsonLoader.class);
     private static String sep = File.separator;
 
     public static TestDataObject getData() {

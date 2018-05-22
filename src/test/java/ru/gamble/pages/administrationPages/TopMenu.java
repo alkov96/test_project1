@@ -1,4 +1,4 @@
-package ru.gamble.pages.AdministrationPages.servicesPages;
+package ru.gamble.pages.administrationPages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -8,7 +8,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.pages.AdministrationPages.TopMenu;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
@@ -19,21 +18,22 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
  * @author p.sivak.
  * @since 18.05.2018.
  */
-@PageEntry(title = "подменю Сервисы")
-public class ServiceSubMenu extends AbstractPage{
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceSubMenu.class);
+@PageEntry(title = "Верхнее меню")
+public class TopMenu extends AbstractPage {
+    private static final Logger LOG = LoggerFactory.getLogger(TopMenu.class);
 
-    @FindBy(xpath = "//div[@id='tabbar-1483-innerCt']")
-    private WebElement subMenu;
+    @FindBy(xpath = "//div[@id='tabbar-1012-innerCt']")
+    private WebElement topMenu;
 
-    @ElementTitle("Сервисные сообщения")
-    @FindBy(xpath = "//span[@id='tab-1618-btnInnerEl']")
-    private WebElement serviceMessages;
+    @ElementTitle("Сервисы")
+    @FindBy(xpath = "//span[@id='tab-1775-btnInnerEl']")
+    private WebElement serviceBotton;
 
-    public ServiceSubMenu() {
+    public TopMenu() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(subMenu));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(topMenu));
     }
+
 }

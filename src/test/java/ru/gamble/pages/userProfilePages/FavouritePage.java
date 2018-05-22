@@ -146,7 +146,7 @@ public class FavouritePage extends AbstractPage {
     @ActionTitle("добавляет ставку в купон")
     public void addToCoupon(){
         WebDriver driver = PageFactory.getDriver();
-        WebElement game = driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']")).get(0);//первая игра в списоке игр в избранном
+        WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
         String nameFavour = game.findElement(xpath("div//div[contains(@class,'elected__teams')]")).getAttribute("title");
         float coefFavour = Float.valueOf(game.findElement(xpath("div//div[contains(@class,'elected-data__event-price')]")).getText());
         String typeFavour = driver.findElement(xpath("//div[contains(@class,'elected-data__caption')]")).getAttribute("title").trim();

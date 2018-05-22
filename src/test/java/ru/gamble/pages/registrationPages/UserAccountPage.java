@@ -1,4 +1,4 @@
-package ru.gamble.pages.userProfilePages;
+package ru.gamble.pages.registrationPages;
 
 import cucumber.api.DataTable;
 import org.openqa.selenium.*;
@@ -8,8 +8,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.utility.BeforeTest;
 import ru.gamble.utility.Generators;
+import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -20,9 +20,7 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import static ru.gamble.utility.Constants.*;
@@ -33,8 +31,6 @@ public class UserAccountPage extends AbstractPage{
 
     @FindBy(xpath = "//*[text()='Учетная запись']")
     private WebElement pageTitle;
-
-
 
     @ElementTitle("Фамилия")
     @FindBy(id = "surname")
@@ -197,7 +193,7 @@ public class UserAccountPage extends AbstractPage{
         String registrationUrl = "";
 
         try {
-            registrationUrl = BeforeTest.getData().get("site1").get("registrationUrl").getValue();
+            registrationUrl = JsonLoader.getData().get("site1").get("registrationUrl").getValue();
         } catch (DataException e) {
             e.printStackTrace();
         }
