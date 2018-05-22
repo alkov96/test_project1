@@ -226,11 +226,11 @@ public class MainPage extends AbstractPage {
             flag &= CommonStepDefs.goLink(element, link);
             LOG.info("Ссылка " + link + " открылась");
         }
+    }
 
-
-
-
-
+    @ActionTitle("проверяет наличие блока новостей")
+    public void checksForNewsBlock(){
+        String xpath = "//div[contains(@class,'news-widget-head') and contains(@class,'active')]";
     }
 
 }
