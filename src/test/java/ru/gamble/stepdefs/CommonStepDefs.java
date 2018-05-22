@@ -85,7 +85,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){goToMainPage("site2");}
+    public static void goToMainPage(){
+        cleanCookies();
+        goToMainPage("site2");}
 
     @Когда("^переходит в админку$")
     public static void goToAdminPage(){goToMainPage("admin");}
@@ -393,7 +395,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^(пользователь |он) очищает cookies$")
-    public void cleanCookies(){
+    public static void cleanCookies(){
         try {
             PageFactory.getWebDriver().manage().deleteAllCookies();
         }catch (Exception e){
