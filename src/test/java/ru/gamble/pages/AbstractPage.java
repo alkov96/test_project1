@@ -66,6 +66,11 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "prematch")
     private WebElement prematchBottom;
 
+    @ElementTitle("Настройки")
+    @FindBy(id = "preferences")
+    protected WebElement preferences;
+
+
 
     // Метод три раза пытается обновить главную страницу
 

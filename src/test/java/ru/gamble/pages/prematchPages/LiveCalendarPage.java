@@ -89,7 +89,7 @@ public class LiveCalendarPage extends AbstractPage {
      //   List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/../.."));
         List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"));
         int count = 0;
-        int number = Integer.valueOf(param);
+        int number = Integer.valueOf(param)-1;
         Random random = new Random();
         int num;
 

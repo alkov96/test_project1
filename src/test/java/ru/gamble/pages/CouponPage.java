@@ -1,6 +1,5 @@
 package ru.gamble.pages;
 
-import org.apache.commons.logging.Log;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -12,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.livePages.DayEventsPage;
+import ru.gamble.pages.mainPages.MainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -28,7 +28,10 @@ import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.pages.AbstractPage.*;
 import static ru.gamble.stepdefs.CommonStepDefs.*;
 
 /**
@@ -78,9 +81,17 @@ public class CouponPage extends AbstractPage {
     @FindBy(id="place-bet-button")
     private WebElement coupon_bet_button;
 
-    @ElementTitle("поле суммы Экспресс-ставки")
+    @ElementTitle("поле суммы общей ставки")
     @FindBy(id="express-bet-input")
     private WebElement coupon_field;
+
+    @ElementTitle("поле суммы ставки типа Система")
+    @FindBy(id="express-unitbet-input")
+    private WebElement coupon_field_System_one;
+
+    @ElementTitle("кнопка Заключить пари")
+    @FindBy(id="place-bet-button")
+    private WebElement buttonBet;
 
 
     public CouponPage() {
@@ -127,25 +138,6 @@ public class CouponPage extends AbstractPage {
         assertThat(false, equalTo(checkBonus()));
     }
 
-//    @ActionTitle("выбирает тип ставки")
-//    public void checkBonusNotPresent(String type) {
-//        if (type.equals("Ординар")){
-//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-//                    "                            Ординар\n" +
-//                    "                        ')]")).click();
-//        }
-//        if (type.equals("Экспресс")){
-//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-//                    "                            Экспресс\n" +
-//                    "                        ')]")).click();
-//        }
-//        if (type.equals("Система")){
-//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-//                    "                            система\n" +
-//                    "                        ')]")).click();
-//        }
-//    }
-
     public boolean checkBonus() {
         try {
             bonus.isDisplayed();
@@ -183,8 +175,8 @@ public class CouponPage extends AbstractPage {
         String team1 = Stash.getValue("team1key");
         String team2 = Stash.getValue("team2key");
         if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(сouponGame))) {
-            LOG.info("Названия команд в купоне совпадают с ожидаемыми: " + team1 + team2 + "=" +сouponGame);
-        } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: " + team1+team2 + сouponGame);
+            LOG.info("Названия команд в купоне совпадают с ожидаемыми: " + team1 + team2 + "=" + сouponGame);
+        } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: " + team1 + team2 + сouponGame);
     }
 
     @ActionTitle("проверяет, совпадает ли исход в купоне с ожидаемым")
@@ -193,8 +185,8 @@ public class CouponPage extends AbstractPage {
         String ishod = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[@class='pick ng-binding']")).getText();
         String ishodName = Stash.getValue("ishodKey");//ожидаемое название исхода
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
-            LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod+ "-"+ ishodName);
-        } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: " + ishod +" - "+ ishodName);
+            LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + "-" + ishodName);
+        } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: " + ishod + " - " + ishodName);
 
     }
 
@@ -211,6 +203,7 @@ public class CouponPage extends AbstractPage {
         } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon +" - " + coef);
 
     }
+
     @ActionTitle("устанавливает условие для принятия коэфицентов как 'Никогда'")
     public void neverAccept() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
@@ -224,9 +217,9 @@ public class CouponPage extends AbstractPage {
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        List<WebElement> oldCoef =  driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+        List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
         Thread.sleep(500);
-        if (oldCoef.size()>0 && !driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()) {
+        if (oldCoef.size() > 0 && !driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()) {
             Assertions.fail("Коэф изменился, однако сообщение не отображается.");
         }
         LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
@@ -250,8 +243,8 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> allBets = driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        for (int i = 2; i >0; i--){
-            List<WebElement> oldCoef =  driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+        for (int i = 2; i > 0; i--) {
+            List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
             if (!oldCoef.isEmpty()) break;
         }
         float coefCoupon = Float.valueOf(allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice')]")).getText());
@@ -301,28 +294,44 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("выбирает тип ставки")
-    public void selectTypeBet(String type){
+    public void selectTypeBet(String type) {
         WebDriver driver = PageFactory.getDriver();
         type = type.toLowerCase();
-        if (driver.findElements(By.xpath("//div[@class='bs-type-switcher open']")).isEmpty()){//если переключатель типа ставки не открыт - открываем
-        LOG.info("Жмём на переключатель типов ставок");
-        driver.findElement(By.xpath("//div[contains(@class,'bs-type-switcher__title')]")).click();
+        if (driver.findElements(By.xpath("//div[@class='bs-type-switcher open']")).isEmpty()) {//если переключатель типа ставки не открыт - открываем
+            LOG.info("Жмём на переключатель типов ставок");
+            driver.findElement(By.xpath("//div[contains(@class,'bs-type-switcher__title')]")).click();
         }
         WebElement selectType = driver.findElement(By.xpath("//li[contains(translate(text(),'ЯЧСМИТЬБЮФЫВАПРОЛДЖЭЙЦУКЕНГШЩЗХЪ', 'ячсмитьбюфывапролджэйцукенгшщзхъ'),'" + type + "')]"));
-                //driver.findElement(By.xpath("//li[contains(@class,'open-type-switcher__item') and contains(lower-case(text()),'"+type+"')]"));
+        //driver.findElement(By.xpath("//li[contains(@class,'open-type-switcher__item') and contains(lower-case(text()),'"+type+"')]"));
         LOG.info("Переключаем тип ставки на '" + selectType.getText() + "'");
         selectType.click();
     }
 
-    @ActionTitle("вводит сумму ставки Экспресс")
-    public void inputExpress(String sumBet){
+    /**
+     * для Системы в куопне по сути сразу несколько ставок. Если есть параметр one = то вводится сумма для одной ставки.
+     * Если такого параметра нет - то сумма общей ставки. Для Экспресса всегда вводится общая ставка(потому что экпрес не разбивается на неколько пари)
+     * @param sumBet
+     */
+    @ActionTitle("вводит сумму ставки")
+    public void inputBet(String sumBet){
+        inputBet(sumBet,"");
+    }
+    public void inputBet(String sumBet,String one){
         WebDriver driver = PageFactory.getDriver();
-        coupon_field.sendKeys(String.valueOf(sumBet));
+       // boolean forOne = one.equals("для каждого разбиения") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
+        boolean forOne = !one.equals("") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
+
+        WebElement field = forOne?coupon_field_System_one:coupon_field;
+        field.clear();
+        field.sendKeys(String.valueOf(sumBet));
         LOG.info("Вводим сумму ставки : " + sumBet);
         float sum = Float.valueOf(sumBet.trim());
-        sum = (float)Stash.getValue("balanceKey") - sum;
-        Stash.put("balanceKey",sum);
+        String countBet = forOne?driver.findElement(By.xpath("//span[@class='eachway-zone__text ng-binding']")).getText().split(" ")[0]:"1";//количество ставок при выбранном виде систем(2/3,3/5,4/5...)
+        float count = Float.valueOf(countBet);
+        sum = count*sum;
+        Stash.put("sumKey",sum);
     }
+
 
     @ActionTitle("заключает пари")
     public void doBet(){
@@ -349,11 +358,14 @@ public class CouponPage extends AbstractPage {
             afterBalance = Float.valueOf(driver.findElement(balance).getText());
             afterBalance = new BigDecimal(afterBalance).setScale(2, RoundingMode.UP).floatValue();
             float balanceExpected = Stash.getValue("balanceKey");
+            float sumBet = Stash.getValue("sumKey");
+            balanceExpected-=sumBet;
             balanceExpected = new BigDecimal(balanceExpected).setScale(2, RoundingMode.UP).floatValue();
-            if ((balanceExpected<afterBalance-0.05) || (balanceExpected<afterBalance+0.05)) {
+            if (Math.abs(balanceExpected-afterBalance)<0.05) {
                 LOG.info("Баланс соответствует ожидаемому: " +afterBalance);
                 break;
             }
+            LOG.info("тик-так");
             count--;
             try {
                 Thread.sleep(1000);
@@ -361,10 +373,63 @@ public class CouponPage extends AbstractPage {
                 e.printStackTrace();
             }
             if (count==0){
-                LOG.error("Баланс не  соответствует ожидаемому. Баланс сейчас:" + afterBalance + ", ожидалось : " + balanceExpected);
-                assert false;
+                Assertions.fail("Баланс не  соответствует ожидаемому. Баланс сейчас:" + afterBalance + ", ожидалось : " + balanceExpected);
             }
         }
+    }
+
+    @ActionTitle("проверяет изменение количества экспрессов при переключении вида системы")
+    public void checkCountExpress(){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> listOfBetType = driver.findElements(By.xpath("//ul[@class='open-type-switcher__list']/li"));
+        for (int typeSys = 3; typeSys < listOfBetType.size(); typeSys++) {
+            String countExp = listOfBetType.get(typeSys).findElement(By.xpath("span")).getText().split(" ")[0].replace("(", "");
+            listOfBetType.get(typeSys).click();
+            String countBet = driver.findElement(By.xpath("//span[@class='eachway-zone__text ng-binding']")).getText().split(" ")[0];
+            if (!countBet.equals(countExp)) {
+                 Assertions.fail("Неправильное количество ставок. Вместо " + countExp + " стало " + countBet);
+            } else {
+                LOG.info("Ок. Количество ставок(экспрессов) равно " + countBet);
+            }
+            driver.findElement(By.cssSelector("div.bs-type-switcher__title")).click();
+        }
+    }
+
+
+    @ActionTitle("проверяет что кнопка Заключить Пари")
+    public void checkButtonBet(String status){
+        WebDriver driver = PageFactory.getDriver();
+        Boolean disabled = status.equals("активна")?true:false;
+        if (buttonBet.isEnabled()!=disabled){
+            Assertions.fail("Кнопка 'Заключить пари' в неправильном состоянии: не " + status);
+        }
+        LOG.info("Кнопка 'Заключить пари' " + status);
+
+        List <WebElement> notifications = driver.findElements(xpath("//div[contains(@class,'bet-notification__suggestion_visible') and @trans]"));
+        notifications.addAll(driver.findElements(xpath("//div[contains(@class,'bet-notification__warning_visible')]/span")));
+        for (WebElement element:notifications){
+            LOG.info(element.getText());
+        }
+    }
+
+    @ActionTitle("переходит в настройки и меняет коэффицент в купоне")
+    public void changePreferencesCoeff() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("переходит в настройки и меняет коэффицент");
+        preferences.click();
+        String previous;
+        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
+        WebElement coeff = driver.findElement(cssSelector("span.coupon-betprice"));
+        previous = coeff.getText();
+        LOG.info("Переключаемся на '" + list.get(2).getText() + "' формат отображения");
+        list.get(2).click();
+        LOG.info("Текущее значение коэффициента : " + coeff.getText());
+        Thread.sleep(350);
+        if (previous.equals(coeff.getText())) {
+            LOG.error("Формат отображения коэффициентов не изменился");
+            Assertions.fail("Формат отображения коэффициентов не изменился");
+        }
+        LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
 }
 
