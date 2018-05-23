@@ -1,6 +1,5 @@
 package ru.gamble.pages;
 
-import org.apache.commons.logging.Log;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -28,8 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.xpath;
-import static ru.gamble.stepdefs.CommonStepDefs.*;
 
 /**
  * @author p.sivak.
@@ -78,9 +77,17 @@ public class CouponPage extends AbstractPage {
     @FindBy(id="place-bet-button")
     private WebElement coupon_bet_button;
 
-    @ElementTitle("поле суммы Экспресс-ставки")
+    @ElementTitle("поле суммы общей ставки")
     @FindBy(id="express-bet-input")
     private WebElement coupon_field;
+
+    @ElementTitle("поле суммы ставки типа Система")
+    @FindBy(id="express-unitbet-input")
+    private WebElement coupon_field_System_one;
+
+    @ElementTitle("кнопка Заключить пари")
+    @FindBy(id="place-bet-button")
+    private WebElement buttonBet;
 
 
     public CouponPage() {
@@ -126,25 +133,6 @@ public class CouponPage extends AbstractPage {
     public void checkBonusNotPresent() {
         assertThat(false, equalTo(checkBonus()));
     }
-
-//    @ActionTitle("выбирает тип ставки")
-//    public void checkBonusNotPresent(String type) {
-//        if (type.equals("Ординар")){
-//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-//                    "                            Ординар\n" +
-//                    "                        ')]")).click();
-//        }
-//        if (type.equals("Экспресс")){
-//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-//                    "                            Экспресс\n" +
-//                    "                        ')]")).click();
-//        }
-//        if (type.equals("Система")){
-//            PageFactory.getWebDriver().findElement(By.xpath("//li[contains(text(), '\n" +
-//                    "                            система\n" +
-//                    "                        ')]")).click();
-//        }
-//    }
 
     public boolean checkBonus() {
         try {
@@ -314,15 +302,31 @@ public class CouponPage extends AbstractPage {
         selectType.click();
     }
 
-    @ActionTitle("вводит сумму ставки Экспресс")
-    public void inputExpress(String sumBet){
+    /**
+     * для Системы в куопне по сути сразу несколько ставок. Если есть параметр one = то вводится сумма для одной ставки.
+     * Если такого параметра нет - то сумма общей ставки. Для Экспресса всегда вводится общая ставка(потому что экпрес не разбивается на неколько пари)
+     * @param sumBet
+     */
+    @ActionTitle("вводит сумму ставки")
+    public void inputBet(String sumBet){
+        inputBet(sumBet,"");
+    }
+    public void inputBet(String sumBet,String one){
         WebDriver driver = PageFactory.getDriver();
-        coupon_field.sendKeys(String.valueOf(sumBet));
+       // boolean forOne = one.equals("для каждого разбиения") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
+        boolean forOne = !one.equals("") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
+
+        WebElement field = forOne?coupon_field_System_one:coupon_field;
+        field.clear();
+        field.sendKeys(String.valueOf(sumBet));
         LOG.info("Вводим сумму ставки : " + sumBet);
         float sum = Float.valueOf(sumBet.trim());
-        sum = (float)Stash.getValue("balanceKey") - sum;
-        Stash.put("balanceKey",sum);
+        String countBet = forOne?driver.findElement(By.xpath("//span[@class='eachway-zone__text ng-binding']")).getText().split(" ")[0]:"1";//количество ставок при выбранном виде систем(2/3,3/5,4/5...)
+        float count = Float.valueOf(countBet);
+        sum = count*sum;
+        Stash.put("sumKey",sum);
     }
+
 
     @ActionTitle("заключает пари")
     public void doBet(){
@@ -349,6 +353,8 @@ public class CouponPage extends AbstractPage {
             afterBalance = Float.valueOf(driver.findElement(balance).getText());
             afterBalance = new BigDecimal(afterBalance).setScale(2, RoundingMode.UP).floatValue();
             float balanceExpected = Stash.getValue("balanceKey");
+            float sumBet = Stash.getValue("sumKey");
+            balanceExpected-=sumBet;
             balanceExpected = new BigDecimal(balanceExpected).setScale(2, RoundingMode.UP).floatValue();
             if (Math.abs(balanceExpected-afterBalance)<0.05) {
                 LOG.info("Баланс соответствует ожидаемому: " +afterBalance);
@@ -381,6 +387,23 @@ public class CouponPage extends AbstractPage {
                 LOG.info("Ок. Количество ставок(экспрессов) равно " + countBet);
             }
             driver.findElement(By.cssSelector("div.bs-type-switcher__title")).click();
+        }
+    }
+
+
+    @ActionTitle("проверяет что кнопка Заключить Пари")
+    public void checkButtonBet(String status){
+        WebDriver driver = PageFactory.getDriver();
+        Boolean disabled = status.equals("активна")?true:false;
+        if (buttonBet.isEnabled()!=disabled){
+            Assertions.fail("Кнопка 'Заключить пари' в неправильном состоянии: не " + status);
+        }
+        LOG.info("Кнопка 'Заключить пари' " + status);
+
+        List <WebElement> notifications = driver.findElements(xpath("//div[contains(@class,'bet-notification__suggestion_visible') and @trans]"));
+        notifications.addAll(driver.findElements(xpath("//div[contains(@class,'bet-notification__warning_visible')]/span")));
+        for (WebElement element:notifications){
+            LOG.info(element.getText());
         }
     }
 }
