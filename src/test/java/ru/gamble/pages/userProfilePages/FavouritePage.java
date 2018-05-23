@@ -69,8 +69,7 @@ public class FavouritePage extends AbstractPage {
 
             sizeFavouriteUpdate = driver.findElements(By.xpath("//*[@id='private_panel']/li[3]/div[1]/div[1]/div[2]/div")).size();
             if (sizeFavouriteUpdate >= sizeFavourite) {
-                LOG.error("Не удалилась игра из избранного через верхнее меню");
-                assert false;
+               org.assertj.core.api.Assertions.fail("Не удалилась игра из избранного через верхнее меню");
             }
             sizeFavourite = sizeFavouriteUpdate;
         }
@@ -175,16 +174,14 @@ public class FavouritePage extends AbstractPage {
         LOG.info("Проверка что в Избранном игр не больше, чем добавлялось");
         if (teams.size() < allMyGames.size())
         {
-            LOG.error("В избранном лишние игры");
-            assert false;
+            fail("В избранном лишние игры");
         }
         LOG.info("Проверка названий игр, которе оказались в Избранном по названию");
         for (WebElement gameN : allMyGames){
             String nameGameFull = gameN.findElement(By.xpath("div[1]/div[1]/div[1]/div[2]")).getAttribute("title");
             LOG.info("В избранном еть игра: " + nameGameFull );
             if (!teams.contains(CommonStepDefs.stringParse(nameGameFull))) {
-                LOG.error("В избранном неверная игра. Добавляли Игры " + teams.toString() + " а в избранном оказалась " +  CommonStepDefs.stringParse(nameGameFull));
-                assert false;
+                fail("В избранном неверная игра. Добавляли Игры " + teams.toString() + " а в избранном оказалась " +  CommonStepDefs.stringParse(nameGameFull));
             }
         }
     }

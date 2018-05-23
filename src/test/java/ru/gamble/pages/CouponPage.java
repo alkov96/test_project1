@@ -362,9 +362,25 @@ public class CouponPage extends AbstractPage {
                 e.printStackTrace();
             }
             if (count==0){
-                LOG.error("Баланс не  соответствует ожидаемому. Баланс сейчас:" + afterBalance + ", ожидалось : " + balanceExpected);
-                assert false;
+                Assertions.fail("Баланс не  соответствует ожидаемому. Баланс сейчас:" + afterBalance + ", ожидалось : " + balanceExpected);
             }
+        }
+    }
+
+    @ActionTitle("проверяет изменение количества экспрессов при переключении вида системы")
+    public void checkCountExpress(){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> listOfBetType = driver.findElements(By.xpath("//ul[@class='open-type-switcher__list']/li"));
+        for (int typeSys = 3; typeSys < listOfBetType.size(); typeSys++) {
+            String countExp = listOfBetType.get(typeSys).findElement(By.xpath("span")).getText().split(" ")[0].replace("(", "");
+            listOfBetType.get(typeSys).click();
+            String countBet = driver.findElement(By.xpath("//span[@class='eachway-zone__text ng-binding']")).getText().split(" ")[0];
+            if (!countBet.equals(countExp)) {
+                 Assertions.fail("Неправильное количество ставок. Вместо " + countExp + " стало " + countBet);
+            } else {
+                LOG.info("Ок. Количество ставок(экспрессов) равно " + countBet);
+            }
+            driver.findElement(By.cssSelector("div.bs-type-switcher__title")).click();
         }
     }
 }

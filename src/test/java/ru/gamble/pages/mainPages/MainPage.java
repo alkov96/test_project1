@@ -59,7 +59,8 @@ public class MainPage extends AbstractPage {
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(pageTitle,10);
         workWithPreloader();
-        new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(slider));
+        tryingLoadPage(slider,10);
+       // new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(slider));
     }
 
     @ActionTitle("переключение видов спорта")
