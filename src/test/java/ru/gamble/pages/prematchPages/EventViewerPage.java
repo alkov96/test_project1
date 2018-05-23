@@ -1,6 +1,7 @@
 package ru.gamble.pages.prematchPages;
 
 import org.apache.poi.ss.formula.functions.T;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -466,8 +467,7 @@ public class EventViewerPage extends AbstractPage {
                 }
                 countSec++;
                 if (countSec==5){
-                    LOG.error("Не удалилась игра из избранного через левое меню. Было игр " + myGamesCount + ",осталось " + sizeFavouriteUpdate);
-                    assert false;
+                    Assertions.fail("Не удалилась игра из избранного через левое меню. Было игр " + myGamesCount + ",осталось " + sizeFavouriteUpdate);
                 }
             }
 
