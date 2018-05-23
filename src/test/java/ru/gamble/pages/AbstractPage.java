@@ -71,7 +71,7 @@ public abstract class AbstractPage extends Page {
 
     public void tryingLoadPage(WebElement element, int count){
         WebDriver driver = PageFactory.getWebDriver();
-        LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
+        LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl() + "\n");
 
         for(int j = 0; j < count; j++) {
             try {
@@ -109,8 +109,8 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("закрываем браузер")
     public static void closeBrowser(){
-        //PageFactory.getWebDriver().close();
         PageFactory.dispose();
+        LOG.info("Браузер закрыт");
     }
 
     /**

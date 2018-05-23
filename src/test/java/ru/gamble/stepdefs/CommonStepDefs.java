@@ -1,7 +1,6 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.Дано;
 import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -17,8 +16,8 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.pagefactory.stepdefs.GenericStepDefs;
-import ru.sbtqa.tag.pagefactory.support.Environment;
 import ru.sbtqa.tag.qautils.properties.Props;
+
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,7 +32,6 @@ import static org.openqa.selenium.By.xpath;
 
 
 public class CommonStepDefs extends GenericStepDefs {
-
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
 
     @ActionTitle("нажимает на кнопку")
@@ -76,9 +74,9 @@ public class CommonStepDefs extends GenericStepDefs {
         try{
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
-            LOG.info("Найдено прелоадеров::" + preloaders.size());
+            LOG.info("Найдено прелоадеров::" + preloaders.size() + "\n");
             driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
-            LOG.info("Прелоадеры закрылись");
+            LOG.info("Прелоадеры закрылись\n");
         }catch (TimeoutException te){
         }
     }
@@ -87,7 +85,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage(){
         cleanCookies();
-        goToMainPage("site2");}
+        goToMainPage("site2");
+    }
 
     @Когда("^переходит в админку$")
     public static void goToAdminPage(){goToMainPage("admin");}
@@ -108,6 +107,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 PageFactory.getWebDriver().get(site);
                 break;
         }
+        LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl());
 
     }
 
@@ -398,6 +398,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void cleanCookies(){
         try {
             PageFactory.getWebDriver().manage().deleteAllCookies();
+            LOG.info("Удаляем Cookies");
         }catch (Exception e){
             LOG.error(e.getMessage());
         }
