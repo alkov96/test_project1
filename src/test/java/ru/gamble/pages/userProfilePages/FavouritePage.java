@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
 
 @PageEntry(title = "Избранное")
@@ -187,6 +188,32 @@ public class FavouritePage extends AbstractPage {
                 assert false;
             }
         }
+    }
+
+    @ActionTitle("переходит в настройки и меняет коэффицент в избранном")
+    public void changePreferencesCoeff() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("переходит в настройки и меняет коэффицент");
+        String previous;
+        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
+       // AbstractPage.openFavourite();
+        Thread.sleep(1000);
+        WebElement coeff =  driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected-data__event-price ng-binding')]")).get(0);
+
+       // Thread.sleep(3000);
+       previous = coeff.getText();
+        AbstractPage.openFavourite();
+        preferences.click();
+        list.get(2).click();
+        LOG.info("Переключаемся на '" + list.get(2).getText() + "' формат отображения");
+        AbstractPage.openFavourite();
+        Thread.sleep(350);
+        LOG.info("Предыдущий: " + previous + "Текущий: " + coeff.getText());
+        if (previous.equals(coeff.getText())) {
+            LOG.error("Формат отображения коэффициентов не изменился");
+            org.assertj.core.api.Assertions.fail("Формат отображения коэффициентов не изменился");
+      }
+        LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
 }
 

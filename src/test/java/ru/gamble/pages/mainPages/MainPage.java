@@ -2,6 +2,7 @@ package ru.gamble.pages.mainPages;
 
 
 import cucumber.api.java.ru.Когда;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -52,6 +53,10 @@ public class MainPage extends AbstractPage {
     @ElementTitle("Лайв")
     @FindBy(id = "live")
     private WebElement liveButton;
+
+    @ElementTitle("Настройки")
+    @FindBy(id = "preferences")
+    private WebElement preferences;
 
     public MainPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -232,5 +237,46 @@ public class MainPage extends AbstractPage {
     public void checksForNewsBlock(){
         String xpath = "//div[contains(@class,'news-widget-head') and contains(@class,'active')]";
     }
+
+    @ActionTitle("ищет доступные коэффиценты на Главной")
+    public void findAvailableCoef() {
+        WebDriver driver = PageFactory.getDriver();
+        WebElement coeff = driver.findElement(By.cssSelector("div.bets-widget-table__link"));
+        Stash.put("coeffKey", coeff);
+        if (coeff == null) {
+            LOG.error("Нет доступных коэффициентов в разделе 'Горячие ставки'");
+            LOG.info("Переходим в прематч");
+            prematchButton.click();
+            CommonStepDefs.workWithPreloader();
+
+            coeff = driver.findElement(By.cssSelector("div.bets-block__bet-cell"));
+            if (coeff == null) {
+                Assertions.fail("Нет доступных коэффициентов");
+            }
+        }
+    }
+    @ActionTitle("переходит в настройки и меняет коэффицент на Главной")
+    public void changePreferencesCoeff() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("переходит в настройки и меняет коэффицент");
+        preferences.click();
+        String previous;
+        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
+        WebElement coeff = Stash.getValue("coeffKey");
+        for (int i = 1; i < 6; i++) {
+            previous = coeff.getText();
+            LOG.info("Переключаемся на '" + list.get(i).getText() + "' формат отображения");
+            list.get(i).click();
+            LOG.info("Текущее значение коэффициента : " + coeff.getText());
+            Thread.sleep(350);
+            if (previous.equals(coeff.getText())){
+                LOG.error("Формат отображения коэффициентов не изменился");
+                Assertions.fail("Формат отображения коэффициентов не изменился");
+            }
+        }
+        LOG.info("Смена форматов отображения коэффицентов прошла успешно");
+
+    }
+
 
 }
