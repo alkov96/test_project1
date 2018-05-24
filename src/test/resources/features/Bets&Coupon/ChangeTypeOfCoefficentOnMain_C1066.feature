@@ -1,8 +1,8 @@
 # language: ru
   Функционал: Изменение типа отображения коэффицентов на главной
   @smoke
-  @ChangeTypeOfCoeffOnMain_C1066
-  Сценарий: ChangeTypeOfCoeffOnMain_C1066
+  @ChangeTypeOfCoefficentOnMain_C1066
+  Сценарий: ChangeTypeOfCoefficentOnMain_C1066
 
     * переходит на главную страницу
 
