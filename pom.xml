@@ -44,23 +44,17 @@
             <artifactId>mail</artifactId>
             <version>1.4.7</version>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>org.seleniumhq.selenium</groupId>-->
-            <!--<artifactId>selenium-java</artifactId>-->
-            <!--<version>3.11.0</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.google.guava</groupId>-->
-            <!--<artifactId>guava</artifactId>-->
-            <!--<version>25.0-jre</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.6</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>ru.yandex.qatools.allure</groupId>-->
+            <!--<artifactId>allure-cucumber-jvm-adaptor</artifactId>-->
+            <!--<version>1.6.4</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
     </dependencies>
     <build>
         <plugins>
@@ -84,20 +78,21 @@
                     <testFailureIgnore>false</testFailureIgnore>
                     <skipTests>false</skipTests>
                     <argLine>
-                             -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.9.0/aspectjweaver-1.9.0.jar
-                             -Dcucumber.options="--plugin ru.sbtqa.tag.pagefactory.support.TagPFAllureReporter --plugin pretty"
+                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.9.1/aspectjweaver-1.9.1.jar
+                              <!-- -Dcucumber.options="&#45;&#45;plugin ru.sbtqa.tag.pagefactory.support.TagPFAllureReporter &#45;&#45;plugin pretty"-->
+                        -Dcucumber.options="--plugin io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm --plugin pretty"
                     </argLine>
                 </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.aspectj</groupId>
                         <artifactId>aspectjweaver</artifactId>
-                        <version>1.9.0</version>
+                        <version>1.9.1</version>
                     </dependency>
                     <dependency>
                         <groupId>org.aspectj</groupId>
                         <artifactId>aspectjtools</artifactId>
-                        <version>1.9.0</version>
+                        <version>1.9.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -110,10 +105,10 @@
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
                 <version>2.9</version>
-                <!--<configuration>-->
-                    <!--<resultsPattern>target/allure-results</resultsPattern>-->
-                    <!--<reportVersion>2.6</reportVersion>-->
-                <!--</configuration>-->
+                <configuration>
+                    <resultsPattern>target/allure-results</resultsPattern>
+                    <reportVersion>2.9</reportVersion>
+                </configuration>
             </plugin>
         </plugins>
     </reporting>

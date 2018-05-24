@@ -1,6 +1,7 @@
 package ru.gamble;
 
 import cucumber.api.CucumberOptions;
+import cucumber.api.java.After;
 import cucumber.api.junit.Cucumber;
 import io.qameta.allure.Attachment;
 import org.junit.AfterClass;
@@ -30,20 +31,10 @@ import java.util.concurrent.TimeUnit;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.pagefactory.stepdefs"},
         features = {"src/test/resources/features/"},
         plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
-        tags = {"@HotBetsCoupon_С1051"})
+        tags = {"@ChangeTypeOfCoefficientFav_C1066"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
-
-//    @BeforeClass
-//    public static void openBrowser(){
-////        LOG.info(LocalTime.now().toString());
-//        WebDriver driver = PageFactory.getWebDriver();
-////        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-////        driver.manage().window().setSize(new Dimension(1920, 1080));
-////        final Wait<WebDriver> wait = new WebDriverWait(driver, 6, 500);
-////        Locale.setDefault(new Locale("ru"));
-//    }
 
     @Rule
     public TestWatcher watchman = new TestWatcher() {
@@ -67,10 +58,17 @@ public class CucumberTest {
             saveScreenshot(((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES));
         }
     };
-
+//
 //    @AfterClass
-//    public static void tearDown() {
-//        PageFactory.dispose();
+//    public static void afterScenario(){
+//           WebDriver driver =  PageFactory.getWebDriver();
+//        if(PageFactory.getWebDriver().getWindowHandles().size() > 0) {
+//            LOG.info("Закрываем WebDriver");
+//            driver.quit();
+//            PageFactory.dispose();
+//        }else {
+//            LOG.info("WebDriver уже закрыт");
+//        }
 //    }
 }
 

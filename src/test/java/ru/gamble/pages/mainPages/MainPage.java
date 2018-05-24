@@ -1,7 +1,9 @@
 package ru.gamble.pages.mainPages;
 
 
+import cucumber.api.DataTable;
 import cucumber.api.java.ru.Когда;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,14 +19,20 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.pagefactory.exceptions.PageException;
+import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+import static ru.gamble.utility.Constants.*;
 
 
 @PageEntry(title = "Главная страница")
@@ -52,6 +60,20 @@ public class MainPage extends AbstractPage {
     @ElementTitle("Лайв")
     @FindBy(id = "live")
     private WebElement liveButton;
+
+    @ElementTitle("Настройки")
+    @FindBy(id = "preferences")
+    private WebElement preferences;
+
+
+    // Блок новостей
+    @ElementTitle("Стрелка-вправо")
+    @FindBy(xpath = "//*[contains(@class,'news-widget')]//button[contains(@class,' next')]")
+    private WebElement arrowRightButton;
+
+    @ElementTitle("Стрелка-влево")
+    @FindBy(xpath = "//*[contains(@class,'news-widget')]//button[contains(@class,'previous')]")
+    private WebElement arrowLeftButton;
 
     public MainPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -229,9 +251,134 @@ public class MainPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("проверяет наличие блока новостей")
-    public void checksForNewsBlock(){
+    @ActionTitle("проверяет наличие обязательных разделов новостей с")
+    public void checksForNewsBlock(DataTable dataTable){
+        String xpathAvailability;
+        WebElement current;
         String xpath = "//div[contains(@class,'news-widget-head') and contains(@class,'active')]";
+        WebDriver driver = PageFactory.getWebDriver();
+        List<String> table = dataTable.asList(String.class);
+        String section;
+        List<WebElement> main = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'news-widget-head__')]"))
+                .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
+
+            for(int i = 0; i < table.size(); i++) {
+                section = table.get(i);
+                if (main.get(i).getText().isEmpty() || main.get(i).getText() == null){main.get(i).click();}
+                String tmp = main.get(i).getText().toUpperCase();
+                assertThat(tmp).as("Строка [" + tmp + "] не соответсвует [" + section + "]").contains(section);
+                LOG.info("Найден раздел новостей::" + main.get(i).getText());
+            }
     }
+
+    @ActionTitle("проверяет что дайджест новостей не пустой")
+    public void verifiesThatNewsDigestsNotEmpty() {
+        List<WebElement> digestList = PageFactory.getWebDriver().findElements(By.xpath("//a[@class='news-widget__item-inner']"))
+                .stream().filter(element -> !element.getText().isEmpty()).collect(Collectors.toList());
+        assertThat(!digestList.isEmpty()).as("Ошибка! Не найден ни один дайджест в блоке новостей").isTrue();
+
+        for(WebElement element: digestList){
+          LOG.info("Найдена новость::" + element.getText().replaceAll("\n", " ").replaceAll("\\?","\""));
+        }
+    }
+
+
+
+    @ActionTitle("ищет доступные коэффиценты на Главной")
+    public void findAvailableCoef() {
+        WebDriver driver = PageFactory.getDriver();
+        WebElement coeff = driver.findElement(By.cssSelector("div.bets-widget-table__link"));
+        Stash.put("coeffKey", coeff);
+        if (coeff == null) {
+            LOG.error("Нет доступных коэффициентов в разделе 'Горячие ставки'");
+            LOG.info("Переходим в прематч");
+            prematchButton.click();
+            CommonStepDefs.workWithPreloader();
+
+            coeff = driver.findElement(By.cssSelector("div.bets-block__bet-cell"));
+            if (coeff == null) {
+                Assertions.fail("Нет доступных коэффициентов");
+            }
+        }
+    }
+    @ActionTitle("переходит в настройки и меняет коэффицент на Главной")
+    public void changePreferencesCoeff() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("переходит в настройки и меняет коэффицент");
+        preferences.click();
+        String previous;
+        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
+        WebElement coeff = Stash.getValue("coeffKey");
+        for (int i = 1; i < 6; i++) {
+            previous = coeff.getText();
+            LOG.info("Переключаемся на '" + list.get(i).getText() + "' формат отображения");
+            list.get(i).click();
+            LOG.info("Текущее значение коэффициента : " + coeff.getText());
+            Thread.sleep(350);
+            if (previous.equals(coeff.getText())){
+                LOG.error("Формат отображения коэффициентов не изменился");
+                Assertions.fail("Формат отображения коэффициентов не изменился");
+            }
+        }
+        LOG.info("Смена форматов отображения коэффицентов прошла успешно");
+    }
+
+    @ActionTitle("проверяет смену цвета точек при нажатии на кнопку c")
+    public void checksChangeColorDotsWhenButtonPressed(DataTable dataTable){
+        WebDriver driver = PageFactory.getWebDriver();
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String direction, buttonName;
+
+        LOG.info("Ищем навигационные точки под слайдером новостей");
+         List<WebElement> dots = driver.findElements(By.xpath("//*[contains(@class,'news-widget')]//li[contains(@class,'dot')]"))
+                 .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+         LOG.info("Всего точек::" + dots.size());
+
+        for(int i = 0; i < table.size(); i++) {
+            direction = table.get(i).get(DIRECTION);
+            buttonName = table.get(i).get(BUTTON);
+
+            if(direction.contains("Вправо")){
+                for (int j = 0; j < dots.size(); j++){
+                    LOG.info("Ищем в строке точек закрашенную");
+                    if(dots.get(j).getAttribute("class").contains("is-selected")){
+                        LOG.info("Нашли");
+                        LOG.info("Нажимаем на::" + buttonName);
+                        pressButtonAP(buttonName);
+                        if(j == (dots.size()-1)) {
+                            assertThat(dots.get(0).getAttribute("class").contains("is-selected"))
+                                    .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
+                            LOG.info("Первая точка [1] закрашена");
+
+                        }else {
+                            assertThat(dots.get(j + 1).getAttribute("class").contains("is-selected"))
+                                    .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
+                            LOG.info("Следующая точка [" + (j + 2) + "] закрашена");
+                            verifiesThatNewsDigestsNotEmpty();
+                        }
+                    }
+                }
+            }else if(direction.contains("Влево")){
+
+                for (int k = dots.size() - 1; k >= 0; k--){
+                    if(dots.get(k).getAttribute("class").contains("is-selected")){
+                        LOG.info("Нашли");
+                        LOG.info("Нажимаем на::" + buttonName);
+                        pressButtonAP(buttonName);
+
+                        verifiesThatNewsDigestsNotEmpty();
+                    }
+                }
+
+            }
+
+
+
+
+           // if(direction)
+
+        }
+    }
+
 
 }
