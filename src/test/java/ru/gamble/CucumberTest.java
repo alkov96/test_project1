@@ -1,6 +1,7 @@
 package ru.gamble;
 
 import cucumber.api.CucumberOptions;
+import cucumber.api.java.After;
 import cucumber.api.junit.Cucumber;
 import io.qameta.allure.Attachment;
 import org.junit.AfterClass;
@@ -57,6 +58,18 @@ public class CucumberTest {
             saveScreenshot(((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES));
         }
     };
+//
+//    @AfterClass
+//    public static void afterScenario(){
+//           WebDriver driver =  PageFactory.getWebDriver();
+//        if(PageFactory.getWebDriver().getWindowHandles().size() > 0) {
+//            LOG.info("Закрываем WebDriver");
+//            driver.quit();
+//            PageFactory.dispose();
+//        }else {
+//            LOG.info("WebDriver уже закрыт");
+//        }
+//    }
 }
 
 

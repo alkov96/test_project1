@@ -65,6 +65,16 @@ public class MainPage extends AbstractPage {
     @FindBy(id = "preferences")
     private WebElement preferences;
 
+
+    // Блок новостей
+    @ElementTitle("Стрелка-вправо")
+    @FindBy(xpath = "//*[contains(@class,'news-widget')]//button[contains(@class,' next')]")
+    private WebElement arrowRightButton;
+
+    @ElementTitle("Стрелка-влево")
+    @FindBy(xpath = "//*[contains(@class,'news-widget')]//button[contains(@class,'previous')]")
+    private WebElement arrowLeftButton;
+
     public MainPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
@@ -268,10 +278,11 @@ public class MainPage extends AbstractPage {
         assertThat(!digestList.isEmpty()).as("Ошибка! Не найден ни один дайджест в блоке новостей").isTrue();
 
         for(WebElement element: digestList){
-          LOG.info("Найдена новость::" + element.getText().replaceAll("\n", " "));
+          LOG.info("Найдена новость::" + element.getText().replaceAll("\n", " ").replaceAll("\\?","\""));
         }
-
     }
+
+
 
     @ActionTitle("ищет доступные коэффиценты на Главной")
     public void findAvailableCoef() {
@@ -310,7 +321,63 @@ public class MainPage extends AbstractPage {
             }
         }
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
+    }
 
+    @ActionTitle("проверяет смену цвета точек при нажатии на кнопку c")
+    public void checksChangeColorDotsWhenButtonPressed(DataTable dataTable){
+        WebDriver driver = PageFactory.getWebDriver();
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String direction, buttonName;
+
+        LOG.info("Ищем навигационные точки под слайдером новостей");
+         List<WebElement> dots = driver.findElements(By.xpath("//*[contains(@class,'news-widget')]//li[contains(@class,'dot')]"))
+                 .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+         LOG.info("Всего точек::" + dots.size());
+
+        for(int i = 0; i < table.size(); i++) {
+            direction = table.get(i).get(DIRECTION);
+            buttonName = table.get(i).get(BUTTON);
+
+            if(direction.contains("Вправо")){
+                for (int j = 0; j < dots.size(); j++){
+                    LOG.info("Ищем в строке точек закрашенную");
+                    if(dots.get(j).getAttribute("class").contains("is-selected")){
+                        LOG.info("Нашли");
+                        LOG.info("Нажимаем на::" + buttonName);
+                        pressButtonAP(buttonName);
+                        if(j == (dots.size()-1)) {
+                            assertThat(dots.get(0).getAttribute("class").contains("is-selected"))
+                                    .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
+                            LOG.info("Первая точка [1] закрашена");
+
+                        }else {
+                            assertThat(dots.get(j + 1).getAttribute("class").contains("is-selected"))
+                                    .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
+                            LOG.info("Следующая точка [" + (j + 2) + "] закрашена");
+                            verifiesThatNewsDigestsNotEmpty();
+                        }
+                    }
+                }
+            }else if(direction.contains("Влево")){
+
+                for (int k = dots.size() - 1; k >= 0; k--){
+                    if(dots.get(k).getAttribute("class").contains("is-selected")){
+                        LOG.info("Нашли");
+                        LOG.info("Нажимаем на::" + buttonName);
+                        pressButtonAP(buttonName);
+
+                        verifiesThatNewsDigestsNotEmpty();
+                    }
+                }
+
+            }
+
+
+
+
+           // if(direction)
+
+        }
     }
 
 
