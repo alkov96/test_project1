@@ -93,6 +93,10 @@ public class CouponPage extends AbstractPage {
     @FindBy(id="place-bet-button")
     private WebElement buttonBet;
 
+    @ElementTitle("переключатель ставки на бонусы")
+    @FindBy(id="bonusmoney")
+    private WebElement bonusBet;
+
 
     public CouponPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -426,6 +430,8 @@ public class CouponPage extends AbstractPage {
                 driver.findElements(By.xpath("//input[contains(@class,'input_coupon-ordinar')]")).get(0);
         input.clear();
         input.sendKeys(String.valueOf(sum));
+        float sumBet = Float.valueOf(sum.trim());
+        Stash.put("sumKey",sumBet);
     }
 
     @ActionTitle("нажимает кнопку ВНИЗ - дублирование ставки для всех пари")
@@ -467,6 +473,15 @@ public class CouponPage extends AbstractPage {
             Assertions.fail("Формат отображения коэффициентов не изменился");
         }
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
+    }
+
+    @ActionTitle("выбирает ставку бонусами")
+    public void onBonus(){
+        WebDriver driver = PageFactory.getDriver();
+        if (!driver.findElement(xpath("//div[@id='bonusmoney']/..")).getAttribute("class").contains("active")){
+            bonusBet.click();
+        }
+        LOG.info("Купон перключен на ставку БОНУСАМИ");
     }
 }
 
