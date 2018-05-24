@@ -1,6 +1,7 @@
 package ru.gamble.pages.mainPages;
 
 
+import cucumber.api.DataTable;
 import cucumber.api.java.ru.Когда;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
@@ -18,14 +19,20 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.pagefactory.exceptions.PageException;
+import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+import static ru.gamble.utility.Constants.*;
 
 
 @PageEntry(title = "Главная страница")
@@ -234,9 +241,36 @@ public class MainPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("проверяет наличие блока новостей")
-    public void checksForNewsBlock(){
+    @ActionTitle("проверяет наличие обязательных разделов новостей с")
+    public void checksForNewsBlock(DataTable dataTable){
+        String xpathAvailability;
+        WebElement current;
         String xpath = "//div[contains(@class,'news-widget-head') and contains(@class,'active')]";
+        WebDriver driver = PageFactory.getWebDriver();
+        List<String> table = dataTable.asList(String.class);
+        String section;
+        List<WebElement> main = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'news-widget-head__')]"))
+                .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
+
+            for(int i = 0; i < table.size(); i++) {
+                section = table.get(i);
+                if (main.get(i).getText().isEmpty() || main.get(i).getText() == null){main.get(i).click();}
+                String tmp = main.get(i).getText().toUpperCase();
+                assertThat(tmp).as("Строка [" + tmp + "] не соответсвует [" + section + "]").contains(section);
+                LOG.info("Найден раздел новостей::" + main.get(i).getText());
+            }
+    }
+
+    @ActionTitle("проверяет что дайджест новостей не пустой")
+    public void verifiesThatNewsDigestsNotEmpty() {
+        List<WebElement> digestList = PageFactory.getWebDriver().findElements(By.xpath("//a[@class='news-widget__item-inner']"))
+                .stream().filter(element -> !element.getText().isEmpty()).collect(Collectors.toList());
+        assertThat(!digestList.isEmpty()).as("Ошибка! Не найден ни один дайджест в блоке новостей").isTrue();
+
+        for(WebElement element: digestList){
+          LOG.info("Найдена новость::" + element.getText().replaceAll("\n", " "));
+        }
+
     }
 
     @ActionTitle("ищет доступные коэффиценты на Главной")
