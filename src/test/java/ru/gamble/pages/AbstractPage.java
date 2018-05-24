@@ -42,6 +42,10 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "main-logo")
     protected WebElement onMainPageButton;
 
+    @ElementTitle("Иконка юзера")
+    @FindBy(id = "user-icon")
+    protected WebElement userIconButton;
+
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
     private WebElement burgerBottom;
