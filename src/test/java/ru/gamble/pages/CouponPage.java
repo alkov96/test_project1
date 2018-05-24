@@ -395,7 +395,10 @@ public class CouponPage extends AbstractPage {
         }
     }
 
-
+    /**
+     * првоерка кнопка Заключить Пари в купоне активна или заблокирована. и Печать ошибок и предупреждений в купоне, если есть
+     * @param status - ожидаемое состояние кнопки(активна, заблокирована)
+     */
     @ActionTitle("проверяет что кнопка Заключить Пари")
     public void checkButtonBet(String status){
         WebDriver driver = PageFactory.getDriver();
@@ -410,6 +413,40 @@ public class CouponPage extends AbstractPage {
         for (WebElement element:notifications){
             LOG.info(element.getText());
         }
+    }
+
+    @ActionTitle("вводит сумму одной ставки Ординар")
+    public void inputBetOrdinar(String sum){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> listBets = driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]"));
+        LOG.info("Вводим для первого события сумму ставки: " + sum);
+        WebElement input;
+        input=listBets.size()==1?
+                driver.findElement(By.id("express-bet-input")):
+                driver.findElements(By.xpath("//input[contains(@class,'input_coupon-ordinar')]")).get(0);
+        input.clear();
+        input.sendKeys(String.valueOf(sum));
+    }
+
+    @ActionTitle("нажимает кнопку ВНИЗ - дублирование ставки для всех пари")
+    public void dublicateBet(){
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> listBets = driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]"));
+        String sumFirstBet = listBets.get(0).getAttribute("value");
+        LOG.info("Сумма первой ставки = " + sumFirstBet);
+        if (listBets.size()>1) {//если в купоне не одна ставка, то имеет смысл нажать кнопку "вниз" заполняющую сумму ставки для всех одинаковой
+            LOG.info("Нажимаем на кнопку ВНИЗ чтобы скопировать размер ставки для второго события");
+            driver.findElement(By.xpath("//ul[contains(@class,'coupon-bet-list')]//i[contains(@class,'icon-download-icon')]")).click();
+            LOG.info("Проверяем что размер ставки продублировался");
+            String valueBet = listBets.get(1).getAttribute("value");
+            if (!valueBet.equals(sumFirstBet)) {
+                Assertions.fail("Ставка не продублировалась для второго события " + valueBet);
+            }
+        }
+        float sum = Float.valueOf(sumFirstBet.trim());
+        float count = Float.valueOf(listBets.size());
+        sum = count*sum;
+        Stash.put("sumKey",sum);
     }
 
     @ActionTitle("переходит в настройки и меняет коэффицент в купоне")
