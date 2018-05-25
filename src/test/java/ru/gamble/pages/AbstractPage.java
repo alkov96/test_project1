@@ -74,6 +74,14 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "preferences")
     protected WebElement preferences;
 
+    @ElementTitle("Активация Быстрой ставки")
+    @FindBy(id = "quickbet")
+    protected WebElement quickButton;
+
+//для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
+    @ElementTitle("поле суммы общей ставки")
+    @FindBy(id="express-bet-input")
+    protected WebElement coupon_field;
 
 
     // Метод три раза пытается обновить главную страницу
@@ -310,6 +318,15 @@ public abstract class AbstractPage extends Page {
                 return element != null && element.isDisplayed();
             }
         });
+    }
+
+
+    @ActionTitle("включает быструю ставку и вводит сумму")
+    public void onQuickBet(String sum){
+        quickButton.click();
+        coupon_field.sendKeys(sum);
+        float sumBet = Float.valueOf(sum.trim());
+        Stash.put("sumKey",sumBet);
     }
 }
 

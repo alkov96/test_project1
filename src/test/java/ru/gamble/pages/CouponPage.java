@@ -81,9 +81,9 @@ public class CouponPage extends AbstractPage {
     @FindBy(id="place-bet-button")
     private WebElement coupon_bet_button;
 
-    @ElementTitle("поле суммы общей ставки")
-    @FindBy(id="express-bet-input")
-    private WebElement coupon_field;
+//    @ElementTitle("поле суммы общей ставки")
+//    @FindBy(id="express-bet-input")
+//    private WebElement coupon_field;
 
     @ElementTitle("поле суммы ставки типа Система")
     @FindBy(id="express-unitbet-input")
@@ -426,7 +426,7 @@ public class CouponPage extends AbstractPage {
         LOG.info("Вводим для первого события сумму ставки: " + sum);
         WebElement input;
         input=listBets.size()==1?
-                driver.findElement(By.id("express-bet-input")):
+                coupon_field:
                 driver.findElements(By.xpath("//input[contains(@class,'input_coupon-ordinar')]")).get(0);
         input.clear();
         input.sendKeys(String.valueOf(sum));
