@@ -13,6 +13,8 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+
 /**
  * @author p.sivak.
  * @since 21.05.2018.
@@ -21,13 +23,14 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 public class OperationHistoryPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(OperationHistoryPage.class);
 
-    @FindBy(xpath = "//div[@class='history__table']")
+    @FindBy(xpath = "//tr[@class='repeated-item ng-scope']")
     private WebElement historyTable;
 
     public OperationHistoryPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
+        workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(historyTable));
     }
 }

@@ -1,6 +1,7 @@
 package ru.gamble.pages.userProfilePages;
 
 import cucumber.api.DataTable;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -16,6 +17,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -46,7 +48,20 @@ public class EnterPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(pageTitle,10);
+        for(int j = 0; j < 10; j++) {
+            try {
+                driver.findElement(By.id("log-in")).click();
+                if (pageTitle.isDisplayed()) {
+                    break;
+                }
+            } catch (Exception e){
+                driver.navigate().refresh();
+            }
+            if(j >= 10 - 1){
+                throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
+            }
+        }
+ //       tryingLoadPage(pageTitle,10);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
