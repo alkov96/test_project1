@@ -425,4 +425,26 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    /**
+     * функиця, которая ждет пока элмент станет доступным. ждет, но не кликает
+     * @param element
+     * @throws Exception
+     */
+    public static void waitEnabled(WebElement element) throws Exception{
+        int count = 20;
+        try {
+            while (count > 0) {
+                if (element.isEnabled()) break;
+                Thread.sleep(500);
+                count--;
+                if (count==0){
+                    Assertions.fail("За 10 секунд элемент " + element + " так и не стал доступным");
+                }
+            }
+        } catch (org.openqa.selenium.StaleElementReferenceException e) {
+            LOG.error(""+e);
+        }
+
+    }
+
 }
