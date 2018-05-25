@@ -1,7 +1,7 @@
 # language: ru
 Функционал: Экспресс бонус
 
-  @smoke
+  #@smoke
   @ExpressBonus_C39773
 
   @correct
