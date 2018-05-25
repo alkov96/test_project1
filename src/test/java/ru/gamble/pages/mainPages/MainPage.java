@@ -82,7 +82,7 @@ public class MainPage extends AbstractPage {
         tryingLoadPage(pageTitle,10);
         workWithPreloader();
         tryingLoadPage(slider,10);
-       // new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOf(slider));
+        workWithPreloader();
     }
 
     @ActionTitle("переключение видов спорта")
