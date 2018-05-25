@@ -46,6 +46,14 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "service-list")
     private WebElement burgerBottom;
 
+    @ElementTitle("Сервисное сообщение")
+    @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
+    private WebElement serviceMessage;
+
+    @ElementTitle("Иконка закрытия сервисного сообщения")
+    @FindBy(xpath = "//span[contains(@class,'tech-msg__close')]")
+    private WebElement loseServiceMessage;
+
     @ElementTitle("День")
     @FindBy(className = "inpD")
     protected WebElement fieldDay;
@@ -245,6 +253,22 @@ public abstract class AbstractPage extends Page {
         PageFactory.getWebDriver().get(link);
         LOG.info("Получили и перешли по ссылке::" + link);
         workWithPreloader();
+    }
+
+    @ActionTitle("проверяет наличие сообщения с текстом")
+    public static void checkServiceMessageTrue(String param){
+    }
+
+    @ActionTitle("проверяет отсутствие сообщения с текстом")
+    public static void checkServiceMessageFalse(){
+    }
+
+    @ActionTitle("проверяет наличие иконки закрытия")
+    public static void chectCloseServiceMessageTrue(){
+    }
+
+    @ActionTitle("проверяет отсутствие иконки закрытия")
+    public static void chectCloseServiceMessageFalse(){
     }
 
     public void fillCouponFinal(int count, String ifForExperss, By findCoeffs) {
