@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.pagefactory.stepdefs"},
         features = {"src/test/resources/features/"},
         plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
-        tags = {"@ChangePassword_C1043"})
+        tags = {"@ChangeTypeOfCoefficientFav_C1063"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
