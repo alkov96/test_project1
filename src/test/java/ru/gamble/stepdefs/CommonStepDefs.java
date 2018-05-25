@@ -400,4 +400,29 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    /**
+     * прелоадер должен обязательно появиться, если его не было - значит способ пополнения как бы и не выбран. поэтому эта ункция ждет чтобы прелоадер точно был,
+     * но чтобы был не бесконечен
+     * @throws Exception
+     */
+    public static void waitToPreloader() throws Exception{
+        WebDriver driver = PageFactory.getDriver();
+        int count = 20;
+        try {
+            while (count > 0) {
+                if (driver.findElement(By.cssSelector("div.preloader__container")).isDisplayed()) {
+                    waitOfPreloader();
+                    break;
+                }
+                Thread.sleep(500);
+                count--;
+                if (count == 0) {
+                    Assertions.fail("Прелоадер так и не появился!");
+                }
+            }
+        } catch (org.openqa.selenium.StaleElementReferenceException e) {
+            LOG.error(""+e);
+        }
+    }
+
 }
