@@ -211,6 +211,7 @@ public class FavouritePage extends AbstractPage {
             org.assertj.core.api.Assertions.fail("Формат отображения коэффициентов не изменился");
       }
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
+        list.get(0).click();
     }
 }
 
