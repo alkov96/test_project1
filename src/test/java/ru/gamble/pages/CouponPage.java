@@ -473,6 +473,7 @@ public class CouponPage extends AbstractPage {
             Assertions.fail("Формат отображения коэффициентов не изменился");
         }
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
+        list.get(0).click();
     }
 
     @ActionTitle("выбирает ставку бонусами")
