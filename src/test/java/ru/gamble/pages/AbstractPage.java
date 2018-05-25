@@ -1,6 +1,9 @@
 package ru.gamble.pages;
 
 import cucumber.api.DataTable;
+import cucumber.api.java.mn.Харин;
+import org.apache.poi.ss.formula.functions.T;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,6 +30,7 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
@@ -321,12 +325,41 @@ public abstract class AbstractPage extends Page {
     }
 
 
+    /**
+     * включается быстрая свтака и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
+     * @param sum
+     */
     @ActionTitle("включает быструю ставку и вводит сумму")
     public void onQuickBet(String sum){
-        quickButton.click();
-        coupon_field.sendKeys(sum);
-        float sumBet = Float.valueOf(sum.trim());
+        if (!quickButton.findElement(By.xpath("..")).getAttribute("class").contains("active")){
+
+            quickButton.click();
+        }
+        float sumBet;
+        sumBet = sum.equals("больше баланса")?(float)Stash.getValue("balanceKey")+1:Float.valueOf(sum);
+        coupon_field.clear();
+        coupon_field.sendKeys(String.valueOf(sumBet));
         Stash.put("sumKey",sumBet);
+    }
+
+
+    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
+    public void checkError(String pattern){
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        List<WebElement> listErrors = driver.findElements(By.xpath("//div[contains(@class,'bet-notification__warning_visible')]"));
+        if (listErrors.isEmpty()){
+            Assertions.fail("Нет никаких предупреждений в купоне");
+        }
+        for (WebElement error: listErrors){
+            if (error.getText().contains(pattern)){
+                LOG.info("Искомое предупреждение в купоне найдено: " + pattern);
+                break;
+            }
+            if (listErrors.indexOf(error)==(listErrors.size()-1)){
+                Assertions.fail("Искомого предупреждения нет в купоне!");
+            }
+        }
     }
 }
 
