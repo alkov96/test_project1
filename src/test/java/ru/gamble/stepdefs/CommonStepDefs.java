@@ -1,8 +1,8 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.Дано;
 import cucumber.api.java.ru.Когда;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -17,8 +17,8 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.pagefactory.stepdefs.GenericStepDefs;
-import ru.sbtqa.tag.pagefactory.support.Environment;
 import ru.sbtqa.tag.qautils.properties.Props;
+
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,7 +33,6 @@ import static org.openqa.selenium.By.xpath;
 
 
 public class CommonStepDefs extends GenericStepDefs {
-
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
 
     @ActionTitle("нажимает на кнопку")
@@ -76,16 +75,19 @@ public class CommonStepDefs extends GenericStepDefs {
         try{
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
-            LOG.info("Найдено прелоадеров::" + preloaders.size());
+            LOG.info("Найдено прелоадеров::" + preloaders.size() + "\n");
             driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
-            LOG.info("Прелоадеры закрылись");
+            LOG.info("Прелоадеры закрылись\n");
         }catch (TimeoutException te){
         }
     }
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){goToMainPage("site2");}
+    public static void goToMainPage(){
+        cleanCookies();
+        goToMainPage("site2");
+    }
 
     @Когда("^переходит в админку$")
     public static void goToAdminPage(){goToMainPage("admin");}
@@ -106,6 +108,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 PageFactory.getWebDriver().get(site);
                 break;
         }
+        LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl());
 
     }
 
@@ -295,7 +298,6 @@ public class CommonStepDefs extends GenericStepDefs {
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      * @throws Exception
      */
-    @ActionTitle("проверяет что переход удался")
     public void checkLinkToGame() throws Exception {
         WebDriver driver = PageFactory.getDriver();
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
@@ -312,26 +314,22 @@ public class CommonStepDefs extends GenericStepDefs {
             String team2name = driver.findElement(By.xpath("//div[@class='live-game-summary']//div[contains(@class,'game-info')]/ng-include[1]//div[contains(@class,'team-2')]//p")).getAttribute("title").trim();
             LOG.info("Перешли на игру. Ее название в линии: " + team1name + " - " + team2name + ". Спорт: " + sportis);
             if (!team1.equals(team1name) || !team2.equals(team2name)) {
-                LOG.error("Из Ближайших трансляций переход на неправильную игру. Вместо " + team1 + " " + team2 + "перешли на " + team1name + " " + team2name);
-                assert false;
+                Assertions.fail("Из Ближайших трансляций переход на неправильную игру. Вместо " + team1 + " " + team2 + "перешли на " + team1name + " " + team2name);
             }
             if (!(sportName.toLowerCase()).equals(sportis.toLowerCase())) {
-                LOG.error("Из Ближайших трансляций переход на неправильный спорт. Игра " + stringParse(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
-                assert false;
+                Assertions.fail("Из Ближайших трансляций переход на неправильный спорт. Игра " + stringParse(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
             }
             if (driver.findElement(By.xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
                 ;
                 //  if (driver.findElements(By.xpath("//div[@class='field-switcher']/div[contains(@class,'field-switcher__item_icon-video')]")).isEmpty()) {
-                LOG.error("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + stringParse(team1 + team2));
-                assert false;
+                Assertions.fail("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + stringParse(team1 + team2));
             }
             LOG.info("У игры, у которой на виджете БТ есть кнопка Смотреть действительно есть видео. Проверка Успешна");
         } else {
             String gameName = driver.findElement(By.xpath("//div[contains(@class,'live-container')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("title");
             LOG.info("Перешли на игру. Ее название в линии: " + gameName);
             if (!stringParse(gameName).equals(stringParse(team1 + team2))) {
-                LOG.error("Из виджета переход на неправильную игру. Вместо " + stringParse(team1 + team2) + "перешли на " + stringParse(gameName));
-                assert false;
+                Assertions.fail("Из виджета переход на неправильную игру. Вместо " + stringParse(team1 + team2) + "перешли на " + stringParse(gameName));
             }
             LOG.info("Название игры в линии совпадает с тем, что ыбло на виджете БТ. Переход прошел успешно");
         }
@@ -390,6 +388,16 @@ public class CommonStepDefs extends GenericStepDefs {
         driver.close();
         driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind - 1].toString()); //мы знаем что поле открытия ссылки на скачивание количесвто ссылок будет на  больше, незачем переопрелеть CountWind.
         return flag;
+    }
+
+    @Когда("^(пользователь |он) очищает cookies$")
+    public static void cleanCookies(){
+        try {
+            PageFactory.getWebDriver().manage().deleteAllCookies();
+            LOG.info("Удаляем Cookies");
+        }catch (Exception e){
+            LOG.error(e.getMessage());
+        }
     }
 
 }

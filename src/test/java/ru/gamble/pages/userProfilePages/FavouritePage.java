@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
 
 @PageEntry(title = "Избранное")
@@ -69,8 +70,7 @@ public class FavouritePage extends AbstractPage {
 
             sizeFavouriteUpdate = driver.findElements(By.xpath("//*[@id='private_panel']/li[3]/div[1]/div[1]/div[2]/div")).size();
             if (sizeFavouriteUpdate >= sizeFavourite) {
-                LOG.error("Не удалилась игра из избранного через верхнее меню");
-                assert false;
+               org.assertj.core.api.Assertions.fail("Не удалилась игра из избранного через верхнее меню");
             }
             sizeFavourite = sizeFavouriteUpdate;
         }
@@ -146,7 +146,7 @@ public class FavouritePage extends AbstractPage {
     @ActionTitle("добавляет ставку в купон")
     public void addToCoupon(){
         WebDriver driver = PageFactory.getDriver();
-        WebElement game = driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']")).get(0);//первая игра в списоке игр в избранном
+        WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
         String nameFavour = game.findElement(xpath("div//div[contains(@class,'elected__teams')]")).getAttribute("title");
         float coefFavour = Float.valueOf(game.findElement(xpath("div//div[contains(@class,'elected-data__event-price')]")).getText());
         String typeFavour = driver.findElement(xpath("//div[contains(@class,'elected-data__caption')]")).getAttribute("title").trim();
@@ -175,18 +175,42 @@ public class FavouritePage extends AbstractPage {
         LOG.info("Проверка что в Избранном игр не больше, чем добавлялось");
         if (teams.size() < allMyGames.size())
         {
-            LOG.error("В избранном лишние игры");
-            assert false;
+            fail("В избранном лишние игры");
         }
         LOG.info("Проверка названий игр, которе оказались в Избранном по названию");
         for (WebElement gameN : allMyGames){
             String nameGameFull = gameN.findElement(By.xpath("div[1]/div[1]/div[1]/div[2]")).getAttribute("title");
             LOG.info("В избранном еть игра: " + nameGameFull );
             if (!teams.contains(CommonStepDefs.stringParse(nameGameFull))) {
-                LOG.error("В избранном неверная игра. Добавляли Игры " + teams.toString() + " а в избранном оказалась " +  CommonStepDefs.stringParse(nameGameFull));
-                assert false;
+                fail("В избранном неверная игра. Добавляли Игры " + teams.toString() + " а в избранном оказалась " +  CommonStepDefs.stringParse(nameGameFull));
             }
         }
+    }
+
+    @ActionTitle("переходит в настройки и меняет коэффицент в избранном")
+    public void changePreferencesCoeff() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("переходит в настройки и меняет коэффицент");
+        String previous;
+        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
+       // AbstractPage.openFavourite();
+        Thread.sleep(1000);
+        WebElement coeff =  driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected-data__event-price ng-binding')]")).get(0);
+
+       // Thread.sleep(3000);
+       previous = coeff.getText();
+        AbstractPage.openFavourite();
+        preferences.click();
+        list.get(2).click();
+        LOG.info("Переключаемся на '" + list.get(2).getText() + "' формат отображения");
+        AbstractPage.openFavourite();
+        Thread.sleep(350);
+        LOG.info("Предыдущий: " + previous + "Текущий: " + coeff.getText());
+        if (previous.equals(coeff.getText())) {
+            LOG.error("Формат отображения коэффициентов не изменился");
+            org.assertj.core.api.Assertions.fail("Формат отображения коэффициентов не изменился");
+      }
+        LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
 }
 

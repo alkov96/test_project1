@@ -183,6 +183,11 @@ public class FooterPage extends AbstractPage {
             // Цикл обновления страницы в случае неудачи её прогрузки
             for(int j = 0; j < 10; j++) {
                 try {
+                    try {
+                        new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+                    }catch (Exception e){
+                        e.getMessage();
+                    }
                     requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
                     LOG.info("Текущая страница::" + driver.getCurrentUrl());
                     if(!requiredElements.isEmpty()){

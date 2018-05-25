@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.utility.BeforeTest;
+import ru.gamble.utility.JsonLoader;
 import ru.gamble.utility.YandexPostman;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
@@ -41,6 +41,10 @@ public abstract class AbstractPage extends Page {
     @ElementTitle("На главную")
     @FindBy(id = "main-logo")
     protected WebElement onMainPageButton;
+
+    @ElementTitle("Иконка юзера")
+    @FindBy(id = "user-icon")
+    protected WebElement userIconButton;
 
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
@@ -74,12 +78,17 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "prematch")
     private WebElement prematchBottom;
 
+    @ElementTitle("Настройки")
+    @FindBy(id = "preferences")
+    protected WebElement preferences;
+
+
 
     // Метод три раза пытается обновить главную страницу
 
     public void tryingLoadPage(WebElement element, int count){
         WebDriver driver = PageFactory.getWebDriver();
-        LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
+        LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl() + "\n");
 
         for(int j = 0; j < count; j++) {
             try {
@@ -117,16 +126,9 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("закрываем браузер")
     public static void closeBrowser(){
-        //PageFactory.getWebDriver().close();
         PageFactory.dispose();
+        LOG.info("Браузер закрыт");
     }
-
- /*   @ActionTitle("Очищает купон")
-    public void crearCoupon(){
-        if (PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).isDisplayed()){ //очистка купона
-            PageFactory.getWebDriver().findElement(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")).click();
-        }
-    }*/
 
     /**
      * Метод получения письма и перехода по ссылке для завершения регистрации на сайте
@@ -141,7 +143,7 @@ public abstract class AbstractPage extends Page {
         String url = "";
 
         try {
-            url = BeforeTest.getData().get("site1").get("mainurl").getValue();
+            url = JsonLoader.getData().get("site1").get("mainurl").getValue();
             link = YandexPostman.getLinkForAuthentication(email);
         }catch (DataException de){
             LOG.error("Ошибка! Не смогли получить ссылку сайта");

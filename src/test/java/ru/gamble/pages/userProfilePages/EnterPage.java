@@ -8,9 +8,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.utility.BeforeTest;
 import ru.gamble.utility.Constants;
 import ru.gamble.stepdefs.CommonStepDefs;
+import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -71,7 +71,7 @@ public class EnterPage extends AbstractPage {
         String login, password;
 
         if(data.get(LOGIN).equals(Constants.DEFAULT)){
-            login = BeforeTest.getData().get("site1").get("login").getValue();
+            login = JsonLoader.getData().get("site1").get("login").getValue();
         } else if(data.get(LOGIN).equals("EMAIL")){
             login = Stash.getValue("EMAIL");
         } else {
@@ -79,7 +79,7 @@ public class EnterPage extends AbstractPage {
         }
 
         if(data.get(PASSWORD).equals(Constants.DEFAULT)){
-            password = BeforeTest.getData().get("site1").get("password").getValue();
+            password = JsonLoader.getData().get("site1").get("password").getValue();
         }
         else if(data.get(PASSWORD).equals("PASSWORD")) {
             password = Stash.getValue("PASSWORD");

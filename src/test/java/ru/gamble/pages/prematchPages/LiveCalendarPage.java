@@ -18,6 +18,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -75,6 +76,35 @@ public class LiveCalendarPage extends AbstractPage {
     @ActionTitle("добавляет некорректные события, пока их не станет")
     public void fillCouponIncorrectEvents(String value) throws InterruptedException {
         fillCouponFinal(Integer.parseInt(value), "incorrect", By.xpath("//div[contains(@class,'livecal-table__coefficient')]"));
+    }
+
+    /**
+     * Добавление в купон нескольких ставок со страницы Лайв-календарь
+     * @param param - сколько ставок нужно доабвить в купон
+     */
+    @ActionTitle("добавляет ставки из разных событий в количестве")
+    public void addToCouponDifferentBets(String param){
+        //  List<WebElement> coefficients = driver.findElements(By.cssSelector("td.table__body-cell.livecal-table__col_1"));WebDriver driver = PageFactory.getDriver();
+        WebDriver driver = PageFactory.getDriver();
+     //   List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/../.."));
+        List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"));
+        int count = 0;
+        int number = Integer.valueOf(param)-1;
+        Random random = new Random();
+        int num;
+
+        LOG.info("Жмём на коэфициенты");
+        do {
+            LOG.info("coefficients = " + coefficients.size());
+            num = random.nextInt(coefficients.size()-1-count);
+            LOG.info("num = " + num);
+            if (coefficients.get(num).isDisplayed()) {
+                coefficients.get(num).click();
+                LOG.info(coefficients.get(num).findElement(By.xpath("preceding-sibling::td[contains(@class,'livecal-table__col_event')]")).getText());
+                coefficients.remove(num);
+                count++;
+            }
+        } while (count <= number);
     }
 
 

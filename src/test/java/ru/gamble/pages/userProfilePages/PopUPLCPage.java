@@ -27,6 +27,11 @@ public class PopUPLCPage extends AbstractPage {
     @FindBy(id ="log-out-button")
     private WebElement exitButton;
 
+    @ElementTitle("Личный кабинет")
+    @FindBy(id ="user-profile")
+    private WebElement profileButton;
+
+
     public PopUPLCPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
