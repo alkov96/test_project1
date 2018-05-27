@@ -178,7 +178,7 @@ public class CouponPage extends AbstractPage {
         String сouponGame = driver.findElement(By.xpath("//div[@class='coupon-bet-list__wrap']/ul[1]/li[1]/span[contains(@class,'bet-event-title')]")).getText();//cuponGame - наше добавленные события в купоне.
         String team1 = Stash.getValue("team1key");
         String team2 = Stash.getValue("team2key");
-        if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(сouponGame))) {
+        if (CommonStepDefs.stringParse(team1  + team2).equals(CommonStepDefs.stringParse(сouponGame))) {
             LOG.info("Названия команд в купоне совпадают с ожидаемыми: " + team1 + team2 + "=" + сouponGame);
         } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: " + team1 + team2 + сouponGame);
     }
@@ -353,7 +353,7 @@ public class CouponPage extends AbstractPage {
      * @param param если параметр = "бонусов", то проверка бонусов, иначе - првоерка рублевого баланса
      */
     @ActionTitle("проверяет изменение баланса")
-    public void balanceIsOK(String param){
+    public static void balanceIsOK(String param){
         WebDriver driver = PageFactory.getDriver();
         float afterBalance;
         By balance=param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть

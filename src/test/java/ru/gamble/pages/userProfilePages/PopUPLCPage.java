@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.CouponPage;
 import ru.gamble.pages.mainPages.AuthenticationMainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
@@ -57,6 +58,17 @@ public class PopUPLCPage extends AbstractPage {
     @FindBy(id = "money_in_amount2")
     private WebElement withdraw_field;
 
+    @FindBy(id = "money_in_amount1")
+    private WebElement deposit_field;
+
+    @FindBy(xpath = "//div[@class='payPartner cupis_card']")
+    private WebElement visa_deposit;
+
+    @FindBy(xpath = "//div[@class='payPartner cupis_wallet']")
+    private WebElement cupis_deposit;
+
+    @FindBy(xpath = "//button[@class='btn_important money-in-out__btn']")
+    private WebElement deposit_on; //кнопка Вывести средства
 
     public PopUPLCPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -207,14 +219,14 @@ public class PopUPLCPage extends AbstractPage {
             String way;
             WebElement maxSum;
             int max;
-            Map maxForWay = new HashMap<String,Integer>();
-            maxForWay.put("cupis_card",550000);
-            maxForWay.put("cupis_wallet",550000);
-            maxForWay.put("cupis_mts",14999);
-            maxForWay.put("cupis_megafon",15000);
-            maxForWay.put("cupis_tele2",15000);
-            maxForWay.put("cupis_beeline",5000);
-            maxForWay.put("cupis_stoloto",550000);
+            Map maxForWay = new HashMap<String, Integer>();
+            maxForWay.put("cupis_card", 550000);
+            maxForWay.put("cupis_wallet", 550000);
+            maxForWay.put("cupis_mts", 14999);
+            maxForWay.put("cupis_megafon", 15000);
+            maxForWay.put("cupis_tele2", 15000);
+            maxForWay.put("cupis_beeline", 5000);
+            maxForWay.put("cupis_stoloto", 550000);
             Stash.put("maxForWayKey", maxForWay);
             way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
             maxSum = driver.findElement(By.xpath("//div[@class='modal ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
@@ -271,11 +283,10 @@ public class PopUPLCPage extends AbstractPage {
         LOG.info("Запоминаем все сообщения с ошибками и предупредлениями, которые появились на попапе пополнения");
         driver.findElements(By.xpath("//div[contains(@class,'money-in-out__messages')]")).forEach(element -> message.append(element.getText())); //строка, содержащая все сообщения на попапе пополнения
         LOG.info("Смотрим что есть соответсвующее проедупреждение о минимально допустимой сумме, и что кнопка #Пополнить# заблокировалась");
-        if (message.toString().isEmpty() || ! message.toString().contains("Сумма меньше минимально допустимой")){
+        if (message.toString().isEmpty() || !message.toString().contains("Сумма меньше минимально допустимой")) {
             Assertions.fail("При сумме пополнения = 1 нет сообщения об ошибке. Сообщение: " + message.toString());
         }
-        if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled())
-        {
+        if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()) {
             Assertions.fail("При сумме пополнения = 1 кнопка осталась активной.");
         }
 
@@ -288,11 +299,10 @@ public class PopUPLCPage extends AbstractPage {
         LOG.info("Запоминаем все сообщения с ошибками и предупреждениями, которые появились на попапе пополнения");
         driver.findElements(By.xpath("//div[contains(@class,'money-in-out__messages')]")).forEach(element -> message.append(element.getText())); //строка, содержащая все сообщения на попапе пополнения
         LOG.info("Смотрим что есть соответсвующее проедупреждение о минимально допустимой сумме, и что кнопка #Пополнить# заблокировалась");
-        if (message.toString().isEmpty() || ! message.toString().contains("Сумма превышает максимальную допустимую")){
+        if (message.toString().isEmpty() || !message.toString().contains("Сумма превышает максимальную допустимую")) {
             Assertions.fail("При сумме пополнения = 600.000 нет сообщения об ошибке. Сообщение: " + message.toString());
         }
-        if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled())
-        {
+        if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()) {
             Assertions.fail("При сумме пополнения = 600.000 кнопка осталась активной.");
         }
 
@@ -322,24 +332,22 @@ public class PopUPLCPage extends AbstractPage {
             //maxSum = driver.findElement(By.xpath("//div[@class='modal ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
             //max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
             Map maxForWay = Stash.getValue("maxForWayKey");
-            int currentMaxFlag=((int) maxForWay.get(way))<=summ?0:1;//switch не работает с булями, поэтому придется испольоватьвот такой флаг, который равен 0 = если допустимый максимум больше введенно суммы, и 1 - если допустимй максимум меньше введенной суммы
-            switch  (currentMaxFlag){
+            int currentMaxFlag = ((int) maxForWay.get(way)) <= summ ? 0 : 1;//switch не работает с булями, поэтому придется испольоватьвот такой флаг, который равен 0 = если допустимый максимум больше введенно суммы, и 1 - если допустимй максимум меньше введенной суммы
+            switch (currentMaxFlag) {
                 case 1:  //т.е. для выбранного способа пополнения введенная сумма разршена
-                    if (!driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()){
+                    if (!driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()) {
                         Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " кнопка Пополнить недоступна, хотя максимально допустимая сумма " + maxForWay.get(way));
                     }
-                    if (message.toString().contains("Сумма превышает максимальную допустимую") || message.toString().contains("Сумма меньше минимально допустимой"))
-                    {
-                        Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " есть сообщение об ошибке  " +message.toString());
+                    if (message.toString().contains("Сумма превышает максимальную допустимую") || message.toString().contains("Сумма меньше минимально допустимой")) {
+                        Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " есть сообщение об ошибке  " + message.toString());
                     }
                     break;
                 case 0: //т.е. для выбранного способа пополнения введенная сумма превышает максимум
-                    if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()){
+                    if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()) {
                         Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " кнопка Пополнить доступна, хотя максимально допустимая сумма " + maxForWay.get(way));
                     }
-                    if (!message.toString().contains("Сумма превышает максимальную допустимую"))
-                    {
-                        Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " нет сообщения об ошибке  " +message.toString());
+                    if (!message.toString().contains("Сумма превышает максимальную допустимую")) {
+                        Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " нет сообщения об ошибке  " + message.toString());
                     }
                     break;
 
@@ -359,10 +367,10 @@ public class PopUPLCPage extends AbstractPage {
         WebElement field = Stash.getValue("fieldKey");
         int sumField = Stash.getValue("sumFieldKey");
         Thread.sleep(1000);
-        if (!driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']")).isDisplayed()){
+        if (!driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']")).isDisplayed()) {
             Assertions.fail("При нажатии на кнопку Внести депозит не открылся попап пополнения");
         }
-        int randomSum = 100 + (int) Math.random()*900;//рандомное число до от 100 до 1000
+        int randomSum = 100 + (int) Math.random() * 900;//рандомное число до от 100 до 1000
         field = driver.findElement(By.id("money_in_amount1"));
         LOG.info("Очищаем поле с суммой и затем вводим туда " + randomSum);
         field.clear();
@@ -373,8 +381,68 @@ public class PopUPLCPage extends AbstractPage {
             Assertions.fail("На кнопке неправильная сумма." + sumField + " вместо " + randomSum);
         }
     }
-}
 
+    @ActionTitle("вводит сумму и выбирает способ пополнения")
+    public void chooseSummAndClick() throws InterruptedException {
+        String sumBet = "1000";
+        Stash.put("sumBetKey",sumBet);
+        deposit_field.clear();
+        deposit_field.sendKeys(sumBet);
+        if (visa_deposit.isDisplayed()) {
+            visa_deposit.click();
+            LOG.info("Пополнение проходит через карту Виза");
+        } else {
+            if (cupis_deposit.isDisplayed()) {
+                cupis_deposit.click();
+                LOG.info("Пополнение проходит через кошелёк ЦУПИС");
+            } else {
+                Assertions.fail("Нет доступных способов пополнения");
+            }
+        }
+        Thread.sleep(2000);
+        deposit_on.click();
+    }
+
+    @ActionTitle("входит в кабинет ЦУПИС и совершает все необходимые операции для потверждения пополнения")
+    public void cupicIn() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        Set<String> allHandles = driver.getWindowHandles();
+        String urlSite = "https://dev-bk-bet-site.tsed.orglot.office/";
+        String cupicSite = "https://23bet-pay.itasystems.ru/frontend/refill?requestId=RID0984840782911";
+        for (String handle : allHandles) { //для переключения на вкладку ЦУПИС, т.к. точного адреса ЦУПИС не знаю
+            driver.switchTo().window(handle);
+            if (!driver.getCurrentUrl().contains(urlSite))
+                break;
+        }
+        CommonStepDefs.workWithPreloader();
+        WebElement password = driver.findElement(By.xpath("//input[@id='form_login_password']"));
+        password.click();
+        password.clear();
+        password.sendKeys("Regfordepoit_0601");
+        CommonStepDefs.workWithPreloader();
+        driver.findElement(By.id("btn_authorization_enter")).click();
+        CommonStepDefs.workWithPreloader();
+        Thread.sleep(1000);
+        driver.findElement(By.xpath("//input[@class='ui-button ui-button-final right']")).click();
+        waitForElementPresent(By.xpath("//input[@type='submit']"), 4000);
+        driver.findElement(By.xpath("//input[@type='submit']")).click();
+        CommonStepDefs.workWithPreloader();
+        for (String handle : allHandles) {
+            driver.switchTo().window(handle);
+            if (!driver.getCurrentUrl().contains(cupicSite))
+                break;
+        }
+    }
+    @ActionTitle("проверяет, увеличился ли баланс")
+    public void checkIsBalance(){
+        WebDriver driver = PageFactory.getDriver();
+        driver.navigate().refresh();
+        waitForElementPresent(By.id("topPanelWalletBalance"), 10000);
+        float sumBet = -Float.valueOf(Stash.getValue("sumBetKey"));
+        Stash.put("sumKey",sumBet);
+        CouponPage.balanceIsOK("рубли");
+    }
+}
 
 
 
