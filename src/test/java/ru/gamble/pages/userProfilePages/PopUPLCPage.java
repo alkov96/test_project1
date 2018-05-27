@@ -335,7 +335,7 @@ public class PopUPLCPage extends AbstractPage {
             CouponPage.balanceIsOK("бонусов");
         }
     }
-}
+
 
     @ActionTitle("смотрит, какие способы пополнения доступны")
     public void lookSummList() {
