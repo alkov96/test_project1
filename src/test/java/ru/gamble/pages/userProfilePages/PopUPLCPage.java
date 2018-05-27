@@ -397,9 +397,7 @@ public class PopUPLCPage extends AbstractPage {
                 Assertions.fail("Для способа пополнения " + way + " максимальная сумма = " + max + ", а ожидалось = " + maxForWay.get(way));
             }
             Stash.put("wayKey", way);
-
         }
-
     }
 
     @ActionTitle("проверяет, что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода")
