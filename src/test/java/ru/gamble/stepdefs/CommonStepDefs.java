@@ -4,6 +4,7 @@ import cucumber.api.DataTable;
 import cucumber.api.java.ru.Когда;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -26,6 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -425,4 +427,21 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+
+
+    /**
+     * открытие новой вкладки по адресу URl из входного параметра
+     * @param newUrl - URl, который нужноввести в этой новой вкладке
+     *      */
+    public static void newWindow(String newUrl){
+        WebDriver driver = PageFactory.getDriver();
+        Set<String> currentHandles = driver.getWindowHandles();
+        ((ChromeDriver) driver).executeScript("window.open()");
+        Set<String> windows = driver.getWindowHandles();
+        windows.removeAll(currentHandles);
+        String newWindow = windows.toArray()[0].toString();
+        driver.switchTo().window(newWindow);
+        driver.get(newUrl);
+        new WebDriverWait(driver, 10).until(ExpectedConditions.urlToBe(newUrl));
+    }
 }
