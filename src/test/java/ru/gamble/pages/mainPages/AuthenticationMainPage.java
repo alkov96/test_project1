@@ -39,8 +39,9 @@ public class AuthenticationMainPage extends AbstractPage {
     @ActionTitle("запоминает значение баланса")
     public static void rememberBalnce(String param){
         By top_balance = param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
+        String key = param.equals("бонусов")?"balanceBonusKey":"balanceKey";
         float balance = Float.valueOf(getWebDriver().findElement(top_balance).getText());
         LOG.info("значение баланса: " + balance);
-        Stash.put("balanceKey",balance);
+        Stash.put(key,balance);
     }
 }

@@ -357,11 +357,12 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         float afterBalance;
         By balance=param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть
+        String key = param.equals("бонусов")?"balanceBonusKey":"balanceKey";
         int count = 30;
         while (count >0){
             afterBalance = Float.valueOf(driver.findElement(balance).getText());
             afterBalance = new BigDecimal(afterBalance).setScale(2, RoundingMode.UP).floatValue();
-            float balanceExpected = Stash.getValue("balanceKey");
+            float balanceExpected = Stash.getValue(key);
             float sumBet = Stash.getValue("sumKey");
             balanceExpected-=sumBet;
             balanceExpected = new BigDecimal(balanceExpected).setScale(2, RoundingMode.UP).floatValue();
