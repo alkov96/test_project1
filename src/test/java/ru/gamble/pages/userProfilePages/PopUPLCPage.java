@@ -24,14 +24,12 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-import sun.awt.windows.WEmbeddedFrame;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.numberOfWindowsToBe;
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
-import static org.openqa.selenium.support.ui.ExpectedConditions.urlToBe;
 import static ru.gamble.stepdefs.CommonStepDefs.waitEnabled;
 import static ru.gamble.stepdefs.CommonStepDefs.waitToPreloader;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
@@ -326,8 +324,6 @@ public class PopUPLCPage extends AbstractPage {
         float sum = Float.valueOf(Stash.getValue("withdrawRub"));
         Stash.put("sumKey",sum);
         CouponPage.balanceIsOK("рубли");
-
-
         sum = -Float.valueOf(Stash.getValue("bonus"));
         if (sum>0.0f){
             LOG.info("Проверка что правильно изменился баланс бонусов");
