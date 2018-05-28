@@ -2,7 +2,6 @@ package ru.gamble.pages.mainPages;
 
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.Когда;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -19,17 +18,13 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
-import ru.sbtqa.tag.pagefactory.exceptions.PageException;
-import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.*;
@@ -68,12 +63,20 @@ public class MainPage extends AbstractPage {
 
     // Блок новостей
     @ElementTitle("Стрелка-вправо")
-    @FindBy(xpath = "//*[contains(@class,'news-widget')]//button[contains(@class,' next')]")
+    @FindBy(xpath = "//*[contains(@class,'news-widget') and contains(@style,'visible')]/button[contains(@class,' next')]")
     private WebElement arrowRightButton;
 
     @ElementTitle("Стрелка-влево")
-    @FindBy(xpath = "//*[contains(@class,'news-widget')]//button[contains(@class,'previous')]")
+    @FindBy(xpath = "//*[contains(@class,'news-widget') and contains(@style,'visible')]/button[contains(@class,'previous')]")
     private WebElement arrowLeftButton;
+
+    @ElementTitle("Новости")
+    @FindBy(xpath = "//a[contains(@class,'bets-widget') and contains(.,'Новости')]")
+    private WebElement newsButton;
+
+    @ElementTitle("Анонсы")
+    @FindBy(xpath = "//a[contains(@class,'bets-widget') and contains(.,'Анонсы')]")
+    private WebElement announceButton;
 
     public MainPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -338,11 +341,12 @@ public class MainPage extends AbstractPage {
             direction = table.get(i).get(DIRECTION);
             buttonName = table.get(i).get(BUTTON);
 
+
             if(direction.contains("Вправо")){
+                LOG.info("Нажимаем на самую левую точку");
+                dots.get(0).click();
                 for (int j = 0; j < dots.size(); j++){
-                    LOG.info("Ищем в строке точек закрашенную");
                     if(dots.get(j).getAttribute("class").contains("is-selected")){
-                        LOG.info("Нашли");
                         LOG.info("Нажимаем на::" + buttonName);
                         pressButtonAP(buttonName);
                         if(j == (dots.size()-1)) {
@@ -359,26 +363,27 @@ public class MainPage extends AbstractPage {
                     }
                 }
             }else if(direction.contains("Влево")){
-
+                LOG.info("Нажимаем на самую правую точку");
+                dots.get(dots.size() - 1).click();
                 for (int k = dots.size() - 1; k >= 0; k--){
                     if(dots.get(k).getAttribute("class").contains("is-selected")){
-                        LOG.info("Нашли");
                         LOG.info("Нажимаем на::" + buttonName);
                         pressButtonAP(buttonName);
+                        if(k == 0) {
+                            assertThat(dots.get(dots.size() - 1).getAttribute("class").contains("is-selected"))
+                                    .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
+                            LOG.info("Последняя точка [" + dots.size() + "] закрашена");
 
-                        verifiesThatNewsDigestsNotEmpty();
+                        }else {
+                            assertThat(dots.get(k - 1).getAttribute("class").contains("is-selected"))
+                                    .as("Ошибка!Предыдующая точка не стала закрашенной").isTrue();
+                            LOG.info("Предыдущая точка [" + (k) + "] закрашена");
+                            verifiesThatNewsDigestsNotEmpty();
+                        }
                     }
                 }
-
             }
-
-
-
-
-           // if(direction)
-
         }
     }
-
 
 }
