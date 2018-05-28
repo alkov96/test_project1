@@ -40,8 +40,13 @@ public class AuthenticationMainPage extends AbstractPage {
     public static void rememberBalnce(String param){
         By top_balance = param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
         String key = param.equals("бонусов")?"balanceBonusKey":"balanceKey";
-        float balance = Float.valueOf(getWebDriver().findElement(top_balance).getText());
-        LOG.info("значение баланса: " + balance);
-        Stash.put(key,balance);
+        if (getWebDriver().findElements(top_balance).isEmpty()) {
+            Stash.put(key,0f);
+        }
+        else {
+            float balance = Float.valueOf(getWebDriver().findElement(top_balance).getText());
+            LOG.info("значение баланса: " + balance);
+            Stash.put(key, balance);
+        }
     }
 }
