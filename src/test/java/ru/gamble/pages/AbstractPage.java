@@ -362,7 +362,7 @@ public abstract class AbstractPage extends Page {
         float sumBet;
         sumBet = sum.equals("больше баланса")?(float)Stash.getValue("balanceKey")+1:Float.valueOf(sum);
         coupon_field.clear();
-        coupon_field.sendKeys(String.valueOf(sumBet));
+        coupon_field.sendKeys(String.valueOf(sumBet).replace("E","").replace(".",""));
         Stash.put("sumKey",sumBet);
     }
 
