@@ -231,34 +231,47 @@ public class PopUPLCPage extends AbstractPage {
        // CommonStepDefs.waitToPreloader();
         List<WebElement> bonuses = new ArrayList<>();
         Pattern patternBonus = Pattern.compile("(?u)[^0-9.]");
-        while (sum<allowMax){
-            withdraw_field.clear();
-            withdraw_field.sendKeys(String.valueOf(sum));
-
-            new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
-     //       Thread.sleep(2000);//вместо слипа.вот тут нужно ожидание что кнопка Вывести - активна.
 
 
-            bonuses=driver.findElements(By.xpath("//p[@ng-if and contains(@class,'money-in-out__bonus-money')]"));//проверка появился ли НДФЛ
-            if (!bonuses.isEmpty()) {//если НДФЛ появился, то такую сумму и будем выводить
-                String bonus = bonuses.get(0).getText();
-                bonus=patternBonus.matcher(bonus).replaceAll("");
-                String sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");//сумма на кнопке
-                Stash.put("bonus",bonus);
-                Stash.put("withdrawRub",sumOnButton);
-                LOG.info("Сумма вывода, при которой высчитывается НДФЛ = " + sum + ", НДФЛ = " + bonus);
-                break;
-            }
-            sum+=50000;   //если НДФЛ на такой сумме не высчитывается - увеличим сумму на 5 рублей
-        }
-        if (Stash.getValue("bonus")==null){
+        withdraw_field.clear();
+        withdraw_field.sendKeys(String.valueOf(sum));
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
+        //       Thread.sleep(2000);//вместо слипа.вот тут нужно ожидание что кнопка Вывести - активна.
+
+
+        bonuses=driver.findElements(By.xpath("//p[@ng-if and contains(@class,'money-in-out__bonus-money')]"));//проверка появился ли НДФЛ при максимуме вывода
+        if (bonuses.isEmpty()) {//если НДФЛ не появился, то будем выводить минимум. а если НДФл при максимуме есть - то будем искать минимальную сумму, при которой он есть
             LOG.info("НДФЛ не начисляется. Проверка вывода без начисления бонусов при сумме вывода = " + min);
             withdraw_field.clear();
             withdraw_field.sendKeys(String.valueOf(min));
-            Stash.put("bonus","0");
-            Stash.put("withdrawRub",min);
-            new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
+            Stash.put("bonus", "0");
+            Stash.put("withdrawRub", min);
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
         }
+        else {
+
+            while (sum < allowMax) {
+                withdraw_field.clear();
+                withdraw_field.sendKeys(String.valueOf(sum));
+
+                new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
+                //       Thread.sleep(2000);//вместо слипа.вот тут нужно ожидание что кнопка Вывести - активна.
+
+
+                bonuses = driver.findElements(By.xpath("//p[@ng-if and contains(@class,'money-in-out__bonus-money')]"));//проверка появился ли НДФЛ
+                if (!bonuses.isEmpty()) {//если НДФЛ появился, то такую сумму и будем выводить
+                    String bonus = bonuses.get(0).getText();
+                    bonus = patternBonus.matcher(bonus).replaceAll("");
+                    String sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");//сумма на кнопке
+                    Stash.put("bonus", bonus);
+                    Stash.put("withdrawRub", sumOnButton);
+                    LOG.info("Сумма вывода, при которой высчитывается НДФЛ = " + sum + ", НДФЛ = " + bonus);
+                    break;
+                }
+                sum += 100;   //если НДФЛ на такой сумме не высчитывается - увеличим сумму на 5 рублей
+            }
+        }
+
         String siteHandle = driver.getWindowHandle();
         withdrawOk.click();
         withdrawCUPIS(siteHandle);
