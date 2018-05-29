@@ -57,8 +57,7 @@ public class NewsPage extends AbstractPage {
         String xpathTabs = "//div/a[contains(@class,'newslist-categories')]";
         String xpathButtonMore = "//div[contains(@class,'categories__add-box')]";
         String xpathDigests = "//a[contains(@class,'newslist__title')]";
-        String currentHandle = driver.getWindowHandle();
-        String exeptedText, actualText;
+        String actualText;
 
         LOG.info("Собираем список всех верхних вкладок");
         List<WebElement> tabsNews = driver.findElements(By.xpath(xpathTabs));
@@ -77,8 +76,8 @@ public class NewsPage extends AbstractPage {
 
             for(WebElement dagest: dagestsNews){
                 if(!dagest.getText().equals("")){
-                    exeptedText = dagest.getText();
-                    LOG.info("Найдено::" + exeptedText);
+                    actualText = dagest.getText();
+                    LOG.info("Найдено::" + actualText);
                 }
             }
             // Так-как элементы перерисовываются
