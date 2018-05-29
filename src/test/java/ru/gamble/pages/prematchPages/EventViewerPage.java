@@ -266,6 +266,9 @@ public class EventViewerPage extends AbstractPage {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (Stash.getValue("nameGameKey")==null){
+            Assertions.fail("Игры не найдена");
+        }
         LOG.info("Игра по фильтру времени " + period + " (" + inPeriod + ") найдена: ");
         LOG.info(Stash.getValue("nameGameKey") + " время начала " + Stash.getValue("timeGameKey"));
 
@@ -372,6 +375,7 @@ public class EventViewerPage extends AbstractPage {
         driver.findElement(By.xpath("//div[@class='periods']/div")).click();// если ищем игру вне периода то убедимся что фильтр выключен
         driver.findElement(By.xpath("//div[@class='periods']/ul/li[1]")).click();
         CommonStepDefs.workWithPreloader();
+
     }
 
     @ActionTitle("включает фильтр по времени")
