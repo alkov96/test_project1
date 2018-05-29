@@ -314,15 +314,16 @@ public class MainPage extends AbstractPage {
         WebElement coeff = Stash.getValue("coeffKey");
         for (int i = 1; i < 6; i++) {
             previous = coeff.getText();
-            LOG.info("Переключаемся на '" + list.get(i).getText() + "' формат отображения");
-            list.get(i).click();
+            LOG.info("Переключаемся на '" + list.get((i*3)%7-1).getText() + "' формат отображения"); // рандомно берёт 1 тип из 6
+            list.get((i*3)%7-1).click();
             LOG.info("Текущее значение коэффициента : " + coeff.getText());
             Thread.sleep(350);
             if (previous.equals(coeff.getText())){
                 LOG.error("Формат отображения коэффициентов не изменился");
-                Assertions.fail("Формат отображения коэффициентов не изменился");
+                Assertions.fail("Формат отображения коэффициентов не изменился: " + previous +" " + coeff.getText());
             }
         }
+        list.get(0).click();
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
 

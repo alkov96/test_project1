@@ -4,7 +4,7 @@
   @smoke
   @Deposit_C1044
   Сценарий: Deposit_C1044
-    * переходит на главную страницу 'https://dev-bk-bet-site.tsed.orglot.office'
+    * переходит на главную страницу 'https://dev-bk-bet-site1.tsed.orglot.office'
     * открывается страница "Главная страница"
 
     * пользователь (нажимает кнопку) "Вход"

@@ -474,4 +474,9 @@ public class EventViewerPage extends AbstractPage {
             myGamesCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
         }
     }
+@ActionTitle("разворачивает левое меню")
+    public void menuCl() {
+
+}
+
 }
