@@ -405,7 +405,7 @@ public class EventViewerPage extends AbstractPage {
         }
 
         LOG.info("Проверим что нужная игра открыта по центарльной части страницы");
-        String nameOnPage = driver.findElement(By.xpath("//div[@ng-switch='openGame.sport.alias']/div[1]/div[contains(@class,'teams-names')]/span[1]")).getAttribute("title");
+        String nameOnPage = driver.findElement(By.xpath("//div[@ng-switch='openGame.sport.id']/div[1]/div[contains(@class,'teams-names')]/span[1]")).getAttribute("title");
         nameOnPage = CommonStepDefs.stringParse(nameOnPage);
         if (!CommonStepDefs.stringParse(team1).equals(nameOnPage)) {
             flag=false;
@@ -474,4 +474,9 @@ public class EventViewerPage extends AbstractPage {
             myGamesCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
         }
     }
+@ActionTitle("разворачивает левое меню")
+    public void menuCl() {
+
+}
+
 }

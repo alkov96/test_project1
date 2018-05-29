@@ -28,6 +28,7 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -52,7 +53,7 @@ public abstract class AbstractPage extends Page {
 
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
-    private WebElement burgerBottom;
+    protected WebElement burgerBottom;
 
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
@@ -371,8 +372,19 @@ public abstract class AbstractPage extends Page {
         }
         float sumBet;
         sumBet = sum.equals("больше баланса")?(float)Stash.getValue("balanceKey")+1:Float.valueOf(sum);
+
+
+//от сюда
+        DecimalFormat formatter;
+
+        if(sumBet - (int)sumBet > 0.0)
+            formatter = new DecimalFormat("0.00"); //Here you can also deal with rounding if you wish..
+        else
+            formatter = new DecimalFormat("0");
+        String aa=formatter.format(sumBet);
+//и до сюда - это приведение экспонициального представления числа - в обычный вид. а то строчка вида "1.00571E5" - плохой вариант дл сумм ставки
         coupon_field.clear();
-        coupon_field.sendKeys(String.valueOf(sumBet));
+        coupon_field.sendKeys(aa);
         Stash.put("sumKey",sumBet);
     }
 

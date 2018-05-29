@@ -1,9 +1,9 @@
 {
   "site1": {
-    "mainurl": "https://stage-bet-site1.tsed.orglot.office/",
+    "mainurl": "https://dev-bk-bet-site1.tsed.orglot.office/",
     "registrationUrl": "http://stage-bet-site1.tsed.orglot.office/test_registration/",
-    "login": "0304888test@mailinator.com",
-    "password": "Qazxsw23"
+    "login": "regfordepoit@mailinator.com",
+    "password": "Parol123"
   },
   "site2": {
     "mainurl": "https://stage-bet-site2.tsed.orglot.office/",
