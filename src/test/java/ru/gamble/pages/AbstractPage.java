@@ -53,7 +53,7 @@ public abstract class AbstractPage extends Page {
 
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
-    private WebElement burgerBottom;
+    protected WebElement burgerBottom;
 
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
