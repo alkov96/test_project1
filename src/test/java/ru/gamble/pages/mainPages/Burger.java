@@ -54,7 +54,9 @@ public class Burger extends AbstractPage {
     private WebElement newsBottom;
 
     @ElementTitle("Статистика")
-    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[text()='Статистика']")
+    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[text()='\n" +
+            "                                                Статистика\n" +
+            "                                            ']")
     private WebElement statisticBottom;
 
     @ElementTitle("Результаты")
