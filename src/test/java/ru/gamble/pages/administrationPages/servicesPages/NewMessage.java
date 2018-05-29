@@ -33,10 +33,6 @@ public class NewMessage extends AbstractPage{
     @FindBy(xpath = "//span[contains(text(),'Редактирование сервисного сообщения')]")
     private WebElement message;
 
-    @ElementTitle("текстовые поля")
-    @FindBy(xpath = "//table[@class='x-field x-table-plain x-form-item x-form-type-text x-field-default x-anchor-form-item']")
-    private List<WebElement> textAreas;
-
     @ElementTitle("элемент для поиска id")
     @FindBy(xpath = "//table[@class='x-field x-table-plain x-form-item x-form-type-checkbox x-field-default x-anchor-form-item']")
     private WebElement elementForId;
@@ -65,12 +61,15 @@ public class NewMessage extends AbstractPage{
             PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + id + "-inputEl']")).click();
         }
         if (possibleClose.equals("Да")) {
+            id = elementForId.getAttribute("id");
             PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + id + "-inputEl']")).click();
         }
+        List<WebElement> textAreas = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-text x-field-default x-anchor-form-item']"));
         PageFactory.getWebDriver().findElement(By.xpath("//textarea[@id='" + textAreas.get(0).getAttribute("id") + "-inputEl']")).clear();
         PageFactory.getWebDriver().findElement(By.xpath("//textarea[@id='" + textAreas.get(0).getAttribute("id") + "-inputEl']")).sendKeys(name);
         Date dateStart = startAfterMins(Integer.parseInt(afterMinutes));
         SimpleDateFormat formatForDateStart = new SimpleDateFormat("dd.MM.yyyy' 'kk:mm:ss");
+        textAreas = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-text x-field-default x-anchor-form-item']"));
         PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + textAreas.get(1).getAttribute("id") + "-inputEl']")).clear();
         PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + textAreas.get(1).getAttribute("id") + "-inputEl']")).sendKeys(formatForDateStart.format(dateStart));
         SimpleDateFormat formatForMinutesEnd = new SimpleDateFormat("mm");
@@ -84,6 +83,7 @@ public class NewMessage extends AbstractPage{
         }
         dateStart.setMinutes(minsEnd);
         dateStart.setHours(hoursEnd);
+        textAreas = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-text x-field-default x-anchor-form-item']"));
         PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + textAreas.get(1).getAttribute("id") + "-inputEl']")).clear();
         PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + textAreas.get(1).getAttribute("id") + "-inputEl']")).sendKeys(formatForDateEnd.format(dateStart));
         saveBotton.click();

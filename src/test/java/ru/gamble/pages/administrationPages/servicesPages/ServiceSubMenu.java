@@ -22,11 +22,11 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 public class ServiceSubMenu extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(ServiceSubMenu.class);
 
-    @FindBy(xpath = "//div[@id='tabbar-1483-innerCt']")
+    @FindBy(xpath = "//div[@id='tabbar-1484-innerCt']")
     private WebElement subMenu;
 
     @ElementTitle("Сервисные сообщения")
-    @FindBy(xpath = "//span[@id='tab-1618-btnInnerEl']")
+    @FindBy(xpath = "//span[@id='tab-1619-btnInnerEl']")
     private WebElement serviceMessages;
 
     public ServiceSubMenu() {
