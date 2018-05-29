@@ -150,13 +150,17 @@ public class DayEventsPage extends AbstractPage {
         int counter=0;
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         List<WebElement> allEvents = driver.findElements(xpath("//div[@class='bets-widget bets-widget_wide liveNow']//table[@class='full_width bets-widget-table']//tr/td[5]/div/span"));
-        for (WebElement event : allEvents) {
-            Thread.sleep(1000);
-            event.click();
-            event.getText();
-            LOG.info("Событие добавилось в купон");
-            counter++;
-            if (counter>=6) break;
+        if(allEvents.size()>0){
+            for (WebElement event : allEvents) {
+                Thread.sleep(1000);
+                event.click();
+                event.getText();
+                LOG.info("Событие добавилось в купон");
+                counter++;
+                if (counter>=6) break;
+            }
+        }else {
+            throw new AutotestError("Ошибка! Лайв->События дня:: Ни одного события не найдено.");
         }
 
     }
