@@ -87,7 +87,7 @@ public class CommonStepDefs extends GenericStepDefs {
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage(){
-        cleanCookies();
+        //cleanCookies();
         goToMainPage("site2");
     }
 
@@ -96,6 +96,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^переходит на главную страницу '(.+)'$")
     public static void goToMainPage(String site){
+        cleanCookies();
         switch (site){
             case "site1":
                 PageFactory.getWebDriver().get(Props.get("webdriver.starting.url1"));

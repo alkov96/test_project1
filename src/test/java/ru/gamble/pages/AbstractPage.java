@@ -70,6 +70,12 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "quickbet")
     protected WebElement quickButton;
     //для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
+
+    @ElementTitle("Очистить всё")
+    @FindBy(xpath = "//span[@class='coupon-clear-all__text ng-binding']")
+    private WebElement clearCoupon;
+
+//для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
     @ElementTitle("поле суммы общей ставки")
     @FindBy(id = "express-bet-input")
     protected WebElement coupon_field;
@@ -404,7 +410,6 @@ public abstract class AbstractPage extends Page {
             }
         }
     }
-
     @ActionTitle("ждёт мс")
     public void whait(String ms) throws InterruptedException {
         int time = Integer.parseInt(ms);
@@ -440,8 +445,18 @@ public abstract class AbstractPage extends Page {
                 PageFactory.getWebDriver().navigate().refresh();
             }
         }
-            return false;
+        return false;
+    }
+    @ActionTitle("ждет некоторое время")
+    public void waiting(String sec) throws InterruptedException {
+        Thread.sleep(Integer.valueOf(sec)*1000);
+    }
 
+    @ActionTitle("очищает купон")
+    public void clearCoupon(){
+        if (clearCoupon.isDisplayed()) clearCoupon.click();
+        WebDriver driver = PageFactory.getDriver();
+        new WebDriverWait(driver,10).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")));
     }
 }
 

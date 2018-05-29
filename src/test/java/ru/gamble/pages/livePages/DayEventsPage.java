@@ -131,7 +131,7 @@ public class DayEventsPage extends AbstractPage {
         FavouritePage.clearFavouriteGames();
         List<WebElement> stars = driver.findElements(By.xpath("//tr[@class='bets-widget-table__bets ng-scope']/td[10]//span[contains(@class,'favorite-icon-dashboard')]"));
         List<WebElement> team1 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who1']//span[contains(@class,'market-info-b market-name-j')]"));//название 1 команды в списке
-        if(team1.size()>0) {
+        if(team1.size() > 0 && stars.size() > 0) {
             String team1name = team1.get(3).getAttribute("title");
             Stash.put("team1nameKey", team1name);
             List<WebElement> team2 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who2']//span[contains(@class,'market-info-b market-name-j')]"));//название 2 команды в списке
