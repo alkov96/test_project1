@@ -54,7 +54,7 @@ public class CouponPage extends AbstractPage {
     private WebElement expressBonusLink;
 
     @ElementTitle("текст экспресс бонуса")
-    @FindBy(xpath = "//div[@class='coupon-bonus-info']")
+    @FindBy(xpath = "//div[@class='coupon-bonus-info ng-binding']")
     private WebElement expressBonusText;
 
     @ElementTitle("бонус к возможному выйгрышу")

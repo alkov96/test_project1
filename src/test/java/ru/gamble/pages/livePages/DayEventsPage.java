@@ -16,12 +16,14 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
 
@@ -50,11 +52,28 @@ public class DayEventsPage extends AbstractPage {
     @ActionTitle("добавляет событие с баннера в купон")
     public void addEventToCouponFromBanner(){
         CommonStepDefs.workWithPreloader();
+//        WebDriver driver = PageFactory.getDriver();
+//        WebElement event = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[2]"));
+//        LOG.info("Нажали на событие  "+ event.getText());
+//        event.click();//добавляем событие со страницы Событие дня с баннера(вторая команда)
+//        teamsOnBannerAndCoupon();
+
+        String xpathEvent = "//div[@class='event-widget-coef']/div[3]/span[2]";
+        CommonStepDefs.workWithPreloader();
         WebDriver driver = PageFactory.getDriver();
-        WebElement event = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[2]"));
-        LOG.info("Нажали на событие  "+ event.getText());
-        event.click();//добавляем событие со страницы Событие дня с баннера(вторая команда)
-        teamsOnBannerAndCoupon();
+
+        List <WebElement> events = driver.findElements(By.xpath(xpathEvent))
+                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        if(events.size()>0) {
+            for(WebElement event: events) {
+                LOG.info("Нажали на событие  " + event.getText());
+                event.click();//добавляем событие со страницы Событие дня с баннера(вторая команда)
+                teamsOnBannerAndCoupon();
+            }
+        }else {
+            throw new AutotestError("Ошибка! Ни один баннер не найден.");
+        }
+
     }
 
 
@@ -112,14 +131,18 @@ public class DayEventsPage extends AbstractPage {
         FavouritePage.clearFavouriteGames();
         List<WebElement> stars = driver.findElements(By.xpath("//tr[@class='bets-widget-table__bets ng-scope']/td[10]//span[contains(@class,'favorite-icon-dashboard')]"));
         List<WebElement> team1 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who1']//span[contains(@class,'market-info-b market-name-j')]"));//название 1 команды в списке
-        String team1name = team1.get(3).getAttribute("title");
-        Stash.put("team1nameKey", team1name);
-        List<WebElement> team2 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who2']//span[contains(@class,'market-info-b market-name-j')]"));//название 2 команды в списке
-        String team2name = team2.get(3).getAttribute("title");
-        Stash.put("team2nameKey", team2name);
-        LOG.info("Все иконки избранного на странице обнаружены");
-        stars.get(3).click();
-        LOG.info("Добавили в Избранное событие");
+        if(team1.size() > 0 && stars.size() > 0) {
+            String team1name = team1.get(3).getAttribute("title");
+            Stash.put("team1nameKey", team1name);
+            List<WebElement> team2 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who2']//span[contains(@class,'market-info-b market-name-j')]"));//название 2 команды в списке
+            String team2name = team2.get(3).getAttribute("title");
+            Stash.put("team2nameKey", team2name);
+            LOG.info("Все иконки избранного на странице обнаружены");
+            stars.get(3).click();
+            LOG.info("Добавили в Избранное событие");
+        }else {
+            throw new AutotestError("Ошибка! В Лайв в События дня не нашли ни одного события.");
+        }
     }
 
     public static void addEventsToCouponF () throws InterruptedException {
@@ -127,13 +150,17 @@ public class DayEventsPage extends AbstractPage {
         int counter=0;
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         List<WebElement> allEvents = driver.findElements(xpath("//div[@class='bets-widget bets-widget_wide liveNow']//table[@class='full_width bets-widget-table']//tr/td[5]/div/span"));
-        for (WebElement event : allEvents) {
-            Thread.sleep(1000);
-            event.click();
-            event.getText();
-            LOG.info("Событие добавилось в купон");
-            counter++;
-            if (counter>=6) break;
+        if(allEvents.size()>0){
+            for (WebElement event : allEvents) {
+                Thread.sleep(1000);
+                event.click();
+                event.getText();
+                LOG.info("Событие добавилось в купон");
+                counter++;
+                if (counter>=6) break;
+            }
+        }else {
+            throw new AutotestError("Ошибка! Лайв->События дня:: Ни одного события не найдено.");
         }
 
     }

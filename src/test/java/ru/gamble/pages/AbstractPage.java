@@ -53,7 +53,7 @@ public abstract class AbstractPage extends Page {
 
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
-    private WebElement burgerBottom;
+    protected WebElement burgerBottom;
 
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
@@ -272,6 +272,7 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("проверяет наличие сообщения с текстом")
     public static void checkServiceMessageTrue(String param){
+
     }
 
     @ActionTitle("проверяет отсутствие сообщения с текстом")
@@ -286,16 +287,17 @@ public abstract class AbstractPage extends Page {
     public static void chectCloseServiceMessageFalse(){
     }
 
-    public void fillCouponFinal(int count, String ifForExperss, By findCoeffs) {
+    public void fillCouponFinal(int count, String ifForExperss, By findCoeffs) throws InterruptedException {
         if (ifForExperss == "correct") {
             List<WebElement> eventsInCoupon;
             List<WebElement> correctMarkets;
+            Thread.sleep(3000);
             waitForElementPresent(findCoeffs,1000);
             correctMarkets = getWebDriver().findElements(findCoeffs)
                         .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.26)
-                        .limit(count+20).collect(Collectors.toList());
+                        .limit(count+10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
-                clickElement(coefficient);
+                tryToClick(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
                 if (eventsInCoupon.size() == count) {
                     break;
@@ -347,6 +349,14 @@ public abstract class AbstractPage extends Page {
                 return element != null && element.isDisplayed();
             }
         });
+    }
+
+    public void tryToClick(WebElement element){
+        try {
+            element.click();
+        } catch (StaleElementReferenceException e){
+            tryToClick(element);
+        }
     }
 
 

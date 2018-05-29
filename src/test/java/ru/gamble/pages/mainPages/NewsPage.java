@@ -1,5 +1,6 @@
 package ru.gamble.pages.mainPages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -9,11 +10,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
+import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author p.sivak.
@@ -31,5 +37,52 @@ public class NewsPage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(newslist));
+    }
+
+    @ActionTitle("проверяет наличие верхней линейки вкладок")
+    public void checksPresenceOfTopRulerOfTabs(){
+        List<WebElement> tabsNews = PageFactory.getWebDriver().findElements(By.xpath("//a[contains(@class,'newslist-')]"))
+                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        assertThat(tabsNews.size()).as("Ошибка! Верхняя линейка вкладок не найдена").isGreaterThan(0);
+        for(WebElement tab: tabsNews){
+            if(!tab.getText().equals("")){
+                LOG.info("Найдено::" + tab.getText());
+            }
+        }
+    }
+
+    @ActionTitle("проверяет наличие дайжеста новостей на имеющихся вкладках")
+    public void checksForNewsDigestsOnExistingTabs(){
+        WebDriver driver = PageFactory.getDriver();
+        String xpathTabs = "//div/a[contains(@class,'newslist-categories')]";
+        String xpathButtonMore = "//div[contains(@class,'categories__add-box')]";
+        String xpathDigests = "//a[contains(@class,'newslist__title')]";
+        String actualText;
+
+        LOG.info("Собираем список всех верхних вкладок");
+        List<WebElement> tabsNews = driver.findElements(By.xpath(xpathTabs));
+        for(int i = 0; i < tabsNews.size(); i++){
+            if(!tabsNews.get(i).isDisplayed()){
+                LOG.info("Нажимаем кнопку [Ещё]");
+                driver.findElement(By.xpath(xpathButtonMore)).click();
+            }
+            LOG.info("Собираем список всех дайджестов на вкладке::" + tabsNews.get(i).getText());
+            tabsNews.get(i).click();
+            //Для ожидание прогрузки
+            workWithPreloader();
+            List<WebElement> dagestsNews = driver.findElements(By.xpath(xpathDigests))
+                    .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+            assertThat(dagestsNews.size()).as("Ошибка! Дайджесты не найдены").isGreaterThan(0);
+
+            for(WebElement dagest: dagestsNews){
+                if(!dagest.getText().equals("")){
+                    actualText = dagest.getText();
+                    LOG.info("Найдено::" + actualText);
+                }
+            }
+            // Так-как элементы перерисовываются
+            tabsNews = driver.findElements(By.xpath(xpathTabs));
+        }
+
     }
 }
