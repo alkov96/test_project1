@@ -2,6 +2,7 @@
 Функционал: Экспресс бонус
 
   @smoke
+  @bets-coupon
   @ExpressBonus_C39773
 
   @correct
