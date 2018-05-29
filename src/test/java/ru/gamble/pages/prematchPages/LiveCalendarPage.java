@@ -22,6 +22,7 @@ import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
 /**
  * @author p.sivak.
@@ -52,7 +53,7 @@ public class LiveCalendarPage extends AbstractPage {
         boolean isCoeffFound = false;
         while (isCoeffFound == false && tryPage < allDaysPages.size()-1) {
             waitForElementPresent(By.xpath("//div[contains(@class,'livecal-table__coefficient')]"),1000);
-            List<WebElement> correctCoeffs = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(text(), '"+coeff+"')]"));
+            List<WebElement> correctCoeffs = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='table livecal-table ng-scope']/div[contains(text(), '"+coeff+"')]"));
             if (correctCoeffs.size()>0) {
                 for(WebElement element : correctCoeffs){
                     if (element.isDisplayed()){
@@ -64,8 +65,11 @@ public class LiveCalendarPage extends AbstractPage {
             } else {
                 tryPage++;
                 allDaysPages.get(tryPage).click();
+                workWithPreloader();
             }
         }
+        allDaysPages.get(0).click();
+        workWithPreloader();
     }
 
     @ActionTitle("добавляет корректные события, пока их не станет")
