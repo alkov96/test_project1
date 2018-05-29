@@ -1,6 +1,5 @@
 # language: ru
 Функционал: Избранное. Добавление ставки в купон из Избранного
-
   @smoke
   @AddBetToCouponFromFavourite_С1050
   Сценарий: AddBetToCouponFromFavourite_С1050
