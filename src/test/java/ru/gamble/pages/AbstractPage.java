@@ -397,5 +397,10 @@ public abstract class AbstractPage extends Page {
             }
         }
     }
+
+    @ActionTitle("ждет некоторое время")
+    public void waiting(String sec) throws InterruptedException {
+        Thread.sleep(Integer.valueOf(sec)*1000);
+    }
 }
 
