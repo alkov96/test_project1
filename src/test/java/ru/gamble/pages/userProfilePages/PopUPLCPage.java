@@ -337,7 +337,7 @@ public class PopUPLCPage extends AbstractPage {
     public void lookSummList() {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("Смотрим какие способы пополнения доступны");
-        List<WebElement> depositWays = driver.findElements(By.xpath("//div[@class='modal ng-scope active']//table[@class='moneyInOutTable']//div[@class='ng-scope moneyChnl']/span/label"));//если способ недоступне, то у имени класса будет строчка not-available и в этот список элемент уже не попадет
+        List<WebElement> depositWays = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[@class='ng-scope moneyChnl']/span/label"));//если способ недоступне, то у имени класса будет строчка not-available и в этот список элемент уже не попадет
         Stash.put("depositWaysKey", depositWays);
         if (depositWays.isEmpty()) {
             LOG.info("Нет доступнх способов пополнения");
@@ -349,7 +349,7 @@ public class PopUPLCPage extends AbstractPage {
     @ActionTitle("проверяет, что на попапе пополнения есть кнопки-ссылки сумм")
     public void sposobSumm() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> summList = driver.findElements(By.xpath("//div[@class='modal ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"));
+        List<WebElement> summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"));
         Stash.put("summListKey", summList);
         Thread.sleep(1000);
         if (summList.isEmpty()) {
@@ -383,7 +383,7 @@ public class PopUPLCPage extends AbstractPage {
             maxForWay.put("cupis_stoloto", 550000);
             Stash.put("maxForWayKey", maxForWay);
             way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
-            maxSum = driver.findElement(By.xpath("//div[@class='modal ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
+            maxSum = driver.findElement(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
             max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
             if (!maxForWay.containsKey(way)) {
                 Assertions.fail("Выбранный способ пополнения не описан в Map<String,Integer> maxForWay " + way);
@@ -400,7 +400,7 @@ public class PopUPLCPage extends AbstractPage {
     public void checkLinkSumm() throws Exception {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> summList = Stash.getValue("summListKey");
-        summList = driver.findElements(By.xpath("//div[@class='modal ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"));
+        summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"));
         LOG.info("Проверка что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода");
         WebElement buttonOk;
         int sumOnButton, sumField;
