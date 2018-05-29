@@ -16,12 +16,14 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
 
@@ -50,11 +52,28 @@ public class DayEventsPage extends AbstractPage {
     @ActionTitle("добавляет событие с баннера в купон")
     public void addEventToCouponFromBanner(){
         CommonStepDefs.workWithPreloader();
+//        WebDriver driver = PageFactory.getDriver();
+//        WebElement event = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[2]"));
+//        LOG.info("Нажали на событие  "+ event.getText());
+//        event.click();//добавляем событие со страницы Событие дня с баннера(вторая команда)
+//        teamsOnBannerAndCoupon();
+
+        String xpathEvent = "//div[@class='event-widget-coef']/div[3]/span[2]";
+        CommonStepDefs.workWithPreloader();
         WebDriver driver = PageFactory.getDriver();
-        WebElement event = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[2]"));
-        LOG.info("Нажали на событие  "+ event.getText());
-        event.click();//добавляем событие со страницы Событие дня с баннера(вторая команда)
-        teamsOnBannerAndCoupon();
+
+        List <WebElement> events = driver.findElements(By.xpath(xpathEvent))
+                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        if(events.size()>0) {
+            for(WebElement event: events) {
+                LOG.info("Нажали на событие  " + event.getText());
+                event.click();//добавляем событие со страницы Событие дня с баннера(вторая команда)
+                teamsOnBannerAndCoupon();
+            }
+        }else {
+            throw new AutotestError("Ошибка! Ни один баннер не найден.");
+        }
+
     }
 
 
