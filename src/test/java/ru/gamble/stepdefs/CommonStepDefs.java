@@ -229,10 +229,10 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-    public static void waitOfPreloader() throws InterruptedException {
+    public static void waitOfPreloader() {
         waitOfPreloader(60);
     }
-    public static void waitOfPreloader(int num) throws InterruptedException {
+    public static void waitOfPreloader(int num) {
         LOG.debug("Проверка на наличие бесконечных прелоадеров");
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> list = driver.findElements(By.cssSelector("div.preloader__container"));
@@ -261,6 +261,8 @@ public class CommonStepDefs extends GenericStepDefs {
             } while (!list.isEmpty() && count > 0);
         } catch (org.openqa.selenium.StaleElementReferenceException e) {
             LOG.error(""+e);
+        } catch (InterruptedException ie){
+            ie.getMessage();
         }
         if (count <= 0) {
             LOG.error("Количество попыток исчерпано. Прелоадер всё ещё виден");
@@ -408,7 +410,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * но чтобы был не бесконечен
      * @throws Exception
      */
-    public static void waitToPreloader() throws Exception{
+    public static void waitToPreloader(){
         WebDriver driver = PageFactory.getDriver();
         int count = 20;
         try {
@@ -425,6 +427,8 @@ public class CommonStepDefs extends GenericStepDefs {
             }
         } catch (org.openqa.selenium.StaleElementReferenceException e) {
             LOG.error(""+e);
+        } catch (InterruptedException ie) {
+            ie.getMessage();
         }
     }
 

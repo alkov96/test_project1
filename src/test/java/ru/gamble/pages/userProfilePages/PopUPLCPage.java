@@ -1,5 +1,6 @@
 package ru.gamble.pages.userProfilePages;
 
+import cucumber.api.DataTable;
 import cucumber.api.java.mn.Харин;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -375,26 +376,27 @@ public class PopUPLCPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("проверяет, что при листании способов пополнения меняется и допустимая максимальная сумма")
-    public void checkMax() throws Exception {
+    @ActionTitle("проверяет смену допустимой макс.суммы при выборе пополнения с")
+    public void checkMax(DataTable dataTable) {
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
+        Map maxForWay = new HashMap<String, Integer>();
+
+        for(Map.Entry entry: data.entrySet() ){
+            maxForWay.put(entry.getKey(),Integer.parseInt(String.valueOf(entry.getValue())));
+        }
+        LOG.info("Кладём максимальные суммы в память по ключу::maxForWayKey");
+        Stash.put("maxForWayKey", maxForWay);
+
+        String way;
+        WebElement maxSum;
+        int max;
         WebDriver driver = PageFactory.getDriver();
+
         List<WebElement> depositWays = Stash.getValue("depositWaysKey");
         for (WebElement sposob : depositWays) {
             LOG.info("Выбираем способ пополнения " + sposob.findElement(By.xpath("div")).getAttribute("class"));
             sposob.click();
             waitToPreloader(); //ждем появления прелоадера. т.к. если его не будет - значит и способ пооплнения по сути не изменился - не отправлялась инфа в сварм и вообще
-            String way;
-            WebElement maxSum;
-            int max;
-            Map maxForWay = new HashMap<String, Integer>();
-            maxForWay.put("cupis_card", 550000);
-            maxForWay.put("cupis_wallet", 550000);
-            maxForWay.put("cupis_mts", 14999);
-            maxForWay.put("cupis_megafon", 15000);
-            maxForWay.put("cupis_tele2", 15000);
-            maxForWay.put("cupis_beeline", 5000);
-            maxForWay.put("cupis_stoloto", 550000);
-            Stash.put("maxForWayKey", maxForWay);
             way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
             maxSum = driver.findElement(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
             max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
@@ -407,6 +409,37 @@ public class PopUPLCPage extends AbstractPage {
             }
             Stash.put("wayKey", way);
         }
+
+
+//        List<WebElement> depositWays = Stash.getValue("depositWaysKey");
+//        for (WebElement sposob : depositWays) {
+//            LOG.info("Выбираем способ пополнения " + sposob.findElement(By.xpath("div")).getAttribute("class"));
+//            sposob.click();
+//            waitToPreloader(); //ждем появления прелоадера. т.к. если его не будет - значит и способ пооплнения по сути не изменился - не отправлялась инфа в сварм и вообще
+//            String way;
+//            WebElement maxSum;
+//            int max;
+//            Map maxForWay = new HashMap<String, Integer>();
+//            maxForWay.put("cupis_card", 550000);
+//            maxForWay.put("cupis_wallet", 550000);
+//            maxForWay.put("cupis_mts", 14999);
+//            maxForWay.put("cupis_megafon", 15000);
+//            maxForWay.put("cupis_tele2", 15000);
+//            maxForWay.put("cupis_beeline", 5000);
+//            maxForWay.put("cupis_stoloto", 550000);
+//            Stash.put("maxForWayKey", maxForWay);
+//            way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
+//            maxSum = driver.findElement(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
+//            max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
+//            if (!maxForWay.containsKey(way)) {
+//                Assertions.fail("Выбранный способ пополнения не описан в Map<String,Integer> maxForWay " + way);
+//                continue;
+//            }
+//            if ((int) maxForWay.get(way) != max) {
+//                Assertions.fail("Для способа пополнения " + way + " максимальная сумма = " + max + ", а ожидалось = " + maxForWay.get(way));
+//            }
+//            Stash.put("wayKey", way);
+//        }
     }
 
     @ActionTitle("проверяет, что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода")

@@ -105,11 +105,7 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        try {
-            CommonStepDefs.waitOfPreloader();
-        }catch (InterruptedException e2){
-            LOG.error(e2.getMessage());
-        }
+        CommonStepDefs.waitOfPreloader();
         LOG.info("Смотрим что страницы в виджете переключаются и содержимое контейнера соответсвует выбранному виду спорта");
         String sportName;
         //    List<WebElement> allSport = driver.findElements(By.xpath("//div[contains(@class,'nearestBroadcasts')]//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
