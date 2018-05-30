@@ -425,10 +425,8 @@ public class CommonStepDefs extends GenericStepDefs {
                     Assertions.fail("Прелоадер так и не появился!");
                 }
             }
-        } catch (org.openqa.selenium.StaleElementReferenceException e) {
+        } catch (Exception e) {
             LOG.error(""+e);
-        } catch (InterruptedException ie) {
-            ie.getMessage();
         }
     }
 
