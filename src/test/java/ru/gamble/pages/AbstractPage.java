@@ -100,9 +100,7 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("нажимает кнопку")
-    public static void pressButtonAP(String param) {
-        CommonStepDefs.pressButton(param);
-    }
+    public static void pressButtonAP(String param) { CommonStepDefs.pressButton(param); }
 
     @ActionTitle("stop")
     public static void stop() {
