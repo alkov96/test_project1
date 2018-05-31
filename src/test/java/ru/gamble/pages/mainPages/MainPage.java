@@ -18,6 +18,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 import java.util.ArrayList;
@@ -286,19 +287,19 @@ public class MainPage extends AbstractPage {
     @ActionTitle("ищет доступные коэффиценты на Главной")
     public void findAvailableCoef() {
         WebDriver driver = PageFactory.getDriver();
-        WebElement coeff = driver.findElement(By.cssSelector("div.bets-widget-table__link"));
-        Stash.put("coeffKey", coeff);
-        if (coeff == null) {
-            LOG.error("Нет доступных коэффициентов в разделе 'Горячие ставки'");
-            LOG.info("Переходим в прематч");
-            prematchButton.click();
-            CommonStepDefs.workWithPreloader();
-
-            coeff = driver.findElement(By.cssSelector("div.bets-block__bet-cell"));
-            if (coeff == null) {
-                Assertions.fail("Нет доступных коэффициентов");
+        List<WebElement> coeff = driver.findElements(By.cssSelector("div.bets-widget-table__link"));
+            if (coeff.size() == 0) {
+                LOG.error("Нет доступных коэффициентов в разделе 'Горячие ставки'");
+                LOG.info("Переходим в прематч");
+                prematchButton.click();
+                CommonStepDefs.workWithPreloader();
+                coeff = driver.findElements(By.cssSelector("div.bets-block__bet-cell"));
+                if (coeff.size() == 0) {
+                    Assertions.fail("Нет доступных коэффициентов");
+                }
+            }else{
+                Stash.put("coeffKey", coeff.get(0));
             }
-        }
     }
     @ActionTitle("переходит в настройки и меняет коэффицент на Главной")
     public void changePreferencesCoeff() throws InterruptedException {
