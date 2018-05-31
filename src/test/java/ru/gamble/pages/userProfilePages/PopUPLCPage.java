@@ -384,14 +384,13 @@ public class PopUPLCPage extends AbstractPage {
         for(Map.Entry entry: data.entrySet() ){
             maxForWay.put(entry.getKey(),Integer.parseInt(String.valueOf(entry.getValue())));
         }
+
         LOG.info("Кладём максимальные суммы в память по ключу::maxForWayKey");
         Stash.put("maxForWayKey", maxForWay);
-
         String way;
         WebElement maxSum;
         int max;
         WebDriver driver = PageFactory.getDriver();
-
         List<WebElement> depositWays = Stash.getValue("depositWaysKey");
         for (WebElement sposob : depositWays) {
             LOG.info("Выбираем способ пополнения " + sposob.findElement(By.xpath("div")).getAttribute("class"));
@@ -409,8 +408,6 @@ public class PopUPLCPage extends AbstractPage {
             }
             Stash.put("wayKey", way);
         }
-
-
 //        List<WebElement> depositWays = Stash.getValue("depositWaysKey");
 //        for (WebElement sposob : depositWays) {
 //            LOG.info("Выбираем способ пополнения " + sposob.findElement(By.xpath("div")).getAttribute("class"));
