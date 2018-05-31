@@ -33,8 +33,8 @@ public class LeftMenu extends AbstractPage{
     @FindBy(xpath = "//li[@class='static-menu__item']/a[contains(text(),'Как начать пари?')]")
     private WebElement howToStartPary;
 
-    @ElementTitle("Получите бесплатную ставку на 1000 рублей в меню")
-    @FindBy(xpath = "//li[@class='static-menu__item']/a[contains(text(),'Получите бесплатную ставку на 1000 рублей')]")
+    @ElementTitle("Получите фрибет на 1000 бонусов в меню")
+    @FindBy(xpath = "//li[@class='static-menu__item']/a[contains(text(),'Получите фрибет на 1000 бонусов')]")
     private WebElement freeBet;
 
     public LeftMenu() {

@@ -1,5 +1,6 @@
 package ru.gamble.pages.userProfilePages;
 
+import cucumber.api.DataTable;
 import cucumber.api.java.mn.Харин;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -231,34 +232,47 @@ public class PopUPLCPage extends AbstractPage {
        // CommonStepDefs.waitToPreloader();
         List<WebElement> bonuses = new ArrayList<>();
         Pattern patternBonus = Pattern.compile("(?u)[^0-9.]");
-        while (sum<allowMax){
-            withdraw_field.clear();
-            withdraw_field.sendKeys(String.valueOf(sum));
-
-            new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
-     //       Thread.sleep(2000);//вместо слипа.вот тут нужно ожидание что кнопка Вывести - активна.
 
 
-            bonuses=driver.findElements(By.xpath("//p[@ng-if and contains(@class,'money-in-out__bonus-money')]"));//проверка появился ли НДФЛ
-            if (!bonuses.isEmpty()) {//если НДФЛ появился, то такую сумму и будем выводить
-                String bonus = bonuses.get(0).getText();
-                bonus=patternBonus.matcher(bonus).replaceAll("");
-                String sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");//сумма на кнопке
-                Stash.put("bonus",bonus);
-                Stash.put("withdrawRub",sumOnButton);
-                LOG.info("Сумма вывода, при которой высчитывается НДФЛ = " + sum + ", НДФЛ = " + bonus);
-                break;
-            }
-            sum+=50000;   //если НДФЛ на такой сумме не высчитывается - увеличим сумму на 5 рублей
-        }
-        if (Stash.getValue("bonus")==null){
+        withdraw_field.clear();
+        withdraw_field.sendKeys(String.valueOf(sum));
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
+        //       Thread.sleep(2000);//вместо слипа.вот тут нужно ожидание что кнопка Вывести - активна.
+
+
+        bonuses=driver.findElements(By.xpath("//p[@ng-if and contains(@class,'money-in-out__bonus-money')]"));//проверка появился ли НДФЛ при максимуме вывода
+        if (bonuses.isEmpty()) {//если НДФЛ не появился, то будем выводить минимум. а если НДФл при максимуме есть - то будем искать минимальную сумму, при которой он есть
             LOG.info("НДФЛ не начисляется. Проверка вывода без начисления бонусов при сумме вывода = " + min);
             withdraw_field.clear();
             withdraw_field.sendKeys(String.valueOf(min));
-            Stash.put("bonus","0");
-            Stash.put("withdrawRub",min);
-            new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
+            Stash.put("bonus", "0");
+            Stash.put("withdrawRub", min);
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
         }
+        else {
+
+            while (sum < allowMax) {
+                withdraw_field.clear();
+                withdraw_field.sendKeys(String.valueOf(sum));
+
+                new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
+                //       Thread.sleep(2000);//вместо слипа.вот тут нужно ожидание что кнопка Вывести - активна.
+
+
+                bonuses = driver.findElements(By.xpath("//p[@ng-if and contains(@class,'money-in-out__bonus-money')]"));//проверка появился ли НДФЛ
+                if (!bonuses.isEmpty()) {//если НДФЛ появился, то такую сумму и будем выводить
+                    String bonus = bonuses.get(0).getText();
+                    bonus = patternBonus.matcher(bonus).replaceAll("");
+                    String sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");//сумма на кнопке
+                    Stash.put("bonus", bonus);
+                    Stash.put("withdrawRub", sumOnButton);
+                    LOG.info("Сумма вывода, при которой высчитывается НДФЛ = " + sum + ", НДФЛ = " + bonus);
+                    break;
+                }
+                sum += 100;   //если НДФЛ на такой сумме не высчитывается - увеличим сумму на 5 рублей
+            }
+        }
+
         String siteHandle = driver.getWindowHandle();
         withdrawOk.click();
         withdrawCUPIS(siteHandle);
@@ -362,26 +376,26 @@ public class PopUPLCPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("проверяет, что при листании способов пополнения меняется и допустимая максимальная сумма")
-    public void checkMax() throws Exception {
+    @ActionTitle("проверяет смену допустимой макс.суммы при выборе пополнения с")
+    public void checkMax(DataTable dataTable) {
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
+        Map maxForWay = new HashMap<String, Integer>();
+
+        for(Map.Entry entry: data.entrySet() ){
+            maxForWay.put(entry.getKey(),Integer.parseInt(String.valueOf(entry.getValue())));
+        }
+
+        LOG.info("Кладём максимальные суммы в память по ключу::maxForWayKey");
+        Stash.put("maxForWayKey", maxForWay);
+        String way;
+        WebElement maxSum;
+        int max;
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> depositWays = Stash.getValue("depositWaysKey");
         for (WebElement sposob : depositWays) {
             LOG.info("Выбираем способ пополнения " + sposob.findElement(By.xpath("div")).getAttribute("class"));
             sposob.click();
             waitToPreloader(); //ждем появления прелоадера. т.к. если его не будет - значит и способ пооплнения по сути не изменился - не отправлялась инфа в сварм и вообще
-            String way;
-            WebElement maxSum;
-            int max;
-            Map maxForWay = new HashMap<String, Integer>();
-            maxForWay.put("cupis_card", 550000);
-            maxForWay.put("cupis_wallet", 550000);
-            maxForWay.put("cupis_mts", 14999);
-            maxForWay.put("cupis_megafon", 15000);
-            maxForWay.put("cupis_tele2", 15000);
-            maxForWay.put("cupis_beeline", 5000);
-            maxForWay.put("cupis_stoloto", 550000);
-            Stash.put("maxForWayKey", maxForWay);
             way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
             maxSum = driver.findElement(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
             max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
@@ -394,6 +408,35 @@ public class PopUPLCPage extends AbstractPage {
             }
             Stash.put("wayKey", way);
         }
+//        List<WebElement> depositWays = Stash.getValue("depositWaysKey");
+//        for (WebElement sposob : depositWays) {
+//            LOG.info("Выбираем способ пополнения " + sposob.findElement(By.xpath("div")).getAttribute("class"));
+//            sposob.click();
+//            waitToPreloader(); //ждем появления прелоадера. т.к. если его не будет - значит и способ пооплнения по сути не изменился - не отправлялась инфа в сварм и вообще
+//            String way;
+//            WebElement maxSum;
+//            int max;
+//            Map maxForWay = new HashMap<String, Integer>();
+//            maxForWay.put("cupis_card", 550000);
+//            maxForWay.put("cupis_wallet", 550000);
+//            maxForWay.put("cupis_mts", 14999);
+//            maxForWay.put("cupis_megafon", 15000);
+//            maxForWay.put("cupis_tele2", 15000);
+//            maxForWay.put("cupis_beeline", 5000);
+//            maxForWay.put("cupis_stoloto", 550000);
+//            Stash.put("maxForWayKey", maxForWay);
+//            way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
+//            maxSum = driver.findElement(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
+//            max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
+//            if (!maxForWay.containsKey(way)) {
+//                Assertions.fail("Выбранный способ пополнения не описан в Map<String,Integer> maxForWay " + way);
+//                continue;
+//            }
+//            if ((int) maxForWay.get(way) != max) {
+//                Assertions.fail("Для способа пополнения " + way + " максимальная сумма = " + max + ", а ожидалось = " + maxForWay.get(way));
+//            }
+//            Stash.put("wayKey", way);
+//        }
     }
 
     @ActionTitle("проверяет, что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода")

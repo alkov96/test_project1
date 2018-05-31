@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 public class ServiceMessagesPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceMessagesPage.class);
 
-    @FindBy(xpath = "//div[@id='tabpanel-1482-body']")
+    @FindBy(xpath = "//div[@id='tabpanel-1483-body']")
     private WebElement table;
 
     @ElementTitle("Последняя страница")
@@ -40,11 +40,11 @@ public class ServiceMessagesPage extends AbstractPage {
     private WebElement prePage;
 
     @ElementTitle("Поле с количеством страниц")
-    @FindBy(xpath = "//div[@id='tbtext-1522']")
+    @FindBy(xpath = "//div[@id='tbtext-1523']")
     private WebElement maxPagesText;
 
     @ElementTitle("Добавить сообщение")
-    @FindBy(xpath = "//span[@id='button-1539-btnIconEl']")
+    @FindBy(xpath = "//span[@id='button-1540-btnIconEl']")
     private WebElement newMessageBotton;
 
     public ServiceMessagesPage() {
@@ -57,8 +57,7 @@ public class ServiceMessagesPage extends AbstractPage {
     @ActionTitle("очищает все активные сообщения")
     public void clearActives() {
         WebDriver driver = PageFactory.getWebDriver();
-        //String xpath = "//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']";
-        String xpath = "//td[contains (@class,'x-grid-cell-checkcolumn-1533')]";
+        String xpath = "//td[contains (@class,'x-grid-cell-checkcolumn-1534')]";
         if (lastPage.isDisplayed()) {
             lastPage.click();
         }
@@ -70,7 +69,7 @@ public class ServiceMessagesPage extends AbstractPage {
         }
         for (int i = 0; i < pageCount; i++) {
             new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-            List<WebElement> activeBoxes = driver.findElements(By.xpath(xpath));//получение всех чекбоксов "Активное"
+            List<WebElement> activeBoxes = driver.findElements(By.xpath(xpath));
             for (int z = 0; z < activeBoxes.size(); z++) {
                 new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
                 if (activeBoxes.get(z).findElement(By.xpath("div/img")).getAttribute("class").contains("checked")) {
@@ -85,25 +84,5 @@ public class ServiceMessagesPage extends AbstractPage {
                 prePage.click();
             }
         }
-
-//        for (int i = 0; i < pageCount; i++) {
-//            waitForElementPresent(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"),1000);
-//            List<WebElement> activeBoxes = PageFactory.getWebDriver().findElements(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"));//получение всех чекбоксов "Активное"
-//            for (int z = 0; z < activeBoxes.size(); z++) {
-//                waitForElementPresent(activeBoxes.get(z), 1000);
-//                if (activeBoxes.get(z).findElement(By.xpath("div/img")).getAttribute("class").contains("checked")) {
-//                    PageFactory.getActions().doubleClick(activeBoxes.get(z)).build().perform();
-//                    String activeBottomId = PageFactory.getWebDriver().findElement(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-checkbox x-field-default x-anchor-form-item x-form-cb-checked x-form-dirty']")).getAttribute("id");
-//                    PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + activeBottomId + "-inputEl']")).click();
-//                    PageFactory.getWebDriver().findElement(By.xpath("//a[@class='x-btn x-unselectable x-box-item x-toolbar-item x-btn-default-small x-noicon x-btn-noicon x-btn-default-small-noicon']")).click();
-//                    activeBoxes = PageFactory.getWebDriver().findElements(By.xpath("//td[@class='x-grid-cell x-grid-td x-grid-cell-checkcolumn-1533 x-grid-cell-checkcolumn x-unselectable x-grid-cell-checkcolumn']"));
-//                }
-//            }
-//            if (prePage.isDisplayed()) {
-//                prePage.click();
-//            }
-//        }
-
-
     }
 }

@@ -1,6 +1,7 @@
 # language: ru
 Функционал: Изменение типа отображения коэффицентов в избранном
   @smoke
+  @bets-coupon
   @ChangeTypeOfCoefficientFav_C1066
   Сценарий: ChangeTypeOfCoefficientFav_C1066
     * переходит на главную страницу
