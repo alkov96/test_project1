@@ -1,7 +1,6 @@
 package ru.gamble.pages.userProfilePages;
 
 import cucumber.api.DataTable;
-import cucumber.api.java.mn.Харин;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
@@ -74,8 +73,9 @@ public class PopUPLCPage extends AbstractPage {
     @FindBy(xpath = "//div[@class='payPartner cupis_wallet']")
     private WebElement cupis_deposit;
 
-    @FindBy(xpath = "//button[@class='btn_important money-in-out__btn']")
-    private WebElement deposit_on; //кнопка Вывести средства
+    @FindBy(xpath = "//div[@class='modal__body modal__body_moneyInOutBox']/button")
+    private WebElement deposit_on; //кнопка Пополнить средства
+
     @ElementTitle("кнопка ВЫВЕСТИ на попапе")
     @FindBy(xpath = "//div[@class='money-in-out__line']/button[contains(@class,'money-in-out__btn')]")
     private WebElement withdrawOk;
@@ -395,7 +395,7 @@ public class PopUPLCPage extends AbstractPage {
         for (WebElement sposob : depositWays) {
             LOG.info("Выбираем способ пополнения " + sposob.findElement(By.xpath("div")).getAttribute("class"));
             sposob.click();
-            waitToPreloader(); //ждем появления прелоадера. т.к. если его не будет - значит и способ пооплнения по сути не изменился - не отправлялась инфа в сварм и вообще
+            //waitToPreloader(); //ждем появления прелоадера. т.к. если его не будет - значит и способ пооплнения по сути не изменился - не отправлялась инфа в сварм и вообще
             way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
             maxSum = driver.findElement(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
             max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
@@ -448,7 +448,7 @@ public class PopUPLCPage extends AbstractPage {
         WebElement buttonOk;
         int sumOnButton, sumField;
         for (WebElement summ : summList) {
-            buttonOk = driver.findElement(By.xpath("//*[@id='moneyInForm']/button"));
+            buttonOk = driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button"));
             LOG.info("Вводим сумму с помощью кнопки " + summ.getText());
             summ.click();
             waitEnabled(buttonOk);
@@ -481,15 +481,21 @@ public class PopUPLCPage extends AbstractPage {
         if (message.toString().isEmpty() || !message.toString().contains("Сумма меньше минимально допустимой")) {
             Assertions.fail("При сумме пополнения = 1 нет сообщения об ошибке. Сообщение: " + message.toString());
         }
-        if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()) {
+        if (driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button")).isEnabled()) {
             Assertions.fail("При сумме пополнения = 1 кнопка осталась активной.");
         }
+    }
 
+    @ActionTitle("проверяет поведение попапа пополнения при вводе суммы больше максимально допустимой")
+    public void checkPopapWithMaxSumm() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
         LOG.info("Проверим поведение попапа при вводе суммы будльше максимума");
         LOG.info("Очищаем поле с суммой и затем вводим туда 600 000");
+        WebElement field = Stash.getValue("fieldKey");
         field.clear();
-        field.sendKeys(String.valueOf(600000));
+        field.sendKeys(String.valueOf(600000000));
         Thread.sleep(1000);
+        StringBuilder message = Stash.getValue("messageKey");
         message.setLength(0);//очищаем список ошибок чтобы заново его создать
         LOG.info("Запоминаем все сообщения с ошибками и предупреждениями, которые появились на попапе пополнения");
         driver.findElements(By.xpath("//div[contains(@class,'money-in-out__messages')]")).forEach(element -> message.append(element.getText())); //строка, содержащая все сообщения на попапе пополнения
@@ -497,8 +503,8 @@ public class PopUPLCPage extends AbstractPage {
         if (message.toString().isEmpty() || !message.toString().contains("Сумма превышает максимальную допустимую")) {
             Assertions.fail("При сумме пополнения = 600.000 нет сообщения об ошибке. Сообщение: " + message.toString());
         }
-        if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()) {
-            Assertions.fail("При сумме пополнения = 600.000 кнопка осталась активной.");
+        if (driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button")).isEnabled()) {
+            Assertions.fail("При сумме пополнения = 60000.000 кнопка осталась активной.");
         }
 
     }
@@ -530,7 +536,7 @@ public class PopUPLCPage extends AbstractPage {
             int currentMaxFlag = ((int) maxForWay.get(way)) <= summ ? 0 : 1;//switch не работает с булями, поэтому придется испольоватьвот такой флаг, который равен 0 = если допустимый максимум больше введенно суммы, и 1 - если допустимй максимум меньше введенной суммы
             switch (currentMaxFlag) {
                 case 1:  //т.е. для выбранного способа пополнения введенная сумма разршена
-                    if (!driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()) {
+                    if (!driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button")).isEnabled()) {
                         Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " кнопка Пополнить недоступна, хотя максимально допустимая сумма " + maxForWay.get(way));
                     }
                     if (message.toString().contains("Сумма превышает максимальную допустимую") || message.toString().contains("Сумма меньше минимально допустимой")) {
@@ -538,7 +544,7 @@ public class PopUPLCPage extends AbstractPage {
                     }
                     break;
                 case 0: //т.е. для выбранного способа пополнения введенная сумма превышает максимум
-                    if (driver.findElement(By.xpath("//*[@id='moneyInForm']/button")).isEnabled()) {
+                    if (driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button")).isEnabled()) {
                         Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " кнопка Пополнить доступна, хотя максимально допустимая сумма " + maxForWay.get(way));
                     }
                     if (!message.toString().contains("Сумма превышает максимальную допустимую")) {
