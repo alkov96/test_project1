@@ -602,15 +602,16 @@ public class PopUPLCPage extends AbstractPage {
     public void cupicIn() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         Set<String> allHandles = driver.getWindowHandles();
-        String urlSite = "https://dev-bk-bet-site.tsed.orglot.office/";
-        String cupicSite = "https://23bet-pay.itasystems.ru/frontend/refill?requestId=RID0984840782911";
-        for (String handle : allHandles) { //для переключения на вкладку ЦУПИС, т.к. точного адреса ЦУПИС не знаю
-            driver.switchTo().window(handle);
-            if (!driver.getCurrentUrl().contains(urlSite))
-                break;
-        }
+        String passwordXpath = "//input[@id='form_login_password']";
+//        String urlSite = "https://dev-bk-bet-site.tsed.orglot.office/";
+//        String cupicSite = "https://23bet-pay.itasystems.ru/frontend/refill?requ0estId=RID0984840782911";
+
+        LOG.info("Переходим на страницу ЦУПИС");
+        driver.switchTo().window(allHandles.toArray()[1].toString());
+
         CommonStepDefs.workWithPreloader();
-        WebElement password = driver.findElement(By.xpath("//input[@id='form_login_password']"));
+        waitForElementPresent(By.xpath(passwordXpath), 4000);
+        WebElement password = driver.findElement(By.xpath(passwordXpath));
         password.click();
         password.clear();
         password.sendKeys("Regfordepoit_0601");
@@ -622,11 +623,9 @@ public class PopUPLCPage extends AbstractPage {
         waitForElementPresent(By.xpath("//input[@type='submit']"), 4000);
         driver.findElement(By.xpath("//input[@type='submit']")).click();
         CommonStepDefs.workWithPreloader();
-        for (String handle : allHandles) {
-            driver.switchTo().window(handle);
-            if (!driver.getCurrentUrl().contains(cupicSite))
-                break;
-        }
+
+        LOG.info("Переходим обратно в на сайт");
+        driver.switchTo().window(allHandles.toArray()[0].toString());
     }
     @ActionTitle("проверяет, увеличился ли баланс")
     public void checkIsBalance(){

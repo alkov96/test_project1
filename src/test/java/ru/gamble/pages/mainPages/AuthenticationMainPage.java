@@ -28,6 +28,11 @@ public class AuthenticationMainPage extends AbstractPage {
     @FindBy(id = "topPanelWalletBalance")
     private WebElement pageTitle;
 
+    @ElementTitle("Мои пари")
+    @FindBy(id = "user-bets")
+    private WebElement myBetsButton;
+
+
     public AuthenticationMainPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(

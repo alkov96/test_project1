@@ -21,6 +21,7 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -172,6 +173,9 @@ public class FavouritePage extends AbstractPage {
         List<String> names = Stash.getValue("nameGameKey");
         List<String> teams = new ArrayList<>();
         names.forEach(name->teams.add(CommonStepDefs.stringParse(name)));
+        if(allMyGames.size() == 0){
+            throw  new AutotestError("В Избранное не найдено ни одного события!");
+        }
         LOG.info("Проверка что в Избранном игр не больше, чем добавлялось");
         if (teams.size() < allMyGames.size())
         {

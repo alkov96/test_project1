@@ -2,7 +2,6 @@
 Функционал: Изменение условий в купоне
 
   @smoke
-  @bets-coupon
   @CouponAcceptChange_C1048
   Сценарий: CouponAcceptChange_C1048
     * переходит на главную страницу

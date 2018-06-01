@@ -1,7 +1,6 @@
 # language: ru
 Функционал: Изменение типа отображения коэффицентов в купоне
   @smoke
-  @bets-coupon
   @ChangeTypeOfCoefficientCoupon_C1066
   Сценарий: ChangeTypeOfCoefficientCoupon_C1066
     * переходит на главную страницу

@@ -1,7 +1,6 @@
 # language: ru
 Функционал: Проверка ставки типа Система
   @smoke
-  @bets-coupon
   @SystemBet_C1048
   Сценарий: Проверка ставки Система из 5 событий (4/5)
     * переходит на главную страницу 'https://dev-bk-bet-site1.tsed.orglot.office'
