@@ -1,7 +1,7 @@
 # language: ru
 Функционал: Проверка вывода средств на карту и начисление бонусов
   @smoke
-  @WithdrawLimits_C36187
+  @Withdraw_C1045
   Сценарий: Withdraw_C1045
     * переходит на главную страницу 'https://dev-bk-bet-site1.tsed.orglot.office'
 #    * переходит на главную страницу
