@@ -1,7 +1,7 @@
 {
   "site1": {
     "mainurl": "https://dev-bk-bet-site1.tsed.orglot.office/",
-    "registrationUrl": "http://stage-bet-site1.tsed.orglot.office/test_registration/",
+    "registrationUrl": "http://dev-bk-bet-site1.tsed.orglot.office/test_registration/",
     "login": "regfordepoit@mailinator.com",
     "password": "Parol123"
   },
@@ -10,9 +10,14 @@
     "login": "bladekeeper@ya.ru",
     "password": "1qwert2ASDF"
   },
-  "888.ru":{
+  "888-ru":{
     "mainurl": "https://888.ru/",
     "login": "bladekeeper@ya.ru",
     "password": " 1qwert2ASDF"
+  },
+  "db-registration":{
+    "url":"jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",
+    "user":"webdev_adm",
+    "password":"tao9Gu8Waenotahv"
   }
 }

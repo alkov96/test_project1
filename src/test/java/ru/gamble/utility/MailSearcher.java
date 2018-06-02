@@ -68,7 +68,7 @@ public class MailSearcher {
             //Ищем в коллекции письмо с нужным адресатом
             for (int i = 1; i <= inbox.getMessageCount(); i++) {
                 message = inbox.getMessage(i);
-                if (mail.equals(message.getHeader("To")[0])) {
+                if (message.getHeader("To")[0].contains(mail)) {
                     LOG.info("Письмо получено");
                     link = getVerifyLink(message);
                     if (!Strings.isNullOrEmpty(link)) {

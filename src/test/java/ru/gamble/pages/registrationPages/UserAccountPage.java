@@ -181,10 +181,6 @@ public class UserAccountPage extends AbstractPage{
         } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
 
         LOG.info("Копируем смс-код для подтверждения телефона");
-
-//        driver.findElement(By.cssSelector("body")).sendKeys(Keys.CONTROL + "t");
-//        driver.get("http://stage-bet-site1.tsed.orglot.office/test_registration/");
-//        driver.findElement(By.cssSelector("body")).sendKeys(Keys.CONTROL + "w");
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
 
         String currentHandle = driver.getWindowHandle();
@@ -207,21 +203,28 @@ public class UserAccountPage extends AbstractPage{
         driver.switchTo().window(newWindow);
 
         String xpath = "//li/a[contains(.,'" + phone + "')]";
-        int i = 0;
+        WebElement numberSring = null;
+        int y = 0;
 
-        do{
-            driver.navigate().refresh();
-            i++;
-        }while (driver.findElements(By.xpath(xpath)).isEmpty() && i < 10);
-        LOG.info("Кол-во обновлений страницы для получения телефона и SMS-кода::" + i);
+        for( ; y < 10; y++) {
+            try {
+                numberSring = driver.findElement(By.xpath(xpath));
+            } catch (NoSuchElementException nsee) {
+                driver.navigate().refresh();
+            }
+        }
+        LOG.info("Кол-во обновлений страницы для получения телефона и SMS-кода::" + y);
+        if(numberSring != null && !numberSring.getText().isEmpty()) {
+            String code = numberSring.getText().split(" - ")[1];
+            driver.switchTo().window(currentHandle);
+            js.executeScript("registration_window.close()");
 
-        String code = driver.findElement(By.xpath(xpath)).getText().split(" - ")[1];
+            LOG.info("Вводим SMS-код::" + code);
+            fillField(cellFoneConformationInput,code);
+        }else {
+            throw new AutotestError("Ошибка! SMS-код не найден.");
+        }
 
-        driver.switchTo().window(currentHandle);
-        js.executeScript("registration_window.close()");
-
-        LOG.info("Вводим SMS-код::" + code);
-        fillField(cellFoneConformationInput,code);
     }
 
     /**

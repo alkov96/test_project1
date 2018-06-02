@@ -41,7 +41,7 @@ public class EnterPage extends AbstractPage {
     private WebElement inputPassword;
 
     @ElementTitle("Войти")
-    @FindBy(xpath = "//button[@class='btn_important modal__submit-btn']")
+    @FindBy(xpath = "//button[contains(.,'Войти')]")
     private WebElement enterButton;
 
     public EnterPage() {
@@ -50,19 +50,18 @@ public class EnterPage extends AbstractPage {
                 new HtmlElementLocatorFactory(driver)), this);
         for(int j = 0; j < 10; j++) {
             try {
-                driver.findElement(By.id("log-in")).click();
-                if (pageTitle.isDisplayed()) {
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(enterButton));
+                if (enterButton.isDisplayed()) {
                     break;
                 }
             } catch (Exception e){
                 driver.navigate().refresh();
+                driver.findElement(By.id("log-in")).click();
             }
-            if(j >= 10 - 1){
+            if(j >= 9){
                 throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
             }
         }
- //       tryingLoadPage(pageTitle,10);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
     @ActionTitle("логинится с")

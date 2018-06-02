@@ -56,7 +56,7 @@ public class PassportDataPage extends AbstractPage {
     private WebElement regionInput;
 
     @ElementTitle("Нас. пункт")
-    @FindBy(id = "city")
+    @FindBy(xpath = "//td[contains(.,'Нас. пункт')]//following-sibling::td//input[1]")
     private WebElement cityInput;
 
     @ElementTitle("Улица")

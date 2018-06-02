@@ -237,6 +237,7 @@ public abstract class AbstractPage extends Page {
      */
     public void fillAddress(WebElement field, boolean authFill) {
         List<WebElement> list;
+        int count = 10;
         do {
             field.clear();
             StringBuilder n = new StringBuilder();
@@ -248,6 +249,8 @@ public abstract class AbstractPage extends Page {
                 e.printStackTrace();
             }
             list = field.findElements(By.xpath("../ul[1]/li"));
+            count--;
+            if(count<=0){ break;}
         } while (list.isEmpty() && authFill);
         if (field.findElements(By.xpath("../ul[1]/li")).isEmpty()) {
             field.clear();
