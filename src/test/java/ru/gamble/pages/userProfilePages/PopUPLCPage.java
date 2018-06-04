@@ -605,7 +605,7 @@ public class PopUPLCPage extends AbstractPage {
     }
 
     @ActionTitle("входит в кабинет ЦУПИС и совершает все необходимые операции для потверждения пополнения")
-    public void cupicIn() throws InterruptedException {
+    public void cupicIn() {
         WebDriver driver = PageFactory.getDriver();
         Set<String> allHandles = driver.getWindowHandles();
         String passwordXpath = "//input[@id='form_login_password']";
@@ -617,6 +617,8 @@ public class PopUPLCPage extends AbstractPage {
 
         CommonStepDefs.workWithPreloader();
         waitForElementPresent(By.xpath(passwordXpath), 4000);
+
+        LOG.info("Ищем поле ввода пароля");
         WebElement password = driver.findElement(By.xpath(passwordXpath));
         password.click();
         password.clear();
@@ -624,7 +626,7 @@ public class PopUPLCPage extends AbstractPage {
         CommonStepDefs.workWithPreloader();
         driver.findElement(By.id("btn_authorization_enter")).click();
         CommonStepDefs.workWithPreloader();
-        Thread.sleep(1000);
+//        Thread.sleep(1000);
         driver.findElement(By.xpath("//input[@class='ui-button ui-button-final right']")).click();
         waitForElementPresent(By.xpath("//input[@type='submit']"), 4000);
         driver.findElement(By.xpath("//input[@type='submit']")).click();
