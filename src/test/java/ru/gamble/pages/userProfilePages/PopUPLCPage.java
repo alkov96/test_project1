@@ -616,7 +616,7 @@ public class PopUPLCPage extends AbstractPage {
         driver.switchTo().window(allHandles.toArray()[1].toString());
 
         CommonStepDefs.workWithPreloader();
-        waitForElementPresent(By.xpath(passwordXpath), 4000);
+        waitForElementPresent(By.xpath(passwordXpath), 4);
 
         LOG.info("Ищем поле ввода пароля");
         WebElement password = driver.findElement(By.xpath(passwordXpath));
@@ -628,7 +628,7 @@ public class PopUPLCPage extends AbstractPage {
         CommonStepDefs.workWithPreloader();
 //        Thread.sleep(1000);
         driver.findElement(By.xpath("//input[@class='ui-button ui-button-final right']")).click();
-        waitForElementPresent(By.xpath("//input[@type='submit']"), 4000);
+        waitForElementPresent(By.xpath("//input[@type='submit']"), 4);
         driver.findElement(By.xpath("//input[@type='submit']")).click();
         CommonStepDefs.workWithPreloader();
 
