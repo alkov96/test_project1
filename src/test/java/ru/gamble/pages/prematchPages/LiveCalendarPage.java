@@ -13,6 +13,7 @@ import ru.gamble.pages.CouponPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -93,11 +94,14 @@ public class LiveCalendarPage extends AbstractPage {
      //   List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/../.."));
         List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"));
         int count = 0;
-        int number = Integer.valueOf(param)-1;
+        int number = (Integer.valueOf(param)) - 1;
         Random random = new Random();
         int num;
 
         LOG.info("Жмём на коэфициенты");
+        if(coefficients.size() == 0){
+            throw new AutotestError("Ошибка! Количество событий::" + coefficients.size());
+        }
         do {
             LOG.info("coefficients = " + coefficients.size());
             num = random.nextInt(coefficients.size()-1-count);

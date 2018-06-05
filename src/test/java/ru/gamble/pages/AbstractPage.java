@@ -73,7 +73,7 @@ public abstract class AbstractPage extends Page {
 
     @ElementTitle("Очистить всё")
     @FindBy(xpath = "//span[@class='coupon-clear-all__text ng-binding']")
-    private WebElement clearCoupon;
+    protected WebElement clearCoupon;
 
 //для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
     @ElementTitle("поле суммы общей ставки")
@@ -455,9 +455,9 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("очищает купон")
     public void clearCoupon(){
-        if (clearCoupon.isDisplayed()) clearCoupon.click();
-        WebDriver driver = PageFactory.getDriver();
-        new WebDriverWait(driver,10).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//span[@class='coupon-clear-all__text ng-binding']")));
+        if (clearCoupon.isDisplayed()){
+            clearCoupon.click();
+        }
     }
 }
 

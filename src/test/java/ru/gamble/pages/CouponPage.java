@@ -45,10 +45,6 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//div[@class='list-bet-block-top__title']")
     private WebElement coupon;
 
-    @ElementTitle("Очистить всё")
-    @FindBy(xpath = "//span[@class='coupon-clear-all__text ng-binding']")
-    private WebElement clearCoupon;
-
     @ElementTitle("экспресс-бонус ссылка")
     @FindBy(xpath = "//div[@class='coupon-bonus-info coupon-bonus-info-link']")
     private WebElement expressBonusLink;
