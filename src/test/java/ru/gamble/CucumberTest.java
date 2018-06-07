@@ -1,36 +1,22 @@
 package ru.gamble;
 
 import cucumber.api.CucumberOptions;
-import cucumber.api.java.After;
 import cucumber.api.junit.Cucumber;
 import io.qameta.allure.Attachment;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
-import java.net.MalformedURLException;
-import java.time.LocalTime;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
 @RunWith(Cucumber.class)
 @CucumberOptions(monochrome = true,
         format ={"pretty"},
-        glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.pagefactory.stepdefs"},
+        glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
         tags = {"@smoke"})

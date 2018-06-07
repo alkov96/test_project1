@@ -17,8 +17,9 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
-import ru.sbtqa.tag.pagefactory.stepdefs.GenericStepDefs;
+import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 import ru.sbtqa.tag.qautils.properties.Props;
+import ru.sbtqa.tag.stepdefs.ru.StepDefs;
 
 
 import java.sql.Connection;
@@ -87,7 +88,6 @@ public class CommonStepDefs extends GenericStepDefs {
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage(){
-        //cleanCookies();
         goToMainPage("site2");
     }
 
