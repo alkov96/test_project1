@@ -332,7 +332,7 @@ public class PopUPLCPage extends AbstractPage {
     }
 
 
-    @ActionTitle("проверяет что снлась праивльная сумма, и бонусы(если были) начислены")
+    @ActionTitle("проверяет снятие правильной суммы, и бонусов, если они были начислены")
     public void balanceAfterWithdraw(){
         LOG.info("Проверка что правильно изменился баланс рублей");
         float sum = Float.valueOf(Stash.getValue("withdrawRub"));
