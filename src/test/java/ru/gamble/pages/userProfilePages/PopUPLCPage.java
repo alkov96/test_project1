@@ -104,14 +104,15 @@ public class PopUPLCPage extends AbstractPage {
         withdraw_field.sendKeys("9999999");
     }
 
-    @ActionTitle("проверяет, появляется ли сообщение о недостаточном количестве средств на балансе")
+    @ActionTitle("проверяет появление сообщения о недостаточном количестве средств на балансе")
     public void excessOfLimit() {
         WebDriver driver = PageFactory.getDriver();
-        if (!driver.findElement(By.xpath("//div[@class='money-in-out__messages']/div[contains(@class, 'money-in-out__message money-in-out__message-error')]")).isDisplayed()) {
-            LOG.error("Предупреждение о превышении лимита не найдено или кнопка вывода средств активна");
-            Assertions.fail("Предупреждение о превышении лимита не найдено или кнопка вывода средств активна");
-        } else {
+        try{
+            driver.findElement(By.xpath("//div[@class='money-in-out__messages']/div[contains(@class, 'money-in-out__message money-in-out__message-error')]")).isDisplayed();
             LOG.info("Предупреждение о превышении лимита отображается. Кнопка вывода средств неактивна");
+        }catch (Exception e){
+            LOG.error("Ошибка! Предупреждение о превышении лимита не найдено или кнопка вывода средств активна");
+            Assertions.fail("Предупреждение о превышении лимита не найдено или кнопка вывода средств активна");
         }
     }
 
