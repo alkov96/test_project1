@@ -1,7 +1,7 @@
 # language: ru
 Функционал: 2.Пополнение и вывод.
 
-  @smoke
+  @regress
   @DepositLimits_C47804
   Сценарий: Проверка лимитов пополнения.
     * переходит на главную страницу 'https://dev-bk-bet-site1.tsed.orglot.office'

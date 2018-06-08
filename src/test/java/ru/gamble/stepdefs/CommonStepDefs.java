@@ -74,7 +74,7 @@ public class CommonStepDefs extends GenericStepDefs {
     // Ожидание появления элемента на странице
     public static void waitShowElement(By by){
         WebDriver driver = PageFactory.getWebDriver();
-        WebDriverWait driverWait = new WebDriverWait(driver,1, 250);
+        WebDriverWait driverWait = new WebDriverWait(driver,2, 250);
         try{
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);

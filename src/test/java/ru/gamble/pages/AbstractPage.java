@@ -302,7 +302,7 @@ public abstract class AbstractPage extends Page {
             List<WebElement> eventsInCoupon;
             List<WebElement> correctMarkets;
             Thread.sleep(3000);
-            waitForElementPresent(findCoeffs, 1000);
+            waitForElementPresent(findCoeffs, 10);
             correctMarkets = getWebDriver().findElements(findCoeffs)
                     .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.26)
                     .limit(count + 10).collect(Collectors.toList());
@@ -317,7 +317,7 @@ public abstract class AbstractPage extends Page {
         if (ifForExperss == "incorrect") {
             List<WebElement> eventsInCoupon;
             List<WebElement> inCorrectMarkets = null;
-            waitForElementPresent(findCoeffs, 1000);
+            waitForElementPresent(findCoeffs, 10);
             List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
             int tryPage = 0;
             do {
@@ -378,6 +378,7 @@ public abstract class AbstractPage extends Page {
         BigDecimal sumBet;
         BigDecimal one = new BigDecimal(1);
         sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2).add(one): new BigDecimal(sum).setScale(2);
+        coupon_field.clear();
         coupon_field.sendKeys(sumBet.toString());
         Stash.put("sumKey", sumBet.toString());
     }

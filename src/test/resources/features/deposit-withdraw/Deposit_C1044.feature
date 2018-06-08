@@ -2,6 +2,7 @@
 Функционал: 2.Пополнение и вывод.
 
   @smoke
+  @regress
   @Deposit_C1044
   Сценарий: Пополнение счёта.
     * переходит на главную страницу 'https://dev-bk-bet-site1.tsed.orglot.office'

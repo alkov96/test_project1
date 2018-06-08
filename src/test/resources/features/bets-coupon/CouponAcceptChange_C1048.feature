@@ -1,7 +1,7 @@
 # language: ru
 Функционал: 3.Ставки.
 
-  @smoke
+  @regress
   @CouponAcceptChange_C1048
   Сценарий: Изменение условий в купоне.
 

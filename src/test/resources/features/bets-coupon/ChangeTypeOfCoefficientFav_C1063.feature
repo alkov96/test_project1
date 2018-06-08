@@ -1,7 +1,7 @@
 # language: ru
 Функционал: 3.Ставки.
 
-  @smoke
+  @regress
   @ChangeTypeOfCoefficientFav_C1066
   Сценарий: Изменение типа отображения коэффицентов в "Избранное".
 

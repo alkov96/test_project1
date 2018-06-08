@@ -18,9 +18,11 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import javax.naming.AuthenticationException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -317,6 +319,7 @@ public class CouponPage extends AbstractPage {
         inputBet(sumBet,"");
     }
     public void inputBet(String sumBet,String one){
+        BigDecimal sum;
         WebDriver driver = PageFactory.getDriver();
        // boolean forOne = one.equals("для каждого разбиения") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
         boolean forOne = !one.equals("") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
@@ -325,22 +328,32 @@ public class CouponPage extends AbstractPage {
         field.clear();
         field.sendKeys(String.valueOf(sumBet));
         LOG.info("Вводим сумму ставки : " + sumBet);
-        float sum = Float.valueOf(sumBet.trim());
+
         String countBet = forOne?driver.findElement(By.xpath("//span[@class='eachway-zone__text ng-binding']")).getText().split(" ")[0]:"1";//количество ставок при выбранном виде систем(2/3,3/5,4/5...)
-        float count = Float.valueOf(countBet);
-        sum = count*sum;
-        Stash.put("sumKey",sum);
+        sum = new BigDecimal(sumBet.trim()).setScale(2,RoundingMode.UP).multiply(new BigDecimal(countBet).setScale(0,RoundingMode.UP));
+
+        Stash.put("sumKey",sum.toString());
     }
 
 
     @ActionTitle("заключает пари")
-    public void doBet(){
+    public void doBet() throws AuthenticationException {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("Жмём Заключить пари");
         coupon_bet_button.click();
-        CommonStepDefs.workWithPreloader();
+        int time = 30;
+        try {
+            new WebDriverWait(driver, time).until(ExpectedConditions.invisibilityOfElementLocated(xpath("//*[contains(@class,'preloader__container')]")));
+        }catch (Exception e){
+            throw new AutotestError("Ошибка! Прелоадер не исчез в течение::"+ time + " сек.");
+        }
         if (!driver.findElement(By.cssSelector("div.bet-accepted-noification")).isDisplayed()) {
             LOG.warn("Сообщение об успешной ставке не найдено");
+        }
+
+
+        if (driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]")).size() != 0) {
+            throw new AuthenticationException("Ошибка! Принялись не все ставки.");
         }
     }
 
@@ -351,19 +364,19 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет изменение баланса")
     public static void balanceIsOK(String param){
         WebDriver driver = PageFactory.getDriver();
-        float afterBalance;
+        BigDecimal afterBalance, balanceExpected, sumBet;
+
         By balance=param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть
         String key = param.equals("бонусов")?"balanceBonusKey":"balanceKey";
         int count = 30;
+        balanceExpected = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.UP);
+        sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.UP);
+
         while (count >0){
-            afterBalance = Float.valueOf(driver.findElement(balance).getText());
-            afterBalance = new BigDecimal(afterBalance).setScale(2, RoundingMode.UP).floatValue();
-            float balanceExpected = Stash.getValue(key);
-            float sumBet = Stash.getValue("sumKey");
-            balanceExpected-=sumBet;
-            balanceExpected = new BigDecimal(balanceExpected).setScale(2, RoundingMode.UP).floatValue();
-            if (Math.abs(balanceExpected-afterBalance)<0.05) {
-                LOG.info("Баланс соответствует ожидаемому: " +afterBalance);
+            afterBalance = new BigDecimal(driver.findElement(balance).getText()).setScale(2, RoundingMode.UP);
+
+            if((balanceExpected.subtract(sumBet).subtract(afterBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.UP))== -1){
+                LOG.info("Баланс соответствует ожидаемому: " + afterBalance.toString());
                 break;
             }
             LOG.info("тик-так");
@@ -373,8 +386,8 @@ public class CouponPage extends AbstractPage {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (count==0){
-                Assertions.fail("Баланс не  соответствует ожидаемому. Баланс сейчас:" + afterBalance + ", ожидалось : " + balanceExpected);
+            if (count == 0){
+                Assertions.fail("Баланс не соответствует ожидаемому. Баланс сейчас: " + afterBalance + ", ожидалось : " + balanceExpected);
             }
         }
     }
@@ -427,12 +440,13 @@ public class CouponPage extends AbstractPage {
                 driver.findElements(By.xpath("//input[contains(@class,'input_coupon-ordinar')]")).get(0);
         input.clear();
         input.sendKeys(String.valueOf(sum));
-        float sumBet = Float.valueOf(sum.trim());
+        String sumBet = sum.trim();
         Stash.put("sumKey",sumBet);
     }
 
     @ActionTitle("нажимает кнопку ВНИЗ - дублирование ставки для всех пари")
     public void dublicateBet(){
+        BigDecimal sum;
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> listBets = driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]"));
         String sumFirstBet = listBets.get(0).getAttribute("value");
@@ -446,10 +460,10 @@ public class CouponPage extends AbstractPage {
                 Assertions.fail("Ставка не продублировалась для второго события " + valueBet);
             }
         }
-        float sum = Float.valueOf(sumFirstBet.trim());
-        float count = Float.valueOf(listBets.size());
-        sum = count*sum;
-        Stash.put("sumKey",sum);
+        sum = new BigDecimal(sumFirstBet.trim()).setScale(2,RoundingMode.UP).multiply(new BigDecimal(listBets.size()));
+        LOG.info("Всего ставок в купоне::" + listBets.size());
+
+        Stash.put("sumKey",sum.toString());
     }
 
     @ActionTitle("переходит в настройки и меняет коэффицент в купоне")

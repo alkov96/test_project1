@@ -1,7 +1,7 @@
 # language: ru
 Функционал: 3.Ставки.
 
-  @smoke
+  @regress
   @ChangeTypeOfCoefficientOnMain_C1066
   Сценарий: Изменение типа отображения коэффицентов на главной
 

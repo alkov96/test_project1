@@ -1,7 +1,7 @@
 # language: ru
 Функционал: 3.Ставки.
 
-  @smoke
+  @regress
   @ChangeTypeOfCoefficientCoupon_C1066
   Сценарий: Изменение типа отображения коэффицентов в купоне
 

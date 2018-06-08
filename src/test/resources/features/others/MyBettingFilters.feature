@@ -1,7 +1,7 @@
 # language: ru
 Функционал: 10.Разное.
 
-  @smoke
+  @regress
   @MyBettingFilters
   Сценарий: Мои пари - проверка фильтров и поиска.
 

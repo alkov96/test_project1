@@ -25,6 +25,8 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -336,13 +338,14 @@ public class PopUPLCPage extends AbstractPage {
     @ActionTitle("проверяет снятие правильной суммы, и бонусов, если они были начислены")
     public void balanceAfterWithdraw(){
         LOG.info("Проверка что правильно изменился баланс рублей");
-        float sum = Float.valueOf(Stash.getValue("withdrawRub"));
-        Stash.put("sumKey",sum);
+        BigDecimal sum;
+        sum = new BigDecimal((String) Stash.getValue("withdrawRub")).setScale(2,RoundingMode.UP);
+        Stash.put("sumKey",sum.toString());
         CouponPage.balanceIsOK("рубли");
-        sum = -Float.valueOf(Stash.getValue("bonus"));
-        if (sum>0.0f){
+        sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.UP).negate();
+        if(sum.compareTo(new BigDecimal(0)) == 1){
             LOG.info("Проверка что правильно изменился баланс бонусов");
-            Stash.put("sumKey","-"+sum);
+            Stash.put("sumKey",sum.toString());
             CouponPage.balanceIsOK("бонусов");
         }
     }
@@ -638,11 +641,12 @@ public class PopUPLCPage extends AbstractPage {
     }
     @ActionTitle("проверяет, увеличился ли баланс")
     public void checkIsBalance(){
+        BigDecimal sumBet;
         WebDriver driver = PageFactory.getDriver();
         driver.navigate().refresh();
-        waitForElementPresent(By.id("topPanelWalletBalance"), 10000);
-        float sumBet = -Float.valueOf(Stash.getValue("sumBetKey"));
-        Stash.put("sumKey",sumBet);
+        waitForElementPresent(By.id("topPanelWalletBalance"), 10);
+        sumBet = new BigDecimal((String) Stash.getValue("sumBetKey")).setScale(2,RoundingMode.UP).negate();
+        Stash.put("sumKey",sumBet.toString());
         CouponPage.balanceIsOK("рубли");
     }
 }

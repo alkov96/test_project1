@@ -47,13 +47,17 @@ public class LiveCalendarPage extends AbstractPage {
     }
 
     @ActionTitle("ищет событие с коэффициентом")
-    public void findCoeff(String param) throws InterruptedException {
+    public void findCoeff(String param) {
         Double coeff = Double.parseDouble(param);
         List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
         int tryPage = 0;
         boolean isCoeffFound = false;
         while (isCoeffFound == false && tryPage < allDaysPages.size()-1) {
-            waitForElementPresent(By.xpath("//div[contains(@class,'livecal-table__coefficient')]"),1000);
+            try {
+                waitForElementPresent(By.xpath("//div[contains(@class,'livecal-table__coefficient')]"), 3);
+            }catch (Exception e){
+                LOG.info("На странице [" + allDaysPages.get(tryPage).getText() + "] нет событий");
+            }
             List<WebElement> correctCoeffs = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='table livecal-table ng-scope']/div[contains(text(), '"+coeff+"')]"));
             if (correctCoeffs.size()>0) {
                 for(WebElement element : correctCoeffs){

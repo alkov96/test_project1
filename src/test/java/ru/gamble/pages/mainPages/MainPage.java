@@ -83,9 +83,9 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(pageTitle,10);
+        tryingLoadPage(pageTitle,3);
         workWithPreloader();
-        tryingLoadPage(slider,10);
+        tryingLoadPage(slider,3);
         workWithPreloader();
     }
 

@@ -204,16 +204,17 @@ public class UserAccountPage extends AbstractPage{
 
         String xpath = "//li/a[contains(.,'" + phone + "')]";
         WebElement numberSring = null;
-        int y = 0;
+        int x = 0;
 
-        for( ; y < 10; y++) {
+        for(int y = 0; y < 10; y++) {
             try {
                 numberSring = driver.findElement(By.xpath(xpath));
             } catch (NoSuchElementException nsee) {
                 driver.navigate().refresh();
             }
+            x++;
         }
-        LOG.info("Кол-во обновлений страницы для получения телефона и SMS-кода::" + y);
+        LOG.info("Кол-во обновлений страницы для получения телефона и SMS-кода::" + x);
         if(numberSring != null && !numberSring.getText().isEmpty()) {
             String code = numberSring.getText().split(" - ")[1];
             driver.switchTo().window(currentHandle);

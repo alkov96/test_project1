@@ -1,7 +1,7 @@
 # language: ru
   Функционал: 1.Регистрация и авторизация.
 
-    @smoke
+    @regress
     @AuthenticationOnSiteAndExit_1
     Сценарий: Аутентификация на сайте и выход.
 
