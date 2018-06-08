@@ -3,12 +3,14 @@ package ru.gamble;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 import io.qameta.allure.Attachment;
+import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -46,18 +48,18 @@ public class CucumberTest {
             saveScreenshot(((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES));
         }
     };
-//
-//    @AfterClass
-//    public static void afterScenario(){
-//           WebDriver driver =  PageFactory.getWebDriver();
-//        if(PageFactory.getWebDriver().getWindowHandles().size() > 0) {
-//            LOG.info("Закрываем WebDriver");
-//            driver.quit();
-//            PageFactory.dispose();
-//        }else {
-//            LOG.info("WebDriver уже закрыт");
-//        }
-//    }
+
+    @AfterClass
+    public static void afterScenario(){
+           WebDriver driver =  PageFactory.getWebDriver();
+           try{
+               LOG.info("Закрываем WebDriver");
+               driver.quit();
+               PageFactory.dispose();
+           }catch (Exception e){
+               LOG.info("WebDriver уже закрыт");
+           }
+    }
 }
 
 

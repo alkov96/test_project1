@@ -120,7 +120,7 @@ public class PopUPLCPage extends AbstractPage {
     public void summWithdraw1() {
         WebDriver driver = PageFactory.getDriver();
         AuthenticationMainPage.rememberBalnce("рубли");
-        float balance1 = Stash.getValue("balanceKey");
+        float balance1 = Float.parseFloat(Stash.getValue("balanceKey"));
         int balance;
         balance = (int) balance1;
         withdraw_field.click();
@@ -223,7 +223,7 @@ public class PopUPLCPage extends AbstractPage {
 
         int sum = Integer.valueOf(min);
         int allowMax = Integer.valueOf(max);
-        float balanceF = Stash.getValue("balanceKey");
+        float balanceF = Float.parseFloat(Stash.getValue("balanceKey"));
         int balance = (int) balanceF;
         allowMax=Math.min(allowMax,balance); //сумму вывода можно увеличивать либо до ограничения на способе вывода, либо до достижения суммы баланса
         LOG.info("Максимальная сумма вывода, с учетом текущего баланса = " + allowMax);

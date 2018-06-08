@@ -23,6 +23,7 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
@@ -374,22 +375,11 @@ public abstract class AbstractPage extends Page {
 
             quickButton.click();
         }
-        float sumBet;
-        sumBet = sum.equals("больше баланса") ? (float) Stash.getValue("balanceKey") + 1 : Float.valueOf(sum);
-
-
-//от сюда
-        DecimalFormat formatter;
-
-        if (sumBet - (int) sumBet > 0.0)
-            formatter = new DecimalFormat("0.00"); //Here you can also deal with rounding if you wish..
-        else
-            formatter = new DecimalFormat("0");
-        String aa = formatter.format(sumBet);
-//и до сюда - это приведение экспонициального представления числа - в обычный вид. а то строчка вида "1.00571E5" - плохой вариант дл сумм ставки
-        coupon_field.clear();
-        coupon_field.sendKeys(aa);
-        Stash.put("sumKey", sumBet);
+        BigDecimal sumBet;
+        BigDecimal one = new BigDecimal(1);
+        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2).add(one): new BigDecimal(sum).setScale(2);
+        coupon_field.sendKeys(sumBet.toString());
+        Stash.put("sumKey", sumBet.toString());
     }
 
 

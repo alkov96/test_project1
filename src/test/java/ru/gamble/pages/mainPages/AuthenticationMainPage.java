@@ -46,10 +46,10 @@ public class AuthenticationMainPage extends AbstractPage {
         By top_balance = param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
         String key = param.equals("бонусов")?"balanceBonusKey":"balanceKey";
         if (getWebDriver().findElements(top_balance).isEmpty()) {
-            Stash.put(key,0f);
+            Stash.put(key,"0.00");
         }
         else {
-            float balance = Float.valueOf(getWebDriver().findElement(top_balance).getText());
+            String balance = getWebDriver().findElement(top_balance).getText();
             LOG.info("значение баланса: " + balance);
             Stash.put(key, balance);
         }
