@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(monochrome = true,
+@CucumberOptions(
+        monochrome = true,
         format ={"pretty"},
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},

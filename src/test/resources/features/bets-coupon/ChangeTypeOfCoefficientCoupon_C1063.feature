@@ -1,5 +1,5 @@
 # language: ru
-Функционал: 3.Ставки.
+Функционал: 3_Ставки
 
   @regress
   @ChangeTypeOfCoefficientCoupon_C1066

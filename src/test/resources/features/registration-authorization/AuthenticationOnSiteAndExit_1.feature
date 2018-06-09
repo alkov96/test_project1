@@ -1,5 +1,5 @@
 # language: ru
-  Функционал: 1.Регистрация и авторизация.
+  Функционал: 1_Регистрация и авторизация
 
     @regress
     @AuthenticationOnSiteAndExit_1

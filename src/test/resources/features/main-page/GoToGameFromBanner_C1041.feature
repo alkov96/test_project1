@@ -1,5 +1,5 @@
 # language: ru
-Функционал: 4.Главная страница.
+Функционал: 4_Главная страница
 
   @regress
   @GoToGameFromBanner_C1041

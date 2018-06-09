@@ -1,5 +1,5 @@
 # language: ru
-Функционал: 9.Футер.
+Функционал: 9_Футер
 
   @regress
   @CheckingWorkFooterInAllSections_C1058

@@ -1,5 +1,5 @@
 # language: ru
-Функционал: 3.Ставки.
+Функционал: 3_Ставки
 
   @smoke
   @ExpressBonus_C39773

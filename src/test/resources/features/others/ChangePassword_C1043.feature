@@ -1,5 +1,5 @@
 # language: ru
-Функционал: 10.Разное.
+Функционал: 10_Разное
 
   @regress
   @ChangePassword_C1043

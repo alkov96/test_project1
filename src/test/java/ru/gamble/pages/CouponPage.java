@@ -341,12 +341,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("Жмём Заключить пари");
         coupon_bet_button.click();
-        int time = 30;
-        try {
-            new WebDriverWait(driver, time).until(ExpectedConditions.invisibilityOfElementLocated(xpath("//*[contains(@class,'preloader__container')]")));
-        }catch (Exception e){
-            throw new AutotestError("Ошибка! Прелоадер не исчез в течение::"+ time + " сек.");
-        }
+        waitingForPreloadertoDisappear(60);
         if (!driver.findElement(By.cssSelector("div.bet-accepted-noification")).isDisplayed()) {
             LOG.warn("Сообщение об успешной ставке не найдено");
         }
