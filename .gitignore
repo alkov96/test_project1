@@ -55,12 +55,8 @@ fabric.properties
 page_factory.iml
 src/main/
 target/
-/src/test/resources/webdrivers/chromedriver/chromedriver.exe
-/src/test/resources/webdrivers/chromedriver/chromedriver
+
 Would skip repository autotest888/
-src/test/resources/webdrivers/chromedriver/chromedriver
-/webdrivers/
-webdrivers/
 /src/test/resources/config/
 allure-results/
 ####
