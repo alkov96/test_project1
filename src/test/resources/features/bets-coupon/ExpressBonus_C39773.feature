@@ -2,7 +2,6 @@
 Функционал: 3.Ставки.
 
   @smoke
-  @regress
   @ExpressBonus_C39773
 
   @correct

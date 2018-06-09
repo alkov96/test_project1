@@ -11,7 +11,6 @@
     * генерим email в "EMAIL"
 
   @smoke
-  @regress
   @NewUserRegistration_C36189
   Сценарий: Регистрация нового пользователя.
 
