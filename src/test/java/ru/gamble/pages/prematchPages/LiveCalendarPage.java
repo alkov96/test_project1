@@ -70,7 +70,7 @@ public class LiveCalendarPage extends AbstractPage {
             } else {
                 tryPage++;
                 allDaysPages.get(tryPage).click();
-                workWithPreloader();
+                waitingForPreloadertoDisappear(10);
             }
         }
         allDaysPages.get(0).click();

@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.openqa.selenium.By.xpath;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.RANDOM;
 import static ru.gamble.utility.Generators.randomString;
@@ -448,6 +449,15 @@ public abstract class AbstractPage extends Page {
     public void clearCoupon(){
         if (clearCoupon.isDisplayed()){
             clearCoupon.click();
+        }
+    }
+
+    public void waitingForPreloadertoDisappear(int timeInSeconds){
+        WebDriver driver = PageFactory.getWebDriver();
+        try {
+            new WebDriverWait(driver, timeInSeconds).until(ExpectedConditions.invisibilityOfElementLocated(xpath("//*[contains(@class,'preloader__container')]")));
+        }catch (Exception e){
+            throw new AutotestError("Ошибка! Прелоадер не исчез в течение::"+ timeInSeconds + " сек.");
         }
     }
 }
