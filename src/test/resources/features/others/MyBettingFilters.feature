@@ -1,5 +1,6 @@
-# language: ru
-Функционал: 10.Разное.
+#language: ru
+Свойство: .MyBettingFilters
+Функционал: 10.Разное
 
   @regress
   @MyBettingFilters

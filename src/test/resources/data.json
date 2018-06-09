@@ -1,7 +1,7 @@
 {
   "site1": {
     "mainurl": "https://dev-bk-bet-site1.tsed.orglot.office/",
-    "registrationUrl": "http://dev-bk-bet-site1.tsed.orglot.office/test_registration/",
+    "registrationUrl": "https://dev-bk-bet-site1.tsed.orglot.office/test_registration/",
     "login": "regfordepoit@mailinator.com",
     "password": "Parol123"
   },

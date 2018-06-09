@@ -213,6 +213,7 @@ public class UserAccountPage extends AbstractPage{
                 driver.navigate().refresh();
             }
             x++;
+            if (numberSring != null){break;}
         }
         LOG.info("Кол-во обновлений страницы для получения телефона и SMS-кода::" + x);
         if(numberSring != null && !numberSring.getText().isEmpty()) {
