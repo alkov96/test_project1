@@ -21,6 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class MyBetting extends AbstractPage {
     private WebElement pageTitle;
 
     @ElementTitle("Фильтр по типу пари")
-    @FindBy(xpath = "//*[@class='input888wrpr']//custom-select")
+    @FindBy(xpath = "//*[@class='input888wrpr']//custom-select/div")
     private WebElement filterByTypeOfBid;
 
     @ElementTitle("Фильтр по дате пари")
@@ -75,6 +76,7 @@ public class MyBetting extends AbstractPage {
         List<WebElement> dates = PageFactory.getWebDriver().findElements(By.xpath("//span[contains(@class,'datapicker__form-text')]"));
         Date firstDate, lastDate, bidDate;
         SimpleDateFormat formatter1 = new SimpleDateFormat("dd.MM.yyyy");
+        Calendar calendar = Calendar.getInstance();
 
         LOG.info("Нашли датапикеров::" + dates.size());
 
@@ -82,10 +84,15 @@ public class MyBetting extends AbstractPage {
         List<WebElement> rows = PageFactory.getWebDriver().findElements(By.xpath("//tr[contains(@class,'showBetInfo ')]"));
         LOG.info("Всего ставок::" + rows.size());
         LOG.info("Проверяем, что даты ставок попадают в диапазон");
-
         try {
             firstDate = formatter1.parse(dates.get(0).getText());
             lastDate = formatter1.parse(dates.get(1).getText());
+            //***Преоборазуем дату из dd.MM.yy 00:00 в dd.MM.yy 23:59
+            calendar.setTime(lastDate);
+            calendar.add(Calendar.SECOND, 86399);
+            lastDate = calendar.getTime();
+            //***
+
             LOG.info("Дата на левом датапикере::" + firstDate.toString());
             LOG.info("Дата на правом датапикере::" + lastDate.toString());
             if(rows.size() > 0) {
@@ -117,8 +124,11 @@ public class MyBetting extends AbstractPage {
             typeOfOutcome = table.get(i).get("Тип пари");
             betType = table.get(i).get("Выбранный исход");
 
-            LOG.info("Открываем фильтр по типу пари.");
-            filterByTypeOfBid.click();
+            if(!filterByTypeOfBid.getAttribute("class").contains("expanded")){
+                LOG.info("Открываем фильтр по типу пари.");
+                filterByTypeOfBid.click();
+            }
+
             LOG.info("Выбираем тип::" + typeOfOutcome);
             filterByTypeOfBid.findElement(By.xpath("//custom-select//div/span[contains(.,'" + typeOfOutcome + "')]")).click();
             workWithPreloader();
@@ -131,12 +141,20 @@ public class MyBetting extends AbstractPage {
             List<WebElement> subIvens;
             if(rows.size() > 0) {
                 for (WebElement row : rows) {
-                        selectedOutcome = row.findElement(By.xpath("./td[5]/div")).getText();
-                        assertThat(selectedOutcome)
-                                .as("Ошибка! Текст [" + selectedOutcome + "] не соответсвует [" + betType + "]").contains(betType);
+//                        selectedOutcome = row.findElement(By.xpath(".//tr[@class='table-inner__row']/td[2]/div")).getText();
+                        selectedOutcome = row.findElement(By.xpath(".//tr[contains(@class,'table')]/td[2]")).getText();
+
+                        if(betType.contains("!")){
+                            assertThat(selectedOutcome).doesNotContain("Система");
+                            assertThat(selectedOutcome).doesNotContain("Экспресс");
+                        }else {
+                            assertThat(selectedOutcome)
+                                    .as("Ошибка! Текст [" + selectedOutcome + "] не соответсвует [" + betType + "]").contains(betType);
+                        }
                         LOG.info("Текст [" + selectedOutcome + "] соответсвует [" + betType + "]");
                         if(selectedOutcome.contains("Экспресс") || selectedOutcome.contains("Система")){
-                            subIvens = row.findElements(By.xpath("//tr[contains(@class,'table-inner__row')]"));
+//                            subIvens = row.findElements(By.xpath("//tr[contains(@class,'table-inner__row')]"));
+                            subIvens = row.findElements(By.xpath(".//div//tr[contains(@class,'table-inner__row')]"));
                             if(subIvens.size() > 1){ subIvens.remove(0);} //Здесь удаляем мусорную строку
                             assertThat(subIvens.size())
                                     .as("Ошибка! В типе пари [" + typeOfOutcome + "] меньше чем " + subIvens.size() + " пари").isGreaterThan(1);
@@ -149,11 +167,11 @@ public class MyBetting extends AbstractPage {
                 LOG.info("Ни одного пари не найдено, нечего проверять.");
             }
 
-            LOG.info("Закрываем фильтр по типу пари.");
-            filterByTypeOfBid.click();
+            if(filterByTypeOfBid.getAttribute("class").contains("expanded")){
+                LOG.info("Закрываем фильтр по типу пари.");
+                filterByTypeOfBid.click();
+            }
         }
-
-
 
     }
 
