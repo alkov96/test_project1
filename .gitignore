@@ -61,6 +61,5 @@ Would skip repository autotest888/
 allure-results/
 ####
 chromedriver.exe
-chromedriver.exe
 webdrivers\
-chromedriver.exe
+
