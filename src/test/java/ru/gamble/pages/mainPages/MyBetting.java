@@ -141,9 +141,7 @@ public class MyBetting extends AbstractPage {
             List<WebElement> subIvens;
             if(rows.size() > 0) {
                 for (WebElement row : rows) {
-//                        selectedOutcome = row.findElement(By.xpath(".//tr[@class='table-inner__row']/td[2]/div")).getText();
                         selectedOutcome = row.findElement(By.xpath(".//tr[contains(@class,'table')]/td[2]")).getText();
-
                         if(betType.contains("!")){
                             assertThat(selectedOutcome).doesNotContain("Система");
                             assertThat(selectedOutcome).doesNotContain("Экспресс");
@@ -153,7 +151,7 @@ public class MyBetting extends AbstractPage {
                         }
                         LOG.info("Текст [" + selectedOutcome + "] соответсвует [" + betType + "]");
                         if(selectedOutcome.contains("Экспресс") || selectedOutcome.contains("Система")){
-//                            subIvens = row.findElements(By.xpath("//tr[contains(@class,'table-inner__row')]"));
+                            LOG.info("Проверяем что в [" + selectedOutcome + "] больше одного события");
                             subIvens = row.findElements(By.xpath(".//div//tr[contains(@class,'table-inner__row')]"));
                             if(subIvens.size() > 1){ subIvens.remove(0);} //Здесь удаляем мусорную строку
                             assertThat(subIvens.size())
@@ -172,7 +170,5 @@ public class MyBetting extends AbstractPage {
                 filterByTypeOfBid.click();
             }
         }
-
     }
-
 }
