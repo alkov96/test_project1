@@ -60,3 +60,7 @@ Would skip repository autotest888/
 /src/test/resources/config/
 allure-results/
 ####
+chromedriver.exe
+chromedriver.exe
+webdrivers\
+chromedriver.exe
