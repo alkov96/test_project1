@@ -112,7 +112,7 @@ public abstract class AbstractPage extends Page {
     @ActionTitle("закрываем браузер")
     public static void closeBrowser() {
         PageFactory.dispose();
-        LOG.info("Браузер закрыт");
+        LOG.info("Браузер закрыт\n");
     }
 
     /**

@@ -78,9 +78,9 @@ public class CommonStepDefs extends GenericStepDefs {
         try{
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
-            LOG.info("Найдено прелоадеров::" + preloaders.size() + "\n");
+            LOG.info("Найдено прелоадеров::" + preloaders.size());
             driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
-            LOG.info("Прелоадеры закрылись\n");
+            LOG.info("Прелоадеры закрылись");
         }catch (TimeoutException te){
         }
     }
@@ -111,7 +111,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 PageFactory.getWebDriver().get(site);
                 break;
         }
-        LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl());
+        LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl()+"\n");
 
     }
 
