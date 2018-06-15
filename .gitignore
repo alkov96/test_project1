@@ -59,6 +59,5 @@ target/
 Would skip repository autotest888/
 /src/test/resources/config/
 allure-results/
-###
 
 
