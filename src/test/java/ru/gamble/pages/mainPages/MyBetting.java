@@ -43,9 +43,9 @@ public class MyBetting extends AbstractPage {
     @FindBy(xpath = "//*[@class='input888wrpr']//custom-select/div")
     private WebElement filterByTypeOfBid;
 
-    @ElementTitle("Фильтр по дате пари")
+
     @FindBy(xpath = "//div[contains(@class,'input888wrpr')]")
-    private WebElement filterByDateOfBid;
+    private WebElement buttonFilterByTypeOfBid;
 
     public MyBetting() {
         WebDriver driver = PageFactory.getDriver();
@@ -61,14 +61,14 @@ public class MyBetting extends AbstractPage {
         List<String> data = dataTable.asList(String.class);
 
         LOG.info("Открываем фильтр по типу пари.");
-        filterByDateOfBid.click();
+        buttonFilterByTypeOfBid.click();
         new WebDriverWait(driver,2);
-        String actual = filterByDateOfBid.getText().replaceAll("\n", " ").toLowerCase();
+        String actual =  buttonFilterByTypeOfBid.getText().replaceAll("\n", " ").toLowerCase();
         for(String existed: data){
             assertThat(actual).as("Строка [" + actual + "] не соответсвует [" + existed + "]").contains(existed);
         }
         LOG.info("Закрываем фильтр по типу пари.");
-        filterByDateOfBid.click();
+        buttonFilterByTypeOfBid.click();
     }
 
     @ActionTitle("проверяет попадание ставок в диапазон дат")
