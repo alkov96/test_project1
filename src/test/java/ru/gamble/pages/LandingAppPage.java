@@ -1,5 +1,6 @@
 package ru.gamble.pages;
 
+import cucumber.api.java.mn.Харин;
 import cucumber.runtime.junit.Assertions;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -26,6 +27,9 @@ import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.openqa.selenium.By.xpath;
 
@@ -106,5 +110,67 @@ public class LandingAppPage extends AbstractPage {
 
         LOG.info("Закрытие попапа на скачивание приложения");
         driver.findElement(By.id("app_desctop_popup_close")).click();
+
+    }
+
+    @ActionTitle("проверка блока %Все как любите")
+    public void checkBlockAsULike() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        int x,y;
+        boolean flag = true;
+        y=driver.findElement(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]")).getLocation().getY()-100;
+        x=driver.findElement(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]")).getLocation().getX()-100;
+        CommonStepDefs.scrollPage(x,y);
+        List<WebElement> links = driver.findElements(xpath("//div[@class='m-landing__inner-block-text-p-links']/p"));//список всех ссылок
+        List <WebElement> images = driver.findElements(xpath("//div[contains(@class,'js-parallaxed-block2_fast')]/img[@class]"));//список картинок
+
+        for (int count=0;count<links.size();count++){
+            LOG.info("Переходим на пункт "+(count+1));
+            links.get(count).click();
+            Thread.sleep(500);
+            if (!links.get(count).getAttribute("class").contains("active")){
+                int currentLink = driver.findElements(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]/preceding-sibling::p")).size() + 1;
+                flag=false;
+                Assert.fail("Нажали на пункт №" + (count+1) + " в блоке Все как любите, но на этот пункт не было перехода. Вместо этого активен пункт №" + currentLink);
+            }
+            if(!images.get(count).getAttribute("class").contains("active")){
+                int currentImg = driver.findElements(xpath("//div[contains(@class,'js-parallaxed-block2_fast')]/img[contains(@class,'active')]/preceding-sibling::img[@class]")).size() + 1;
+                flag=false;
+                Assert.fail("Нажали на пункт №" + (count+1) + " в блоке Все как любите, но картинка не изменилась. Вмсето этого активна картинка №" + currentImg);
+            }
+        }
+
+    }
+
+    @ActionTitle("проверка того, что все нужные картинки прогрузились и есть футер")
+    public void picsAndFooter(){
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        List<String> waitingImg = Arrays.asList (
+                "ipad_screen1.png",
+                "ipad_screen6.png",
+                "ipad_screen2.png",
+                "man2.png",
+                "man3.png",
+                "phone_3.png",
+                "woman.png",
+                "phone_1.png",
+                "man1.png",
+                "ipad.png",
+                "ipad_screen5.png"
+        );
+        List<String> allImg=new ArrayList<>();
+        driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> allImg.add(element.getAttribute("src").replace("https://dev-bk-bet-site1.tsed.orglot.office/images/landing/mobile_app/","")));
+        if (!allImg.containsAll(waitingImg)){
+            flag=false;
+            Assert.fail("Не все картинки прогрузились. На сайте есть следующие картинки " + allImg);
+        }
+
+        if (driver.findElements(xpath("//div[contains(@class,'footer')]")).isEmpty()){
+            flag=false;
+            Assert.fail("Нет футера");
+        }
     }
 }
+
+
