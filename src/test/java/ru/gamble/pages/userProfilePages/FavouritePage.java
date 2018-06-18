@@ -169,7 +169,7 @@ public class FavouritePage extends AbstractPage {
     @ActionTitle("проверяет что в избранном все нужные игры")
     public void checkFavourite(){
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> allMyGames = driver.findElements(By.xpath("//*[@id='elected']/..//div[@class='elected ng-isolate-scope']"));
+        List<WebElement> allMyGames =  driver.findElements(By.xpath("//*[@id='elected']/..//div[contains(@class,'elected-box ng-scope')]/div"));
         List<String> names = Stash.getValue("nameGameKey");
         List<String> teams = new ArrayList<>();
         names.forEach(name->teams.add(CommonStepDefs.stringParse(name)));
