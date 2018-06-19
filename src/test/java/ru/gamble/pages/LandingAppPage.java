@@ -209,6 +209,59 @@ public class LandingAppPage extends AbstractPage {
         flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")), linkNDFL);
     }
 
+    @ActionTitle("отправляет СМС со страницы лэндинга")
+    public void sendSMS() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        int x, y;
+        WebElement inputPhone=driver.findElement(By.id("app_desctop_sms_block_input_phone"));
+        WebElement sendPhone=driver.findElement(By.id("app_desctop_sms_block_btn_send"));
+        x=inputPhone.getLocation().getX()-100;
+        y=inputPhone.getLocation().getY()-100;
+        CommonStepDefs.scrollPage(x,y);
+
+        int phone=1000000+(int) (Math.random()*8999999);
+        String hint;
+        for (int num=0; num<3;num++) {
+            inputPhone.clear();
+            inputPhone.sendKeys("999" + phone);
+
+            LOG.info("Отправили смс на номер +7999"+phone);
+            sendPhone.click();
+            Thread.sleep(1000);
+            hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
+            if (!hint.contains("Мы отправили вам ссылку на скачивание")) {
+                flag = false;
+                Assert.fail("После отпраки смс текст подскази не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
+            }
+            int count = 0;
+            while (!sendPhone.isEnabled() && count != 10) {
+                Thread.sleep(1000);
+                count++;
+                if (count == 10) {
+                    flag = false;
+                    Assert.fail("Спустя 10 секунд после отправки смс кнопка Отправить не стала снова активной");
+                }
+            }
+        }
+        inputPhone.clear();
+        inputPhone.sendKeys("999" + phone);
+        LOG.info("пытаемся четвертый раз отправить смс на номер +7999"+phone);
+        sendPhone.click();
+        Thread.sleep(1000);
+        hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
+        if (!hint.contains("Ошибка. Повторите попытку через 24 часа")) {
+            flag = false;
+            Assert.fail("После отпраки 3 смс текст подскази не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
+        }
+        else LOG.info("Подсказка с ошибкой появилась.");
+
+        Thread.sleep(9000);
+        if (sendPhone.isEnabled()){
+            flag=false;
+            Assert.fail("После отправки 3 смс кнопка отправить незаблокирована");
+        }
+    }
 }
 
 
