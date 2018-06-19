@@ -16,18 +16,13 @@
         <dependency>
             <groupId>ru.sbtqa.tag</groupId>
             <artifactId>page-factory</artifactId>
-            <version>1.10.0</version>
+            <version>1.11.1</version>
         </dependency>
         <dependency>
             <groupId>ru.sbtqa.tag.datajack.adaptors</groupId>
             <artifactId>datajack-json-adaptor</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>io.qameta.allure</groupId>-->
-            <!--<artifactId>allure-cucumber-jvm</artifactId>-->
-            <!--<version>2.6.0</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber2-jvm</artifactId>
