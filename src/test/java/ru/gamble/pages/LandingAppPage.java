@@ -116,37 +116,37 @@ public class LandingAppPage extends AbstractPage {
     @ActionTitle("проверка блока %Все как любите")
     public void checkBlockAsULike() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        int x,y;
+        int x, y;
         boolean flag = true;
-        y=driver.findElement(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]")).getLocation().getY()-100;
-        x=driver.findElement(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]")).getLocation().getX()-100;
-        CommonStepDefs.scrollPage(x,y);
+        y = driver.findElement(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]")).getLocation().getY() - 100;
+        x = driver.findElement(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]")).getLocation().getX() - 100;
+        CommonStepDefs.scrollPage(x, y);
         List<WebElement> links = driver.findElements(xpath("//div[@class='m-landing__inner-block-text-p-links']/p"));//список всех ссылок
-        List <WebElement> images = driver.findElements(xpath("//div[contains(@class,'js-parallaxed-block2_fast')]/img[@class]"));//список картинок
+        List<WebElement> images = driver.findElements(xpath("//div[contains(@class,'js-parallaxed-block2_fast')]/img[@class]"));//список картинок
 
-        for (int count=0;count<links.size();count++){
-            LOG.info("Переходим на пункт "+(count+1));
+        for (int count = 0; count < links.size(); count++) {
+            LOG.info("Переходим на пункт " + (count + 1));
             links.get(count).click();
             Thread.sleep(500);
-            if (!links.get(count).getAttribute("class").contains("active")){
+            if (!links.get(count).getAttribute("class").contains("active")) {
                 int currentLink = driver.findElements(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]/preceding-sibling::p")).size() + 1;
-                flag=false;
-                Assert.fail("Нажали на пункт №" + (count+1) + " в блоке Все как любите, но на этот пункт не было перехода. Вместо этого активен пункт №" + currentLink);
+                flag = false;
+                Assert.fail("Нажали на пункт №" + (count + 1) + " в блоке Все как любите, но на этот пункт не было перехода. Вместо этого активен пункт №" + currentLink);
             }
-            if(!images.get(count).getAttribute("class").contains("active")){
+            if (!images.get(count).getAttribute("class").contains("active")) {
                 int currentImg = driver.findElements(xpath("//div[contains(@class,'js-parallaxed-block2_fast')]/img[contains(@class,'active')]/preceding-sibling::img[@class]")).size() + 1;
-                flag=false;
-                Assert.fail("Нажали на пункт №" + (count+1) + " в блоке Все как любите, но картинка не изменилась. Вмсето этого активна картинка №" + currentImg);
+                flag = false;
+                Assert.fail("Нажали на пункт №" + (count + 1) + " в блоке Все как любите, но картинка не изменилась. Вмсето этого активна картинка №" + currentImg);
             }
         }
 
     }
 
     @ActionTitle("проверка того, что все нужные картинки прогрузились и есть футер")
-    public void picsAndFooter(){
+    public void picsAndFooter() {
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
-        List<String> waitingImg = Arrays.asList (
+        List<String> waitingImg = Arrays.asList(
                 "ipad_screen1.png",
                 "ipad_screen6.png",
                 "ipad_screen2.png",
@@ -159,16 +159,107 @@ public class LandingAppPage extends AbstractPage {
                 "ipad.png",
                 "ipad_screen5.png"
         );
-        List<String> allImg=new ArrayList<>();
-        driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> allImg.add(element.getAttribute("src").replace("https://dev-bk-bet-site1.tsed.orglot.office/images/landing/mobile_app/","")));
-        if (!allImg.containsAll(waitingImg)){
-            flag=false;
+        List<String> allImg = new ArrayList<>();
+        driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> allImg.add(element.getAttribute("src").replace("https://dev-bk-bet-site1.tsed.orglot.office/images/landing/mobile_app/", "")));
+        if (!allImg.containsAll(waitingImg)) {
+            flag = false;
             Assert.fail("Не все картинки прогрузились. На сайте есть следующие картинки " + allImg);
         }
 
-        if (driver.findElements(xpath("//div[contains(@class,'footer')]")).isEmpty()){
-            flag=false;
+        if (driver.findElements(xpath("//div[contains(@class,'footer')]")).isEmpty()) {
+            flag = false;
             Assert.fail("Нет футера");
+        }
+    }
+
+    @ActionTitle("смотрит ссылку на правила про фрибет")
+    public void linkFreeBet() {
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        int x, y;
+        y = driver.findElement(By.id("app_desctop_freebet_block_btn")).getLocation().getY() - 100;
+        x = driver.findElement(By.id("app_desctop_freebet_block_btn")).getLocation().getX() - 100;
+        CommonStepDefs.scrollPage(x, y);
+        String linkFreeBet = driver.findElement(By.id("app_desctop_freebet_block_btn")).getAttribute("href");
+        flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_freebet_block_btn")), linkFreeBet);
+        LOG.info("Ссылка на фрибет работает");
+    }
+
+    @ActionTitle("смотрит ссылку на правила про выплаты выигрышей")
+    public void linkForPrize() {
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        int x, y;
+        y = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getLocation().getY() - 100;
+        x = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getLocation().getX() - 100;
+        CommonStepDefs.scrollPage(x, y);
+        String linkWithdraw = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getAttribute("href");
+        flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_warranty")), linkWithdraw);
+    }
+
+    @ActionTitle("смотрит ссылку на правила про НДФЛ")
+    public void linkForNDFL() {
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        int x, y;
+        y = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getLocation().getY() - 100;
+        x = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getLocation().getX() - 100;
+        CommonStepDefs.scrollPage(x, y);
+        String linkNDFL = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getAttribute("href");
+        flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")), linkNDFL);
+    }
+
+    @ActionTitle("отправляет СМС со страницы лэндинга")
+    public void sendSMS() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        int x, y;
+        WebElement inputPhone=driver.findElement(By.id("app_desctop_sms_block_input_phone"));
+        WebElement sendPhone=driver.findElement(By.id("app_desctop_sms_block_btn_send"));
+        x=inputPhone.getLocation().getX()-100;
+        y=inputPhone.getLocation().getY()-100;
+        CommonStepDefs.scrollPage(x,y);
+
+        int phone=1000000+(int) (Math.random()*8999999);
+        String hint;
+        for (int num=0; num<3;num++) {
+            inputPhone.clear();
+            inputPhone.sendKeys("999" + phone);
+
+            LOG.info("Отправили смс на номер +7999"+phone);
+            sendPhone.click();
+            Thread.sleep(1000);
+            hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
+            if (!hint.contains("Мы отправили вам ссылку на скачивание")) {
+                flag = false;
+                Assert.fail("После отпраки смс текст подскази не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
+            }
+            int count = 0;
+            while (!sendPhone.isEnabled() && count != 10) {
+                Thread.sleep(1000);
+                count++;
+                if (count == 10) {
+                    flag = false;
+                    Assert.fail("Спустя 10 секунд после отправки смс кнопка Отправить не стала снова активной");
+                }
+            }
+        }
+        inputPhone.clear();
+        inputPhone.sendKeys("999" + phone);
+        LOG.info("пытаемся четвертый раз отправить смс на номер +7999"+phone);
+        sendPhone.click();
+        Thread.sleep(1000);
+        hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
+        if (!hint.contains("Ошибка. Повторите попытку через 24 часа")) {
+            flag = false;
+            Assert.fail("После отпраки 3 смс текст подскази не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
+        }
+        else LOG.info("Подсказка с ошибкой появилась.");
+
+        Thread.sleep(9000);
+        if (sendPhone.isEnabled()){
+            flag=false;
+            Assert.fail("После отправки 3 смс кнопка отправить незаблокирована");
         }
     }
 }
