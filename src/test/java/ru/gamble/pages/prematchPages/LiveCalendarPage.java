@@ -93,6 +93,7 @@ public class LiveCalendarPage extends AbstractPage {
      */
     @ActionTitle("добавляет ставки из разных событий в количестве")
     public void addToCouponDifferentBets(String param){
+        String xpathCoefficient = "//preceding-sibling::td[contains(@class,'livecal-table__col_event')]";
         //  List<WebElement> coefficients = driver.findElements(By.cssSelector("td.table__body-cell.livecal-table__col_1"));WebDriver driver = PageFactory.getDriver();
         WebDriver driver = PageFactory.getDriver();
      //   List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/../.."));
@@ -112,7 +113,9 @@ public class LiveCalendarPage extends AbstractPage {
             LOG.info("num = " + num);
             if (coefficients.get(num).isDisplayed()) {
                 coefficients.get(num).click();
-                LOG.info(coefficients.get(num).findElement(By.xpath("preceding-sibling::td[contains(@class,'livecal-table__col_event')]")).getText());
+                LOG.info("Ожидаем прогрузки коеффициента.");
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathCoefficient)));
+                LOG.info(coefficients.get(num).findElement(By.xpath(xpathCoefficient)).getText());
                 coefficients.remove(num);
                 count++;
             }
