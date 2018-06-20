@@ -339,15 +339,18 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("заключает пари")
     public void doBet() throws AuthenticationException {
         WebDriver driver = PageFactory.getDriver();
+        String xpath = "//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]";
         LOG.info("Жмём Заключить пари");
         coupon_bet_button.click();
-        waitingForPreloadertoDisappear(60);
+        waitingForPreloadertoDisappear(120);
+
         if (!driver.findElement(By.cssSelector("div.bet-accepted-noification")).isDisplayed()) {
             LOG.warn("Сообщение об успешной ставке не найдено");
         }
+        LOG.info("Ожидаем исчезновения из купона принятых ставок");
+        new WebDriverWait(driver, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xpath)));
 
-
-        if (driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]")).size() != 0) {
+        if (driver.findElements(By.xpath(xpath)).size() != 0) {
             throw new AuthenticationException("Ошибка! Принялись не все ставки.");
         }
     }
