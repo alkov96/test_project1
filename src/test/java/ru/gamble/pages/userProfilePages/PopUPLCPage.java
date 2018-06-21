@@ -51,6 +51,10 @@ public class PopUPLCPage extends AbstractPage {
     @FindBy(id = "log-out-button")
     private WebElement exitButton;
 
+    @ElementTitle("История операций")
+    @FindBy(id = "history")
+    private WebElement history;
+
     @ElementTitle("Личный кабинет")
     @FindBy(id = "user-profile")
     private WebElement profileButton;
