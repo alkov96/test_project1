@@ -50,14 +50,18 @@ public class EnterPage extends AbstractPage {
                 new HtmlElementLocatorFactory(driver)), this);
         for(int j = 0; j < 10; j++) {
             try {
-              //  new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(enterButton));
                 new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(inputLogin));
                 if (enterButton.isDisplayed()) {
                     break;
                 }
             } catch (Exception e){
                 driver.navigate().refresh();
-                driver.findElement(By.id("log-in")).click();
+                try {
+                    new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("log-in")));
+                    driver.findElement(By.id("log-in")).click();
+                }catch (Exception e1) {
+                    new AutotestError("Ошибка! На Главной странице не нашлась кнопка 'ВХОД'.");
+                }
             }
             if(j >= 9){
                 throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");

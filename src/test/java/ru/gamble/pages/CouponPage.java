@@ -100,8 +100,8 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(coupon,10);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
+        tryingLoadPage(coupon,10, 5);
+       // new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
     }
 
     @ActionTitle("убирает события из купона, пока их не станет")
@@ -298,10 +298,16 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("выбирает тип ставки")
     public void selectTypeBet(String type) {
         WebDriver driver = PageFactory.getDriver();
+        String typeBetXpath = "//div[contains(@class,'bs-type-switcher__title')]";
         type = type.toLowerCase();
         if (driver.findElements(By.xpath("//div[@class='bs-type-switcher open']")).isEmpty()) {//если переключатель типа ставки не открыт - открываем
             LOG.info("Жмём на переключатель типов ставок");
-            driver.findElement(By.xpath("//div[contains(@class,'bs-type-switcher__title')]")).click();
+            try {
+                new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(typeBetXpath)));
+                driver.findElement(By.xpath(typeBetXpath)).click();
+            }catch (Exception e){
+                new AutotestError("ОШИБКА! Не смогли нажать на переключатель типов ставок.");
+            }
         }
         WebElement selectType = driver.findElement(By.xpath("//li[contains(translate(text(),'ЯЧСМИТЬБЮФЫВАПРОЛДЖЭЙЦУКЕНГШЩЗХЪ', 'ячсмитьбюфывапролджэйцукенгшщзхъ'),'" + type + "')]"));
         //driver.findElement(By.xpath("//li[contains(@class,'open-type-switcher__item') and contains(lower-case(text()),'"+type+"')]"));

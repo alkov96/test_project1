@@ -81,7 +81,8 @@ public class DayEventsPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String team2 = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[1]")).getAttribute("title");//Сохраняем название команды2 на банере
         String team1 = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[1]/span[1]")).getAttribute("title");//Сохраняем название команды1 на банере
-        float coef = Float.valueOf(driver.findElement(By.xpath("//div[@class='event-widget-coef__item' and contains(@ng-click,'P2')]/span[2]")).getText());
+        float coef = Float.valueOf(driver.findElement(By.xpath("//div[@class='event-widget-coef__item' and contains(@ng-click,'W2')]/span[2]")).getText());
+        driver.findElements(By.xpath("//span[contains (@class,'event-widget-coef')]"));
         Stash.put("team1key", team1);
         Stash.put("team2key", team2);
         Stash.put("ishodKey", team2);

@@ -571,7 +571,7 @@ public class PopUPLCPage extends AbstractPage {
         CommonStepDefs.workWithPreloader();
         Thread.sleep(2000);
         LOG.info("Открываем попап через кнопку #Внести депозит#");
-        driver.findElement(By.xpath("//*[@id='private_panel']//button[contains(@ng-click,'depositInit()')]")).click();
+        driver.findElement(By.xpath("//*[@id='private_panel']//button[contains(.,'Внести депозит')]")).click();
         WebElement field = Stash.getValue("fieldKey");
         int sumField = Stash.getValue("sumFieldKey");
         Thread.sleep(1000);

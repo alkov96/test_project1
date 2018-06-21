@@ -30,7 +30,7 @@ public class LiveViewPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(pageTitle,10);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        tryingLoadPage(pageTitle,10, 5);
+        //new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 }

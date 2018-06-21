@@ -35,8 +35,8 @@ public class MainBannerPage extends AbstractPage{
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(dotsOnBanner,10);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(dotsOnBanner));
+        tryingLoadPage(dotsOnBanner,5, 10);
+        //new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(dotsOnBanner));
     }
 
 @ActionTitle("запоминает состояние главного баннера")

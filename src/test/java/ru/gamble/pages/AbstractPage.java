@@ -149,14 +149,14 @@ public abstract class AbstractPage extends Page {
         myDynamicElement.click();
     }
 
-    public void tryingLoadPage(WebElement element, int count) {
+    public void tryingLoadPage(WebElement element, int count, int waitSeconds) {
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("");
         LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
 
         for (int j = 0; j < count; j++) {
             try {
-                new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(element));
+                new WebDriverWait(PageFactory.getDriver(), waitSeconds).until(ExpectedConditions.visibilityOf(element));
                 break;
             } catch (Exception e) {
                 driver.navigate().refresh();

@@ -74,7 +74,7 @@ public class CommonStepDefs extends GenericStepDefs {
     // Ожидание появления элемента на странице
     public static void waitShowElement(By by){
         WebDriver driver = PageFactory.getWebDriver();
-        WebDriverWait driverWait = new WebDriverWait(driver,2, 250);
+        WebDriverWait driverWait = new WebDriverWait(driver,3, 250);
         try{
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
@@ -430,8 +430,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-
-
     /**
      * открытие новой вкладки по адресу URl из входного параметра
      * @param newUrl - URl, который нужноввести в этой новой вкладке
@@ -466,7 +464,5 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (org.openqa.selenium.StaleElementReferenceException e) {
             LOG.error(""+e);
         }
-
     }
-
 }
