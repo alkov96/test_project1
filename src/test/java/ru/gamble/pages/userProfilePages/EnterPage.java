@@ -50,7 +50,8 @@ public class EnterPage extends AbstractPage {
                 new HtmlElementLocatorFactory(driver)), this);
         for(int j = 0; j < 10; j++) {
             try {
-                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(enterButton));
+              //  new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(enterButton));
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(inputLogin));
                 if (enterButton.isDisplayed()) {
                     break;
                 }

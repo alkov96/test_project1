@@ -100,6 +100,7 @@ public class PassportDataPage extends AbstractPage {
     public void fillsPassportDate(DataTable dataTable){
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String serial, number, whoIssued, unitCode, sex, placeOfBirth, house, building, block, flat;
+        String wrongAddressXpath = "//div[@class='message-error']/div[contains(.,'Неправильный адрес')]";
 
         serial = (data.get(SERIAL).equals(RANDOM))? Generators.randomNumber(4): data.get(SERIAL);
         LOG.info("Заполняем серию паспорта::" + serial);
@@ -133,37 +134,43 @@ public class PassportDataPage extends AbstractPage {
         placeOfBirth = (data.get(PLACEOFBIRTH).equals(RANDOM))? Generators.randomCity() : data.get(PLACEOFBIRTH);
         LOG.info("Заполняем место рождения::" + placeOfBirth);
         fillField(placeOfBirthInput,placeOfBirth);
+        for(int g = 0; g < 10; g++ ) {
+            if (data.get(REGION).equals(TRUE)) {
+                LOG.info("Регион");
+                fillAddress(regionInput, true);
+            }
 
-        if(data.get(REGION).equals(TRUE)){
-            LOG.info("Регион");
-            fillAddress(regionInput, true);
+            if (data.get(LOCALITY).equals(TRUE)) {
+                LOG.info("Населённый пункт");
+                fillAddress(cityInput, true);
+            }
+
+            if (data.get(STREET).equals(TRUE)) {
+                LOG.info("Улица");
+                fillAddress(streetInput, true);
+            }
+
+            house = (data.get(HOUSE).equals(RANDOM)) ? Generators.randomNumber(3) : data.get(HOUSE);
+            LOG.info("Заполняем Дом/владение::" + house);
+            fillField(houseInput, house);
+
+            building = (data.get(BUILDING).equals(RANDOM)) ? Generators.randomNumber(2) : data.get(BUILDING);
+            LOG.info("Заполняем Строение::" + building);
+            fillField(buildingInput, building);
+
+            block = (data.get(BLOCK).equals(RANDOM)) ? Generators.randomNumber(3) : data.get(BLOCK);
+            LOG.info("Заполняем Корпус::" + block);
+            fillField(blockInput, block);
+
+            flat = (data.get(FLAT).equals(RANDOM)) ? Generators.randomNumber(3) : data.get(FLAT);
+            LOG.info("Заполняем Квартира::" + flat);
+            fillField(flatInput, flat);
+
+            LOG.info("Нажимаем кнопку 'Отправить'");
+            sendButton.click();
+            if(PageFactory.getWebDriver().findElements(By.xpath(wrongAddressXpath)).isEmpty()){break;}
         }
 
-        if(data.get(LOCALITY).equals(TRUE)){
-            LOG.info("Населённый пункт");
-            fillAddress(cityInput, true);
-        }
-
-        if(data.get(STREET).equals(TRUE)){
-            LOG.info("Улица");
-            fillAddress(streetInput, true);
-        }
-
-        house = (data.get(HOUSE).equals(RANDOM))? Generators.randomNumber(3) : data.get(HOUSE);
-        LOG.info("Заполняем Дом/владение::" + house);
-        fillField(houseInput,house);
-
-        building = (data.get(BUILDING).equals(RANDOM))? Generators.randomNumber(2) : data.get(BUILDING);
-        LOG.info("Заполняем Строение::" + building);
-        fillField(buildingInput,building);
-
-        block = (data.get(BLOCK).equals(RANDOM))? Generators.randomNumber(3) : data.get(BLOCK);
-        LOG.info("Заполняем Корпус::" + block);
-        fillField(blockInput,block);
-
-        flat = (data.get(FLAT).equals(RANDOM))? Generators.randomNumber(3) : data.get(FLAT);
-        LOG.info("Заполняем Квартира::" + flat);
-        fillField(flatInput,flat);
     }
 
 }
