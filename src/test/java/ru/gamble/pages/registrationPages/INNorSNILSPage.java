@@ -1,5 +1,6 @@
 package ru.gamble.pages.registrationPages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -50,12 +51,18 @@ public class INNorSNILSPage extends AbstractPage {
 
 
     @ActionTitle("заполняет одно из двух полей")
-    public void inputSNILSorINN(String keySNILS, String keyINN){
+    public void inputSNILSorINN(String keySNILS, String keyINN) throws InterruptedException {
         int rnd = new Random().nextInt(2);
-        if(rnd == 1){
-            fillField(snilsInput,Stash.getValue(keySNILS));
-        }else {
-            fillField(innInput,Stash.getValue(keyINN));
-        }
+
+       Thread.sleep(1000);
+
+            if (rnd == 1) {
+                fillField(snilsInput, Stash.getValue(keySNILS));
+                LOG.info("Ввели СНИЛС::" + Stash.getValue(keySNILS));
+            } else {
+                fillField(innInput, Stash.getValue(keyINN));
+                LOG.info("Ввели ИНН::" + Stash.getValue(keyINN));
+            }
+
     }
 }

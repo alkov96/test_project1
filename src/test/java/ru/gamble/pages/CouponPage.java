@@ -341,17 +341,22 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String xpathBet = "//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]";
         String xpathMessage = "//div[contains(@class,'accepted-bet-message') and contains(.,'Ваша ставка принята.')]";
+
         LOG.info("Жмём Заключить пари");
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon_bet_button));
         coupon_bet_button.click();
+
         waitingForPreloadertoDisappear(120);
 
         if (!driver.findElement(By.cssSelector("div.bet-accepted-noification")).isDisplayed()) {
             LOG.warn("Сообщение об успешной ставке не найдено");
         }
-        LOG.info("Ожидаем исчезновения из купона принятых ставок");
-       // new WebDriverWait(driver, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xpath)));
 
+        LOG.info("Ожидаем исчезновения сообщения 'Ваша ставка принята!'");
         new WebDriverWait(driver, 20).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xpathMessage)));
+
+        LOG.info("Ожидаем исчезновения из купона принятых ставок");
+         new WebDriverWait(driver, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xpathBet)));
 
         if (driver.findElements(By.xpath(xpathBet)).size() != 0) {
             throw new AuthenticationException("Ошибка! Принялись не все ставки.");
@@ -388,7 +393,7 @@ public class CouponPage extends AbstractPage {
                 e.printStackTrace();
             }
             if (count == 0){
-                Assertions.fail("Баланс не соответствует ожидаемому. Баланс сейчас: " + afterBalance + ", ожидалось : " + balanceExpected);
+                Assertions.fail("Баланс не соответствует ожидаемому. Баланс сейчас: " + afterBalance + ", ожидалось : " + balanceExpected.subtract(sumBet));
             }
         }
     }

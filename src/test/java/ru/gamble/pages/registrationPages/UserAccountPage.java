@@ -148,7 +148,6 @@ public class UserAccountPage extends AbstractPage{
     @ActionTitle("вводит email")
     public void enterEmail(String key){
                 LOG.info("Вводим e-mail");
-
                 fillField(inputEmail, Stash.getValue(key));
     }
 
@@ -206,10 +205,12 @@ public class UserAccountPage extends AbstractPage{
         WebElement numberSring = null;
         int x = 0;
 
-        for(int y = 0; y < 10; y++) {
+        LOG.info("Пытаемся найти код подтверждения телефона");
+        for(int y = 0; y < 3; y++) {
             try {
+                new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
                 numberSring = driver.findElement(By.xpath(xpath));
-            } catch (NoSuchElementException nsee) {
+            } catch (Exception е) {
                 driver.navigate().refresh();
             }
             x++;
