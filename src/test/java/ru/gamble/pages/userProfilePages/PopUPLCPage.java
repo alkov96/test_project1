@@ -17,6 +17,8 @@ import ru.gamble.pages.AbstractPage;
 import ru.gamble.pages.CouponPage;
 import ru.gamble.pages.mainPages.AuthenticationMainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
+import ru.gamble.utility.Constants;
+import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -35,6 +37,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
 import static ru.gamble.stepdefs.CommonStepDefs.waitEnabled;
 import static ru.gamble.stepdefs.CommonStepDefs.waitToPreloader;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+import static ru.gamble.utility.Constants.LOGIN;
 
 
 @PageEntry(title = "Мини Личный Кабинет")
@@ -609,28 +612,35 @@ public class PopUPLCPage extends AbstractPage {
     }
 
     @ActionTitle("входит в кабинет ЦУПИС и совершает все необходимые операции для потверждения пополнения")
-    public void cupicIn() {
+    public void cupicIn(DataTable dataTable) {
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
+        String phoneNumber, passwordWord;
         WebDriver driver = PageFactory.getDriver();
         Set<String> allHandles = driver.getWindowHandles();
-        String passwordXpath = "//input[@id='form_login_password']";
-//        String urlSite = "https://dev-bk-bet-site.tsed.orglot.office/";
-//        String cupicSite = "https://23bet-pay.itasystems.ru/frontend/refill?requ0estId=RID0984840782911";
+        String loginId = "form_login_phone";
+        String passwordId = "form_login_password";
+
+        phoneNumber = data.get("Телефон");
+        passwordWord = data.get("Пароль_ЦУПИС");
 
         LOG.info("Переходим на страницу ЦУПИС");
         driver.switchTo().window(allHandles.toArray()[1].toString());
 
         CommonStepDefs.workWithPreloader();
-        waitForElementPresent(By.xpath(passwordXpath), 4);
+        waitForElementPresent(By.id(passwordId), 4);
+
+        LOG.info("Ищем поле ввода логина");
+        WebElement login = driver.findElement(By.id(loginId));
+        LOG.info("Вводим логин::" + phoneNumber);
+        fillField(login,phoneNumber);
 
         LOG.info("Ищем поле ввода пароля");
-        WebElement password = driver.findElement(By.xpath(passwordXpath));
-        password.click();
-        password.clear();
-        password.sendKeys("Regfordepoit_0601");
+        WebElement password = driver.findElement(By.id(passwordId));
+        fillField(login,passwordWord);
+
         CommonStepDefs.workWithPreloader();
         driver.findElement(By.id("btn_authorization_enter")).click();
         CommonStepDefs.workWithPreloader();
-//        Thread.sleep(1000);
         driver.findElement(By.xpath("//input[@class='ui-button ui-button-final right']")).click();
         waitForElementPresent(By.xpath("//input[@type='submit']"), 4);
         driver.findElement(By.xpath("//input[@type='submit']")).click();
@@ -639,6 +649,7 @@ public class PopUPLCPage extends AbstractPage {
         LOG.info("Переходим обратно в на сайт");
         driver.switchTo().window(allHandles.toArray()[0].toString());
     }
+
     @ActionTitle("проверяет, увеличился ли баланс")
     public void checkIsBalance(){
         BigDecimal sumBet;

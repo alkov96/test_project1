@@ -393,7 +393,7 @@ public class CouponPage extends AbstractPage {
                 e.printStackTrace();
             }
             if (count == 0){
-                Assertions.fail("Баланс не соответствует ожидаемому. Баланс сейчас: " + afterBalance + ", ожидалось : " + balanceExpected);
+                Assertions.fail("Баланс не соответствует ожидаемому. Баланс сейчас: " + afterBalance + ", ожидалось : " + balanceExpected.subtract(sumBet));
             }
         }
     }
