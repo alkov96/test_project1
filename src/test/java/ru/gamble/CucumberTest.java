@@ -56,7 +56,7 @@ public class CucumberTest {
            try{
                LOG.info("Закрываем WebDriver");
                driver.quit();
-               PageFactory.dispose();
+//               PageFactory.dispose();
            }catch (Exception e){
                LOG.info("WebDriver уже закрыт");
            }
