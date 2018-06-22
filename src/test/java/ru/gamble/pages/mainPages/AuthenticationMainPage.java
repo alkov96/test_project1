@@ -37,7 +37,7 @@ public class AuthenticationMainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(pageTitle,10, 5);
+        tryingLoadPage(pageTitle,10, 10);
         //new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
