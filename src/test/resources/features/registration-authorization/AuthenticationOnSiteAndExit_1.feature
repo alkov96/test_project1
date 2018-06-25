@@ -5,10 +5,17 @@
     @AuthenticationOnSiteAndExit_1
     Сценарий: Аутентификация на сайте и выход.
 
+#      * переходит на главную страницу 'https://demo.gamebet.ru'
+#      * открывается страница "Главная страница"
+#
+#      * (запрос к мобильному API c) данными
+#        | devId  | 1                           |
+#        | email  | regfordepoit@mailinator.com |
+#        | pass   | Parol123                    |
+#        | source | 16                          |
+
       * переходит на главную страницу
       * открывается страница "Главная страница"
-
-#      * (получаем куки) "https://dev-bk-bet-site.tsed.orglot.office/api/mobile/v2/changePhone"
 
       * пользователь (нажимает кнопку) "Вход"
       * открывается страница "Вход"

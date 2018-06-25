@@ -1,13 +1,13 @@
 package ru.gamble.pages;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
-import org.apache.commons.io.IOUtils;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.remote.JsonException;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,8 +15,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.utility.JsonLoader;
-import ru.gamble.utility.YandexPostman;
+import ru.gamble.utility.*;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
@@ -31,9 +30,10 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.StringWriter;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -45,10 +45,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.RANDOM;
+import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.randomString;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
-import com.mongodb.util.JSON;
 
 
 public abstract class AbstractPage extends Page {
@@ -475,22 +474,100 @@ public abstract class AbstractPage extends Page {
         }
     }
 
-    @ActionTitle("получаем куки")
-    public void xxx(String param){
-         String currentURL = PageFactory.getWebDriver().getCurrentUrl();
-         URL url = null;
+//    @ActionTitle("получаем куки")
+//    public void xxx(String param){
+//         String currentURL = PageFactory.getWebDriver().getCurrentUrl();
+//         URL url = null;
+//
+//         // Здесь собираем запрос к серверу на основании URL+Cookie методом GET
+//        Set<Cookie> cookies = PageFactory.getWebDriver().manage().getCookies();
+//        try {
+//            url = new URL(currentURL);
+//        } catch (MalformedURLException e) {
+//            LOG.error(e.getMessage(),e);
+//        }
+//        String s0 = cookies.toArray()[0].toString();
+//        String s1 = cookies.toArray()[1].toString();
+//        String s2 = cookies.toArray()[2].toString();
+//        String cookie = s0 + ";" + s1 + ";" + s2;
+//
+//
+//        TrustManager[] trustAllCerts = new TrustManager[]{
+//                new X509TrustManager() {
+//                    @Override
+//                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+//                    }
+//
+//                    @Override
+//                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+//                    }
+//
+//                    @Override
+//                    public X509Certificate[] getAcceptedIssuers() {
+//                        return new X509Certificate[0];
+//                    }
+//                }
+//        };
+//
+//        try{
+//            SSLContext sc = SSLContext.getInstance("SSL");
+//            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+//            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+//        }catch (Exception e1){
+//            LOG.error(e1.getMessage(),e1);
+//        }
+//
+//         // Соединяемся с сервером и получаем JSON
+//        HttpsURLConnection con = null;
+//        ObjectMapper mapper = new ObjectMapper();
+//
+//        try{
+//            con = (HttpsURLConnection) url.openConnection();
+//            con.setRequestProperty("Cookie",cookie);
+//            con.getRequestProperty("Cookie");
+//            con.setRequestMethod("GET");
+//            con.connect();
+//            StringWriter writer = new StringWriter();
+//            IOUtils.copy(con.getInputStream(), writer, "UTF-8");
+//            String jsonString = writer.toString();
+//            TypeReference<HashMap<String,Object>> typeRef
+//                    = new TypeReference<HashMap<String,Object>>() {};
+//            Map<String, Object> params = mapper.readValue(jsonString, typeRef);
+//            Stash.put("Наш джейсон",params);
+//        }catch (Exception e2 ){
+//            LOG.error(e2.getMessage(),e2);
+//        }
+//
+//    }
 
-         // Здесь собираем запрос к серверу на основании URL+Cookie методом GET
-        Set<Cookie> cookies = PageFactory.getWebDriver().manage().getCookies();
-        try {
-            url = new URL(currentURL);
-        } catch (MalformedURLException e) {
-            LOG.error(e.getMessage(),e);
+    @ActionTitle("запрос к мобильному API c")
+    public void yyy(DataTable dataTable) {
+        //List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        String key, value, requestUrl, requestPath, requestFull, params;
+        URL url;
+//        requestUrl = "http://dev-bk-bet-mobile-site1.tsed.orglot.office";
+        requestUrl = "https://demo.gamebet.ru";
+        requestPath = "api/mobile/v3/login";
+        requestFull = requestUrl + "/" + requestPath;
+
+        JSONArray json_arr = new JSONArray();
+        for (int i = 0; i < table.size(); i++) {
+            JSONObject jsonObject = new JSONObject();
+//            for (Map.Entry<String, String> entry : map.entrySet()) {
+            for (Map.Entry<String, String> entry : table.entrySet()) {
+                key = entry.getKey();
+                value = entry.getValue();
+                try {
+                    jsonObject.put(key, value);
+                } catch (JsonException e) {
+                    e.printStackTrace();
+                }
+                json_arr.add(jsonObject);
+            }
+
         }
-        String s0 = cookies.toArray()[0].toString();
-        String s1 = cookies.toArray()[1].toString();
-        String s2 = cookies.toArray()[2].toString();
-        String cookie = s0 + ";" + s1 + ";" + s2;
+        params = json_arr.toString();
 
 
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -510,33 +587,33 @@ public abstract class AbstractPage extends Page {
                 }
         };
 
-        try{
+        try {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        }catch (Exception e1){
-            LOG.error(e1.getMessage(),e1);
-        }
 
-         // Соединяемся с сервером и получаем JSON
-        HttpsURLConnection con = null;
-        ObjectMapper mapper = new ObjectMapper();
+            url = new URL(requestFull);
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
-        try{
-            con = (HttpsURLConnection) url.openConnection();
-            con.setRequestProperty("Cookie",cookie);
-            con.getRequestProperty("Cookie");
-            con.setRequestMethod("GET");
-            con.connect();
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(con.getInputStream(), writer, "UTF-8");
-            String jsonString = writer.toString();
-            TypeReference<HashMap<String,Object>> typeRef
-                    = new TypeReference<HashMap<String,Object>>() {};
-            Map<String, Object> params = mapper.readValue(jsonString, typeRef);
-            Stash.put("Наш джейсон",params);
-        }catch (Exception e2 ){
-            LOG.error(e2.getMessage(),e2);
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
+            writer.write(params);
+            writer.close();
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuffer jsonString = new StringBuffer();
+            String line;
+            while ((line = br.readLine()) != null) {
+                jsonString.append(line);
+            }
+            br.close();
+            con.disconnect();
+
+        } catch (Exception e1) {
+            LOG.error(e1.getMessage(), e1);
         }
 
     }
