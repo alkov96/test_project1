@@ -497,7 +497,11 @@ public class CommonStepDefs extends GenericStepDefs {
         JSONObject jsonObject = new JSONObject();
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
-            value = entry.getValue();
+            if(entry.getValue().contains("^[A-Z]+$")){
+                value = Stash.getValue(entry.getValue());
+            }else {
+                value = entry.getValue();
+            }
             try {
                 jsonObject.put(key, value);
             } catch (JsonException e) {
