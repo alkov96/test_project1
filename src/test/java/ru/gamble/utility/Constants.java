@@ -11,6 +11,7 @@ public class Constants {
     public static final String DEFAULT = "Default";
     public static final String PERIOD = "Период";
     public static final String RANDOM = "random";
+    public static final String RANDOMDATE = "randomdate";
     public static final String SERIAL = "Серия";
     public static final String NUMBER = "Номер";
     public static final String DATEISSUE = "Дата выдачи";

@@ -169,10 +169,10 @@ public abstract class AbstractPage extends Page {
         }
     }
 
-    @ActionTitle("сохраняет с")
-    public void saveKeyValue(DataTable dataTable) {
-        CommonStepDefs.saveValueToKey(dataTable);
-    }
+//    @ActionTitle("сохраняет с")
+//    public void saveKeyValue(DataTable dataTable) {
+//        CommonStepDefs.saveValueToKey(dataTable);
+//    }
 
     /**
      * Метод получения письма и перехода по ссылке для завершения регистрации на сайте

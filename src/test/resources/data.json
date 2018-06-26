@@ -23,6 +23,10 @@
   "mobile-api":{
     "url":"https://demo.gamebet.ru",
     "user":"demo617@mailinator.com",
-    "password":"Parol123"
+    "EMAIL":"demo617@mailinator.com",
+    "password":"Parol123",
+    "PHONE":"71110020076",
+    "DEVID":"3",
+    "PASS":"Parol123"
   }
 }
