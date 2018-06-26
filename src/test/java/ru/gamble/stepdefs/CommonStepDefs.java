@@ -1,17 +1,21 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.Когда;
 import org.assertj.core.api.Assertions;
+import cucumber.api.java.ru.Когда;
+import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.JsonException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.utility.DBUtils;
+import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
+import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -19,9 +23,16 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 import ru.sbtqa.tag.qautils.properties.Props;
-import ru.sbtqa.tag.stepdefs.ru.StepDefs;
-
-
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -31,8 +42,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static org.openqa.selenium.By.xpath;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -464,5 +475,91 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (org.openqa.selenium.StaleElementReferenceException e) {
             LOG.error(""+e);
         }
+    }
+
+    @Когда("^запрос к API \"([^\"]*)\":$")
+    public void requestToAPI(String path, DataTable dataTable) {
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        String key, value, requestUrl, requestPath, requestFull = "", params;
+        URL url;
+        requestPath = path;
+        LOG.info("Собираем строку запроса.");
+        try {
+            requestUrl = JsonLoader.getData().get("mobile-api").get("url").getValue();
+            requestFull = requestUrl + "/" + requestPath;
+
+        } catch (DataException e) {
+            e.getMessage();
+        }
+        LOG.info("requestFull");
+
+        LOG.info("Собираем параметы в JSON строку");
+        JSONObject jsonObject = new JSONObject();
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+            key = entry.getKey();
+            value = entry.getValue();
+            try {
+                jsonObject.put(key, value);
+            } catch (JsonException e) {
+                e.printStackTrace();
+            }
+        }
+        params = jsonObject.toString();
+        LOG.info(params);
+
+        //************Этот код нужен для соединения по HTTPS
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                    }
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                    }
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
+                }
+        };
+
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            //************
+
+            url = new URL(requestFull);
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
+            writer.write(params.replaceAll("'","\""));
+            writer.close();
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuffer jsonString = new StringBuffer();
+            String line;
+            while ((line = br.readLine()) != null) {
+                jsonString.append(line);
+            }
+            LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
+            Stash.put("responceAPI",jsonString);
+            br.close();
+            con.disconnect();
+        } catch (Exception e1) {
+            LOG.error(e1.getMessage(), e1);
+        }
+    }
+
+    @Когда ("^проверка ответа API:$")
+    public void checkresponceAPI(DataTable dataTable) {
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        String actual = Stash.getValue("responceAPI").toString();
+        String expected = table.get("exepted");
+        assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
+        LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 }
