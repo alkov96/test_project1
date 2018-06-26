@@ -11,7 +11,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.livePages.DayEventsPage;
-import ru.gamble.pages.mainPages.MainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -31,10 +30,7 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.openqa.selenium.By.cssSelector;
-import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.xpath;
-import static ru.gamble.pages.AbstractPage.*;
-import static ru.gamble.stepdefs.CommonStepDefs.*;
 
 /**
  * @author p.sivak.
