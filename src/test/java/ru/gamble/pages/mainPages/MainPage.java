@@ -2,6 +2,7 @@ package ru.gamble.pages.mainPages;
 
 
 import cucumber.api.DataTable;
+import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -26,7 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.setRemoveAssertJRelatedElementsFromStackTrace;
+import static org.junit.Assert.assertFalse;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.*;
 
@@ -384,4 +389,78 @@ public class MainPage extends AbstractPage {
         }
     }
 
+
+    @ActionTitle("ищет подходящий спорт в Горячих ставках")
+    public void findSportHB(){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
+        List<String> sportsLanding = new ArrayList<String>();
+        driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).forEach(element->
+        sportsLanding.add(element.getText().replace("На ","")));
+
+        //смотрим список всех спортов. ищем там нужный нам
+        List<WebElement> allSport = driver.findElements(By.xpath("//div[@class='bets-widget lastMinutesBets']//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
+        int index = -1;
+        for (WebElement sport : allSport){
+            index = sportsLanding.indexOf(sport.getAttribute("title").toLowerCase().trim());
+            if (index>0){
+                sport.click(); //кликаем на нужный спорт в Гоячих ставках чтобы убедиться что там есть записи
+                wait.until(CommonStepDefs.attributeContainsLowerCase(
+                        By.xpath("//div[@class='bets-widget lastMinutesBets']//div[contains(@class,'bets-widget-table__inner')]"),"class","active"));
+                if (driver.findElements(By.xpath("//div[@class='bets-widget lastMinutesBets']//div[contains(@class,'bets-widget-table__inner')]/table[1]/tbody/tr")).size() == 1) {
+                    LOG.error("В горячих ставках есть вкладка спорта " + sport + ", но список для него пустой");
+                }
+                else break;
+            }
+        }
+        assertTrue("В горячих ставках нет походящих видов спорта",index>=0);
+        LOG.info("index = " + index);
+        Stash.put("indexLandingSportKey",index);
+    }
+
+    @ActionTitle("переходит на лендинг вида спорта")
+    public void openLandingSport(){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
+        int index = Stash.getValue("indexLandingSportKey");
+        LOG.info(driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).getText());
+        String sport = driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).getAttribute("href").substring(1);
+        driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).click();
+        wait.until(ExpectedConditions.urlContains(sport));
+        waitForElementPresent(By.cssSelector("h1.landing-sports-section__h"),10);
+        Stash.put("sportKey",sport);
+    }
+
+    @ActionTitle("проверяет наличие блока Горячие ставки и переходит на игру")
+    public void checkHBandAddBetToCoupon(){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        //смотрим что есть заголовок Горячие ставки
+        WebElement titleHB = driver.findElement(By.xpath("//ul[@class='landing-sports-wmenu']/li[contains(text(),'ставки')]"));
+        boolean isHide = titleHB.getAttribute("class").contains("hide");
+        assertFalse("На странице лендинга спорта нет горячих ставок",isHide);
+        LOG.info("На странице лендинга есть блок Горячие ставки");
+        LOG.info("Кликаем на заголовок блока ГС");
+        driver.findElement(By.xpath("//ul[@class='landing-sports-wmenu']/li[contains(text(),'ставки')]")).click();//кликаем на заголовк блока Горячих ставок (на тот случай, если есть еще ближашие трансляции или просто соревнование и ГС неактивны
+        wait.until(ExpectedConditions.attributeContains(titleHB,"class","active"));
+
+        WebElement hotBet = driver.findElements(By.xpath("//div[@class='bets-widget-table hot-bets']//tr[contains(@class,'bets-widget-table__bets')]")).get(0);
+        String team1 = hotBet.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div")).getAttribute("title");
+        String team2 = hotBet.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div")).getAttribute("title");
+        float p1 = Float.valueOf(hotBet.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div/span")).getText());
+
+        LOG.info("Нажимаем на коэффициент к1 - победа первой коаманды в Гоячих Ставках");
+        hotBet.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div/span")).click();
+        waitForElementPresent(By.cssSelector("div.list-bet-block-top"),10);
+
+        Stash.put("team1key",team1);
+        Stash.put("team2key",team2);
+        Stash.put("ishodKey",team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
+        Stash.put("coefKey",p1);
+    }
 }
