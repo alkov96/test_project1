@@ -12,7 +12,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.utility.Constants;
 import ru.gamble.utility.DBUtils;
+import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
@@ -44,6 +46,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.openqa.selenium.By.xpath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static ru.gamble.utility.Constants.*;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -72,6 +75,27 @@ public class CommonStepDefs extends GenericStepDefs {
         String key, value;
         key = data.get(0);
         value = data.get(1);
+        if (value.equals(DEFAULT)){
+            value = JsonLoader.getData().get("mobile-api").get(key).getValue();
+        }
+
+        if (value.equals(RANDOM)){
+            value = Generators.randomString(25);
+        }
+
+        if (value.equals(RANDOMDATE)){
+            Integer day = (int)(Math.floor(1+Math.random() *27));
+            Integer mon = (int)(Math.floor(1+Math.random() *11));
+            Integer year = (int)(Math.floor(1950+Math.random() *49));
+            String mons;
+            if (mon<10) {
+                mons="0"+mon.toString();
+            }
+            else
+                mons = mon.toString();
+            value  = day.toString() + "." +mons + "." + year.toString();
+        }
+
         Stash.put(key,value);
         LOG.info("key:" + key + "| value::" + value);
     }
