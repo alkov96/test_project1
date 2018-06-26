@@ -2,10 +2,11 @@
 Функционал: API
 
   @api
+  @login
   @correct
   Сценарий: 3_19 Аутентификация пользователя. Позитивный кейс
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "responceAPI":
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | 1                      |
       | email  | demo617@mailinator.com |
       | pass   | Parol123               |
@@ -17,7 +18,7 @@
   @fail
   Сценарий: 3_19 Аутентификация пользователя. Негативный кейс
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "responceAPI":
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | 0 |
       | email  | 0 |
       | pass   | 0 |

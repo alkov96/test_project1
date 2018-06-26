@@ -38,14 +38,14 @@
     * открывается страница "Главная страница"
     * пользователь (получает смс-код для подтверждения телефона) "CODE"
 
-    * запрос к API "api/mobile/v3/createUser":
-      | devId  | DEVID |
-      | source  | 16 |
-      | first_name    |  FIRST_NAME|
-      | surname    |  SURNAME |
-      | patronymic    |  PATRONYMIC |
-      | birth_date    |  BIRTH_DATE |
-      | phone    |  PHONE  |
-      | phoneConfirmationCode    |  CODE  |
-      | email    |  EMAIL  |
-      | pass    |  PASS  |
+    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+      | devId                 | DEVID      |
+      | source                | 16         |
+      | first_name            | FIRST_NAME |
+      | surname               | SURNAME    |
+      | patronymic            | PATRONYMIC |
+      | birth_date            | BIRTH_DATE |
+      | phone                 | PHONE      |
+      | phoneConfirmationCode | CODE       |
+      | email                 | EMAIL      |
+      | pass                  | PASS       |

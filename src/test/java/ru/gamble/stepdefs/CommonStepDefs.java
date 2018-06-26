@@ -76,7 +76,11 @@ public class CommonStepDefs extends GenericStepDefs {
         key = data.get(0);
         value = data.get(1);
         if (value.equals(DEFAULT)){
-            value = JsonLoader.getData().get("mobile-api").get(key).getValue();
+            try {
+                value = JsonLoader.getData().get("mobile-api").get(key).getValue();
+            } catch (DataException e) {
+                e.getMessage();
+            }
         }
 
         if (value.equals(RANDOM)){
