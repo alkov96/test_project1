@@ -70,7 +70,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^сохраняем в память$")
-    public static void saveValueToKey(DataTable dataTable) throws DataException {
+    public static void saveValueToKey(DataTable dataTable){
         List<String> data = dataTable.asList(String.class);
         String key, value;
         key = data.get(0);
@@ -501,9 +501,8 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-
-    @Когда("^запрос к API \"([^\"]*)\":$")
-    public void requestToAPI(String path, DataTable dataTable) throws DataException {
+    @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestToAPI(String path, String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         String key, value, requestUrl, requestPath, requestFull = "", params;
         URL url;
@@ -520,13 +519,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
         LOG.info("Собираем параметы в JSON строку");
         JSONObject jsonObject = new JSONObject();
-
-
-
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
             value = entry.getValue();
-
             try {
                 jsonObject.put(key, value);
             } catch (JsonException e) {
@@ -575,7 +570,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 jsonString.append(line);
             }
             LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
-            Stash.put("responceAPI",jsonString);
+            Stash.put(keyStash,jsonString);
             br.close();
             con.disconnect();
         } catch (Exception e1) {
@@ -583,10 +578,10 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда ("^проверка ответа API:$")
-    public void checkresponceAPI(DataTable dataTable) {
+    @Когда ("^проверка ответа API из \"([^\"]*)\":$")
+    public void checkresponceAPI(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = Stash.getValue("responceAPI").toString();
+        String actual = Stash.getValue(keyStash).toString();
         String expected = table.get("exepted");
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
