@@ -618,6 +618,8 @@ public class CommonStepDefs extends GenericStepDefs {
         JSONObject jsonObject = new JSONObject(Stash.getValue(sourceString));
         String valueFingingParams =  jsonObject.get(keyFingingParams).toString();
 
+
+
         LOG.info("Достаем значение и запысываем в память::" + valueFingingParams);
         Stash.put(keyFingingParams,valueFingingParams);
 //        Pattern pattern = Pattern.compile("\\[(.*?)\\]");
