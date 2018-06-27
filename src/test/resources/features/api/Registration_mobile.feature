@@ -27,18 +27,16 @@
   Сценарий: Мобильная регистрация
 
 
-#    * запрос к API "api/mobile/v3/sendPhoneCode":
-#      | devId  | Default                           |
-#      | phone  | Default |
-#
-#    * проверка ответа API:
-#      | exepted  |  "code":0  |
+    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "responceAPI":
+      | devId  | 2 |
+      | phone  | 71110020077 |
 
-    * переходит на главную страницу
-    * открывается страница "Главная страница"
-    * пользователь (получает смс-код для подтверждения телефона) "CODE"
+    * проверка ответа API из "responceAPI":
+      | exepted  |  "code":0  |
 
-    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+    * получаем код подтверждения телефона "CODE"
+
+    * запрос к API "api/mobile/v3/createUser" и сохраняем в "responceAPI":
       | devId                 | DEVID      |
       | source                | 16         |
       | first_name            | FIRST_NAME |

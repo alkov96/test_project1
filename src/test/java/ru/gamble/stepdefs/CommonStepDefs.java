@@ -40,9 +40,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -209,6 +207,27 @@ public class CommonStepDefs extends GenericStepDefs {
         }finally {
             DBUtils.closeAll(con,ps,null);
         }
+    }
+
+    private static String workWithDBgetResult(String sqlRequest){
+        Connection con = DBUtils.getConnection();
+        Statement stmt = null;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        String result = "";
+        try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlRequest);
+            rs.next();
+            result=rs.getString("code");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            DBUtils.closeAll(con,ps,null);
+        }
+
+        return result;
+
     }
 
 
@@ -625,5 +644,17 @@ public class CommonStepDefs extends GenericStepDefs {
 //            String s = m.group(1);
 //            // s now contains "BAR"
 //        }
+    }
+
+
+
+
+    @Когда("^получаем код подтверждения телефона \"([^\"]*)\"$")
+    public static void confirmPhone(String param) {
+        String phone = Stash.getValue("PHONE");
+        String sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='"+phone+"'";
+        String code = workWithDBgetResult(sqlRequest);
+        Stash.put(param,code);
+        LOG.info("Полуили код подтверждения телефона: " + code);
     }
 }
