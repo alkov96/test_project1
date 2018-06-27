@@ -1,5 +1,7 @@
 package ru.gamble.stepdefs;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import cucumber.api.DataTable;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
@@ -41,10 +43,7 @@ import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.openqa.selenium.By.xpath;
@@ -549,7 +548,7 @@ public class CommonStepDefs extends GenericStepDefs {
         JSONObject jsonObject = new JSONObject();
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
-            if(entry.getValue().contains("^[A-Z]+$")){
+            if(entry.getValue().matches("^[A-Z]+$")){
                 value = Stash.getValue(entry.getValue());
             }else {
                 value = entry.getValue();
@@ -627,14 +626,23 @@ public class CommonStepDefs extends GenericStepDefs {
     public void fingingAndSave(String keyFingingParams, String sourceString) {
         JsonParser jparser = new JsonParser();
         String tmp = Stash.getValue(sourceString).toString();
-        try {
-            JSONArray posts = jparser.read(tmp, "$.[*]");
-        } catch (ParserException e) {
-            e.getMessage();
-        }
+        JSONObject jsonObject;
+        String valueFingingParams = "";
 
-        JSONObject jsonObject = new JSONObject(Stash.getValue(sourceString));
-        String valueFingingParams =  jsonObject.get(keyFingingParams).toString();
+        Map<String, Object> retMap = new Gson()
+                .fromJson(tmp, new TypeToken<HashMap<String, Object>>() {}.getType());
+
+//        retMap.get("")
+
+//        try {
+//            jsonObject = jparser.read(tmp, "$.[*]");
+//            valueFingingParams =  jsonObject.get(keyFingingParams).toString();
+//        } catch (ParserException e) {
+//            e.getMessage();
+//        }
+
+     //   JSONObject jsonObject = new JSONObject(Stash.getValue(sourceString));
+      //  valueFingingParams =  jsonObject.get(keyFingingParams).toString();
 
         LOG.info("Достаем значение и запысываем в память::" + valueFingingParams);
         Stash.put(keyFingingParams,valueFingingParams);
