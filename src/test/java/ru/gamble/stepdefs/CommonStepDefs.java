@@ -1,6 +1,8 @@
 package ru.gamble.stepdefs;
 
 import cucumber.api.DataTable;
+import net.minidev.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import cucumber.api.java.ru.Когда;
 import net.minidev.json.JSONObject;
@@ -23,6 +25,9 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
+import ru.sbtqa.tag.parsers.JsonParser;
+import ru.sbtqa.tag.parsers.core.exceptions.ParserException;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 import ru.sbtqa.tag.qautils.properties.Props;
 import javax.net.ssl.HttpsURLConnection;
@@ -127,7 +132,7 @@ public class CommonStepDefs extends GenericStepDefs {
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage(){
-        goToMainPage("site2");
+        goToMainPage("site1");
     }
 
     @Когда("^переходит в админку$")
@@ -577,10 +582,14 @@ public class CommonStepDefs extends GenericStepDefs {
             while ((line = br.readLine()) != null) {
                 jsonString.append(line);
             }
-            LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
-            Stash.put(keyStash,jsonString);
             br.close();
             con.disconnect();
+            LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
+            if(StringUtils.isNoneEmpty(jsonString)) {
+                Stash.put(keyStash, jsonString);
+            }else {
+                throw new AutotestError("ОШИБКА! Пустая строка JSON");
+            }
         } catch (Exception e1) {
             LOG.error(e1.getMessage(), e1);
         }
@@ -597,6 +606,14 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда ("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
+        JsonParser jparser = new JsonParser();
+        String tmp = Stash.getValue(sourceString).toString();
+        try {
+            JSONArray posts = jparser.read(tmp, "$.[*]");
+        } catch (ParserException e) {
+            e.getMessage();
+        }
+
 
         JSONObject jsonObject = new JSONObject(Stash.getValue(sourceString));
         String valueFingingParams =  jsonObject.get(keyFingingParams).toString();
