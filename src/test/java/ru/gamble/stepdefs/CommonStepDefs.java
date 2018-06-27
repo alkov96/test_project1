@@ -594,4 +594,20 @@ public class CommonStepDefs extends GenericStepDefs {
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
+
+    @Когда ("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
+    public void fingingAndSave(String keyFingingParams, String sourceString) {
+
+        JSONObject jsonObject = new JSONObject(Stash.getValue(sourceString));
+        String valueFingingParams =  jsonObject.get(keyFingingParams).toString();
+
+        LOG.info("Достаем значение и запысываем в память::" + valueFingingParams);
+        Stash.put(keyFingingParams,valueFingingParams);
+//        Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+//        Matcher m = pattern.matcher(Stash.getValue(sourceString));
+//        while (m.find()) {
+//            String s = m.group(1);
+//            // s now contains "BAR"
+//        }
+    }
 }
