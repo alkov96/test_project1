@@ -614,11 +614,8 @@ public class CommonStepDefs extends GenericStepDefs {
             e.getMessage();
         }
 
-
         JSONObject jsonObject = new JSONObject(Stash.getValue(sourceString));
         String valueFingingParams =  jsonObject.get(keyFingingParams).toString();
-
-
 
         LOG.info("Достаем значение и запысываем в память::" + valueFingingParams);
         Stash.put(keyFingingParams,valueFingingParams);
