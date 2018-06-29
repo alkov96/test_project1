@@ -21,9 +21,8 @@
     * сохраняем в память
       | PASS  | Default |
 
-  @regress
+  @api
   @Registration_mobile
-
   Сценарий: Мобильная регистрация
 
 
