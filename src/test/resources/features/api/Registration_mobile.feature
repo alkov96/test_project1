@@ -42,41 +42,41 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация
 
-#
-#    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "responceAPI":
-#      |  devId                 | DEVID           |
-#      |  phone                 | PHONE           |
-#
-#    * проверка ответа API из "responceAPI":
-#      |  exepted               | "code":0        |
-#
-#    * получаем код подтверждения телефона "CODE"
-#
-#    * запрос к API "api/mobile/v3/createUser" и сохраняем в "responceAPI":
-#      |  devId                 | DEVID           |
-#      |  source                | 16              |
-#      |  first_name            | FIRSTNAME       |
-#      |  surname               | SURNAME         |
-#      |  patronymic            | PATRONYMIC      |
-#      |  birth_date            | BIRTHDATE       |
-#      |  phone                 | PHONE           |
-#      |  phoneConfirmationCode | CODE            |
-#      |  email                 | EMAIL           |
-#      |  pass                  | PASS            |
-#
-#    * проверка ответа API из "responceAPI":
-#      |  exepted               | "code":0        |
 
-#    * получаем код подтверждения почты "CODEEMAIL"
-#
-#    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "responceAPI":
-#      | code                    | CODEEMAIL       |
-#      | source                  | 16              |
-#
-#    * проверка ответа API из "responceAPI":
-#      |  exepted               | "code":0         |
-#    * проверка ответа API из "responceAPI":
-#      |  exepted               | "status":10      |
+    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "responceAPI":
+      |  devId                 | DEVID           |
+      |  phone                 | PHONE           |
+
+    * проверка ответа API из "responceAPI":
+      |  exepted               | "code":0        |
+
+    * получаем код подтверждения телефона "CODE"
+
+    * запрос к API "api/mobile/v3/createUser" и сохраняем в "responceAPI":
+      |  devId                 | DEVID           |
+      |  source                | 16              |
+      |  first_name            | FIRSTNAME       |
+      |  surname               | SURNAME         |
+      |  patronymic            | PATRONYMIC      |
+      |  birth_date            | BIRTHDATE       |
+      |  phone                 | PHONE           |
+      |  phoneConfirmationCode | CODE            |
+      |  email                 | EMAIL           |
+      |  pass                  | PASS            |
+
+    * проверка ответа API из "responceAPI":
+      |  exepted               | "code":0        |
+
+    * получаем код подтверждения почты "CODEEMAIL"
+
+    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "responceAPI":
+      | code                    | CODEEMAIL       |
+      | source                  | 16              |
+
+    * проверка ответа API из "responceAPI":
+      |  exepted               | "code":0         |
+    * проверка ответа API из "responceAPI":
+      |  exepted               | "status":10      |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "responceAPI":
       | devId                   | DEVID           |
@@ -90,13 +90,13 @@
       |  exepted               | "status":10      |
 
 
-    * временная функция запоминания токена
+    * находим и сохраняем "AUTHTOKEN" из "responceAPI"
 
     * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
 
 #    * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "responceAPI":
 #      | devId                   | DEVID           |
-#      | authToken               | TOKEN           |
+#      | authToken               | AUTHTOKEN           |
 #      | source                  | 16              |
 #      | gender                  | MALE            |
 #      | birthplace              | BIRTHPLACE      |
