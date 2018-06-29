@@ -38,9 +38,8 @@
         | FLAT  | randomint 2 |
 
 
-  @regress
+  @api
   @Registration_mobile
-
   Сценарий: Мобильная регистрация
 
 #

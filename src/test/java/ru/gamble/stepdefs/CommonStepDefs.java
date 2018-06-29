@@ -1,12 +1,10 @@
 package ru.gamble.stepdefs;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
-import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import cucumber.api.java.ru.Когда;
+import cucumber.api.java.ru.*;
 import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,7 +14,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.utility.Constants;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -24,11 +21,10 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
+import ru.sbtqa.tag.pagefactory.annotations.*;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.parsers.JsonParser;
-import ru.sbtqa.tag.parsers.core.exceptions.ParserException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 import ru.sbtqa.tag.qautils.properties.Props;
@@ -36,20 +32,17 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import static org.openqa.selenium.By.xpath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.utility.Constants.*;
@@ -59,14 +52,14 @@ public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
 
     @ActionTitle("нажимает на кнопку")
-    public static void pressButton(String param){
+    public static void pressButton(String param) {
         Page page = null;
         WebElement button = null;
         try {
             page = PageFactory.getInstance().getCurrentPage();
             button = page.getElementByTitle(param);
-                button.click();
-                workWithPreloader();
+            button.click();
+            workWithPreloader();
         } catch (PageInitializationException e) {
             LOG.error(e.getMessage());
         } catch (PageException e1) {
@@ -76,21 +69,12 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^сохраняем в память$")
-    public static void saveValueToKey(DataTable dataTable){
+    public static void saveValueToKey(DataTable dataTable) {
         List<String> data = dataTable.asList(String.class);
         String key, value;
         key = data.get(0);
         value = data.get(1);
-
-        if (value.contains("randomint")){
-            StringBuilder result = new StringBuilder();
-            int count = Integer.valueOf(value.replace("randomint","").trim());
-            for (int i = 0; i <= count; i++) {
-                result.append((char) ('0' + new Random().nextInt(9)));
-            }
-            value=result.toString();
-        }
-        if (value.equals(DEFAULT)){
+        if (value.equals(DEFAULT)) {
             try {
                 value = JsonLoader.getData().get("mobile-api").get(key).getValue();
             } catch (DataException e) {
@@ -98,64 +82,61 @@ public class CommonStepDefs extends GenericStepDefs {
             }
         }
 
-        if (value.equals(RANDOM)){
+        if (value.equals(RANDOM)) {
             value = Generators.randomString(25);
         }
 
-        if (value.equals(RANDOMDATE)){
-            Integer day = (int)(Math.floor(1+Math.random() *27));
-            Integer mon = (int)(Math.floor(1+Math.random() *11));
-            Integer year = (int)(Math.floor(1950+Math.random() *49));
+        if (value.equals(RANDOMDATE)) {
+            Integer day = (int) (Math.floor(1 + Math.random() * 27));
+            Integer mon = (int) (Math.floor(1 + Math.random() * 11));
+            Integer year = (int) (Math.floor(1950 + Math.random() * 49));
             String mons;
-            if (mon<10) {
-                mons="0"+mon.toString();
-            }
-            else
+            if (mon < 10) {
+                mons = "0" + mon.toString();
+            } else
                 mons = mon.toString();
-            value  = day.toString() + "." +mons + "." + year.toString();
+            value = day.toString() + "." + mons + "." + year.toString();
         }
 
-        if (value.equals("EmailGenerate")){
-            value = "testregistrator+"+Stash.getValue("PHONE")+"@yandex.ru";
-        }
-
-        Stash.put(key,value);
+        Stash.put(key, value);
         LOG.info("key:" + key + "| value::" + value);
     }
 
     // Метод ожидания появления и изчезновения прелоадера при методе click()
-    public static void workWithPreloader(){
-       String xpathPreloader = "//*[contains(@class,'preloader__container')]";
-       waitShowElement(By.xpath(xpathPreloader));
+    public static void workWithPreloader() {
+        String xpathPreloader = "//*[contains(@class,'preloader__container')]";
+        waitShowElement(By.xpath(xpathPreloader));
     }
 
     // Ожидание появления элемента на странице
-    public static void waitShowElement(By by){
+    public static void waitShowElement(By by) {
         WebDriver driver = PageFactory.getWebDriver();
-        WebDriverWait driverWait = new WebDriverWait(driver,3, 250);
-        try{
+        WebDriverWait driverWait = new WebDriverWait(driver, 3, 250);
+        try {
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
             LOG.info("Найдено прелоадеров::" + preloaders.size());
             driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
             LOG.info("Прелоадеры закрылись");
-        }catch (TimeoutException te){
+        } catch (TimeoutException te) {
         }
     }
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
-    public static void goToMainPage(){
+    public static void goToMainPage() {
         goToMainPage("site1");
     }
 
     @Когда("^переходит в админку$")
-    public static void goToAdminPage(){goToMainPage("admin");}
+    public static void goToAdminPage() {
+        goToMainPage("admin");
+    }
 
     @Когда("^переходит на главную страницу '(.+)'$")
-    public static void goToMainPage(String site){
+    public static void goToMainPage(String site) {
         cleanCookies();
-        switch (site){
+        switch (site) {
             case "site1":
                 PageFactory.getWebDriver().get(Props.get("webdriver.starting.url1"));
                 break;
@@ -169,12 +150,12 @@ public class CommonStepDefs extends GenericStepDefs {
                 PageFactory.getWebDriver().get(site);
                 break;
         }
-        LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl()+"\n");
+        LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl() + "\n");
 
     }
 
     @Когда("^сохраняем в память таблицу$")
-    public static void saveKeyValueTable(DataTable dataTable){
+    public static void saveKeyValueTable(DataTable dataTable) {
         Map<String, String> date = dataTable.asMap(String.class, String.class);
         int birthDay, birthMonth, birthYear;
         String berthdayDate;
@@ -185,17 +166,17 @@ public class CommonStepDefs extends GenericStepDefs {
      *
      * @param key - ключ по которому сохраняем е-mail в памяти.
      */
-    @Когда ("^генерим email в \"([^\"]*)\"$")
-    public static void generateEmailAndSave(String key){
+    @Когда("^генерим email в \"([^\"]*)\"$")
+    public static void generateEmailAndSave(String key) {
         String value = "testregistrator+" + System.currentTimeMillis() + "@yandex.ru";
         LOG.info("Сохраняем в память key:" + key + "|value::" + value);
-        Stash.put(key,value);
+        Stash.put(key, value);
     }
 
 
     @Когда("^подтверждаем видеорегистрацию \"([^\"]*)\"$")
     public static void confirmVidochat(String param) {
-      String sqlRequest = "UPDATE gamebet.`user` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
+        String sqlRequest = "UPDATE gamebet.`user` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
         workWithDB(sqlRequest);
         LOG.info("Подтвердили видеорегистрацию");
 
@@ -209,7 +190,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
-    private static void workWithDB(String sqlRequest){
+    private static void workWithDB(String sqlRequest) {
         Connection con = DBUtils.getConnection();
         PreparedStatement ps = null;
         int rs;
@@ -220,30 +201,9 @@ public class CommonStepDefs extends GenericStepDefs {
             con.commit();
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
-            DBUtils.closeAll(con,ps,null);
+        } finally {
+            DBUtils.closeAll(con, ps, null);
         }
-    }
-
-    private static String workWithDBgetResult(String sqlRequest,String param){
-        Connection con = DBUtils.getConnection();
-        Statement stmt = null;
-        PreparedStatement ps = null;
-        ResultSet rs;
-        String result = "";
-        try {
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(sqlRequest);
-            rs.last();
-            result=rs.getString(param);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }finally {
-            DBUtils.closeAll(con,ps,null);
-        }
-
-        return result;
-
     }
 
 
@@ -256,15 +216,16 @@ public class CommonStepDefs extends GenericStepDefs {
      * @throws PageInitializationException при неудачной инициализации страницы
      */
     public void openPage(String title) throws PageInitializationException {
-            for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
-                PageFactory.getWebDriver().switchTo().window(windowHandle);
-            }
+        for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
+            PageFactory.getWebDriver().switchTo().window(windowHandle);
+        }
         PageFactory.getInstance().getPage(title);
     }
 
 
     /**
      * ожидание пока аттрибут без учета регистра будет содержать подстроку
+     *
      * @param locator
      * @param attribute
      * @param value
@@ -273,19 +234,19 @@ public class CommonStepDefs extends GenericStepDefs {
     public static ExpectedCondition<Boolean> attributeContainsLowerCase(final By locator,
                                                                         final String attribute,
                                                                         final String value) {
-             return new ExpectedCondition<Boolean>() {
-                private String currentValue = null;
+        return new ExpectedCondition<Boolean>() {
+            private String currentValue = null;
 
             @Override
             public Boolean apply(WebDriver driver) {
-                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase()) ? true : false;
             }
 
-                @Override
-                public String toString() {
-                    return String.format("value to contain \"%s\". Current value: \"%s\"", value, currentValue);
-                }
-            };
+            @Override
+            public String toString() {
+                return String.format("value to contain \"%s\". Current value: \"%s\"", value, currentValue);
+            }
+        };
     }
 
 
@@ -297,7 +258,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
             @Override
             public Boolean apply(WebDriver driver) {
-                return element.getAttribute(attribute).toLowerCase().contains(value.toLowerCase())?true:false;
+                return element.getAttribute(attribute).toLowerCase().contains(value.toLowerCase()) ? true : false;
             }
 
             @Override
@@ -311,6 +272,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void waitOfPreloader() {
         waitOfPreloader(60);
     }
+
     public static void waitOfPreloader(int num) {
         LOG.debug("Проверка на наличие бесконечных прелоадеров");
         WebDriver driver = PageFactory.getDriver();
@@ -339,8 +301,8 @@ public class CommonStepDefs extends GenericStepDefs {
                 }
             } while (!list.isEmpty() && count > 0);
         } catch (org.openqa.selenium.StaleElementReferenceException e) {
-            LOG.error(""+e);
-        } catch (InterruptedException ie){
+            LOG.error("" + e);
+        } catch (InterruptedException ie) {
             ie.getMessage();
         }
         if (count <= 0) {
@@ -353,12 +315,13 @@ public class CommonStepDefs extends GenericStepDefs {
 
     /**
      * Провкрутка страницы на х и y
+     *
      * @param x прокрутка по горизонтали
      * @param y прокрутка по вертикали
      */
-    public static void scrollPage(int x, int y){
+    public static void scrollPage(int x, int y) {
         WebDriver driver = PageFactory.getDriver();
-        ((JavascriptExecutor)driver).executeScript("window.scroll(" + x + ","
+        ((JavascriptExecutor) driver).executeScript("window.scroll(" + x + ","
                 + y + ");");
     }
 
@@ -379,12 +342,13 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * проверка что из Ближвйших трансляци переход на правильную игру
      * сравнивает на совпадение название спорта, команд и првоеряет есть ли видео если страница Лайв
+     *
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      * @throws Exception
      */
     public void checkLinkToGame() throws Exception {
         WebDriver driver = PageFactory.getDriver();
-        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         workWithPreloader();
         boolean flag = true;
         boolean haveButton = Stash.getValue("haveButtonKey");
@@ -420,25 +384,26 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^(?:пользователь |он |)(?:осуществляет переход в) \"([^\"]*)\"$")
-    public void changeFocusOnPage(String title) throws PageInitializationException{
+    public void changeFocusOnPage(String title) throws PageInitializationException {
         super.openPage(title);
     }
 
 
-    public static void addStash(String key,String value){
+    public static void addStash(String key, String value) {
         List<String> values = new ArrayList<>();
-        if (Stash.asMap().containsKey(key)){
+        if (Stash.asMap().containsKey(key)) {
             values = Stash.getValue(key);
             values.add(value);
-            Stash.asMap().replace(key,values);
-        }
-        else {
+            Stash.asMap().replace(key, values);
+        } else {
             values.add(value);
             Stash.put(key, values);
         }
     }
+
     /**
      * Проверка что при нажатии на ссылку открывается нужная страница. Проверка идет по url, причем эти url очищаются от всех символов, кроме букв и цифр. т.е. слеши собого значения тут не имеют
+     *
      * @param element - на какой элемент жмакать чтобы открылась ссылка
      * @param pattern - ссылка или ее часть, которая должна открыться
      * @return true - если все ок.
@@ -448,14 +413,13 @@ public class CommonStepDefs extends GenericStepDefs {
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
         LOG.info("Проверяем что откроется правильная ссылка " + pattern);
-        pattern=stringParse(pattern);
+        pattern = stringParse(pattern);
         int CountWind = driver.getWindowHandles().size();
         if (element.findElements(xpath("ancestor-or-self::*[@target='_blank']")).isEmpty()) {
 
             ((JavascriptExecutor) driver)//открываем ссылку в новой вкладке
                     .executeScript("window.open(arguments[0])", element);
-        }
-        else element.click();
+        } else element.click();
         CommonStepDefs.workWithPreloader();
         driver.switchTo().window(driver.getWindowHandles().toArray()[driver.getWindowHandles().size() - 1].toString());
         if ((CountWind + 1) != driver.getWindowHandles().size()) {
@@ -467,7 +431,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String siteUrl = stringParse(driver.getCurrentUrl());
         if (!siteUrl.contains(pattern)) {
             flag = false;
-            LOG.error("Ссылка открылась, но не то, что надо. Вместо "+pattern +" открылось " + siteUrl);
+            LOG.error("Ссылка открылась, но не то, что надо. Вместо " + pattern + " открылось " + siteUrl);
         }
         driver.close();
         driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind - 1].toString()); //мы знаем что поле открытия ссылки на скачивание количесвто ссылок будет на  больше, незачем переопрелеть CountWind.
@@ -475,11 +439,11 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^(пользователь |он) очищает cookies$")
-    public static void cleanCookies(){
+    public static void cleanCookies() {
         try {
             PageFactory.getWebDriver().manage().deleteAllCookies();
             LOG.info("Удаляем Cookies");
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error(e.getMessage());
         }
     }
@@ -487,9 +451,10 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * прелоадер должен обязательно появиться, если его не было - значит способ пополнения как бы и не выбран. поэтому эта ункция ждет чтобы прелоадер точно был,
      * но чтобы был не бесконечен
+     *
      * @throws Exception
      */
-    public static void waitToPreloader(){
+    public static void waitToPreloader() {
         WebDriver driver = PageFactory.getDriver();
         int count = 20;
         try {
@@ -505,15 +470,16 @@ public class CommonStepDefs extends GenericStepDefs {
                 }
             }
         } catch (Exception e) {
-            LOG.error(""+e);
+            LOG.error("" + e);
         }
     }
 
     /**
      * открытие новой вкладки по адресу URl из входного параметра
+     *
      * @param newUrl - URl, который нужноввести в этой новой вкладке
-     *      */
-    public static void newWindow(String newUrl){
+     */
+    public static void newWindow(String newUrl) {
         WebDriver driver = PageFactory.getDriver();
         Set<String> currentHandles = driver.getWindowHandles();
         ((ChromeDriver) driver).executeScript("window.open()");
@@ -524,24 +490,26 @@ public class CommonStepDefs extends GenericStepDefs {
         driver.get(newUrl);
         new WebDriverWait(driver, 10).until(ExpectedConditions.urlToBe(newUrl));
     }
+
     /**
      * функиця, которая ждет пока элмент станет доступным. ждет, но не кликает
+     *
      * @param element
      * @throws Exception
      */
-    public static void waitEnabled(WebElement element) throws Exception{
+    public static void waitEnabled(WebElement element) throws Exception {
         int count = 20;
         try {
             while (count > 0) {
                 if (element.isEnabled()) break;
                 Thread.sleep(500);
                 count--;
-                if (count==0){
+                if (count == 0) {
                     Assertions.fail("За 10 секунд элемент " + element + " так и не стал доступным");
                 }
             }
         } catch (org.openqa.selenium.StaleElementReferenceException e) {
-            LOG.error(""+e);
+            LOG.error("" + e);
         }
     }
 
@@ -565,9 +533,9 @@ public class CommonStepDefs extends GenericStepDefs {
         JSONObject jsonObject = new JSONObject();
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
-            if(entry.getValue().matches("^[A-Z]+$")){
+            if (entry.getValue().matches("^[A-Z]+$")) {
                 value = Stash.getValue(entry.getValue());
-            }else {
+            } else {
                 value = entry.getValue();
             }
             try {
@@ -585,9 +553,11 @@ public class CommonStepDefs extends GenericStepDefs {
                     @Override
                     public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
                     }
+
                     @Override
                     public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
                     }
+
                     @Override
                     public X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
@@ -609,7 +579,7 @@ public class CommonStepDefs extends GenericStepDefs {
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-            writer.write(params.replaceAll("'","\""));
+            writer.write(params.replaceAll("'", "\""));
             writer.close();
             BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuffer jsonString = new StringBuffer();
@@ -620,9 +590,9 @@ public class CommonStepDefs extends GenericStepDefs {
             br.close();
             con.disconnect();
             LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
-            if(StringUtils.isNoneEmpty(jsonString)) {
+            if (StringUtils.isNoneEmpty(jsonString)) {
                 Stash.put(keyStash, jsonString);
-            }else {
+            } else {
                 throw new AutotestError("ОШИБКА! Пустая строка JSON");
             }
         } catch (Exception e1) {
@@ -630,7 +600,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда ("^проверка ответа API из \"([^\"]*)\":$")
+    @Когда("^проверка ответа API из \"([^\"]*)\":$")
     public void checkresponceAPI(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         String actual = Stash.getValue(keyStash).toString();
@@ -639,92 +609,49 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 
-    @Когда ("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
+    @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
         JsonParser jparser = new JsonParser();
         String tmp = Stash.getValue(sourceString).toString();
-        JSONObject jsonObject;
         String valueFingingParams = "";
 
-        Map<String, Object> retMap = new Gson()
-                .fromJson(tmp, new TypeToken<HashMap<String, Object>>() {}.getType());
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
 
-//        retMap.get("")
-
-//        try {
-//            jsonObject = jparser.read(tmp, "$.[*]");
-//            valueFingingParams =  jsonObject.get(keyFingingParams).toString();
-//        } catch (ParserException e) {
-//            e.getMessage();
-//        }
-
-     //   JSONObject jsonObject = new JSONObject(Stash.getValue(sourceString));
-      //  valueFingingParams =  jsonObject.get(keyFingingParams).toString();
-
+        HashMap<String,Object> retMap = null;
+        try {
+            retMap = mapper.readValue(tmp, typeRef);
+        } catch (IOException e) {
+            e.getMessage();
+        }
+        valueFingingParams = hashMapper(retMap, keyFingingParams);
         LOG.info("Достаем значение и запысываем в память::" + valueFingingParams);
-        Stash.put(keyFingingParams,valueFingingParams);
-//        Pattern pattern = Pattern.compile("\\[(.*?)\\]");
-//        Matcher m = pattern.matcher(Stash.getValue(sourceString));
-//        while (m.find()) {
-//            String s = m.group(1);
-//            // s now contains "BAR"
-//        }
+        Stash.put(keyFingingParams, valueFingingParams);
     }
 
-
-
-
-    @Когда("^получаем код подтверждения телефона \"([^\"]*)\"$")
-    public static void confirmPhone(String param) {
-        String phone = Stash.getValue("PHONE");
-        String sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='"+phone+"' ORDER BY creation_date";
-        String code = workWithDBgetResult(sqlRequest,"code");
-        Stash.put(param,code);
-        LOG.info("Получили код подтверждения телефона: " + code);
+    /**
+     * Метод пробегает по Map of Maps и ищет ключ
+     * и возвращает либо значение по искомогу ключу или null
+     * @param finding - искомый ключ
+     * @param map - Map of Maps
+     */
+    private String hashMapper(Map<String, Object> map, String finding){
+        String key, request = null;
+        Object value;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            key = entry.getKey();
+            value = entry.getValue();
+            if (value instanceof String) {
+                if (key.equalsIgnoreCase(finding)) {
+                    return request = ((String) value).trim();
+                }
+            } else if (value instanceof Map) {
+                Map<String, Object> subMap = (Map<String, Object>) value;
+                request = hashMapper(subMap, finding);
+            } else if(!(value instanceof Integer)){
+                throw new IllegalArgumentException(String.valueOf(value));
+            }
+        }
+        return request;
     }
-
-    @Когда("^получаем код подтверждения почты \"([^\"]*)\"$")
-    public static void confirmEmail(String param) {
-        String email = Stash.getValue("EMAIL");
-        String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='"+email + "'";
-        String userId = workWithDBgetResult(sqlRequest,"id");
-        sqlRequest = "SELECT code FROM gamebet.`useremailconfirmationcode`  WHERE user_id="+userId;
-        String code = workWithDBgetResult(sqlRequest,"code");
-        Stash.put(param,code);
-        LOG.info("Получили код подтверждения почты: " + code);
-    }
-
-    @Когда("^определяем валидную и невалидную дату выдачи паспорта \"([^\"]*)\" \"([^\"]*)\"$")
-    public void issueDateGenerate(String validKey, String invalidKey) throws ParseException {
-        String birthDateString = Stash.getValue("BIRTHDATE");
-        SimpleDateFormat formatDate = new SimpleDateFormat();
-        formatDate.applyPattern("dd.MM.yyyy");
-        Date birthDate= formatDate.parse(birthDateString);
-        Date now = new Date();
-        Date valid = new Date();
-        long days = TimeUnit.DAYS.convert(now.getTime() - birthDate.getTime(),TimeUnit.MILLISECONDS) + 2*24*3600;
-        int years = (int) (days/365);// количество полных лет (считается без учета високосных лет
-        valid.setDate(valid.getDate()-1);//валидная дата выдачи паспорта - это вчерашний день. точно валидна
-        Calendar invalid = new GregorianCalendar();
-        invalid.setTime(birthDate);
-        invalid.add(Calendar.YEAR,17);
-        Stash.put(validKey,formatDate.format(valid));
-        Stash.put(invalidKey,formatDate.format(invalid.getTime()));
-
-        LOG.info("Дата рождения: " + birthDateString);
-        LOG.info("Валидная дата выдачи паспорта: " + formatDate.format(valid));
-        LOG.info("Невалидна дата выдачи паспорта: " + formatDate.format(invalid.getTime()));
-    }
-
-    @Когда("^временная функция запоминания токена$")
-    public static void gettoken() {
-        String actual = Stash.getValue("responceAPI").toString();
-        int a = actual.indexOf("Token");
-        actual=actual.substring(a);
-        a = actual.indexOf(":");
-        int b = actual.substring(a+2).indexOf("\"");
-        String token = actual.substring(a+2,b+a+2);
-        Stash.put("TOKEN",token);
-    }
-
 }
