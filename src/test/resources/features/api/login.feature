@@ -12,8 +12,8 @@
       | pass   | Parol123               |
       | source | 16                     |
 
-    * проверка ответа API из "responceAPI":
-    | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+    | exepted | "code":0,"data":{"status": |
 
   @fail
   Сценарий: 3_19 Аутентификация пользователя. Негативный кейс
@@ -24,7 +24,7 @@
       | pass   | 0 |
       | source | 0 |
 
-    * проверка ответа API из "responceAPI":
-      | exepted | "code":1 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | {"code":1,"data":{"message": |
 
 

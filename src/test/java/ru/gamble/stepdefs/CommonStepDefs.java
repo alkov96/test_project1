@@ -98,6 +98,13 @@ public class CommonStepDefs extends GenericStepDefs {
             value = day.toString() + "." + mons + "." + year.toString();
         }
 
+        if(value.equals(RANDOME_PHONE)){
+            value = "70" + Generators.randomNumber(9);
+        }
+        if(value.equals(RANDOME_EMAIL)){
+            value = "testregistrator+" + System.currentTimeMillis() + "@yandex.ru";
+        }
+
         Stash.put(key, value);
         LOG.info("key:" + key + "| value::" + value);
     }
@@ -533,7 +540,7 @@ public class CommonStepDefs extends GenericStepDefs {
         JSONObject jsonObject = new JSONObject();
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
-            if (entry.getValue().matches("^[A-Z]+$")) {
+            if (entry.getValue().matches("^[A-Z_]+$")) {
                 value = Stash.getValue(entry.getValue());
             } else {
                 value = entry.getValue();
@@ -590,6 +597,7 @@ public class CommonStepDefs extends GenericStepDefs {
             br.close();
             con.disconnect();
             LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
+            LOG.info("");
             if (StringUtils.isNoneEmpty(jsonString)) {
                 Stash.put(keyStash, jsonString);
             } else {
@@ -625,7 +633,7 @@ public class CommonStepDefs extends GenericStepDefs {
             e.getMessage();
         }
         valueFingingParams = hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение и запысываем в память::" + valueFingingParams);
+        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + valueFingingParams);
         Stash.put(keyFingingParams, valueFingingParams);
     }
 

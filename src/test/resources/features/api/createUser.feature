@@ -15,23 +15,16 @@
     * сохраняем в память
       | DEVID  | Default |
     * сохраняем в память
-      | PHONE  | Default |
+      | PHONE  | randomPhone |
     * сохраняем в память
-      | EMAIL  | Default |
+      | EMAIL  | randomEmail |
     * сохраняем в память
       | PASS  | Default |
 
   @api
-  @Registration_mobile
-  Сценарий: Мобильная регистрация
-
-
-#    * запрос к API "api/mobile/v3/sendPhoneCode":
-#      | devId  | Default                           |
-#      | phone  | Default |
-#
-#    * проверка ответа API:
-#      | exepted  |  "code":0  |
+  @createUser
+  @correct
+  Сценарий: 3_7	Создание пользователя. Позитивный кейс
 
     * переходит на главную страницу
     * открывается страница "Главная страница"
@@ -48,3 +41,6 @@
       | phoneConfirmationCode | CODE       |
       | email                 | EMAIL      |
       | pass                  | PASS       |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted  |  "code":0,"data":{  |
