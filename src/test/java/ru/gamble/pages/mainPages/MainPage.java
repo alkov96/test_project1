@@ -427,8 +427,10 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-
-        int index = Stash.getValue("indexLandingSportKey");
+        int index=0;
+        if (Stash.asMap().containsKey("indexLandingSportKey")){
+            index= Stash.getValue("indexLandingSportKey");
+        }
         LOG.info(driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).getText());
         String sport = driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).getAttribute("href").substring(1);
         driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).click();

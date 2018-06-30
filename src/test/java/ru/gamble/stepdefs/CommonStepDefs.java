@@ -36,10 +36,12 @@ import java.io.*;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,7 +83,18 @@ public class CommonStepDefs extends GenericStepDefs {
                 e.getMessage();
             }
         }
+        if (value.contains("randomint")){
+            StringBuilder result = new StringBuilder();
+            int count = Integer.valueOf(value.replace("randomint","").trim());
+            for (int i = 0; i <= count; i++) {
+                result.append((char) ('0' + new Random().nextInt(9)));
+            }
+            value=result.toString();
+        }
 
+        if (value.equals("EmailGenerate")){
+            value = "testregistrator+"+Stash.getValue("PHONE")+"@yandex.ru";
+        }
         if (value.equals(RANDOM)) {
             value = Generators.randomString(25);
         }
@@ -662,4 +675,71 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         return request;
     }
+
+
+    private static String workWithDBgetResult(String sqlRequest,String param) {
+        Connection con = DBUtils.getConnection();
+        Statement stmt = null;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        String result = "";
+        try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlRequest);
+            rs.last();
+            result = rs.getString(param);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtils.closeAll(con, ps, null);
+        }
+
+        return result;
+    }
+
+
+
+        @Когда("^получаем код подтверждения телефона \"([^\"]*)\"$")
+    public static void confirmPhone(String param) {
+        String phone = Stash.getValue("PHONE");
+        String sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='"+phone+"' ORDER BY creation_date";
+        String code = workWithDBgetResult(sqlRequest,"code");
+        Stash.put(param,code);
+        LOG.info("Получили код подтверждения телефона: " + code);
+    }
+
+    @Когда("^получаем код подтверждения почты \"([^\"]*)\"$")
+    public static void confirmEmail(String param) {
+        String email = Stash.getValue("EMAIL");
+        String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='"+email + "'";
+        String userId = workWithDBgetResult(sqlRequest,"id");
+        sqlRequest = "SELECT code FROM gamebet.`useremailconfirmationcode`  WHERE user_id="+userId;
+        String code = workWithDBgetResult(sqlRequest,"code");
+        Stash.put(param,code);
+        LOG.info("Получили код подтверждения почты: " + code);
+    }
+
+    @Когда("^определяем валидную и невалидную дату выдачи паспорта \"([^\"]*)\" \"([^\"]*)\"$")
+    public void issueDateGenerate(String validKey, String invalidKey) throws ParseException {
+        String birthDateString = Stash.getValue("BIRTHDATE");
+        SimpleDateFormat formatDate = new SimpleDateFormat();
+        formatDate.applyPattern("dd.MM.yyyy");
+        Date birthDate= formatDate.parse(birthDateString);
+        Date now = new Date();
+        Date valid = new Date();
+        long days = TimeUnit.DAYS.convert(now.getTime() - birthDate.getTime(),TimeUnit.MILLISECONDS) + 2*24*3600;
+        int years = (int) (days/365);// количество полных лет (считается без учета високосных лет
+        valid.setDate(valid.getDate()-1);//валидная дата выдачи паспорта - это вчерашний день. точно валидна
+        Calendar invalid = new GregorianCalendar();
+        invalid.setTime(birthDate);
+        invalid.add(Calendar.YEAR,17);
+        Stash.put(validKey,formatDate.format(valid));
+        Stash.put(invalidKey,formatDate.format(invalid.getTime()));
+
+        LOG.info("Дата рождения: " + birthDateString);
+        LOG.info("Валидная дата выдачи паспорта: " + formatDate.format(valid));
+        LOG.info("Невалидна дата выдачи паспорта: " + formatDate.format(invalid.getTime()));
+    }
+
+
 }
