@@ -9,7 +9,7 @@
     * сохраняем в память
       | PATRONYMIC | random |
     * сохраняем в память
-      | BIRTH_DATE | randomdate |
+      | BIRTH_DATE | randomDate |
     * сохраняем в память
       | CODE | random |
     * сохраняем в память
@@ -21,14 +21,19 @@
     * сохраняем в память
       | PASS  | Default |
 
+      * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "responceAPI":
+        | devId | DEVID |
+        | phone | PHONE |
+
+      * проверка ответа API из "responceAPI":
+        | exepted | "code":0 |
+
+      * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE"
+
   @api
   @createUser
   @correct
   Сценарий: 3_7	Создание пользователя. Позитивный кейс
-
-    * переходит на главную страницу
-    * открывается страница "Главная страница"
-    * пользователь (получает смс-код для подтверждения телефона) "CODE"
 
     * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
       | devId                 | DEVID      |
@@ -43,4 +48,4 @@
       | pass                  | PASS       |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted  |  "code":0,"data":{  |
+      | exepted | "code":0,"data":{"status": |

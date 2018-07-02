@@ -83,16 +83,16 @@ public class CommonStepDefs extends GenericStepDefs {
                 e.getMessage();
             }
         }
-        if (value.contains("randomint")){
+        if (value.contains(RANDOME_NUMBER)){
             StringBuilder result = new StringBuilder();
-            int count = Integer.valueOf(value.replace("randomint","").trim());
+            int count = Integer.valueOf(value.replace(RANDOME_NUMBER,"").trim());
             for (int i = 0; i <= count; i++) {
                 result.append((char) ('0' + new Random().nextInt(9)));
             }
             value=result.toString();
         }
 
-        if (value.equals("EmailGenerate")){
+        if (value.equals(RANDOME_EMAIL)){
             value = "testregistrator+"+Stash.getValue("PHONE")+"@yandex.ru";
         }
         if (value.equals(RANDOM)) {
@@ -113,9 +113,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
         if(value.equals(RANDOME_PHONE)){
             value = "70" + Generators.randomNumber(9);
-        }
-        if(value.equals(RANDOME_EMAIL)){
-            value = "testregistrator+" + System.currentTimeMillis() + "@yandex.ru";
         }
 
         Stash.put(key, value);
@@ -676,7 +673,6 @@ public class CommonStepDefs extends GenericStepDefs {
         return request;
     }
 
-
     private static String workWithDBgetResult(String sqlRequest,String param) {
         Connection con = DBUtils.getConnection();
         Statement stmt = null;
@@ -693,29 +689,26 @@ public class CommonStepDefs extends GenericStepDefs {
         } finally {
             DBUtils.closeAll(con, ps, null);
         }
-
         return result;
     }
 
-
-
-        @Когда("^получаем код подтверждения телефона \"([^\"]*)\"$")
-    public static void confirmPhone(String param) {
-        String phone = Stash.getValue("PHONE");
-        String sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='"+phone+"' ORDER BY creation_date";
+        @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\"$")
+    public static void confirmPhone(String keyCode, String keyPhone) {
+        String phone = Stash.getValue(keyPhone);
+        String sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
         String code = workWithDBgetResult(sqlRequest,"code");
-        Stash.put(param,code);
+        Stash.put(keyCode, code);
         LOG.info("Получили код подтверждения телефона: " + code);
     }
 
-    @Когда("^получаем код подтверждения почты \"([^\"]*)\"$")
-    public static void confirmEmail(String param) {
-        String email = Stash.getValue("EMAIL");
+    @Когда("^получаем и сохраняем в память код \\\"([^\\\"]*)\\\" подтверждения почты \\\"([^\\\"]*)\\\"$")
+    public static void confirmEmail(String keyEmailCode, String keyEmail) {
+        String email = Stash.getValue(keyEmail);
         String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='"+email + "'";
         String userId = workWithDBgetResult(sqlRequest,"id");
         sqlRequest = "SELECT code FROM gamebet.`useremailconfirmationcode`  WHERE user_id="+userId;
         String code = workWithDBgetResult(sqlRequest,"code");
-        Stash.put(param,code);
+        Stash.put(keyEmailCode,code);
         LOG.info("Получили код подтверждения почты: " + code);
     }
 

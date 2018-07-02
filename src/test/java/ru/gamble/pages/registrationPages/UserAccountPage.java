@@ -76,7 +76,6 @@ public class UserAccountPage extends AbstractPage{
     @FindBy(xpath = "//div[@class='modal__btn-row']/button[text()='Ок']")
     private WebElement okButton;
 
-
     public UserAccountPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
@@ -106,7 +105,6 @@ public class UserAccountPage extends AbstractPage{
         String email = Stash.getValue(data.get(EMAIL));
         LOG.info("Вводим e-mail::" + email);
         fillField(inputEmail, email);
-
 
         String password = data.get(PASSWORD);
         LOG.info("Вводим пароль::" + password);
