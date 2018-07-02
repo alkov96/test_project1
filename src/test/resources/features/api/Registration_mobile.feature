@@ -15,7 +15,7 @@
       | BIRTHDATE | randomDate |
 
     * сохраняем в память
-      | DEVID  | Default |
+      | DEVID  | randomNumber 4 |
 
     * сохраняем в память
       | PHONE  | randomPhone |
@@ -107,6 +107,28 @@
     * находим и сохраняем "AUTHTOKEN" из "responceAPI"
 
     * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
+
+    * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
+      | gender                  | MALE             |
+      | birthplace              | BIRTHPLACE       |
+      | region                  | Москва           |
+      | locality                | CITY             |
+      | street                  | STREET           |
+      | house                   | HOUSE            |
+      | construction            |                  |
+      | housing                 |                  |
+      | flat                    | FLAT             |
+      | docNum                  | DOCNUM           |
+      | docSeries               | DOCSERIES        |
+      | issueDate               | INVALIDISSUEDATE |
+      | issuePlace              | ISSUEPLACE       |
+      | codePlace               | CODEPLACE        |
+
+    * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "responceAPI":
+      | devId                   | DEVID            |
+      | authToken               | AUTHTOKEN        |
+      | source                  | 16               |
+      | personalData            | PERSONALDATA     |
 
 #    * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "responceAPI":
 #      | devId                   | DEVID           |

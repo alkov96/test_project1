@@ -13,7 +13,8 @@
     * сохраняем в память
       | CODE | random |
     * сохраняем в память
-      | DEVID  | Default |
+      | DEVID  | randomNumber 4 |
+#      | DEVID  | Default |
     * сохраняем в память
       | PHONE  | randomPhone |
     * сохраняем в память

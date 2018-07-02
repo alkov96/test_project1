@@ -2,6 +2,8 @@ package ru.gamble.stepdefs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
+import net.minidev.json.JSONArray;
+import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import cucumber.api.java.ru.*;
@@ -83,17 +85,17 @@ public class CommonStepDefs extends GenericStepDefs {
                 e.getMessage();
             }
         }
-        if (value.contains(RANDOME_NUMBER)){
+        if (value.contains(RANDOME_NUMBER)) {
             StringBuilder result = new StringBuilder();
-            int count = Integer.valueOf(value.replace(RANDOME_NUMBER,"").trim());
+            int count = Integer.valueOf(value.replace(RANDOME_NUMBER, "").trim());
             for (int i = 0; i <= count; i++) {
                 result.append((char) ('0' + new Random().nextInt(9)));
             }
-            value=result.toString();
+            value = result.toString();
         }
 
-        if (value.equals(RANDOME_EMAIL)){
-            value = "testregistrator+"+Stash.getValue("PHONE")+"@yandex.ru";
+        if (value.equals(RANDOME_EMAIL)) {
+            value = "testregistrator+" + Stash.getValue("PHONE") + "@yandex.ru";
         }
         if (value.equals(RANDOM)) {
             value = Generators.randomString(25);
@@ -111,7 +113,7 @@ public class CommonStepDefs extends GenericStepDefs {
             value = day.toString() + "." + mons + "." + year.toString();
         }
 
-        if(value.equals(RANDOME_PHONE)){
+        if (value.equals(RANDOME_PHONE)) {
             value = "70" + Generators.randomNumber(9);
         }
 
@@ -533,7 +535,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestToAPI(String path, String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String key, value, requestUrl, requestPath, requestFull = "", params;
+        String requestUrl, requestPath, requestFull = "";
         URL url;
         requestPath = path;
         LOG.info("Собираем строку запроса.");
@@ -548,21 +550,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         LOG.info("Собираем параметы в JSON строку");
         JSONObject jsonObject = new JSONObject();
-        for (Map.Entry<String, String> entry : table.entrySet()) {
-            key = entry.getKey();
-            if (entry.getValue().matches("^[A-Z_]+$")) {
-                value = Stash.getValue(entry.getValue());
-            } else {
-                value = entry.getValue();
-            }
-            try {
-                jsonObject.put(key, value);
-            } catch (JsonException e) {
-                e.printStackTrace();
-            }
-        }
-        params = jsonObject.toString();
-        LOG.info(params);
+        String params = collectParametersInJSONString(dataTable);
 
         //************Этот код нужен для соединения по HTTPS
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -596,7 +584,7 @@ public class CommonStepDefs extends GenericStepDefs {
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-            writer.write(params.replaceAll("'", "\""));
+            writer.write(params.toString().replaceAll("'", "\""));
             writer.close();
             BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuffer jsonString = new StringBuffer();
@@ -634,9 +622,10 @@ public class CommonStepDefs extends GenericStepDefs {
         String valueFingingParams = "";
 
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        };
 
-        HashMap<String,Object> retMap = null;
+        HashMap<String, Object> retMap = null;
         try {
             retMap = mapper.readValue(tmp, typeRef);
         } catch (IOException e) {
@@ -650,10 +639,11 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * Метод пробегает по Map of Maps и ищет ключ
      * и возвращает либо значение по искомогу ключу или null
+     *
      * @param finding - искомый ключ
-     * @param map - Map of Maps
+     * @param map     - Map of Maps
      */
-    private String hashMapper(Map<String, Object> map, String finding){
+    private String hashMapper(Map<String, Object> map, String finding) {
         String key, request = null;
         Object value;
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -666,14 +656,14 @@ public class CommonStepDefs extends GenericStepDefs {
             } else if (value instanceof Map) {
                 Map<String, Object> subMap = (Map<String, Object>) value;
                 request = hashMapper(subMap, finding);
-            } else if(!(value instanceof Integer)){
+            } else if (!(value instanceof Integer)) {
                 throw new IllegalArgumentException(String.valueOf(value));
             }
         }
         return request;
     }
 
-    private static String workWithDBgetResult(String sqlRequest,String param) {
+    private static String workWithDBgetResult(String sqlRequest, String param) {
         Connection con = DBUtils.getConnection();
         Statement stmt = null;
         PreparedStatement ps = null;
@@ -692,11 +682,11 @@ public class CommonStepDefs extends GenericStepDefs {
         return result;
     }
 
-        @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\"$")
+    @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\"$")
     public static void confirmPhone(String keyCode, String keyPhone) {
         String phone = Stash.getValue(keyPhone);
         String sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
-        String code = workWithDBgetResult(sqlRequest,"code");
+        String code = workWithDBgetResult(sqlRequest, "code");
         Stash.put(keyCode, code);
         LOG.info("Получили код подтверждения телефона: " + code);
     }
@@ -704,11 +694,11 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^получаем и сохраняем в память код \\\"([^\\\"]*)\\\" подтверждения почты \\\"([^\\\"]*)\\\"$")
     public static void confirmEmail(String keyEmailCode, String keyEmail) {
         String email = Stash.getValue(keyEmail);
-        String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='"+email + "'";
-        String userId = workWithDBgetResult(sqlRequest,"id");
-        sqlRequest = "SELECT code FROM gamebet.`useremailconfirmationcode`  WHERE user_id="+userId;
-        String code = workWithDBgetResult(sqlRequest,"code");
-        Stash.put(keyEmailCode,code);
+        String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='" + email + "'";
+        String userId = workWithDBgetResult(sqlRequest, "id");
+        sqlRequest = "SELECT code FROM gamebet.`useremailconfirmationcode`  WHERE user_id=" + userId;
+        String code = workWithDBgetResult(sqlRequest, "code");
+        Stash.put(keyEmailCode, code);
         LOG.info("Получили код подтверждения почты: " + code);
     }
 
@@ -717,22 +707,52 @@ public class CommonStepDefs extends GenericStepDefs {
         String birthDateString = Stash.getValue("BIRTHDATE");
         SimpleDateFormat formatDate = new SimpleDateFormat();
         formatDate.applyPattern("dd.MM.yyyy");
-        Date birthDate= formatDate.parse(birthDateString);
+        Date birthDate = formatDate.parse(birthDateString);
         Date now = new Date();
         Date valid = new Date();
-        long days = TimeUnit.DAYS.convert(now.getTime() - birthDate.getTime(),TimeUnit.MILLISECONDS) + 2*24*3600;
-        int years = (int) (days/365);// количество полных лет (считается без учета високосных лет
-        valid.setDate(valid.getDate()-1);//валидная дата выдачи паспорта - это вчерашний день. точно валидна
+        long days = TimeUnit.DAYS.convert(now.getTime() - birthDate.getTime(), TimeUnit.MILLISECONDS) + 2 * 24 * 3600;
+        int years = (int) (days / 365);// количество полных лет (считается без учета високосных лет
+        valid.setDate(valid.getDate() - 1);//валидная дата выдачи паспорта - это вчерашний день. точно валидна
         Calendar invalid = new GregorianCalendar();
         invalid.setTime(birthDate);
-        invalid.add(Calendar.YEAR,17);
-        Stash.put(validKey,formatDate.format(valid));
-        Stash.put(invalidKey,formatDate.format(invalid.getTime()));
+        invalid.add(Calendar.YEAR, 17);
+        Stash.put(validKey, formatDate.format(valid));
+        Stash.put(invalidKey, formatDate.format(invalid.getTime()));
 
         LOG.info("Дата рождения: " + birthDateString);
         LOG.info("Валидная дата выдачи паспорта: " + formatDate.format(valid));
         LOG.info("Невалидна дата выдачи паспорта: " + formatDate.format(invalid.getTime()));
     }
 
+    @Когда("^добавляем данные в JSON объект \"([^\"]*)\" сохраняем в память:$")
+    public void добавляем_данные_в_JSON_объект_сохраняем_в_память(String keyJSONObject, DataTable dataTable) {
 
+        String jSONString = collectParametersInJSONString(dataTable);
+        Stash.put(keyJSONObject, jSONString);
+        LOG.info("Сохранили в память key==>[" + keyJSONObject + "] :: value==>[" + jSONString + "]");
+
+    }
+
+    private String collectParametersInJSONString(DataTable dataTable) {
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        String key, params, value;
+        LOG.info("Собираем параметы в JSON строку");
+        JSONObject jsonObject = new JSONObject();
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+            key = entry.getKey();
+            if (entry.getValue().matches("^[A-Z_]+$")) {
+                value = Stash.getValue(entry.getValue());
+            } else {
+                value = entry.getValue();
+            }
+            try {
+                jsonObject.put(key, value);
+            } catch (JsonException e) {
+                e.printStackTrace();
+            }
+        }
+        params = jsonObject.toString();
+        LOG.info(params);
+        return params;
+    }
 }
