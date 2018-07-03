@@ -13,7 +13,8 @@
     * сохраняем в память
       | CODE | random |
     * сохраняем в память
-      | DEVID  | Default |
+      | DEVID  | randomNumber 4 |
+#      | DEVID  | Default |
     * сохраняем в память
       | PHONE  | randomPhone |
     * сохраняем в память
@@ -21,11 +22,11 @@
     * сохраняем в память
       | PASS  | Default |
 
-      * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "responceAPI":
+      * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
         | devId | DEVID |
         | phone | PHONE |
 
-      * проверка ответа API из "responceAPI":
+      * проверка ответа API из "RESPONCE_API":
         | exepted | "code":0 |
 
       * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE"

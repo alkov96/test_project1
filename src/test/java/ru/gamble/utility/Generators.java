@@ -88,4 +88,11 @@ public class Generators {
         Stash.put(key,value);
     }
 
+    /**
+     * @return Возвращает случайно строку с полом Мужским или Женским
+     */
+    public static String randomGender(){
+        return Constants.gender.get(new Random().nextInt(Constants.gender.size()));
+    }
+
 }

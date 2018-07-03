@@ -43,10 +43,12 @@ public class Constants {
     public static final String RANDOME_PHONE = "randomPhone";
     public static final String RANDOME_EMAIL = "randomEmail";
     public static final String RANDOME_NUMBER = "randomNumber";
+    public static final String RANDOME_SEX = "randomSex";
 
 
 
     public static final List<String> cities = Arrays.asList("Москва","Санкт-Петербург","Новосибирск","Екатеринбург","Нижний Новгород","Казань","Челябинск","Омск","Самара","Ростов-на-Дону","Уфа","Красноярск","Пермь","Воронеж","Волгоград");
     public static final List<String> sex = Arrays.asList("Мужской","Женский");
+    public static final List<String> gender = Arrays.asList("MALE","FEMALE");
 }
 
