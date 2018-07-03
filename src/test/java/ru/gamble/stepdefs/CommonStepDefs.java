@@ -1,8 +1,13 @@
 package ru.gamble.stepdefs;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
 import cucumber.api.DataTable;
 import net.minidev.json.JSONArray;
+import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
@@ -115,6 +120,10 @@ public class CommonStepDefs extends GenericStepDefs {
 
         if (value.equals(RANDOME_PHONE)) {
             value = "70" + Generators.randomNumber(9);
+        }
+
+        if(value.equals(RANDOME_SEX)){
+            value = Generators.randomGender();
         }
 
         Stash.put(key, value);
@@ -550,7 +559,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         LOG.info("Собираем параметы в JSON строку");
         JSONObject jsonObject = new JSONObject();
-        String params = collectParametersInJSONString(dataTable);
+        Object params = collectParametersInJSONString(dataTable);
 
         //************Этот код нужен для соединения по HTTPS
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -584,7 +593,7 @@ public class CommonStepDefs extends GenericStepDefs {
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-            writer.write(params.toString().replaceAll("'", "\""));
+            writer.write(String.valueOf(params));
             writer.close();
             BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuffer jsonString = new StringBuffer();
@@ -617,9 +626,8 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
-        JsonParser jparser = new JsonParser();
         String tmp = Stash.getValue(sourceString).toString();
-        String valueFingingParams = "";
+        Object valueFingingParams;
 
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
@@ -632,7 +640,7 @@ public class CommonStepDefs extends GenericStepDefs {
             e.getMessage();
         }
         valueFingingParams = hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + valueFingingParams);
+        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + (String) valueFingingParams);
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
@@ -643,15 +651,15 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param finding - искомый ключ
      * @param map     - Map of Maps
      */
-    private String hashMapper(Map<String, Object> map, String finding) {
-        String key, request = null;
-        Object value;
+    private Object hashMapper(Map<String, Object> map, String finding) {
+        String key;
+        Object request = null, value;
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             key = entry.getKey();
             value = entry.getValue();
             if (value instanceof String) {
                 if (key.equalsIgnoreCase(finding)) {
-                    return request = ((String) value).trim();
+                    return request = value;
                 }
             } else if (value instanceof Map) {
                 Map<String, Object> subMap = (Map<String, Object>) value;
@@ -727,17 +735,20 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^добавляем данные в JSON объект \"([^\"]*)\" сохраняем в память:$")
     public void добавляем_данные_в_JSON_объект_сохраняем_в_память(String keyJSONObject, DataTable dataTable) {
 
-        String jSONString = collectParametersInJSONString(dataTable);
+        Object jSONString = collectParametersInJSONString(dataTable);
         Stash.put(keyJSONObject, jSONString);
-        LOG.info("Сохранили в память key==>[" + keyJSONObject + "] :: value==>[" + jSONString + "]");
+        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jSONString) + ")");
 
     }
 
-    private String collectParametersInJSONString(DataTable dataTable) {
+    private Object collectParametersInJSONString(DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String key, params, value;
-        LOG.info("Собираем параметы в JSON строку");
         JSONObject jsonObject = new JSONObject();
+        String key;
+        Object value, params;
+        Map<String, Object> map;
+        ObjectMapper mapper;
+        LOG.info("Собираем параметы в JSON строку");
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
             if (entry.getValue().matches("^[A-Z_]+$")) {
@@ -745,14 +756,42 @@ public class CommonStepDefs extends GenericStepDefs {
             } else {
                 value = entry.getValue();
             }
-            try {
-                jsonObject.put(key, value);
-            } catch (JsonException e) {
-                e.printStackTrace();
-            }
+            jsonObject.put(key, JSONValue.parse(String.valueOf(value)));
         }
         params = jsonObject.toString();
-        LOG.info(params);
+        LOG.info(String.valueOf(params));
         return params;
+    }
+
+    private static Map<String, Object> toMap(JSONObject object) throws JsonException {
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        Iterator<String> keysItr = object.keySet().iterator();
+        while(keysItr.hasNext()) {
+            String key = keysItr.next();
+            Object value = object.get(key);
+            if(value instanceof JsonArray) {
+                value = toList((JsonArray) value);
+            } else if(value instanceof JSONObject) {
+                value = toMap((JSONObject) value);
+            }
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    private static List<Object> toList(JsonArray array) {
+        List<Object> list = new ArrayList<Object>();
+        for(int i = 0; i < array.size(); i++) {
+            Object value = array.get(i);
+            if(value instanceof JsonArray) {
+                value = toList((JsonArray) value);
+            }
+            else if(value instanceof JSONObject) {
+                value = toMap((JSONObject) value);
+            }
+            list.add(value);
+        }
+        return list;
     }
 }
