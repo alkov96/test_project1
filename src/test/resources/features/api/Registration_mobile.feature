@@ -132,6 +132,10 @@
       | source                  | 16               |
       | personalData            | PERSONALDATA     |
 
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | {"code":0,"data":{"status":10,"tsupisStatus":3}} |
+
+
 #    * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "responceAPI":
 #      | devId                   | DEVID           |
 #      | authToken               | AUTHTOKEN           |
