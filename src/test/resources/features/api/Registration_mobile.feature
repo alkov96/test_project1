@@ -15,7 +15,7 @@
       | BIRTHDATE | randomDate |
 
     * сохраняем в память
-      | DEVID  | Default |
+      | DEVID  | randomNumber 4 |
 
     * сохраняем в память
       | PHONE  | randomPhone |
