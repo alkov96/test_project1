@@ -83,6 +83,11 @@ public class CommonStepDefs extends GenericStepDefs {
         String key, value;
         key = data.get(0);
         value = data.get(1);
+
+        if (value.equals("skypeLoginGenerate")) {
+            value = "skype" + Stash.getValue("PHONE");
+        }
+
         if (value.equals(DEFAULT)) {
             try {
                 value = JsonLoader.getData().get("mobile-api").get(key).getValue();
@@ -93,8 +98,8 @@ public class CommonStepDefs extends GenericStepDefs {
         if (value.contains(RANDOME_NUMBER)) {
             StringBuilder result = new StringBuilder();
             int count = Integer.valueOf(value.replace(RANDOME_NUMBER, "").trim());
-            for (int i = 0; i <= count; i++) {
-                result.append((char) ('0' + new Random().nextInt(9)));
+            for (int i = 0; i < count; i++) {
+                result.append((char) ('1' + new Random().nextInt(8)));
             }
             value = result.toString();
         }
@@ -652,19 +657,39 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param map     - Map of Maps
      */
     private Object hashMapper(Map<String, Object> map, String finding) {
+//        String key;
+//        Object request = null, value;
+//        for (Map.Entry<String, Object> entry : map.entrySet()) {
+//            key = entry.getKey();
+//            value = entry.getValue();
+//            if (value instanceof String) {
+//                if (key.equalsIgnoreCase(finding)) {
+//                    return request = value;
+//                }
+//            } else if (value instanceof Map) {
+//                Map<String, Object> subMap = (Map<String, Object>) value;
+//                request = hashMapper(subMap, finding);
+//            } else if (!(value instanceof Integer)) {
+//                throw new IllegalArgumentException(String.valueOf(value));
+//            }
+//        }
+//        return request;
+
+
+
         String key;
         Object request = null, value;
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             key = entry.getKey();
             value = entry.getValue();
-            if (value instanceof String) {
+            if ((value instanceof String) || (value instanceof Integer)) {
                 if (key.equalsIgnoreCase(finding)) {
-                    return request = value;
+                    return request = String.valueOf(value);
                 }
             } else if (value instanceof Map) {
                 Map<String, Object> subMap = (Map<String, Object>) value;
                 request = hashMapper(subMap, finding);
-            } else if (!(value instanceof Integer)) {
+            } else {
                 throw new IllegalArgumentException(String.valueOf(value));
             }
         }
@@ -793,5 +818,32 @@ public class CommonStepDefs extends GenericStepDefs {
             list.add(value);
         }
         return list;
+    }
+
+    @Когда("^определяем незанятый номер телефона и сохраняем в \\\"([^\\\"]*)\\\"$")
+    public static void confirmEmail(String keyPhone) {
+        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7111002%' ORDER BY phone";
+        String phoneLast = workWithDBgetResult(sqlRequest, "phone");
+        String phone = "7111002" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
+        Stash.put(keyPhone, phone);
+        LOG.info("Вычислилии подходящий нмоер телефона" + phone);
+    }
+
+
+    @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\":$")
+    public void checkTimeLeft(String keyTimeLeft,String keyResponse) {
+        String timewasS = Stash.getValue(keyTimeLeft);
+        fingingAndSave(keyTimeLeft,keyResponse);
+        String timenowS = Stash.getValue(keyTimeLeft);
+        Long timewas = Long.parseLong(timewasS);
+        Long timenow = Long.parseLong(timenowS);
+        if (timenow.compareTo(timewas)>=0){
+            Assertions.fail("Время ожидани звонка скайп не изменилось");
+        }
+    }
+    @Когда("^ожидание \\\"([^\\\"]*)\\\"$")
+    public static void justsleep(String sleep) throws InterruptedException {
+        Long mcsleep = Long.parseLong(sleep);
+        Thread.sleep(mcsleep);
     }
 }
