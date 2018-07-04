@@ -1,27 +1,30 @@
 {
-  "dev-bk": {
-    "mainUrl": "https://dev-bk-bet-site.tsed.orglot.office",
-    "adminUrl": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
+  "site1": {
+    "mainurl": "https://dev-bk-bet-site.tsed.orglot.office/",
     "registrationUrl": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
     "login": "regfordepoit@mailinator.com",
-    "password": "Parol123",
-    "db-registration": {
-      "url": "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",
-      "user": "webdev_adm",
-      "password": "tao9Gu8Waenotahv"
-    }
+    "password": "Parol123"
   },
-  "demo": {
-    "mainUrl": "https://demo.gamebet.ru",
-    "adminUrl": "http://demo.gamebet.ru/admin/",
-    "registrationUrl": "https://demo.gamebet.ru/test_registration/",
-    "login": "demo617@mailinator.com",
-    "password": "Parol123",
-    "db-registration": {
-      "url": "jdbc:mysql://main-demo.wd.orglot.office:3306",
-      "user": "stoloto_main",
-      "password": "lizByr4WO#"
-    }
+  "site2": {
+    "mainurl": "https://dev-bk-bet-site.tsed.orglot.office/",
+    "login": "regfordepoit@mailinator.com",
+    "password": "Parol123"
+  },
+  "888-ru":{
+    "mainurl": "https://888.ru/",
+    "login": "bladekeeper@ya.ru",
+    "password": " 1qwert2ASDF"
+  },
+  "db-registration":{
+    "url":"jdbc:mysql://main-demo.wd.orglot.office:3306",
+    "user":"stoloto_main",
+    "password":"lizByr4WO#"
+
+  },
+  "db-registration2":{
+    "url":"jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",
+    "user":"webdev_adm",
+    "password":"tao9Gu8Waenotahv"
   },
   "mobile-api": {
     "mainUrl": "https://demo.gamebet.ru",
