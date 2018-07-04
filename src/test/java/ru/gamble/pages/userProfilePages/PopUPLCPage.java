@@ -640,7 +640,7 @@ public class PopUPLCPage extends AbstractPage {
 
         LOG.info("Ищем поле ввода пароля");
         WebElement password = driver.findElement(By.id(passwordId));
-        fillField(login,passwordWord);
+        fillField(password,passwordWord);
 
         CommonStepDefs.workWithPreloader();
         driver.findElement(By.id("btn_authorization_enter")).click();

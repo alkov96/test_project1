@@ -1,5 +1,7 @@
 package ru.gamble.utility;
 
+import ru.sbtqa.tag.qautils.properties.Props;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -44,6 +46,7 @@ public class Constants {
     public static final String RANDOME_EMAIL = "randomEmail";
     public static final String RANDOME_NUMBER = "randomNumber";
     public static final String RANDOME_SEX = "randomSex";
+    public static final String STARTING_URL = Props.get("webdriver.starting.url");
 
 
 

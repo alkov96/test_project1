@@ -18,6 +18,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.stepdefs.CommonStepDefs;
+import ru.gamble.utility.JsonLoader;
+import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
@@ -32,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.utility.Constants.STARTING_URL;
 
 /**
  * @author p.sivak.
@@ -160,7 +163,14 @@ public class LandingAppPage extends AbstractPage {
                 "ipad_screen5.png"
         );
         List<String> allImg = new ArrayList<>();
-        driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> allImg.add(element.getAttribute("src").replace("https://dev-bk-bet-site1.tsed.orglot.office/images/landing/mobile_app/", "")));
+        driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> {
+            try {
+                allImg.add(element.getAttribute("src")
+                        .replace(JsonLoader.getData().get(STARTING_URL).get("mainUrl") + "https://dev-bk-bet-site1.tsed.orglot.office/images/landing/mobile_app/", ""));
+            } catch (DataException e) {
+                LOG.error(e.getMessage());
+            }
+        });
         if (!allImg.containsAll(waitingImg)) {
             flag = false;
             Assert.fail("Не все картинки прогрузились. На сайте есть следующие картинки " + allImg);

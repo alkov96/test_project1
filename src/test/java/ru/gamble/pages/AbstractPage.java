@@ -187,7 +187,7 @@ public abstract class AbstractPage extends Page {
         String url = "";
 
         try {
-            url = JsonLoader.getData().get("site1").get("mainurl").getValue();
+            url = JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue();
             link = YandexPostman.getLinkForAuthentication(email);
         } catch (DataException de) {
             LOG.error("Ошибка! Не смогли получить ссылку сайта");
@@ -197,10 +197,10 @@ public abstract class AbstractPage extends Page {
         }
 
         LOG.info("Переходим по ссылке из e-mail");
-
         driver.get(url + "?action=verify&" + link);
 
-        new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.modal__closeBtn.closeBtn")));
+        LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.modal__closeBtn.closeBtn")));
 
         LOG.info("Закрываем уведомление об успешном подтверждении почты");
         driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
@@ -372,10 +372,14 @@ public abstract class AbstractPage extends Page {
     }
 
     public void tryToClick(WebElement element) {
+
+       for(int count = 0; count < 10; count ++){
         try {
             element.click();
+            break;
         } catch (StaleElementReferenceException e) {
             tryToClick(element);
+        }
         }
     }
 

@@ -186,9 +186,9 @@ public class UserAccountPage extends AbstractPage{
         String registrationUrl = "";
 
         try {
-            registrationUrl = JsonLoader.getData().get("site1").get("registrationUrl").getValue();
+            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("registrationUrl").getValue();
         } catch (DataException e) {
-            e.printStackTrace();
+           LOG.error(e.getMessage());
         }
 
         js.executeScript("registration_window = window.open('" + registrationUrl + "')");

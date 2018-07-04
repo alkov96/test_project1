@@ -21,7 +21,7 @@
       | PHONE  | randomPhone |
 
     * сохраняем в память
-      | EMAIL  | randomEmail|
+      | EMAIL  | randomEmail |
 
     * сохраняем в память
       | PASS  | Default |
