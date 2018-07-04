@@ -25,10 +25,15 @@
   },
   "mobile-api": {
     "mainUrl": "https://demo.gamebet.ru",
-    "login": "demo617@mailinator.com",
-    "password": "Parol123",
-    "phone": "71110020076",
-    "devId": "3"
+    "USER": "demo617@mailinator.com",
+    "PASS": "Parol123",
+    "PHONE": "71110020076",
+    "DEVID": "3",
+    "db-registration": {
+      "url": "jdbc:mysql://main-demo.wd.orglot.office:3306",
+      "user": "stoloto_main",
+      "password": "lizByr4WO#"
+    }
   },
   "mail-registration": {
     "login": "testregistrator@yandex.ru",

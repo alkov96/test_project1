@@ -82,7 +82,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         if (value.equals(DEFAULT)) {
             try {
-                value = JsonLoader.getData().get("mobile-api").get(key).getValue();
+                value = JsonLoader.getData().get(STARTING_URL).get(key).getValue();
             } catch (DataException e) {
                 e.getMessage();
             }
@@ -553,7 +553,7 @@ public class CommonStepDefs extends GenericStepDefs {
         requestPath = path;
         LOG.info("Собираем строку запроса.");
         try {
-            requestUrl = JsonLoader.getData().get("mobile-api").get("url").getValue();
+            requestUrl = JsonLoader.getData().get("mobile-api").get("mainUrl").getValue();
             requestFull = requestUrl + "/" + requestPath;
 
         } catch (DataException e) {
