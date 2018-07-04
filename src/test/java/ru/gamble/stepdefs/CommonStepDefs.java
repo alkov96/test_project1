@@ -656,26 +656,6 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param map     - Map of Maps
      */
     private Object hashMapper(Map<String, Object> map, String finding) {
-//        String key;
-//        Object request = null, value;
-//        for (Map.Entry<String, Object> entry : map.entrySet()) {
-//            key = entry.getKey();
-//            value = entry.getValue();
-//            if (value instanceof String) {
-//                if (key.equalsIgnoreCase(finding)) {
-//                    return request = value;
-//                }
-//            } else if (value instanceof Map) {
-//                Map<String, Object> subMap = (Map<String, Object>) value;
-//                request = hashMapper(subMap, finding);
-//            } else if (!(value instanceof Integer)) {
-//                throw new IllegalArgumentException(String.valueOf(value));
-//            }
-//        }
-//        return request;
-
-
-
         String key;
         Object request = null, value;
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -785,38 +765,6 @@ public class CommonStepDefs extends GenericStepDefs {
         params = jsonObject.toString();
         LOG.info(String.valueOf(params));
         return params;
-    }
-
-    private static Map<String, Object> toMap(JSONObject object) throws JsonException {
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        Iterator<String> keysItr = object.keySet().iterator();
-        while(keysItr.hasNext()) {
-            String key = keysItr.next();
-            Object value = object.get(key);
-            if(value instanceof JsonArray) {
-                value = toList((JsonArray) value);
-            } else if(value instanceof JSONObject) {
-                value = toMap((JSONObject) value);
-            }
-            map.put(key, value);
-        }
-        return map;
-    }
-
-    private static List<Object> toList(JsonArray array) {
-        List<Object> list = new ArrayList<Object>();
-        for(int i = 0; i < array.size(); i++) {
-            Object value = array.get(i);
-            if(value instanceof JsonArray) {
-                value = toList((JsonArray) value);
-            }
-            else if(value instanceof JSONObject) {
-                value = toMap((JSONObject) value);
-            }
-            list.add(value);
-        }
-        return list;
     }
 
     @Когда("^определяем незанятый номер телефона и сохраняем в \\\"([^\\\"]*)\\\"$")
