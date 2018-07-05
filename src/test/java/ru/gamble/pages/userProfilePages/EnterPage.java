@@ -18,6 +18,7 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
+import ru.sbtqa.tag.qautils.properties.Props;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import static ru.gamble.utility.Constants.LOGIN;
 import static ru.gamble.utility.Constants.PASSWORD;
+import static ru.gamble.utility.Constants.STARTING_URL;
 
 @PageEntry(title = "Вход")
 public class EnterPage extends AbstractPage {
@@ -73,9 +75,8 @@ public class EnterPage extends AbstractPage {
     public void logIn(DataTable dataTable) throws DataException {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String login, password;
-
         if(data.get(LOGIN).equals(Constants.DEFAULT)){
-            login = JsonLoader.getData().get("site1").get("login").getValue();
+            login = JsonLoader.getData().get(STARTING_URL).get("login").getValue();
         } else if(data.get(LOGIN).equals("EMAIL")){
             login = Stash.getValue("EMAIL");
         } else {
@@ -83,7 +84,7 @@ public class EnterPage extends AbstractPage {
         }
 
         if(data.get(PASSWORD).equals(Constants.DEFAULT)){
-            password = JsonLoader.getData().get("site1").get("password").getValue();
+            password = JsonLoader.getData().get(STARTING_URL).get("password").getValue();
         }
         else if(data.get(PASSWORD).equals("PASSWORD")) {
             password = Stash.getValue("PASSWORD");

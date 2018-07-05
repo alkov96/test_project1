@@ -1,21 +1,15 @@
 package ru.gamble.stepdefs;
-import com.fasterxml.jackson.core.JsonParseException;
+
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonArray;
 import cucumber.api.DataTable;
-import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
-import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import cucumber.api.java.ru.*;
 import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.remote.JsonException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -31,10 +25,8 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.*;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
-import ru.sbtqa.tag.parsers.JsonParser;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
-import ru.sbtqa.tag.qautils.properties.Props;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -90,7 +82,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         if (value.equals(DEFAULT)) {
             try {
-                value = JsonLoader.getData().get("mobile-api").get(key).getValue();
+                value = JsonLoader.getData().get(STARTING_URL).get(key).getValue();
             } catch (DataException e) {
                 e.getMessage();
             }
@@ -158,7 +150,7 @@ public class CommonStepDefs extends GenericStepDefs {
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage() {
-        goToMainPage("site1");
+        goToMainPage("site");
     }
 
     @Когда("^переходит в админку$")
@@ -166,25 +158,32 @@ public class CommonStepDefs extends GenericStepDefs {
         goToMainPage("admin");
     }
 
-    @Когда("^переходит на главную страницу '(.+)'$")
-    public static void goToMainPage(String site) {
+
+    /**
+     * Метод параметризованного перехода на страницу по siteUrl
+     * или по-умолчанию указанную в файле application.properties
+     * @param siteUrl - URL страницы
+     */
+    @Когда("^переходит на страницу '(.+)'$")
+    public static void goToMainPage(String siteUrl) {
         cleanCookies();
-        switch (site) {
-            case "site1":
-                PageFactory.getWebDriver().get(Props.get("webdriver.starting.url1"));
-                break;
-            case "site2":
-                PageFactory.getWebDriver().get(Props.get("webdriver.starting.url2"));
+        try {
+        switch (siteUrl) {
+            case "site":
+                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
                 break;
             case "admin":
-                PageFactory.getWebDriver().get(Props.get("webdriver.starting.urla"));
+                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("adminUrl").getValue());
                 break;
+            case "registr":
+                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("registrationUrl").getValue());
             default:
-                PageFactory.getWebDriver().get(site);
+                PageFactory.getWebDriver().get(siteUrl);
                 break;
+        }}catch (DataException e) {
+            LOG.error(e.getMessage());
         }
         LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl() + "\n");
-
     }
 
     @Когда("^сохраняем в память таблицу$")
@@ -554,7 +553,7 @@ public class CommonStepDefs extends GenericStepDefs {
         requestPath = path;
         LOG.info("Собираем строку запроса.");
         try {
-            requestUrl = JsonLoader.getData().get("mobile-api").get("url").getValue();
+            requestUrl = JsonLoader.getData().get("mobile-api").get("mainUrl").getValue();
             requestFull = requestUrl + "/" + requestPath;
 
         } catch (DataException e) {
@@ -657,26 +656,6 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param map     - Map of Maps
      */
     private Object hashMapper(Map<String, Object> map, String finding) {
-//        String key;
-//        Object request = null, value;
-//        for (Map.Entry<String, Object> entry : map.entrySet()) {
-//            key = entry.getKey();
-//            value = entry.getValue();
-//            if (value instanceof String) {
-//                if (key.equalsIgnoreCase(finding)) {
-//                    return request = value;
-//                }
-//            } else if (value instanceof Map) {
-//                Map<String, Object> subMap = (Map<String, Object>) value;
-//                request = hashMapper(subMap, finding);
-//            } else if (!(value instanceof Integer)) {
-//                throw new IllegalArgumentException(String.valueOf(value));
-//            }
-//        }
-//        return request;
-
-
-
         String key;
         Object request = null, value;
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -786,38 +765,6 @@ public class CommonStepDefs extends GenericStepDefs {
         params = jsonObject.toString();
         LOG.info(String.valueOf(params));
         return params;
-    }
-
-    private static Map<String, Object> toMap(JSONObject object) throws JsonException {
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        Iterator<String> keysItr = object.keySet().iterator();
-        while(keysItr.hasNext()) {
-            String key = keysItr.next();
-            Object value = object.get(key);
-            if(value instanceof JsonArray) {
-                value = toList((JsonArray) value);
-            } else if(value instanceof JSONObject) {
-                value = toMap((JSONObject) value);
-            }
-            map.put(key, value);
-        }
-        return map;
-    }
-
-    private static List<Object> toList(JsonArray array) {
-        List<Object> list = new ArrayList<Object>();
-        for(int i = 0; i < array.size(); i++) {
-            Object value = array.get(i);
-            if(value instanceof JsonArray) {
-                value = toList((JsonArray) value);
-            }
-            else if(value instanceof JSONObject) {
-                value = toMap((JSONObject) value);
-            }
-            list.add(value);
-        }
-        return list;
     }
 
     @Когда("^определяем незанятый номер телефона и сохраняем в \\\"([^\\\"]*)\\\"$")
