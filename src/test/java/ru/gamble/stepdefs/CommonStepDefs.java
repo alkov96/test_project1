@@ -1,8 +1,14 @@
 package ru.gamble.stepdefs;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.sun.jna.platform.win32.Sspi;
 import cucumber.api.DataTable;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
@@ -27,6 +33,8 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
+import sun.awt.image.ImageWatched;
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -44,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.openqa.selenium.By.partialLinkText;
 import static org.openqa.selenium.By.xpath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.utility.Constants.*;
@@ -553,7 +562,7 @@ public class CommonStepDefs extends GenericStepDefs {
         requestPath = path;
         LOG.info("Собираем строку запроса.");
         try {
-            requestUrl = JsonLoader.getData().get("mobile-api").get("mainUrl").getValue();
+            requestUrl = JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue();
             requestFull = requestUrl + "/" + requestPath;
 
         } catch (DataException e) {
@@ -634,42 +643,59 @@ public class CommonStepDefs extends GenericStepDefs {
         Object valueFingingParams;
 
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        TypeReference<LinkedHashMap<String, Object>> typeRef = new TypeReference<LinkedHashMap<String, Object>>() {
         };
 
-        HashMap<String, Object> retMap = null;
+        LinkedHashMap<String, Object> retMap = null;
         try {
             retMap = mapper.readValue(tmp, typeRef);
         } catch (IOException e) {
             e.getMessage();
         }
-        valueFingingParams = hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + (String) valueFingingParams);
+        valueFingingParams = hashMapper((Object) retMap, keyFingingParams);
+        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + String.valueOf(valueFingingParams));
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
     /**
-     * Метод пробегает по Map of Maps и ищет ключ
+     * Метод ищет в Object ключ
      * и возвращает либо значение по искомогу ключу или null
      *
      * @param finding - искомый ключ
-     * @param map     - Map of Maps
+     * @param json     - Object
      */
-    private Object hashMapper(Map<String, Object> map, String finding) {
+    private Object hashMapper(Object json, String finding) {
         String key;
         Object request = null, value;
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            key = entry.getKey();
-            value = entry.getValue();
-            if ((value instanceof String) || (value instanceof Integer)) {
-                if (key.equalsIgnoreCase(finding)) {
-                    return request = String.valueOf(value);
+
+        if (json instanceof Map) {
+            ObjectMapper oMapper = new ObjectMapper();
+            Map<String, Object> map = oMapper.convertValue(json, Map.class);
+
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                key = entry.getKey();
+                value = entry.getValue();
+                if ((value instanceof String) || (value instanceof Integer)) {
+                    if (key.equalsIgnoreCase(finding)) {
+                        return request = String.valueOf(value);
+                    }
+                } else if (value instanceof Map) {
+                    Map<String, Object> subMap = (Map<String, Object>) value;
+                    request = hashMapper(subMap, finding);
+                } else if (value instanceof List) {
+                    List list = (List) value;
+                    if (key.equalsIgnoreCase(finding)) {
+                        return request = ((List) list);
+                    }
+                    request = hashMapper((Object) list, finding);
+                } else {
+                    throw new IllegalArgumentException(String.valueOf(value));
                 }
-            } else if (value instanceof Map) {
-                Map<String, Object> subMap = (Map<String, Object>) value;
-                request = hashMapper(subMap, finding);
-            } else {
-                throw new IllegalArgumentException(String.valueOf(value));
+            }
+        }else if(json instanceof List){
+            for (int i = 0; i < ((List) json).size(); i++) {
+                Object listItem = ((List) json).get(i);
+                request = hashMapper(listItem, finding);
             }
         }
         return request;
@@ -751,7 +777,6 @@ public class CommonStepDefs extends GenericStepDefs {
         String key;
         Object value, params;
         Map<String, Object> map;
-        ObjectMapper mapper;
         LOG.info("Собираем параметы в JSON строку");
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
@@ -793,4 +818,53 @@ public class CommonStepDefs extends GenericStepDefs {
         Long mcsleep = Long.parseLong(sleep);
         Thread.sleep(mcsleep);
     }
+
+    /**
+     * Метод сверяет в JSON Object наличие полей и их типы
+     * и возвращает либо значение по искомогу ключу или null
+     *
+     * @param keyJSONObject - Ключ объекта из памяти
+     * @param dataTable - таблица проверяемых параметров
+     */
+    @Когда("^проверка полей и типов в ответе \"([^\"]*)\":$")
+    public void checkFieldsAndTypesInResponse(String keyJSONObject, DataTable dataTable) {
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String param, type, currentValue = "";
+        Object json =  Stash.getValue(keyJSONObject);
+
+
+        for(int i = 0; i < table.size(); i++) {
+            param = table.get(i).get(PARAMETER);
+            type = table.get(i).get(TYPE);
+            try {
+                currentValue = String.valueOf(hashMapper(json, param));
+                assertThat(checkType(currentValue, type)).as("Тип параметра[" + param + "] не совпадаетс с[" + type + "]").isTrue();
+            }catch (Exception e){
+                LOG.error("Ошибка! [" + param + "] не найден");
+            }
+            LOG.info("Тип параметра[" + currentValue + "] соответсвует [" + type + "]");
+        }
+    }
+
+    private Boolean checkType(String value, String type) {
+            if (type.equals("Long")) {
+                Long.valueOf(value);
+                return true;
+            }if (type.equals("Integer")) {
+                Integer.valueOf(value);
+                return true;
+            }if (type.equals("Timestamp")) {
+                Timestamp.valueOf(value);
+                return true;
+            }if(type.equals("Boolean")){
+                Boolean.valueOf(value);
+                return true;
+            }
+            if(type.equals("String")) {
+                String.valueOf(value);
+                return true;
+            }
+            return false;
+    }
+
 }

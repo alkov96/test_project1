@@ -34,13 +34,30 @@
       | devId           | DEVID     |
       | authToken       | AUTHTOKEN |
       | source          | 16        |
-      | phone           | 16        |
+      | phone           | PHONE     |
       | comment         |           |
       | operatingSystem |           |
       | appVersion      |           |
-      | phone           | PHONE     |
+
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
     * находим и сохраняем "CALLBACKREQUESTS" из "RESPONCE_API"
+
+    * проверка полей и типов в ответе "CALLBACKREQUESTS":
+    | Параметр         | Тип       |
+    | id               | Long      |
+    | userId           | Integer   |
+    | creationTime     | TimeStamp |
+    | cancellationTime | TimeStamp |
+    | isActive         | Boolean   |
+
+#    * запрос к API "api/mobile/v3/requestPhoneCall" и сохраняем в "RESPONCE_API":
+#      | devId           | DEVID     |
+#      | authToken       | AUTHTOKEN |
+#      | source          | 16        |
+#      | phone           | PHONE     |
+#      | comment         |           |
+#      | operatingSystem |           |
+#      | appVersion      |           |
