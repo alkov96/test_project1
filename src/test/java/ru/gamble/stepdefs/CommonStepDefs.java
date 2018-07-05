@@ -1,14 +1,8 @@
 package ru.gamble.stepdefs;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.sun.jna.platform.win32.Sspi;
 import cucumber.api.DataTable;
-import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
@@ -33,8 +27,6 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
-import sun.awt.image.ImageWatched;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -661,40 +653,23 @@ public class CommonStepDefs extends GenericStepDefs {
      * и возвращает либо значение по искомогу ключу или null
      *
      * @param finding - искомый ключ
-     * @param json     - Object
+     * @param map     - Map of Maps
      */
-    private Object hashMapper(Object json, String finding) {
+    private Object hashMapper(Map<String, Object> map, String finding) {
         String key;
         Object request = null, value;
-
-        if (json instanceof Map) {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(json, Map.class);
-
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                key = entry.getKey();
-                value = entry.getValue();
-                if ((value instanceof String) || (value instanceof Integer)) {
-                    if (key.equalsIgnoreCase(finding)) {
-                        return request = String.valueOf(value);
-                    }
-                } else if (value instanceof Map) {
-                    Map<String, Object> subMap = (Map<String, Object>) value;
-                    request = hashMapper(subMap, finding);
-                } else if (value instanceof List) {
-                    List list = (List) value;
-                    if (key.equalsIgnoreCase(finding)) {
-                        return request = ((List) list);
-                    }
-                    request = hashMapper((Object) list, finding);
-                } else {
-                    throw new IllegalArgumentException(String.valueOf(value));
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            key = entry.getKey();
+            value = entry.getValue();
+            if ((value instanceof String) || (value instanceof Integer)) {
+                if (key.equalsIgnoreCase(finding)) {
+                    return request = String.valueOf(value);
                 }
-            }
-        }else if(json instanceof List){
-            for (int i = 0; i < ((List) json).size(); i++) {
-                Object listItem = ((List) json).get(i);
-                request = hashMapper(listItem, finding);
+            } else if (value instanceof Map) {
+                Map<String, Object> subMap = (Map<String, Object>) value;
+                request = hashMapper(subMap, finding);
+            } else {
+                throw new IllegalArgumentException(String.valueOf(value));
             }
         }
         return request;
