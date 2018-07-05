@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.openqa.selenium.By.partialLinkText;
 import static org.openqa.selenium.By.xpath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.utility.Constants.*;
@@ -562,7 +561,7 @@ public class CommonStepDefs extends GenericStepDefs {
         requestPath = path;
         LOG.info("Собираем строку запроса.");
         try {
-            requestUrl = JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue();
+            requestUrl = JsonLoader.getData().get("mobile-api").get("mainUrl").getValue();
             requestFull = requestUrl + "/" + requestPath;
 
         } catch (DataException e) {
@@ -643,22 +642,22 @@ public class CommonStepDefs extends GenericStepDefs {
         Object valueFingingParams;
 
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<LinkedHashMap<String, Object>> typeRef = new TypeReference<LinkedHashMap<String, Object>>() {
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
         };
 
-        LinkedHashMap<String, Object> retMap = null;
+        HashMap<String, Object> retMap = null;
         try {
             retMap = mapper.readValue(tmp, typeRef);
         } catch (IOException e) {
             e.getMessage();
         }
-        valueFingingParams = hashMapper((Object) retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + String.valueOf(valueFingingParams));
+        valueFingingParams = hashMapper(retMap, keyFingingParams);
+        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + (String) valueFingingParams);
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
     /**
-     * Метод ищет в Object ключ
+     * Метод пробегает по Map of Maps и ищет ключ
      * и возвращает либо значение по искомогу ключу или null
      *
      * @param finding - искомый ключ
@@ -777,6 +776,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String key;
         Object value, params;
         Map<String, Object> map;
+        ObjectMapper mapper;
         LOG.info("Собираем параметы в JSON строку");
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
@@ -802,7 +802,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-    @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\":$")
+    @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\"$")
     public void checkTimeLeft(String keyTimeLeft,String keyResponse) {
         String timewasS = Stash.getValue(keyTimeLeft);
         fingingAndSave(keyTimeLeft,keyResponse);
@@ -867,4 +867,34 @@ public class CommonStepDefs extends GenericStepDefs {
             return false;
     }
 
+
+
+
+    @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
+    public static void searchUserStatus2(String status,String keyEmail) {
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%yandex.ru' AND registration_stage_id"+status + " AND offer_state=3";
+        String email = workWithDBgetResult(sqlRequest, "email");
+        Stash.put(keyEmail, email);
+        LOG.info("Подхлдящий пользователь найден : " + email);
+    }
+
+    @Когда("^обновляем оферту пользователю \"([^\"]*)\" \"([^\"]*)\"$")
+    public static void offertUpdate(String offer_state,String keyEmail) {
+        String sqlRequest = "UPDATE gamebet.`user` SET offer_state=" + offer_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
+        workWithDB(sqlRequest);
+    }
+
+
+    @Когда("^запоминаем дату рождения пользователя \"([^\"]*)\" \"([^\"]*)\"$")
+    public static void rememberBirthDate(String keyBD,String keyEmail) throws ParseException {
+        String sqlRequest = "SELECT birth_date FROM gamebet.`user` WHERE email='"+Stash.getValue(keyEmail) + "'";
+        String birthDate = workWithDBgetResult(sqlRequest, "birth_date");
+        SimpleDateFormat formatDate = new SimpleDateFormat();
+        SimpleDateFormat formatgut = new SimpleDateFormat();
+        formatgut.applyPattern("dd.MM.yyyy");
+        formatDate.applyPattern("yyyy-MM-dd");
+        birthDate=formatgut.format(formatDate.parse(birthDate));
+        Stash.put(keyBD, birthDate);
+        LOG.info("Дата рождения: " + birthDate);
+    }
 }
