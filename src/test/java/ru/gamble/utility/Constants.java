@@ -47,6 +47,8 @@ public class Constants {
     public static final String RANDOME_NUMBER = "randomNumber";
     public static final String RANDOME_SEX = "randomSex";
     public static final String STARTING_URL = Props.get("webdriver.starting.url");
+    public static final String PARAMETER = "Параметр";
+    public static final String TYPE = "Тип";
 
 
 
