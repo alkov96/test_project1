@@ -152,7 +152,14 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":6 |
 
-    * смотрим изменился ли "TIMELEFT" из "RESPONCE_API":
+    * смотрим изменился ли "TIMELEFT" из "RESPONCE_API"
 
+    * подтверждаем видеорегистрацию "EMAIL"
+    * подтверждаем от ЦУПИС "EMAIL"
 
+* запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId  | DEVID |
+      | email  | EMAIL |
+      | pass   | PASS  |
+      | source | 16    |
 

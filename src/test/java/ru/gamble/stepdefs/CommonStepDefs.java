@@ -830,7 +830,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-    @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\":$")
+    @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\"$")
     public void checkTimeLeft(String keyTimeLeft,String keyResponse) {
         String timewasS = Stash.getValue(keyTimeLeft);
         fingingAndSave(keyTimeLeft,keyResponse);
@@ -845,5 +845,35 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void justsleep(String sleep) throws InterruptedException {
         Long mcsleep = Long.parseLong(sleep);
         Thread.sleep(mcsleep);
+    }
+
+
+
+    @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
+    public static void searchUserStatus2(String status,String keyEmail) {
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%yandex.ru' AND registration_stage_id"+status + " AND offer_state=3";
+        String email = workWithDBgetResult(sqlRequest, "email");
+        Stash.put(keyEmail, email);
+        LOG.info("Подхлдящий пользователь найден : " + email);
+    }
+
+    @Когда("^обновляем оферту пользователю \"([^\"]*)\" \"([^\"]*)\"$")
+    public static void offertUpdate(String offer_state,String keyEmail) {
+        String sqlRequest = "UPDATE gamebet.`user` SET offer_state=" + offer_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
+        workWithDB(sqlRequest);
+    }
+
+
+    @Когда("^запоминаем дату рождения пользователя \"([^\"]*)\" \"([^\"]*)\"$")
+    public static void rememberBirthDate(String keyBD,String keyEmail) throws ParseException {
+        String sqlRequest = "SELECT birth_date FROM gamebet.`user` WHERE email='"+Stash.getValue(keyEmail) + "'";
+        String birthDate = workWithDBgetResult(sqlRequest, "birth_date");
+        SimpleDateFormat formatDate = new SimpleDateFormat();
+        SimpleDateFormat formatgut = new SimpleDateFormat();
+        formatgut.applyPattern("dd.MM.yyyy");
+        formatDate.applyPattern("yyyy-MM-dd");
+        birthDate=formatgut.format(formatDate.parse(birthDate));
+        Stash.put(keyBD, birthDate);
+        LOG.info("Дата рождения: " + birthDate);
     }
 }
