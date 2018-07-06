@@ -7,11 +7,18 @@
     * сохраняем в память
       | DEVID  | randomNumber 4 |
 
+    * сохраняем в память
+      | PASS  | Default |
+
+    * сохраняем в память
+      | USER  | Default |
+
+
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | DEVID                  |
-      | email  | demo617@mailinator.com |
-      | pass   | Parol123               |
-      | source | 16                     |
+      | devId  | DEVID |
+      | email  | USER  |
+      | pass   | PASS  |
+      | source | 16    |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0,"data":{"status": |

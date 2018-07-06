@@ -142,7 +142,7 @@
 
     * находим и сохраняем "TIMELEFT" из "RESPONCE_API"
 
-    * ожидание "2000"
+    * ожидание "2" сек
 
     * запрос к API "api/mobile/v3/requestSkypeTimeLeft" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID            |

@@ -2,6 +2,7 @@ package ru.gamble.stepdefs;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
@@ -638,21 +639,35 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
-        String tmp = Stash.getValue(sourceString).toString();
-        Object valueFingingParams;
-
+        String tmp = null;
+        Object valueFingingParams, retMap = null;
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+
+        //Преобразуем в строку JSON-объект в зависимости от его структуры
+        if(JSONValue.isValidJson(Stash.getValue(sourceString).toString())){
+            tmp  = Stash.getValue(sourceString).toString();
+        }else {
+            tmp = JSONValue.toJSONString(Stash.getValue(sourceString));
+        }
+
+
+        TypeReference<LinkedHashMap<String, Object>> typeRef = new TypeReference<LinkedHashMap<String, Object>>() {
         };
 
-        HashMap<String, Object> retMap = null;
         try {
             retMap = mapper.readValue(tmp, typeRef);
         } catch (IOException e) {
+            TypeReference<ArrayList<Object>> typeRef1 = new TypeReference<ArrayList<Object>>() {
+            };
+            try {
+                retMap = mapper.readValue(tmp, typeRef1);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             e.getMessage();
         }
         valueFingingParams = hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + (String) valueFingingParams);
+        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + String.valueOf(valueFingingParams));
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
@@ -674,7 +689,7 @@ public class CommonStepDefs extends GenericStepDefs {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 key = entry.getKey();
                 value = entry.getValue();
-                if ((value instanceof String) || (value instanceof Integer)) {
+                if ((value instanceof String) || (value instanceof Integer) || (value instanceof Long) || (value instanceof Timestamp) || (value instanceof Boolean)) {
                     if (key.equalsIgnoreCase(finding)) {
                         return request = String.valueOf(value);
                     }
@@ -798,7 +813,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String phoneLast = workWithDBgetResult(sqlRequest, "phone");
         String phone = "7111002" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
         Stash.put(keyPhone, phone);
-        LOG.info("Вычислилии подходящий нмоер телефона" + phone);
+        LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
 
 
@@ -813,9 +828,9 @@ public class CommonStepDefs extends GenericStepDefs {
             Assertions.fail("Время ожидани звонка скайп не изменилось");
         }
     }
-    @Когда("^ожидание \\\"([^\\\"]*)\\\"$")
+    @Когда("^ожидание \\\"([^\\\"]*)\\\" сек$")
     public static void justsleep(String sleep) throws InterruptedException {
-        Long mcsleep = Long.parseLong(sleep);
+        Long mcsleep = Long.parseLong(sleep) * 1000;
         Thread.sleep(mcsleep);
     }
 
@@ -832,16 +847,11 @@ public class CommonStepDefs extends GenericStepDefs {
         String param, type, currentValue = "";
         Object json =  Stash.getValue(keyJSONObject);
 
-
         for(int i = 0; i < table.size(); i++) {
             param = table.get(i).get(PARAMETER);
             type = table.get(i).get(TYPE);
-            try {
-                currentValue = String.valueOf(hashMapper(json, param));
-                assertThat(checkType(currentValue, type)).as("Тип параметра[" + param + "] не совпадаетс с[" + type + "]").isTrue();
-            }catch (Exception e){
-                LOG.error("Ошибка! [" + param + "] не найден");
-            }
+            currentValue = String.valueOf(hashMapper(json, param));
+            assertThat(checkType(currentValue, type)).as("Тип параметра[" + param + "] не совпадает с[" + type + "]").isTrue();
             LOG.info("Тип параметра[" + currentValue + "] соответсвует [" + type + "]");
         }
     }
@@ -854,7 +864,9 @@ public class CommonStepDefs extends GenericStepDefs {
                 Integer.valueOf(value);
                 return true;
             }if (type.equals("Timestamp")) {
-                Timestamp.valueOf(value);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+                Date date = new Date(Long.valueOf(value));
+                simpleDateFormat.format(date);
                 return true;
             }if(type.equals("Boolean")){
                 Boolean.valueOf(value);
@@ -866,9 +878,6 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             return false;
     }
-
-
-
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchUserStatus2(String status,String keyEmail) {
@@ -884,7 +893,6 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlRequest);
     }
 
-
     @Когда("^запоминаем дату рождения пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public static void rememberBirthDate(String keyBD,String keyEmail) throws ParseException {
         String sqlRequest = "SELECT birth_date FROM gamebet.`user` WHERE email='"+Stash.getValue(keyEmail) + "'";
@@ -896,5 +904,34 @@ public class CommonStepDefs extends GenericStepDefs {
         birthDate=formatgut.format(formatDate.parse(birthDate));
         Stash.put(keyBD, birthDate);
         LOG.info("Дата рождения: " + birthDate);
+    }
+
+    @Когда("^проверяем значение полей в ответе \"([^\"]*)\":$")
+    public void checkValueOfFieldsInResponse(String keyJSONObject, DataTable dataTable) {
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String param, value, currentValue = null, tmp;
+        Object json =  Stash.getValue(keyJSONObject);
+
+        for(int i = 0; i < table.size(); i++) {
+            param = table.get(i).get(PARAMETER);
+            tmp = table.get(i).get(VALUE);
+            if (tmp.matches("^[A-Z_]+$")) {
+                value = Stash.getValue(tmp);
+            } else {
+                value = tmp;
+            }
+            currentValue = String.valueOf(hashMapper(json, param));
+            assertThat(currentValue).as("[" + currentValue + "] не совпадает с [" + value + "]").isEqualToIgnoringCase(value);
+            LOG.info("[" + currentValue + "] совпадает с [" + value + "]");
+        }
+    }
+
+    @Когда("^устанавливаем время ожидания обратного звонка \"([^\"]*)\"$")
+    public void setCallWaitingTime(String time) {
+        //String sqlRequest = "UPDATE gamebet.`user` SET registered_in_tsupis = TRUE, identified_in_tsupis = TRUE, identState = 1 WHERE `email` ='" + Stash.getValue(param) + "'";
+        String sqlRequest = "UPDATE gamebet.`params` SET VALUE=" + time + " WHERE NAME='CALLBACK_OPERATOR_WAIT'";
+        workWithDB(sqlRequest);
+        LOG.info("Установили время ожидания в [" + time + "]");
+
     }
 }

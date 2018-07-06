@@ -30,6 +30,9 @@
   @correct
   Сценарий: 3_25 Запросить/отменить обратный телефонный звонок. Позитивный кейс
 
+    * устанавливаем время ожидания обратного звонка "20"
+
+    # Запрос 1
     * запрос к API "api/mobile/v3/requestPhoneCall" и сохраняем в "RESPONCE_API":
       | devId           | DEVID     |
       | authToken       | AUTHTOKEN |
@@ -38,7 +41,6 @@
       | comment         |           |
       | operatingSystem |           |
       | appVersion      |           |
-
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
@@ -49,15 +51,81 @@
     | Параметр         | Тип       |
     | id               | Long      |
     | userId           | Integer   |
-    | creationTime     | TimeStamp |
-    | cancellationTime | TimeStamp |
+    | creationTime     | Timestamp |
     | isActive         | Boolean   |
 
-#    * запрос к API "api/mobile/v3/requestPhoneCall" и сохраняем в "RESPONCE_API":
-#      | devId           | DEVID     |
-#      | authToken       | AUTHTOKEN |
-#      | source          | 16        |
-#      | phone           | PHONE     |
-#      | comment         |           |
-#      | operatingSystem |           |
-#      | appVersion      |           |
+    # Отмена 1
+    * находим и сохраняем "ID" из "CALLBACKREQUESTS"
+
+    * проверяем значение полей в ответе "CALLBACKREQUESTS":
+    | Параметр | Значение |
+    | id       | ID       |
+    | isActive | true     |
+
+    * запрос к API "api/mobile/v3/cancelPhoneCall" и сохраняем в "RESPONCE_API":
+      | devId           | DEVID     |
+      | authToken       | AUTHTOKEN |
+      | source          | 16        |
+      | id              | ID        |
+      | phone           | PHONE     |
+      | comment         |           |
+      | operatingSystem |           |
+      | appVersion      |           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    # Запрос 2
+    * запрос к API "api/mobile/v3/requestPhoneCall" и сохраняем в "RESPONCE_API":
+      | devId           | DEVID     |
+      | authToken       | AUTHTOKEN |
+      | source          | 16        |
+      | phone           | PHONE     |
+      | comment         |           |
+      | operatingSystem |           |
+      | appVersion      |           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * находим и сохраняем "CALLBACKREQUESTS" из "RESPONCE_API"
+
+    # Отмена 2
+    * находим и сохраняем "ID" из "CALLBACKREQUESTS"
+
+#    * устанавливаем время ожидания обратного звонка "30"
+
+    * ожидание "21" сек
+
+    * проверяем значение полей в ответе "CALLBACKREQUESTS":
+      | Параметр | Значение |
+      | id       | ID       |
+      | isActive | true     |
+
+    * запрос к API "api/mobile/v3/cancelPhoneCall" и сохраняем в "RESPONCE_API":
+      | devId           | DEVID     |
+      | authToken       | AUTHTOKEN |
+      | source          | 16        |
+      | id              | ID        |
+      | phone           | PHONE     |
+      | comment         |           |
+      | operatingSystem |           |
+      | appVersion      |           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | {"code":36,"data":{"message":"active callback not found or cancellation time expired"}} |
+
+    # Запрос 3
+    * запрос к API "api/mobile/v3/requestPhoneCall" и сохраняем в "RESPONCE_API":
+      | devId           | DEVID     |
+      | authToken       | AUTHTOKEN |
+      | source          | 16        |
+      | phone           | PHONE     |
+      | comment         |           |
+      | operatingSystem |           |
+      | appVersion      |           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":1 |
+
+

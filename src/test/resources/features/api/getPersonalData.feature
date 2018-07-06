@@ -1,10 +1,19 @@
 # language: ru
 Функционал: API
   Предыстория:
+    * сохраняем в память
+      | DEVID | randomNumber 4 |
+
+    * сохраняем в память
+      | USER  | Default |
+
+    * сохраняем в память
+      | PASS  | Default |
+
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | 1                      |
-      | email  | demo617@mailinator.com |
-      | pass   | Parol123               |
+      | devId  | DEVID |
+      | email  | USER  |
+      | pass   | PASS  |
       | source | 16                     |
 
     * проверка ответа API из "RESPONCE_API":
