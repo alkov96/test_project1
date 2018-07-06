@@ -881,7 +881,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchUserStatus2(String status,String keyEmail) {
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%yandex.ru' AND registration_stage_id"+status + " AND offer_state=3";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND offer_state=3 AND tsupis_status=3";
         String email = workWithDBgetResult(sqlRequest, "email");
         Stash.put(keyEmail, email);
         LOG.info("Подхлдящий пользователь найден : " + email);
@@ -892,6 +892,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String sqlRequest = "UPDATE gamebet.`user` SET offer_state=" + offer_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
     }
+
 
     @Когда("^запоминаем дату рождения пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public static void rememberBirthDate(String keyBD,String keyEmail) throws ParseException {
@@ -934,4 +935,41 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Установили время ожидания в [" + time + "]");
 
     }
+
+
+    @Когда("^выбираем fullalt пользователя \"([^\"]*)\" \"([^\"]*)\"$")
+    public static void searchFullAlt(String keyPhone, String keyBD) throws Exception {
+        RandomAccessFile fr = new RandomAccessFile("src\\test\\resources\\full_alt.txt", "r");
+        String line;
+        StringBuffer sbt=new StringBuffer("");
+        String user = fr.readLine();
+        String phone=user.trim().split("\t")[0];
+        String birthDate = user.trim().split("\t")[1];
+        SimpleDateFormat formatDate = new SimpleDateFormat();
+        SimpleDateFormat formatgut = new SimpleDateFormat();
+        formatgut.applyPattern("dd.MM.yyyy");
+        formatDate.applyPattern("yyyy-MM-dd");
+        birthDate=formatgut.format(formatDate.parse(birthDate));
+        Stash.put(keyPhone,phone);
+        Stash.put(keyBD,birthDate);
+        while ((line = fr.readLine()) != null){
+            sbt.append(line).append(System.lineSeparator());
+        }
+        FileWriter fw = new FileWriter("src\\test\\resources\\full_alt.txt");
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(sbt.toString());
+        bw.flush();
+        bw.close();
+        fr.close();
+        LOG.info(phone + " " +birthDate);
+    }
+
+    @Когда("^поиск пользователя проходившего ускоренную регистрацию \"([^\"]*)\"$")
+    public static void searchUserNotPD(String keyEmail) {
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE tsupis_status IN (1,2) AND personal_data_state=1 AND email LIKE 'testregistrator+%@yandex.ru'";
+        String email = workWithDBgetResult(sqlRequest, "email");
+        Stash.put(keyEmail, email);
+        LOG.info("Дата рождения: " + email);
+    }
+
 }
