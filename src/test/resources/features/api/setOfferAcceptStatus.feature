@@ -13,8 +13,6 @@
     * сохраняем в память
       | SOURCE | 16 |
 
-
-
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID    |
       | email  | USER     |

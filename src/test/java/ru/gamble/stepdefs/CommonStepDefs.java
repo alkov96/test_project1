@@ -631,7 +631,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^проверка ответа API из \"([^\"]*)\":$")
     public void checkresponceAPI(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = Stash.getValue(keyStash).toString();
+        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
         String expected = table.get("exepted");
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
@@ -667,7 +667,7 @@ public class CommonStepDefs extends GenericStepDefs {
             e.getMessage();
         }
         valueFingingParams = hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + String.valueOf(valueFingingParams));
+        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + JSONValue.toJSONString(valueFingingParams));
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
@@ -691,17 +691,23 @@ public class CommonStepDefs extends GenericStepDefs {
                 value = entry.getValue();
                 if ((value instanceof String) || (value instanceof Integer) || (value instanceof Long) || (value instanceof Timestamp) || (value instanceof Boolean)) {
                     if (key.equalsIgnoreCase(finding)) {
-                        return request = String.valueOf(value);
+                       // return request = String.valueOf(value);
+                        return request = value;
                     }
                 } else if (value instanceof Map) {
                     Map<String, Object> subMap = (Map<String, Object>) value;
+                    if (key.equalsIgnoreCase(finding)) {
+                        return request = value;
+                    }else{
                     request = hashMapper(subMap, finding);
+                    }
                 } else if (value instanceof List) {
                     List list = (List) value;
                     if (key.equalsIgnoreCase(finding)) {
                         return request = ((List) list);
+                    } else {
+                        request = hashMapper((Object) list, finding);
                     }
-                    request = hashMapper((Object) list, finding);
                 } else {
                     throw new IllegalArgumentException(String.valueOf(value));
                 }
@@ -850,7 +856,7 @@ public class CommonStepDefs extends GenericStepDefs {
         for(int i = 0; i < table.size(); i++) {
             param = table.get(i).get(PARAMETER);
             type = table.get(i).get(TYPE);
-            currentValue = String.valueOf(hashMapper(json, param));
+            currentValue = JSONValue.toJSONString(hashMapper(json, param));
             assertThat(checkType(currentValue, type)).as("Тип параметра[" + param + "] не совпадает с[" + type + "]").isTrue();
             LOG.info("Тип параметра[" + currentValue + "] соответсвует [" + type + "]");
         }
@@ -876,6 +882,12 @@ public class CommonStepDefs extends GenericStepDefs {
                 String.valueOf(value);
                 return true;
             }
+            if(type.equals("List")){
+                List<Object> items = null;
+                items = Collections.singletonList(JSONValue.parse(value));
+                return true;
+            }
+
             return false;
     }
 
@@ -970,6 +982,77 @@ public class CommonStepDefs extends GenericStepDefs {
         String email = workWithDBgetResult(sqlRequest, "email");
         Stash.put(keyEmail, email);
         LOG.info("Дата рождения: " + email);
+    }
+
+
+    @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
+    public void requestToAPI(String path, String keyStash) {
+        String requestUrl, requestPath, requestFull = "";
+        URL url;
+        requestPath = path;
+        LOG.info("Собираем строку запроса.");
+        try {
+            requestUrl = JsonLoader.getData().get("mobile-api").get("mainUrl").getValue();
+            requestFull = requestUrl + "/" + requestPath;
+
+        } catch (DataException e) {
+            e.getMessage();
+        }
+        LOG.info("requestFull");
+
+        LOG.info("Собираем параметы в JSON строку");
+        JSONObject jsonObject = new JSONObject();
+
+        //************Этот код нужен для соединения по HTTPS
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                    }
+
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
+                }
+        };
+
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            //************
+
+            url = new URL(requestFull);
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuffer jsonString = new StringBuffer();
+            String line;
+            while ((line = br.readLine()) != null) {
+                jsonString.append(line);
+            }
+            br.close();
+            con.disconnect();
+            LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
+            LOG.info("");
+            if (StringUtils.isNoneEmpty(jsonString)) {
+                Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
+            } else {
+                throw new AutotestError("ОШИБКА! Пустая строка JSON");
+            }
+        } catch (Exception e1) {
+            LOG.error(e1.getMessage(), e1);
+        }
     }
 
 }
