@@ -883,8 +883,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 return true;
             }
             if(type.equals("List")){
-                List<Object> items = null;
-                items = Collections.singletonList(JSONValue.parse(value));
+                List<Object> items = Collections.singletonList(JSONValue.parse(value));
                 return true;
             }
 
@@ -904,7 +903,6 @@ public class CommonStepDefs extends GenericStepDefs {
         String sqlRequest = "UPDATE gamebet.`user` SET offer_state=" + offer_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
     }
-
 
     @Когда("^запоминаем дату рождения пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public static void rememberBirthDate(String keyBD,String keyEmail) throws ParseException {
@@ -1053,6 +1051,22 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (Exception e1) {
             LOG.error(e1.getMessage(), e1);
         }
+    }
+
+    @Когда("^достаём из \"([^\"]*)\" параметр и сохраняем в переменую:$")
+    public void достаём_из_параметр_и_сохраняем_в_переменую(String keyJSONObject, DataTable dataTable) {
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String param, keyVariable, currentValue = "";
+        Object json =  Stash.getValue(keyJSONObject);
+
+//        for(int i = 0; i < table.size(); i++) {
+//            param = table.get(i).get(PARAMETER);
+//            keyVariable = table.get(i).get(TYPE);
+//            currentValue = JSONValue.toJSONString(hashMapper(json, param));
+//            assertThat(checkType(currentValue, type)).as("Тип параметра[" + param + "] не совпадает с[" + type + "]").isTrue();
+//            LOG.info("Тип параметра[" + currentValue + "] соответсвует [" + type + "]");
+//        }
+
     }
 
 }

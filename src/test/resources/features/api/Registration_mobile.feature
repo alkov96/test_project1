@@ -99,26 +99,26 @@
     * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
 
     * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
-      | gender                  | GENDER           |
-      | birthplace              | BIRTHPLACE       |
-      | region                  | Москва           |
-      | locality                | CITY             |
-      | street                  | STREET           |
-      | house                   | HOUSE            |
-      | construction            |                  |
-      | housing                 |                  |
-      | flat                    | FLAT             |
-      | docNum                  | DOCNUM           |
-      | docSeries               | DOCSERIES        |
+      | gender                  | GENDER         |
+      | birthplace              | BIRTHPLACE     |
+      | region                  | Москва         |
+      | locality                | CITY           |
+      | street                  | STREET         |
+      | house                   | HOUSE          |
+      | construction            |                |
+      | housing                 |                |
+      | flat                    | FLAT           |
+      | docNum                  | DOCNUM         |
+      | docSeries               | DOCSERIES      |
       | issueDate               | VALIDISSUEDATE |
-      | issuePlace              | ISSUEPLACE       |
+      | issuePlace              | ISSUEPLACE     |
       | codePlace               | 123-456        |
 
     * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
-      | devId                   | DEVID            |
-      | authToken               | AUTHTOKEN        |
-      | source                  | 16               |
-      | personalData            | PERSONALDATA     |
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+      | personalData            | PERSONALDATA |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | {"code":0,"data":{"status":12,"tsupisStatus":3}} |

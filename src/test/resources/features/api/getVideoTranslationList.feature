@@ -7,6 +7,7 @@
   Сценарий: 3_28 Получение списка доступных видео трансляций. Позитивный кейс
 
     * запрос к API "api/mobile/v3/getVideoTranslationList" и сохраняем в "RESPONCE_API"
+
     * проверка ответа API из "RESPONCE_API":
       | exepted | {"code":0,"data":{"videoTranslations": |
 
