@@ -854,7 +854,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchUserStatus2(String status,String keyEmail) {
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND offer_state=3 AND tsupis_status=3";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id" + status + " AND offer_state=3 AND tsupis_status=3";
 
         if (keyEmail.equals("ALLROWS")){
             try {
@@ -866,7 +866,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         String email = workWithDBgetResult(sqlRequest, "email");
         Stash.put(keyEmail, email);
-        LOG.info("Подхлдящий пользователь найден : " + email);
+        LOG.info("Подходящий пользователь найден : " + email);
     }
 
     @Когда("^обновляем оферту пользователю \"([^\"]*)\" \"([^\"]*)\"$")
@@ -973,8 +973,6 @@ public class CommonStepDefs extends GenericStepDefs {
         String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length()-1,setter.length()).toString() +  " WHERE email = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
     }
-}
-
 
 
     @Когда("^достаём случайную видеотрансляцию из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
@@ -993,7 +991,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
             Stash.put(keyGameId, selectedObject);
     }
-
 
     @Когда("^достаём параметр из \"([^\"]*)\" и сохраняем в переменую:$")
     public void takeParamFromAndSaveInVariable (String keyJSONObject, DataTable dataTable) {
