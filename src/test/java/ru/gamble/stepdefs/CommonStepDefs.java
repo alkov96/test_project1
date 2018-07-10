@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.sun.jna.platform.win32.Sspi;
 import cucumber.api.DataTable;
+import cucumber.api.java.it.Ma;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +53,8 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -974,7 +977,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^запрос к IMG \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public void запрос_к_IMG_и_сохраняем_в(String path, String keyStash) {
-        String fullPath = Stash.getValue(path);
+        String fullPath = (Stash.getValue(path)).toString().replaceAll("\\\\","");
         requestByHTTPS(fullPath, keyStash,"GET",null);
     }
 
@@ -1055,5 +1058,25 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.error(e1.getMessage(), e1);
         }
     }
+
+//    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
+//    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
+//        Map<String, Object> map;
+//        String key;
+//        Object value, selectedObject = null;
+//        ObjectMapper oMapper = new ObjectMapper();
+//        Object json =  Stash.getValue(keyListTranslation);
+//        map = oMapper.convertValue(json, Map.class);
+//
+//        for (Map.Entry<String, Object> entry : map.entrySet()) {
+//            key = entry.getKey();
+//            value = entry.getValue();
+//            hashMapper(JSONValue.toJSONString(value), "providerName");
+////            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
+//            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
+//        }
+//        Stash.put(keyGameId, selectedObject);
+//    }
+
 }
 
