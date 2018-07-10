@@ -23,14 +23,15 @@
 
     * запрос к API "api/mobile/v3/getVideoTranslationList" и сохраняем в "RESPONCE_API"
 
-    * находим и сохраняем "VIDEOTRANSLATIONS" из "RESPONCE_API"
+    * находим и сохраняем "DATA" из "RESPONCE_API"
 
-    * достаём из "VIDEOTRANSLATION" параметр и сохраняем в переменую:
-    | Параметр      | Переменная      |
-    | key           | GAME_ID         |
-    | providerName  | PROVIDER_NAME   |
-    | translationId | TRANSLATION_ID  |
+    * достаём случайную видеотрансляцию из списка "DATA" и сохраняем в переменую "GAME_ID"
 
+    * достаём параметр из "GAME_ID" и сохраняем в переменую:
+      | Параметр      | Переменная     |
+      | gameId        | GAME_ID        |
+      | providerName  | PROVIDER_NAME  |
+      | translationId | TRANSLATION_ID |
 
 
   @api
@@ -46,25 +47,31 @@
     | providerName  | PROVIDER_NAME  |
     | translationId | TRANSLATION_ID |
 
-
-
-
-
-
-
-
-
-
-
-
-
     * проверка ответа API из "RESPONCE_API":
-      | exepted | {"code":0,"data":{"videoTranslations": |
+      | exepted | {"code":0,"data":{"videoTranslation": |
 
-    * находим и сохраняем "DATA" из "RESPONCE_API"
+    * находим и сохраняем "VIDEOTRANSLATION" из "RESPONCE_API"
 
-    * проверка полей и типов в ответе "DATA":
-      | Параметр          | Тип    |
-      | videoTranslations | List   |
-      | providerName      | String |
-      | translationId     | String |
+#    * сохраняем в память
+#      | VIDEOTRANSLATION | https://stream.betconstruct.tv:7791/927249/index.m3u8?token=2cc3b0ab44698366991fd6f68fa068a0-1531218960-325-16 |
+
+    * запрос к IMG "VIDEOTRANSLATION" и сохраняем в "RESPONCE_IMG"
+
+#    * проверка вариантов ответа
+#
+#    * проверка полей и типов в ответе "RESPONCE_IMG":
+#      | Параметр     | Тип     |
+#      | eventId      | Integer |
+#      | rtmpUrl      | String  |
+#      | hlsUrl       | String  |
+#      | thumbnailUrl | String  |
+#      | statusCode   | Integer |
+#
+#
+#    * находим и сохраняем "DATA" из "RESPONCE_API"
+#
+#    * проверка полей и типов в ответе "DATA":
+#      | Параметр          | Тип    |
+#      | videoTranslations | List   |
+#      | providerName      | String |
+#      | translationId     | String |

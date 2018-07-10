@@ -25,7 +25,7 @@
       | source | SOURCE  |
 
     * проверка ответа API из "RESPONCE_API":
-    | exepted | "code":0,"data":{"status": |
+    | exepted | "code":0,"data":{ |
 
   @fail
   Сценарий: 3_19 Аутентификация пользователя. Негативный кейс

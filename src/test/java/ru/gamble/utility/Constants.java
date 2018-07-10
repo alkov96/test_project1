@@ -50,7 +50,7 @@ public class Constants {
     public static final String PARAMETER = "Параметр";
     public static final String TYPE = "Тип";
     public static final String VALUE = "Значение";
-    public static final String VARIABLE = "";
+    public static final String VARIABLE = "Переменная";
 
 
 

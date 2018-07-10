@@ -554,79 +554,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
-    public void requestToAPI(String path, String keyStash, DataTable dataTable) {
-        Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String requestUrl, requestPath, requestFull = "";
-        URL url;
-        requestPath = path;
-        LOG.info("Собираем строку запроса.");
-        try {
-            requestUrl = JsonLoader.getData().get("mobile-api").get("mainUrl").getValue();
-            requestFull = requestUrl + "/" + requestPath;
-
-        } catch (DataException e) {
-            e.getMessage();
-        }
-        LOG.info("requestFull");
-
-        LOG.info("Собираем параметы в JSON строку");
-        JSONObject jsonObject = new JSONObject();
-        Object params = collectParametersInJSONString(dataTable);
-
-        //************Этот код нужен для соединения по HTTPS
-        TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
-                }
-        };
-
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            //************
-
-            url = new URL(requestFull);
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/json");
-            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-            writer.write(String.valueOf(params));
-            writer.close();
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            StringBuffer jsonString = new StringBuffer();
-            String line;
-            while ((line = br.readLine()) != null) {
-                jsonString.append(line);
-            }
-            br.close();
-            con.disconnect();
-            LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
-            LOG.info("");
-            if (StringUtils.isNoneEmpty(jsonString)) {
-                Stash.put(keyStash, jsonString);
-            } else {
-                throw new AutotestError("ОШИБКА! Пустая строка JSON");
-            }
-        } catch (Exception e1) {
-            LOG.error(e1.getMessage(), e1);
-        }
-    }
 
     @Когда("^проверка ответа API из \"([^\"]*)\":$")
     public void checkresponceAPI(String keyStash, DataTable dataTable) {
@@ -927,7 +854,7 @@ public class CommonStepDefs extends GenericStepDefs {
             param = table.get(i).get(PARAMETER);
             tmp = table.get(i).get(VALUE);
             if (tmp.matches("^[A-Z_]+$")) {
-                value = Stash.getValue(tmp);
+                value = JSONValue.toJSONString(Stash.getValue(tmp));
             } else {
                 value = tmp;
             }
@@ -983,23 +910,97 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
+
+
+    @Когда("^достаём случайную видеотрансляцию из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
+    public void getRandomTranslationFromListAndSaveToVariable(String keyListTranslation, String keyGameId) {
+        Map<String, Object> map;
+        String key;
+        Object value, selectedObject = null;
+        ObjectMapper oMapper = new ObjectMapper();
+        Object json =  Stash.getValue(keyListTranslation);
+        map = oMapper.convertValue(json, Map.class);
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            key = entry.getKey();
+            value = entry.getValue();
+            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
+        }
+            Stash.put(keyGameId, selectedObject);
+    }
+
+
+    @Когда("^достаём параметр из \"([^\"]*)\" и сохраняем в переменую:$")
+    public void takeParamFromAndSaveInVariable (String keyJSONObject, DataTable dataTable) {
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String param, keyVariable, currentValue = "";
+        Object json =  Stash.getValue(keyJSONObject);
+        Object key = null, value;
+        ObjectMapper oMapper = new ObjectMapper();
+        Map<String, Object> map;
+        Object selectedObject = null;
+        map = oMapper.convertValue(json, Map.class);
+
+        for(int i = 0; i < table.size(); i++) {
+            param = table.get(i).get(PARAMETER);
+            keyVariable = table.get(i).get(VARIABLE);
+
+            for (Map.Entry<String, Object> entry1 : map.entrySet()) {
+                if(param.equals("gameId")){
+                    key = entry1.getKey();
+                    Stash.put(keyVariable, key);
+                    LOG.info("Cохранили [" + key.toString() + "]==>[" + keyVariable + "]");
+                }else {
+                    value = entry1.getValue();
+                    currentValue = JSONValue.toJSONString(hashMapper(value, param));
+                    Stash.put(keyVariable, currentValue);
+                    LOG.info("Cохранили [" + currentValue + "]==>[" + keyVariable + "]");
+                }
+            }
+        }
+    }
+
+    @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestToAPI(String path, String keyStash, DataTable dataTable) {
+        String fullPath = collectQueryString(path);
+        requestByHTTPS(fullPath,keyStash,"POST",dataTable);
+    }
+
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public void requestToAPI(String path, String keyStash) {
-        String requestUrl, requestPath, requestFull = "";
-        URL url;
-        requestPath = path;
+        String fullPath = collectQueryString(path);
+        requestByHTTPS(fullPath, keyStash,"GET",null);
+    }
+
+    @Когда("^запрос к IMG \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
+    public void запрос_к_IMG_и_сохраняем_в(String path, String keyStash) {
+        String fullPath = Stash.getValue(path);
+        requestByHTTPS(fullPath, keyStash,"GET",null);
+    }
+
+    private String collectQueryString(String path){
+        String requestUrl, requestPath = path, requestFull = "";
         LOG.info("Собираем строку запроса.");
         try {
             requestUrl = JsonLoader.getData().get("mobile-api").get("mainUrl").getValue();
             requestFull = requestUrl + "/" + requestPath;
-
         } catch (DataException e) {
             e.getMessage();
         }
         LOG.info("requestFull");
+        return requestFull;
+    }
+
+    private void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
+        if(!(null == dataTable)) { Map<String, String> table = dataTable.asMap(String.class, String.class); }
+        Object params = null;
+        URL url;
 
         LOG.info("Собираем параметы в JSON строку");
         JSONObject jsonObject = new JSONObject();
+        if(!(null == dataTable)) {
+            params = collectParametersInJSONString(dataTable);
+        }
 
         //************Этот код нужен для соединения по HTTPS
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -1007,11 +1008,9 @@ public class CommonStepDefs extends GenericStepDefs {
                     @Override
                     public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
                     }
-
                     @Override
                     public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
                     }
-
                     @Override
                     public X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
@@ -1029,10 +1028,14 @@ public class CommonStepDefs extends GenericStepDefs {
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setDoInput(true);
             con.setDoOutput(true);
-            con.setRequestMethod("GET");
+            con.setRequestMethod(method);
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
             OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
+            if(!(null == dataTable)) { writer.write(String.valueOf(params)); }
+            writer.close();
+
             BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuffer jsonString = new StringBuffer();
             String line;
@@ -1052,21 +1055,5 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.error(e1.getMessage(), e1);
         }
     }
-
-    @Когда("^достаём из \"([^\"]*)\" параметр и сохраняем в переменую:$")
-    public void достаём_из_параметр_и_сохраняем_в_переменую(String keyJSONObject, DataTable dataTable) {
-        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-        String param, keyVariable, currentValue = "";
-        Object json =  Stash.getValue(keyJSONObject);
-
-//        for(int i = 0; i < table.size(); i++) {
-//            param = table.get(i).get(PARAMETER);
-//            keyVariable = table.get(i).get(TYPE);
-//            currentValue = JSONValue.toJSONString(hashMapper(json, param));
-//            assertThat(checkType(currentValue, type)).as("Тип параметра[" + param + "] не совпадает с[" + type + "]").isTrue();
-//            LOG.info("Тип параметра[" + currentValue + "] соответсвует [" + type + "]");
-//        }
-
-    }
-
 }
+
