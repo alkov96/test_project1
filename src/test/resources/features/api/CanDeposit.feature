@@ -46,9 +46,9 @@
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
     * запрос к API "api/mobile/v3/canDeposit" и сохраняем в "RESPONCE_API":
-      | devId       | DEVID |
+      | devId       | DEVID     |
       | authToken   | AUTHTOKEN |
-      | source      | 16 |
+      | source      | 16        |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "depositStatus":0 |
@@ -75,9 +75,9 @@
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
     * запрос к API "api/mobile/v3/canDeposit" и сохраняем в "RESPONCE_API":
-      | devId       | DEVID |
+      | devId       | DEVID     |
       | authToken   | AUTHTOKEN |
-      | source      | 16 |
+      | source      | 16        |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":12 |
@@ -103,9 +103,9 @@
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
     * запрос к API "api/mobile/v3/canDeposit" и сохраняем в "RESPONCE_API":
-      | devId       | DEVID |
+      | devId       | DEVID     |
       | authToken   | AUTHTOKEN |
-      | source      | 16 |
+      | source      | 16        |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "depositStatus":1 |
