@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.sun.jna.platform.win32.Sspi;
 import cucumber.api.DataTable;
 import cucumber.api.java.it.Ma;
 import net.minidev.json.JSONArray;
@@ -35,7 +32,6 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
-import sun.awt.image.ImageWatched;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -670,6 +666,42 @@ public class CommonStepDefs extends GenericStepDefs {
         return result;
     }
 
+    /**
+     * запрос на БД и сохранение всего ответа в map
+     * @param sqlRequest
+     * @return
+     */
+    private static void workWithDBresult(String sqlRequest) throws Exception{
+        Connection con = DBUtils.getConnection();
+        Statement stmt = null;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        StringBuilder keyNormal = new StringBuilder();
+        try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlRequest);
+            rs.last();
+            ResultSetMetaData allRows = rs.getMetaData();
+            int count = allRows.getColumnCount();
+            for (int i=1; i<=count; i++){
+                String key = allRows.getColumnName(i);
+                String value = rs.getString(key);
+                for (String part: key.split("_")){
+                    keyNormal.append(part);
+                }
+                LOG.info(keyNormal + "=" + value);
+                Stash.put(keyNormal.toString().toUpperCase(),value);
+                keyNormal.setLength(0);
+            }
+            } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtils.closeAll(con, ps, null);
+        }
+    }
+
+
+
     @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\"$")
     public static void confirmPhone(String keyCode, String keyPhone) {
         String phone = Stash.getValue(keyPhone);
@@ -823,6 +855,15 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchUserStatus2(String status,String keyEmail) {
         String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND offer_state=3 AND tsupis_status=3";
+
+        if (keyEmail.equals("ALLROWS")){
+            try {
+                workWithDBresult(sqlRequest);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         String email = workWithDBgetResult(sqlRequest, "email");
         Stash.put(keyEmail, email);
         LOG.info("Подхлдящий пользователь найден : " + email);
@@ -912,6 +953,27 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Дата рождения: " + email);
     }
 
+
+    @Когда("^сбрасываем пользователю статус ПД до \"([^\"]*)\" \"([^\"]*)\"$")
+    public static void updatePDState(String peronal_data_state,String keyEmail) {
+        String sqlRequest = "UPDATE gamebet.`user` SET personal_data_state=" + peronal_data_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
+        workWithDB(sqlRequest);
+    }
+
+
+    @Когда("^обновляем поля в БД для юзера \"([^\"]*)\":$")
+    public void NullToField(String keyEmail, DataTable dataTable) {
+
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        StringBuilder setter = new StringBuilder();
+        table.entrySet().forEach(el->
+        {
+            setter.append(el.getKey()+"="+el.getValue()+",");
+        });
+        String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length()-1,setter.length()).toString() +  " WHERE email = '" + Stash.getValue(keyEmail) + "'";
+        workWithDB(sqlRequest);
+    }
+}
 
 
 
