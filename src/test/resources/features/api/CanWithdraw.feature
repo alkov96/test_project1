@@ -123,8 +123,8 @@
   Сценарий: Проверка доступных способов вывода пользователя, вводившего ПД, но не совпавшие с данными из ЦУПИС(full,alternative)
 
     * поиск пользователя проходившего ускоренную регистрацию "EMAIL"
-#    * обновляем поля в БД для юзера "EMAIL":
-#      | passport_number         | NULL             |
+    * обновляем поля в БД для юзера "EMAIL":
+      | registration_stage_id         | 2             |
 #      | passport_series         | NULL             |
 #      | birth_place             | NULL             |
 #      | region                  | NULL             |
@@ -176,6 +176,7 @@
       | issueDate               | ISSUEDATE       |
       | issuePlace              | ISSUEPLACE      |
       | codePlace               | 123-456          |
+
 
     * запрос к API "api/mobile/v3/submitAndCheckPersonalData" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID            |

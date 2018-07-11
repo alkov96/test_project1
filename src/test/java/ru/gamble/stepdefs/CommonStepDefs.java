@@ -247,6 +247,8 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
+
+
     /**
      * Инициализируйте страницу с соответствующим заголовком (определенным через
      * {@link ru.sbtqa.tag.pagefactory.annotations.PageEntry} аннотация)
@@ -561,6 +563,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String expected = table.get("exepted");
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
+
     }
 
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
@@ -1116,6 +1119,29 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.error(e1.getMessage(), e1);
         }
     }
+
+    @Когда("^обновим версию мобильного приложения для \"([^\"]*)\" \"([^\"]*)\" до \"([^\"]*)\" \"([^\"]*)\"$")
+    public void updateVersionApp(String typeOS, String keyTypeOS, String vers, String hardVers) {
+        String type;
+        switch (typeOS){
+            case "Android":
+                type="1";
+                break;
+            case "IOS":
+                type="2";
+                break;
+            default:
+                type=typeOS;
+        }
+        Stash.put(keyTypeOS,type);
+        String sqlDel = "DELETE FROM  gamebet.`appversion` WHERE (version=" + vers + " OR hard_update_version=" + hardVers + ") AND type_os=" + type + " AND active_version=0";
+        workWithDB(sqlDel);
+        String sqlRequest = "UPDATE gamebet.`appversion` SET version=" + vers + ", hard_update_version=" + hardVers + " WHERE active_version=1 AND type_os=" + type;
+        workWithDB(sqlRequest);
+
+    }
+
+
 
 //    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
 //    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
