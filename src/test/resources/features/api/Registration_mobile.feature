@@ -121,7 +121,11 @@
       | personalData            | PERSONALDATA |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted | {"code":0,"data":{"status":12,"tsupisStatus":3}} |
+      | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "status":12 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "tsupisStatus":3 |
 
     * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -130,7 +134,11 @@
       | innNumber               |                  |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted | {"code":0,"data":{"status":5,"tsupisStatus":3}}   |
+      | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "status":5 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "tsupisStatus":3 |
 
     * запрос к API "api/mobile/v3/requestSkypeCall" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -138,7 +146,9 @@
       | skype                   | SKYPELOGIN       |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":6,"tsupisStatus":3   |
+      | exepted | "status":6   |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "tsupisStatus":3   |
 
     * находим и сохраняем "TIMELEFT" из "RESPONCE_API"
 
