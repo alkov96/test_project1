@@ -39,6 +39,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.net.URL;
+import java.security.Key;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -155,6 +156,21 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    @Когда("^разлогиниваем пользователя$")
+    public static void logOut(){
+        goToMainPage("site");
+        List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
+                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        if(!userIcon.isEmpty()){
+            userIcon.get(0).click();
+            List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
+                    .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+            if(!logOutButton.isEmpty()) {
+                logOutButton.get(0).click();
+            }
+        }
+    }
+
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
     public static void goToMainPage() {
@@ -245,8 +261,6 @@ public class CommonStepDefs extends GenericStepDefs {
             DBUtils.closeAll(con, ps, null);
         }
     }
-
-
 
 
     /**
@@ -563,7 +577,6 @@ public class CommonStepDefs extends GenericStepDefs {
         String expected = table.get("exepted");
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
-
     }
 
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
@@ -969,7 +982,7 @@ public class CommonStepDefs extends GenericStepDefs {
         StringBuilder setter = new StringBuilder();
         table.entrySet().forEach(el->
         {
-            setter.append(el.getKey()+"="+el.getValue()+",");
+            setter.append(el.getKey() + "=" + el.getValue() + ",");
         });
         LOG.info(setter.toString());
         String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length()-1,setter.length()).toString() +  " WHERE email = '" + Stash.getValue(keyEmail) + "'";
@@ -1120,6 +1133,22 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    @Когда("^проверка ответа \"([^\"]*)\" в зависимости от \"([^\"]*)\":$")
+    public void checkAnswerDependingOn(String responceAPI, String providerName, DataTable dataTable) {
+        Object json = Stash.getValue(responceAPI);
+        Map<String,String> data = dataTable.asMap(String.class,String.class);
+        for (Map.Entry entry: data.entrySet()) {
+          if(String.valueOf(entry.getKey()).equalsIgnoreCase(providerName)){
+
+          }
+        }
+
+    }
+
+    @Когда("^если в \"([^\"]*)\" провайдер PERFORM, то проверяем JSON:$")
+    public void если_в_провайдер_PERFORM_то_проверяем_JSON(String arg1, DataTable arg2) {
+
+    }
     @Когда("^обновим версию мобильного приложения для \"([^\"]*)\" \"([^\"]*)\" до \"([^\"]*)\" \"([^\"]*)\"$")
     public void updateVersionApp(String typeOS, String keyTypeOS, String vers, String hardVers) {
         String type;

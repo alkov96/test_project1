@@ -7,6 +7,9 @@ import ru.sbtqa.tag.datajack.adaptors.JsonDataObjectAdaptor;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class JsonLoader {
     private static TestDataObject data;
@@ -22,4 +25,19 @@ public class JsonLoader {
         return data;
     }
 
+    @SuppressWarnings("unchecked")
+    public static Map<String, String> flatMap(String parentKey, Map<String, Object> nestedMap)
+    {
+        Map<String, String> flatMap = new HashMap<>();
+        String prefixKey = parentKey != null ? parentKey + "." : "";
+        for (Map.Entry<String, Object> entry : nestedMap.entrySet()) {
+            if (entry.getValue() instanceof String) {
+                flatMap.put(prefixKey + entry.getKey(), (String)entry.getValue());
+            }
+            if (entry.getValue() instanceof Map) {
+                flatMap.putAll(flatMap(prefixKey + entry.getKey(), (Map<String, Object>)entry.getValue()));
+            }
+        }
+        return flatMap;
+    }
 }

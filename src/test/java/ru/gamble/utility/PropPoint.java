@@ -26,7 +26,7 @@ public class PropPoint {
             instance = new Properties();
 
             try {
-                String filename = "config" + File.separator + "application.properties";
+                String filename = "email.properties";
                 input = PropPoint.class.getClassLoader().getResourceAsStream(filename);
 
                 if (input == null) {
