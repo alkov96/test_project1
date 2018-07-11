@@ -787,12 +787,10 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\"$")
     public void checkTimeLeft(String keyTimeLeft,String keyResponse) {
-        String timewasS = Stash.getValue(keyTimeLeft);
+        Integer timewasS =Stash.getValue(keyTimeLeft);
         fingingAndSave(keyTimeLeft,keyResponse);
-        String timenowS = Stash.getValue(keyTimeLeft);
-        Long timewas = Long.parseLong(timewasS);
-        Long timenow = Long.parseLong(timenowS);
-        if (timenow.compareTo(timewas)>=0){
+        Integer timenowS = Stash.getValue(keyTimeLeft);
+        if (timenowS.compareTo(timewasS)>=0){
             Assertions.fail("Время ожидани звонка скайп не изменилось");
         }
     }
@@ -854,7 +852,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchUserStatus2(String status,String keyEmail) {
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id" + status + " AND offer_state=3 AND tsupis_status=3";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND offer_state=3 AND tsupis_status=3";
 
         if (keyEmail.equals("ALLROWS")){
             try {
@@ -970,6 +968,7 @@ public class CommonStepDefs extends GenericStepDefs {
         {
             setter.append(el.getKey()+"="+el.getValue()+",");
         });
+        LOG.info(setter.toString());
         String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length()-1,setter.length()).toString() +  " WHERE email = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
     }
