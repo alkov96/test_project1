@@ -24,13 +24,11 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v3/getVideoTranslationList" и сохраняем в "RESPONCE_API"
+    * запрос к API "api/mobile/v4/getVideoTranslationList" и сохраняем в "RESPONCE_API"
 
     * находим и сохраняем "DATA" из "RESPONCE_API"
 
     * достаём случайную видеотрансляцию из списка "DATA" и сохраняем в переменую "GAME_ID"
-
-#    * достаём видеотрансляцию провайдера "PROVIDER_NAME" из списка "DATA" и сохраняем в переменую "GAME_ID"
 
     * достаём параметр из "GAME_ID" и сохраняем в переменую:
       | Параметр      | Переменная     |
@@ -38,19 +36,39 @@
       | providerName  | PROVIDER_NAME  |
       | translationId | TRANSLATION_ID |
 
-
   @api
   @getVideoTranslationLink
   @correct
   Сценарий: 3_29 Получение ссылки на определенную видео трансляцию от IMG. Позитивный кейс
 
-    * запрос к API "api/mobile/v3/getVideoTranslationLink" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v4/getVideoTranslationLink" и сохраняем в "RESPONCE_API":
     | authToken     | AUTHTOKEN      |
     | devId         | DEVID          |
     | source        | SOURCE         |
     | gameId        | GAME_ID        |
     | providerName  | PROVIDER_NAME  |
     | translationId | TRANSLATION_ID |
+
+
+    * проверка ответа "RESPONCE_API" в зависимости от "PROVIDER_NAME":
+      | IMG          | {"code":0,"data":{"videoTranslation":"https: |
+      | BETCONSTRUCT | {"code":0,"data":{"videoTranslation":        |
+      | PERFORM      | {"code":0,"data":{"performData":             |
+
+    * если в "RESPONCE_API" провайдер PERFORM, то проверяем JSON:
+    | access_token | String |
+    | fixtureId    | String |
+    | outletkey    | String |
+    | token_type   | String |
+    | uuid         | String |
+    | expires_in   | String |
+
+
+
+
+
+
+
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | {"code":0,"data":{"videoTranslation": |

@@ -46,14 +46,5 @@
         "user": "stoloto_main",
         "password": "lizByr4WO#"
       }
-    },
-  "mail-registration": {
-    "login": "testregistrator@yandex.ru",
-    "password": "n1TnYu3j",
-    "host": "imap.yandex.ru",
-    "port": "993",
-    "ssl": "true",
-    "protocol": "imaps",
-    "debug": "false"
-  }
+    }
 }

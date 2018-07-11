@@ -966,7 +966,7 @@ public class CommonStepDefs extends GenericStepDefs {
         StringBuilder setter = new StringBuilder();
         table.entrySet().forEach(el->
         {
-            setter.append(el.getKey()+"="+el.getValue()+",");
+            setter.append(el.getKey() + "=" + el.getValue() + ",");
         });
         LOG.info(setter.toString());
         String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length()-1,setter.length()).toString() +  " WHERE email = '" + Stash.getValue(keyEmail) + "'";
@@ -1117,24 +1117,20 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-//    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
-//    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
-//        Map<String, Object> map;
-//        String key;
-//        Object value, selectedObject = null;
-//        ObjectMapper oMapper = new ObjectMapper();
-//        Object json =  Stash.getValue(keyListTranslation);
-//        map = oMapper.convertValue(json, Map.class);
-//
-//        for (Map.Entry<String, Object> entry : map.entrySet()) {
-//            key = entry.getKey();
-//            value = entry.getValue();
-//            hashMapper(JSONValue.toJSONString(value), "providerName");
-////            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
-//            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
-//        }
-//        Stash.put(keyGameId, selectedObject);
-//    }
+    @Когда("^проверка ответа \"([^\"]*)\" в зависимости от \"([^\"]*)\":$")
+    public void проверка_ответа_в_зависимости_от(String responceAPI, String providerName, DataTable dataTable) {
+        Object json = Stash.getValue(responceAPI);
+        Map<String,String> data = dataTable.asMap(String.class,String.class);
+        for (Map.Entry entry: data.entrySet()) {
+
+        }
+
+    }
+
+    @Когда("^если в \"([^\"]*)\" провайдер PERFORM, то проверяем JSON:$")
+    public void если_в_провайдер_PERFORM_то_проверяем_JSON(String arg1, DataTable arg2) {
+
+    }
 
 }
 
