@@ -15,9 +15,9 @@
   @correct
   Сценарий: 3_27 Восстановление забытого пароля
 
-    * запрос к API "api/mobile/v3/sendEmailForChangePassword" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v3/sendEmailForRestorePassword" и сохраняем в "RESPONCE_API":
       | devId       | DEVID   |
       | email       | EMAIL   |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0,"data" |
+      | exepted | {"code":0} |
