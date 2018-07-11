@@ -39,6 +39,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.net.URL;
+import java.security.Key;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -152,6 +153,21 @@ public class CommonStepDefs extends GenericStepDefs {
             driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
             LOG.info("Прелоадеры закрылись");
         } catch (TimeoutException te) {
+        }
+    }
+
+    @Когда("^разлогиниваем пользователя$")
+    public static void logOut(){
+        goToMainPage("site");
+        List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
+                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        if(!userIcon.isEmpty()){
+            userIcon.get(0).click();
+            List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
+                    .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+            if(!logOutButton.isEmpty()) {
+                logOutButton.get(0).click();
+            }
         }
     }
 
@@ -1118,11 +1134,13 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^проверка ответа \"([^\"]*)\" в зависимости от \"([^\"]*)\":$")
-    public void проверка_ответа_в_зависимости_от(String responceAPI, String providerName, DataTable dataTable) {
+    public void checkAnswerDependingOn(String responceAPI, String providerName, DataTable dataTable) {
         Object json = Stash.getValue(responceAPI);
         Map<String,String> data = dataTable.asMap(String.class,String.class);
         for (Map.Entry entry: data.entrySet()) {
+          if(String.valueOf(entry.getKey()).equalsIgnoreCase(providerName)){
 
+          }
         }
 
     }
