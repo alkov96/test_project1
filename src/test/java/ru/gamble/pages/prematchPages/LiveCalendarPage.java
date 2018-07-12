@@ -36,7 +36,6 @@ public class LiveCalendarPage extends AbstractPage {
     @FindBy(xpath = "//div[@class='livecal-calendar-wrapper']")
     private WebElement centralMarkets;
 
-//    @FindBy(xpath = "span.livecal-days__weekday.ng-binding")
 
 
     public LiveCalendarPage() {
@@ -120,6 +119,19 @@ public class LiveCalendarPage extends AbstractPage {
                 count++;
             }
         } while (count <= number);
+    }
+
+    @ActionTitle("в меню выбора видов спорта выбирает")
+    public static void inSportsSelectionMenuSelect(String sport){
+        WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Нажимаем на выпадающее меню видов спорта");
+        WebElement menuSport = driver.findElement(By.xpath("//div[contains(@class,'select__toggler')]"));
+        menuSport.click();
+        LOG.info("Выбираем вид спорта::" + sport);
+        WebElement selectSport = menuSport.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
+        selectSport.click();
+        LOG.info("Нажимаем на выпадающее меню видов спорта");
+        menuSport.click();
     }
 
 

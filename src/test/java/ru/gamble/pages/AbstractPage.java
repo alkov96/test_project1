@@ -398,9 +398,10 @@ public abstract class AbstractPage extends Page {
         BigDecimal sumBet;
         BigDecimal one = new BigDecimal(1);
         sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2).add(one): new BigDecimal(sum).setScale(2);
-        coupon_field.clear();
+        //coupon_field.clear();
         LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
         fillField(coupon_field,sumBet.toString());
+        LOG.info("Ввелось в поле::" + coupon_field.getAttribute("value"));
         Stash.put("sumKey", sumBet.toString());
     }
 
