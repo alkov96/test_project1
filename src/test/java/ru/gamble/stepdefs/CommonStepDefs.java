@@ -743,6 +743,12 @@ public class CommonStepDefs extends GenericStepDefs {
         String birthDateString = Stash.getValue("BIRTHDATE");
         SimpleDateFormat formatDate = new SimpleDateFormat();
         formatDate.applyPattern("dd.MM.yyyy");
+        if (birthDateString.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")){
+            SimpleDateFormat formatgut = new SimpleDateFormat();
+            formatgut.applyPattern("yyyy-MM-dd");
+            birthDateString=formatDate.format(formatgut.parse(birthDateString));
+        }
+
         Date birthDate = formatDate.parse(birthDateString);
         Date now = new Date();
         Date valid = new Date();
@@ -867,20 +873,9 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
-    public static void searchUserStatus2(String status,String keyEmail) {
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND offer_state=3 AND tsupis_status=3";
-
-        if (keyEmail.equals("ALLROWS")){
-            try {
-                workWithDBresult(sqlRequest);
-                return;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        String email = workWithDBgetResult(sqlRequest, "email");
-        Stash.put(keyEmail, email);
-        LOG.info("Подходящий пользователь найден : " + email);
+    public void searchUserStatus2(String status,String keyEmail) {
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3";
+        searchUser(keyEmail,sqlRequest);
     }
 
     @Когда("^обновляем оферту пользователю \"([^\"]*)\" \"([^\"]*)\"$")
@@ -960,11 +955,9 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^поиск пользователя проходившего ускоренную регистрацию \"([^\"]*)\"$")
-    public static void searchUserNotPD(String keyEmail) {
+    public void searchUserNotPD(String keyEmail) {
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE tsupis_status IN (1,2) AND personal_data_state=1 AND email LIKE 'testregistrator+%@yandex.ru'";
-        String email = workWithDBgetResult(sqlRequest, "email");
-        Stash.put(keyEmail, email);
-        LOG.info("Дата рождения: " + email);
+        searchUser(keyEmail,sqlRequest);
     }
 
 
@@ -1170,7 +1163,19 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
-
+public void searchUser(String keyEmail, String sqlRequest){
+    if (keyEmail.equals("ALLROWS")){
+        try {
+            workWithDBresult(sqlRequest);
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    String email = workWithDBgetResult(sqlRequest, "email");
+    Stash.put(keyEmail, email);
+    LOG.info("Подходящий пользователь найден : " + email);
+}
 
 //    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
 //    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {

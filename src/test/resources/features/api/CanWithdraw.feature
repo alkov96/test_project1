@@ -7,21 +7,21 @@
     * сохраняем в память
       | PASS  | Default |
     * сохраняем в память
-      | ISSUEPLACE  | random |
+      | ISSUEPLACER  | random |
     * сохраняем в память
-      | CITY  | random |
+      | CITYR  | random |
     * сохраняем в память
-      | STREET  | random |
+      | STREETR  | random |
     * сохраняем в память
-      | BIRTHPLACE | random |
+      | BIRTHPLACER | random |
     * сохраняем в память
       | HOUSER  | randomNumber 2 |
     * сохраняем в память
-      | DOCNUM  | randomNumber 6 |
+      | DOCNUMR  | randomNumber 6 |
     * сохраняем в память
-      | DOCSERIES  | randomNumber 4 |
+      | DOCSERIESR  | randomNumber 4 |
     * сохраняем в память
-      | FLAT  | randomNumber 2 |
+      | FLATR  | randomNumber 2 |
     * сохраняем в память
       | GENDER | randomSex |
     * сохраняем в память
@@ -30,113 +30,103 @@
       | LASNAME | random |
     * сохраняем в память
       | PARONIMYC | random |
-    * сохраняем в память
-      | ISSUEDATE | randomDate |
 
-#  @api
-#  @canWithdraw
-#  @correct
-#  Сценарий: Проверка доступных способов вывода для полностью зарегистрированного пользователя
-#
-#    * поиск акаунта со статуом регистрации "=2" "EMAIL"
-#
-#    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID |
-#      | email       | EMAIL |
-#      | pass        | PASS  |
-#      | source      | 16    |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#
-#    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
-#
-#    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID |
-#      | authToken   | AUTHTOKEN |
-#      | source      | 16 |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "withdrawStatus":0 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#
-#
-#  @api
-#  @canWithdraw
-#  @incorrect
-#  Сценарий: Проверка доступных способов вывода для не до конца зарегистрированного пользователя
-#
-#    * поиск акаунта со статуом регистрации ">=9" "EMAIL"
-#
-#    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID |
-#      | email       | EMAIL |
-#      | pass        | PASS  |
-#      | source      | 16    |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#
-#    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
-#
-#    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID |
-#      | authToken   | AUTHTOKEN |
-#      | source      | 16 |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":12 |
-#
-#
-#  @api
-#  @canWithdraw
-#  @correct
-#  Сценарий: Проверка доступных способов вывода пользователя, не вводившего ПД (full,alternative)
-#
-#    * поиск пользователя проходившего ускоренную регистрацию "EMAIL"
-#
-#    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID |
-#      | email       | EMAIL |
-#      | pass        | PASS  |
-#      | source      | 16    |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#
-#    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
-#
-#    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID |
-#      | authToken   | AUTHTOKEN |
-#      | source      | 16 |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "withdrawStatus":1 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
+
+  @api
+  @canWithdraw
+  @correct
+  Сценарий: Проверка доступных способов вывода для полностью зарегистрированного пользователя
+
+    * поиск акаунта со статуом регистрации "=2" "EMAIL"
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | email       | EMAIL |
+      | pass        | PASS  |
+      | source      | 16    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | authToken   | AUTHTOKEN |
+      | source      | 16 |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "withdrawStatus":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+
+  @api
+  @canWithdraw
+  @incorrect
+  Сценарий: Проверка доступных способов вывода для не до конца зарегистрированного пользователя
+
+    * поиск акаунта со статуом регистрации ">=9" "EMAIL"
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | email       | EMAIL |
+      | pass        | PASS  |
+      | source      | 16    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | authToken   | AUTHTOKEN |
+      | source      | 16 |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":12 |
+
+
+  @api
+  @canWithdraw
+  @correct
+  Сценарий: Проверка доступных способов вывода пользователя, не вводившего ПД (full,alternative)
+
+    * поиск пользователя проходившего ускоренную регистрацию "EMAIL"
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | email       | EMAIL |
+      | pass        | PASS  |
+      | source      | 16    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | authToken   | AUTHTOKEN |
+      | source      | 16 |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "withdrawStatus":1 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
 
   @api
   @canWithdraw
   @correct
   Сценарий: Проверка доступных способов вывода пользователя, вводившего ПД, но не совпавшие с данными из ЦУПИС(full,alternative)
 
-    * поиск пользователя проходившего ускоренную регистрацию "EMAIL"
+    * поиск пользователя проходившего ускоренную регистрацию "ALLROWS"
+
+    * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
+
     * обновляем поля в БД для юзера "EMAIL":
       | registration_stage_id         | 2             |
-#      | passport_series         | NULL             |
-#      | birth_place             | NULL             |
-#      | region                  | NULL             |
-#      | city                    | NULL             |
-#      | street                  | NULL             |
-#      | house_number            | NULL             |
-#      | building                | NULL             |
-#      | housing                 | NULL             |
-#      | apartment               | NULL             |
-#      | passport_date           | NULL             |
-#      | passport_issuer         | NULL             |
-#      | passport_issuer_code    | NULL             |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
@@ -163,18 +153,18 @@
 
     * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
       | gender                  | GENDER          |
-      | birthplace              | BIRTHPLACE      |
+      | birthplace              | BIRTHPLACER      |
       | region                  | Москва           |
-      | locality                | CITY            |
-      | street                  | STREET          |
-      | house                   | HOUSE           |
+      | locality                | CITYR            |
+      | street                  | STREETR          |
+      | house                   | HOUSER           |
       | construction            |                  |
       | housing                 |                  |
-      | flat                    | FLAT            |
-      | docNum                  | DOCNUM          |
-      | docSeries               | DOCSERIES       |
-      | issueDate               | ISSUEDATE       |
-      | issuePlace              | ISSUEPLACE      |
+      | flat                    | FLATR            |
+      | docNum                  | DOCNUMR          |
+      | docSeries               | DOCSERIESR       |
+      | issueDate               | VALIDISSUEDATE       |
+      | issuePlace              | ISSUEPLACER      |
       | codePlace               | 123-456          |
 
 
@@ -204,20 +194,6 @@
       | skype                   | PHONE            |
 
 
-    * подтверждаем видеорегистрацию "EMAIL"
-
-    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
-      | devId       | DEVID |
-      | authToken   | AUTHTOKEN |
-      | source      | 16 |
-
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | "withdrawStatus":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | "code":0 |
-
-
   @api
   @canWithdraw
   @correct
@@ -226,7 +202,8 @@
 
 
     * поиск акаунта со статуом регистрации "=2" "ALLROWS"
-    * обновляем оферту пользователю "1" "EMAIL"
+    * обновляем поля в БД для юзера "EMAIL":
+      | offer_state | 1     |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
@@ -249,7 +226,6 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
 
-#    * запоминаем дату рождения пользователя "BIRTHDATE" "EMAIL"
     * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
 
     * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
@@ -277,7 +253,8 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
 
-    * обновляем оферту пользователю "3" "EMAIL"
+    * обновляем поля в БД для юзера "EMAIL":
+      | offer_state | 3     |
 
     * подтверждаем видеорегистрацию "EMAIL"
 
