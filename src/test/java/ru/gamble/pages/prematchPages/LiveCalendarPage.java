@@ -57,7 +57,7 @@ public class LiveCalendarPage extends AbstractPage {
             }catch (Exception e){
                 LOG.info("На странице [" + allDaysPages.get(tryPage).getText() + "] нет событий");
             }
-            List<WebElement> correctCoeffs = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='table livecal-table ng-scope']/div[contains(text(), '"+coeff+"')]"));
+            List<WebElement> correctCoeffs = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='table livecal-table ng-scope']/div[contains(text(), '" + coeff + "')]"));
             if (correctCoeffs.size()>0) {
                 for(WebElement element : correctCoeffs){
                     if (element.isDisplayed()){
