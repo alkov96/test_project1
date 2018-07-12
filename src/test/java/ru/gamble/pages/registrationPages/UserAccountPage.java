@@ -226,6 +226,8 @@ public class UserAccountPage extends AbstractPage{
         }else {
             throw new AutotestError("Ошибка! SMS-код не найден.");
         }
+        Stash.put("PHONE_NUMBER",phone);
+        LOG.info("Сохранили номер телефона в память::" + phone + "[PHONE_NUMBER]");
 
     }
 

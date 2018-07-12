@@ -24,8 +24,11 @@ import ru.sbtqa.tag.qautils.properties.Props;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.LOGIN;
 import static ru.gamble.utility.Constants.PASSWORD;
 import static ru.gamble.utility.Constants.STARTING_URL;
@@ -76,6 +79,7 @@ public class EnterPage extends AbstractPage {
 
     @ActionTitle("логинится с")
     public void logIn(DataTable dataTable) throws DataException {
+        WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String login, password;
         if(data.get(LOGIN).equals(Constants.DEFAULT)){
@@ -94,12 +98,31 @@ public class EnterPage extends AbstractPage {
         }else {
             password = data.get(PASSWORD);
         }
+        // КОСТЫЛЬНЫЙ МЕТОД, ТАК-КАК ПОЛЕ ВВОДА ЛОГИНА ДОСТУПНО В СЛУЧАЙНЫЕ ВРЕМЕННЫЕ ПЕРИОДЫ *************************
+         int count = 0;
+         int count1 = 0;
+         do{
 
-        LOG.info("Водим в поле::" + login);
-        fillField(inputLogin,login);
-        LOG.info("Водим в поле::" + password);
-        fillField(inputPassword,password);
-        LOG.info("Ожидаем пока кнопка 'Войти' будет видимой");
-        new WebDriverWait(PageFactory.getWebDriver(),10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
+             do {
+                 LOG.info("Водим в поле::" + login);
+                 fillField(inputLogin, login);
+                 LOG.info("Попытка ввести::" + login + "[" + count1 + "]");
+                 LOG.info("Реально в поле ввелось::" + inputLogin.getAttribute("value"));
+                 count1++;
+             }while (!(inputLogin.getAttribute("value").equals(login)) && count1 < 3);
+
+            LOG.info("Водим в поле::" + password);
+            fillField(inputPassword, password);
+
+            LOG.info("Ожидаем пока кнопка 'Войти' будет видимой");
+            new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
+            LOG.info("Нажимаем на кнопку 'Войти'");
+            driver.findElement(By.xpath("//button[contains(.,'Войти')]")).click();
+            LOG.info("Попытка ввеcти::" + count);
+            count++;
+
+        }while ((!driver.findElements(By.xpath("//div[contains(.,'Ошибка в адресе электронной почты или пароле')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).isEmpty()) && count < 3);
+        workWithPreloader();
+      //***********************
     }
 }
