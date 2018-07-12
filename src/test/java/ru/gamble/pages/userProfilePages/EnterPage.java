@@ -7,6 +7,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.utility.Constants;
 import ru.gamble.stepdefs.CommonStepDefs;
@@ -30,6 +32,7 @@ import static ru.gamble.utility.Constants.STARTING_URL;
 
 @PageEntry(title = "Вход")
 public class EnterPage extends AbstractPage {
+    private static final Logger LOG = LoggerFactory.getLogger(EnterPage.class);
 
     @FindBy(xpath = "//div[@class='modal__title' and contains(text(),'Вход')]")
     private WebElement pageTitle;
@@ -92,7 +95,11 @@ public class EnterPage extends AbstractPage {
             password = data.get(PASSWORD);
         }
 
+        LOG.info("Водим в поле::" + login);
         fillField(inputLogin,login);
+        LOG.info("Водим в поле::" + password);
         fillField(inputPassword,password);
+        LOG.info("Ожидаем пока кнопка 'Войти' будет видимой");
+        new WebDriverWait(PageFactory.getWebDriver(),10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
     }
 }
