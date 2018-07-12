@@ -21,7 +21,7 @@
       | source | 16    |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0,"data":{"status": |
+      | exepted | "code":0,"data":{ |
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
