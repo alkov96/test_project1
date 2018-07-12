@@ -1149,6 +1149,47 @@ public class CommonStepDefs extends GenericStepDefs {
     public void если_в_провайдер_PERFORM_то_проверяем_JSON(String arg1, DataTable arg2) {
 
     }
+    @Когда("^обновим версию мобильного приложения для \"([^\"]*)\" \"([^\"]*)\" до \"([^\"]*)\" \"([^\"]*)\"$")
+    public void updateVersionApp(String typeOS, String keyTypeOS, String vers, String hardVers) {
+        String type;
+        switch (typeOS){
+            case "Android":
+                type="1";
+                break;
+            case "IOS":
+                type="2";
+                break;
+            default:
+                type=typeOS;
+        }
+        Stash.put(keyTypeOS,type);
+        String sqlDel = "DELETE FROM  gamebet.`appversion` WHERE (version=" + vers + " OR hard_update_version=" + hardVers + ") AND type_os=" + type + " AND active_version=0";
+        workWithDB(sqlDel);
+        String sqlRequest = "UPDATE gamebet.`appversion` SET version=" + vers + ", hard_update_version=" + hardVers + " WHERE active_version=1 AND type_os=" + type;
+        workWithDB(sqlRequest);
+
+    }
+
+
+
+//    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
+//    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
+//        Map<String, Object> map;
+//        String key;
+//        Object value, selectedObject = null;
+//        ObjectMapper oMapper = new ObjectMapper();
+//        Object json =  Stash.getValue(keyListTranslation);
+//        map = oMapper.convertValue(json, Map.class);
+//
+//        for (Map.Entry<String, Object> entry : map.entrySet()) {
+//            key = entry.getKey();
+//            value = entry.getValue();
+//            hashMapper(JSONValue.toJSONString(value), "providerName");
+////            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
+//            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
+//        }
+//        Stash.put(keyGameId, selectedObject);
+//    }
 
 }
 
