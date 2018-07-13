@@ -60,6 +60,7 @@ import static ru.gamble.utility.Constants.*;
 
 public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
+    private static String sep = File.separator;
 
     @ActionTitle("нажимает на кнопку")
     public static void pressButton(String param) {
@@ -929,7 +930,10 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^выбираем fullalt пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchFullAlt(String keyPhone, String keyBD) throws Exception {
-        RandomAccessFile fr = new RandomAccessFile("src\\test\\resources\\full_alt.txt", "r");
+
+
+        RandomAccessFile fr = new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r");
+//        RandomAccessFile fr = new RandomAccessFile("src\\test\\resources\\full_alt.txt", "r");
         String line;
         StringBuffer sbt=new StringBuffer("");
         String user = fr.readLine();
