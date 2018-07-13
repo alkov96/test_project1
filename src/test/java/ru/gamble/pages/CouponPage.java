@@ -348,14 +348,14 @@ public class CouponPage extends AbstractPage {
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon_bet_button));
         coupon_bet_button.click();
 
-        waitingForPreloadertoDisappear(120);
+        waitingForPreloadertoDisappear(60);
 
         if (!driver.findElement(By.cssSelector("div.bet-accepted-noification")).isDisplayed()) {
             LOG.warn("Сообщение об успешной ставке не найдено");
         }
 
         LOG.info("Ожидаем исчезновения сообщения 'Ваша ставка принята!'");
-        new WebDriverWait(driver, 20).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xpathMessage)));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xpathMessage)));
 
         LOG.info("Ожидаем исчезновения из купона принятых ставок");
          new WebDriverWait(driver, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xpathBet)));
