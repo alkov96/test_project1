@@ -1,15 +1,9 @@
 package ru.gamble.pages;
 
-import cucumber.api.DataTable;
-import cucumber.api.java.ru.Допустим;
-import cucumber.api.java.ru.Когда;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.remote.JsonException;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -28,18 +22,7 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -168,11 +151,6 @@ public abstract class AbstractPage extends Page {
             }
         }
     }
-
-//    @ActionTitle("сохраняет с")
-//    public void saveKeyValue(DataTable dataTable) {
-//        CommonStepDefs.saveValueToKey(dataTable);
-//    }
 
     /**
      * Метод получения письма и перехода по ссылке для завершения регистрации на сайте
