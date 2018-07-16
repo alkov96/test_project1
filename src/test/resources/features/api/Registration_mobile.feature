@@ -16,7 +16,6 @@
     * определяем незанятый номер телефона и сохраняем в "PHONE"
     * сохраняем в память
       | EMAIL  | randomEmail |
-
     * сохраняем в память
       | PASS  | Default |
     * сохраняем в память
@@ -124,8 +123,6 @@
       | exepted | "code":0 |
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":12 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "tsupisStatus":3 |
 
     * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -137,8 +134,6 @@
       | exepted | "code":0 |
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":5 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "tsupisStatus":3 |
 
     * запрос к API "api/mobile/v3/requestSkypeCall" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -147,8 +142,6 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":6   |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "tsupisStatus":3   |
 
     * находим и сохраняем "TIMELEFT" из "RESPONCE_API"
 
@@ -164,7 +157,12 @@
 
     * смотрим изменился ли "TIMELEFT" из "RESPONCE_API"
 
-    * подтверждаем видеорегистрацию "EMAIL"
+    * определяем "ID" пользователя "EMAIL"
+#    * подтверждаем видеорегистрацию "EMAIL"
+    * запрос к API "api/stoloto/identification/approveVideoIdent" и сохраняем в "RESPONCE_API":
+      | customer  | ID |
+      | type  | skype |
+
     * подтверждаем от ЦУПИС "EMAIL"
 
 * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
@@ -173,59 +171,59 @@
       | pass   | PASS  |
       | source | 16    |
 
-
-  @api
-  @Registration_mobile
-  Сценарий: Мобильная регистрация быстрая
-
-    * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
-    * сохраняем в память
-      | EMAIL  | randomEmail |
-
-    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
-      | devId | DEVID |
-      | phone | PHONE |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-
-    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE"
-
-    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
-      |  devId                 | DEVID      |
-      |  source                | 16         |
-      |  first_name            | FIRSTNAME  |
-      |  surname               | SURNAME    |
-      |  patronymic            | PATRONYMIC |
-      |  birth_date            | BIRTHDATE  |
-      |  phone                 | PHONE      |
-      |  phoneConfirmationCode | CODE       |
-      |  email                 | EMAIL      |
-      |  pass                  | PASS       |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-
-    * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
-
-    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
-      | code   | CODEEMAIL |
-      | source | 16        |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":15 |
-
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | DEVID |
-      | email  | EMAIL |
-      | pass   | PASS  |
-      | source | 16    |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":15 |
-
+#
+#  @api
+#  @Registration_mobile_quick
+#  Сценарий: Мобильная регистрация быстрая
+#
+#    * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
+#    * сохраняем в память
+#      | EMAIL  | randomEmail |
+#
+#    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+#      | devId | DEVID |
+#      | phone | PHONE |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#
+#    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE"
+#
+#    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+#      |  devId                 | DEVID      |
+#      |  source                | 16         |
+#      |  first_name            | FIRSTNAME  |
+#      |  surname               | SURNAME    |
+#      |  patronymic            | PATRONYMIC |
+#      |  birth_date            | BIRTHDATE  |
+#      |  phone                 | PHONE      |
+#      |  phoneConfirmationCode | CODE       |
+#      |  email                 | EMAIL      |
+#      |  pass                  | PASS       |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#
+#    * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
+#
+#    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+#      | code   | CODEEMAIL |
+#      | source | 16        |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "status":15 |
+#
+#    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+#      | devId  | DEVID |
+#      | email  | EMAIL |
+#      | pass   | PASS  |
+#      | source | 16    |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "status":15 |
+#
 

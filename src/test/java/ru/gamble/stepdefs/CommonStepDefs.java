@@ -9,6 +9,7 @@ import cucumber.api.DataTable;
 import cucumber.api.java.it.Ma;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
+import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import cucumber.api.java.ru.*;
@@ -38,6 +39,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
+import java.net.Socket;
 import java.net.URL;
 import java.security.Key;
 import java.security.cert.CertificateException;
@@ -230,11 +232,24 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(key, value);
     }
 
+    @Когда("^определяем \"([^\"]*)\" пользователя \"([^\"]*)\"$")
+    public static void getUserID(String key,String keyEmail) {
+        String sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(keyEmail) + "'";
+        String id = workWithDBgetResult(sqlRequest, "id");
+        Stash.put(key,id);
+    }
+
 
     @Когда("^подтверждаем видеорегистрацию \"([^\"]*)\"$")
-    public static void confirmVidochat(String param) {
+    public void confirmVidochat(String param) {
         String sqlRequest = "UPDATE gamebet.`user` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
         workWithDB(sqlRequest);
+//        sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(param) + "'";
+//        String id = workWithDBgetResult(sqlRequest, "id");
+//        Stash.put("customer",id);
+//        String path = "/api/stoloto/identification/approveVideoIdent";
+//
+//        requestToAPI(path, "RESPONSE_API", dataTable);
         LOG.info("Подтвердили видеорегистрацию");
 
     }
@@ -876,6 +891,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status,String keyEmail) {
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3";
+
         searchUser(keyEmail,sqlRequest);
     }
 
@@ -1040,6 +1056,7 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(fullPath,keyStash,"POST",dataTable);
     }
 
+
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public void requestToAPI(String path, String keyStash) {
         String fullPath = collectQueryString(path);
@@ -1130,6 +1147,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+
     @Когда("^проверка ответа \"([^\"]*)\" в зависимости от \"([^\"]*)\":$")
     public void checkAnswerDependingOn(String responceAPI, String providerName, DataTable dataTable) {
         Object json = Stash.getValue(responceAPI);
@@ -1180,6 +1198,16 @@ public void searchUser(String keyEmail, String sqlRequest){
     Stash.put(keyEmail, email);
     LOG.info("Подходящий пользователь найден : " + email);
 }
+
+
+
+    @Когда("^составляем новый номер телефона \"([^\"]*)\" вместо старого \"([^\"]*)\"$")
+    public void newPhone(String keyNewPhone, String keyOldPhone) {
+        String oldPhone = Stash.getValue(keyOldPhone);
+        String newPhone = "7222" + oldPhone.substring(4,11);
+        Stash.put(keyNewPhone,newPhone);
+        LOG.info("Новый нмоер телефона: " + newPhone);
+    }
 
 //    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
 //    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
