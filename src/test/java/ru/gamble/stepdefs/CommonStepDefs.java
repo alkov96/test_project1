@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
 import cucumber.api.java.it.Ma;
+import cucumber.api.java.mn.Харин;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
@@ -734,10 +735,16 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
 
-    @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\"$")
-    public static void confirmPhone(String keyCode, String keyPhone) {
+    @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\" \\\"([^\\\"]*)\\\"$")
+    public static void confirmPhone(String keyCode, String keyPhone, String type) {
         String phone = Stash.getValue(keyPhone);
-        String sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
+        String sqlRequest = new String();
+        if (type.equals("новый")){
+            sqlRequest="SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone=" + phone + ") ORDER BY creation_date";
+        }
+        else {
+            sqlRequest="SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
+        }
         String code = workWithDBgetResult(sqlRequest, "code");
         Stash.put(keyCode, code);
         LOG.info("Получили код подтверждения телефона: " + code);
@@ -1207,6 +1214,15 @@ public void searchUser(String keyEmail, String sqlRequest){
         String newPhone = "7222" + oldPhone.substring(4,11);
         Stash.put(keyNewPhone,newPhone);
         LOG.info("Новый нмоер телефона: " + newPhone);
+    }
+
+
+
+    @Когда("^смотрим какое время обновления баннера \"([^\"]*)\"$")
+    public void delayGromBanner(String keyDelay) {
+        String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='index_main_default'";
+        String delay = workWithDBgetResult(sqlRequest, "delay");
+        Stash.put(keyDelay,delay);
     }
 
 //    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")

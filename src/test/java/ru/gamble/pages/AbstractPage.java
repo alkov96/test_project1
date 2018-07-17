@@ -444,7 +444,15 @@ public abstract class AbstractPage extends Page {
     }
     @ActionTitle("ждет некоторое время")
     public void waiting(String sec) throws InterruptedException {
-        Thread.sleep(Integer.valueOf(sec)*1000);
+        Integer seconds=0;
+        if (sec.matches("^[0-9]+")) {
+            seconds = Integer.valueOf(sec);
+        }
+        else
+        {
+            seconds = Integer.valueOf(Stash.getValue(sec));
+        }
+        Thread.sleep(seconds*1000);
     }
 
     @ActionTitle("очищает купон")
