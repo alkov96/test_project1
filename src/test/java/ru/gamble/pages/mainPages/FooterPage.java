@@ -53,7 +53,7 @@ public class FooterPage extends AbstractPage {
     private WebElement mobileAppLink;
 
     @ElementTitle("Онлайн-чат")
-    @FindBy(xpath = "//div/a[@href='#']")
+    @FindBy(xpath = "//div/span[@href='#']")
     private WebElement onlineChatLink;
 
     @ElementTitle("Для iOS")
