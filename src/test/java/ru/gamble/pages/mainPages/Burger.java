@@ -110,9 +110,7 @@ public class Burger extends AbstractPage {
     private WebElement landingAppBottom;
 
     @ElementTitle("Онлайн-чат")
-    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[text()='\n" +
-            "                                                Онлайн-чат\n" +
-            "                                            ']")
+    @FindBy(xpath = "//li/span[@href='#']")
     private WebElement onlineChatBottom;
 
     @ElementTitle("Часто задаваемые вопросы")
