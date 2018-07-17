@@ -173,7 +173,7 @@ public class CouponPage extends AbstractPage {
         String team1 = Stash.getValue("team1key");
         String team2 = Stash.getValue("team2key");
         if (CommonStepDefs.stringParse(team1  + team2).equals(CommonStepDefs.stringParse(сouponGame))) {
-            LOG.info("Названия команд в купоне совпадают с ожидаемыми: " + team1 + team2 + "=" + сouponGame);
+            LOG.info("Названия команд в купоне совпадают с ожидаемыми: " + team1 + team2 + " <=> " + сouponGame);
         } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: " + team1 + team2 + сouponGame);
     }
 
@@ -183,7 +183,7 @@ public class CouponPage extends AbstractPage {
         String ishod = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[@class='pick ng-binding']")).getText();
         String ishodName = Stash.getValue("ishodKey");//ожидаемое название исхода
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
-            LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + "-" + ishodName);
+            LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + " <=> " + ishodName);
         } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: " + ishod + " - " + ishodName);
 
     }
@@ -198,7 +198,7 @@ public class CouponPage extends AbstractPage {
         coefOld = oldString.contains("ng-hide") ? 0.0f : Float.valueOf(driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice_old')]")).getText());//Краткая запись цикла. ? - часть синтаксиса. Здесь показываем чему равен старый коэфицент. если скрыт, то 0.0.
         if (coef != coefCoupon && coef != coefOld) {
             Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCoupon + coef);
-        } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon +" - " + coef);
+        } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon + " <=> " + coef);
 
     }
 

@@ -242,7 +242,7 @@ public class LandingAppPage extends AbstractPage {
             hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
             if (!hint.contains("Мы отправили вам ссылку на скачивание")) {
                 flag = false;
-                Assert.fail("После отпраки смс текст подскази не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
+                Assert.fail("После отпраки смс текст подсказки не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
             }
             int count = 0;
             while (!sendPhone.isEnabled() && count != 10) {
@@ -262,7 +262,7 @@ public class LandingAppPage extends AbstractPage {
         hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
         if (!hint.contains("Ошибка. Повторите попытку через 24 часа")) {
             flag = false;
-            Assert.fail("После отпраки 3 смс текст подскази не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
+            Assert.fail("После отпраки 3 смс текст подсказки не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
         }
         else LOG.info("Подсказка с ошибкой появилась.");
 
