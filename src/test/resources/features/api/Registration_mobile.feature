@@ -54,7 +54,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE"
+    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
 
     * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
@@ -171,59 +171,59 @@
       | pass   | PASS  |
       | source | 16    |
 
-#
-#  @api
-#  @Registration_mobile_quick
-#  Сценарий: Мобильная регистрация быстрая
-#
-#    * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
-#    * сохраняем в память
-#      | EMAIL  | randomEmail |
-#
-#    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
-#      | devId | DEVID |
-#      | phone | PHONE |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#
-#    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE"
-#
-#    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
-#      |  devId                 | DEVID      |
-#      |  source                | 16         |
-#      |  first_name            | FIRSTNAME  |
-#      |  surname               | SURNAME    |
-#      |  patronymic            | PATRONYMIC |
-#      |  birth_date            | BIRTHDATE  |
-#      |  phone                 | PHONE      |
-#      |  phoneConfirmationCode | CODE       |
-#      |  email                 | EMAIL      |
-#      |  pass                  | PASS       |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#
-#    * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
-#
-#    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
-#      | code   | CODEEMAIL |
-#      | source | 16        |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "status":15 |
-#
-#    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-#      | devId  | DEVID |
-#      | email  | EMAIL |
-#      | pass   | PASS  |
-#      | source | 16    |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "status":15 |
-#
+
+  @api
+  @Registration_mobile_quick
+  Сценарий: Мобильная регистрация быстрая
+
+    * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
+    * сохраняем в память
+      | EMAIL  | randomEmail |
+
+    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+      | devId | DEVID |
+      | phone | PHONE |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
+
+    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+      |  devId                 | DEVID      |
+      |  source                | 16         |
+      |  first_name            | FIRSTNAME  |
+      |  surname               | SURNAME    |
+      |  patronymic            | PATRONYMIC |
+      |  birth_date            | BIRTHDATE  |
+      |  phone                 | PHONE      |
+      |  phoneConfirmationCode | CODE       |
+      |  email                 | EMAIL      |
+      |  pass                  | PASS       |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
+
+    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+      | code   | CODEEMAIL |
+      | source | 16        |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "status":15 |
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId  | DEVID |
+      | email  | EMAIL |
+      | pass   | PASS  |
+      | source | 16    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "status":15 |
+
 

@@ -69,16 +69,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "status":1 |
 
-    * запрос к API "api/mobile/v3/changePhone" и сохраняем в "RESPONCE_API":
-      | devId       | DEVID       |
-      | authToken   | AUTHTOKEN   |
-      | source      | 16          |
-      | phone       | PHONE   |
-      | pass        | PASS     |
-
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | "status":1 |
+    * ожидание "1" сек
 
     * запрос к API "api/mobile/v3/resendPhoneCode" и сохраняем в "RESPONCE_API":
       | devId       | DEVID       |
@@ -89,7 +80,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "status":1 |
 
-    * получаем и сохраняем в память код подтверждения "CODE" телефона "NEWPHONE"
+    * получаем и сохраняем в память код подтверждения "CODE" телефона "NEWPHONE" "новый"
 
     * запрос к API "api/mobile/v3/confirmPhone" и сохраняем в "RESPONCE_API":
       | devId       | DEVID       |
