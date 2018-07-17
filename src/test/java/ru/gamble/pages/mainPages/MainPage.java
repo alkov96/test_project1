@@ -90,8 +90,6 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-//        tryingLoadPage(pageTitle,5, 10);
-//        workWithPreloader();
         tryingLoadPage(slider,5, 10);
         workWithPreloader();
     }
@@ -108,8 +106,6 @@ public class MainPage extends AbstractPage {
                 break;
         }
 
-        //boolean flag = true;
-        // DemoSingleton allError = DemoSingleton.getInstance();
         WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);

@@ -99,7 +99,9 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("нажимает кнопку")
-    public static void pressButtonAP(String param) { CommonStepDefs.pressButton(param); }
+    public static void pressButtonAP(String param) {
+        CommonStepDefs.pressButton(param);
+    LOG.info("Нажали на [" + param + "]");}
 
     @ActionTitle("stop")
     public static void stop() {
@@ -221,6 +223,7 @@ public abstract class AbstractPage extends Page {
             selectMenu(fieldDay, Integer.parseInt(tmp[0]));
             selectMenu(fieldYear, Integer.parseInt(tmp[2]));
         }
+        LOG.info("В итоге ввели::" + fieldDay.getText() + "::" + fieldMonth.getText() + "::" + fieldYear.getText());
     }
 
     /**
