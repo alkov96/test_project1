@@ -1216,6 +1216,15 @@ public void searchUser(String keyEmail, String sqlRequest){
         LOG.info("Новый нмоер телефона: " + newPhone);
     }
 
+
+
+    @Когда("^смотрим какое время обновления баннера \"([^\"]*)\"$")
+    public void delayGromBanner(String keyDelay) {
+        String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='index_main_default'";
+        String delay = workWithDBgetResult(sqlRequest, "delay");
+        Stash.put(keyDelay,delay);
+    }
+
 //    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
 //    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
 //        Map<String, Object> map;
