@@ -1,7 +1,5 @@
 package ru.gamble.pages;
 
-import cucumber.api.java.mn.Харин;
-import cucumber.runtime.junit.Assertions;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -25,10 +23,8 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-import sun.rmi.runtime.Log;
 
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -272,6 +268,50 @@ public class LandingAppPage extends AbstractPage {
             Assert.fail("После отправки 3 смс кнопка отправить незаблокирована");
         }
     }
+
+
+
+    @ActionTitle("отправляет СМС со страницы лэндинга на телефон")
+    public void sendSMSflag(String phone, String flagError) throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = flagError.equals("ожидаем успех");
+        int x, y;
+        WebElement inputPhone=driver.findElement(By.id("app_desctop_sms_block_input_phone"));
+        WebElement sendPhone=driver.findElement(By.id("app_desctop_sms_block_btn_send"));
+        x=inputPhone.getLocation().getX()-100;
+        y=inputPhone.getLocation().getY()-100;
+        CommonStepDefs.scrollPage(x,y);
+
+        String hint;
+        inputPhone.clear();
+        inputPhone.sendKeys(phone);
+        sendPhone.click();
+        LOG.info("Отправили смс на номер "+phone);
+
+        Thread.sleep(1000);
+        hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
+        if (hint.contains("Мы отправили вам ссылку на скачивание")!=flag) {
+            Assert.fail("После отпраки смс текст подсказки не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
+        }
+        int count = 0;
+        while (sendPhone.isEnabled()!=flag && count != 10) {
+            Thread.sleep(1000);
+            count++;
+            if (count == 10) {
+                Assert.fail("Спустя 10 секунд после отправки смс активность кнопки Отправить " + !flag);
+            }
+        }
+        if (hint.contains("Ошибка. Повторите попытку через 24 часа")==flag) {
+            Assert.fail("Текст подсказки не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
+        }
+        else LOG.info("Подсказка с ошибкой появилась.");
+
+        if (!flag){
+            Thread.sleep(9000);
+            Assert.assertFalse("После отправки 3 смс кнопка отправить незаблокирована",sendPhone.isEnabled());
+        }
+    }
+
 }
 
 
