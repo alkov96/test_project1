@@ -176,6 +176,7 @@
   @Registration_mobile_quick
   Сценарий: Мобильная регистрация быстрая
 
+    * включаем экспресс-регистрацию
     * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
     * сохраняем в память
       | EMAIL  | randomEmail |

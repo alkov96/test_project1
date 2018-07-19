@@ -1225,6 +1225,16 @@ public void searchUser(String keyEmail, String sqlRequest){
         Stash.put(keyDelay,delay);
     }
 
+    @Когда("^включаем экспресс-регистрацию$")
+    public void onExpressReg() {
+        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        if (!activeOpt.contains("fast_registration")){
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt+", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+            workWithDB(sqlRequest);
+        }
+    }
+
 //    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
 //    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
 //        Map<String, Object> map;
