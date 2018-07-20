@@ -38,10 +38,10 @@ public class VewingEventsPage extends AbstractPage {
 
 
     /**
-     * Поиск игры в прематче, подходщей по фильтру по времени. И добавление найденно игры в избранное если есть такой параметр
+     * Поиск игры в лайве по фильтру видео. И добавление найденно игры в избранное если есть такой параметр
      *
      * @param video   - искать игру с видео или без
-     * @param adding   - добавлять ил игру в Избранное. если этот параметр = "и добавляет в избранное" - то добавляем в Избранное, в остальных случаях - нет
+     * @param adding   - добавлять ли игру в Избранное. если этот параметр = "и добавляет в избранное" - то добавляем в Избранное, в остальных случаях - нет
      */
     @ActionTitle("находит игру по фильтру видео")
     public void searchGameLiveVideo(String video, String adding) {
@@ -95,6 +95,7 @@ public class VewingEventsPage extends AbstractPage {
 //если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
             if (gameNumber != -1 && !gameIsAdding) {
                 String nameGamefull = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul/li/div/div/ul/li/div[1]/div[1]/div[1]")).get(gameNumber).findElement(By.xpath("../p")).getText();
+                if (!nameGamefull.trim().matches("\\b[a-zA-Zа-яА-Я ).(―-]+\\b")) {continue;}
                 CommonStepDefs.addStash("nameGameKey",nameGamefull);
                 CommonStepDefs.addStash("typeGameKey",typeGame);
                 if (adding) {
@@ -206,5 +207,19 @@ public class VewingEventsPage extends AbstractPage {
             LOG.error("Сменился фильтр 'с видео'");
         }
         return flag;
+    }
+
+    @ActionTitle("вычленяет из названия игры одно слово")
+    public void oneWordSearch(String keySearch,String type){
+        List <String> types = Stash.getValue("typeGameKey");
+        int index = types.indexOf(type);
+        List<String> names = Stash.getValue("nameGameKey");
+        for (String str:names.get(index).split(" ")){
+            if (str.length()>3) {
+                Stash.put(keySearch,str);
+                LOG.info(keySearch  + ": " + str);
+                break;
+            }
+        }
     }
 }
