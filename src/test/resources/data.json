@@ -1,5 +1,5 @@
 {
-  "dev-bk": {
+  "dev-bk1": {
     "mainUrl": "https://dev-bk-bet-site.tsed.orglot.office",
     "adminUrl": "http://stage-bet-dbproca.tsed.orglot.office/admin/",
     "registrationUrl": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
@@ -25,7 +25,7 @@
     }
   },
 
-  "dev-bk1": {
+  "dev-bk": {
     "mainUrl": "https://888.ru",
     "adminUrl": "http://stage-bet-dbproca.tsed.orglot.office/admin/",
     "registrationUrl": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",

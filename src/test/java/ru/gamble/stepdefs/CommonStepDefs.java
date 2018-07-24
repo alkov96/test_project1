@@ -17,6 +17,7 @@ import cucumber.api.java.ru.*;
 import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -33,6 +34,7 @@ import ru.sbtqa.tag.pagefactory.annotations.*;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
+import ru.sbtqa.tag.qautils.properties.Props;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -1235,24 +1237,22 @@ public void searchUser(String keyEmail, String sqlRequest){
         }
     }
 
-//    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
-//    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
-//        Map<String, Object> map;
-//        String key;
-//        Object value, selectedObject = null;
-//        ObjectMapper oMapper = new ObjectMapper();
-//        Object json =  Stash.getValue(keyListTranslation);
-//        map = oMapper.convertValue(json, Map.class);
-//
-//        for (Map.Entry<String, Object> entry : map.entrySet()) {
-//            key = entry.getKey();
-//            value = entry.getValue();
-//            hashMapper(JSONValue.toJSONString(value), "providerName");
-////            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
-//            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
-//        }
-//        Stash.put(keyGameId, selectedObject);
-//    }
+    @Когда("^переходим на сайт и включаем режим эмуляции$")
+    public void goToSiteAndTurnOnEmulationMode(){
+        Map<String, String> mobileEmulation = new HashMap<>();
+        String WEBDRIVER_PATH = Props.get("webdriver.drivers.path");
+
+        mobileEmulation.put("deviceName", "Nexus 5");
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
+
+        WebDriver driver = new ChromeDriver(chromeOptions);
+        try {
+            driver.get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
+        } catch (DataException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
 

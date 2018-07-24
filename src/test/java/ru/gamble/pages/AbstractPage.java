@@ -138,7 +138,6 @@ public abstract class AbstractPage extends Page {
 
     public void tryingLoadPage(WebElement element, int count, int waitSeconds) {
         WebDriver driver = PageFactory.getWebDriver();
-        LOG.info("");
         LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
 
         for (int j = 0; j < count; j++) {
