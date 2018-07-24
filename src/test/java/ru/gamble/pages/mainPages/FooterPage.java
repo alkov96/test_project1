@@ -152,7 +152,7 @@ public class FooterPage extends AbstractPage {
      * @param currentHandle - идентификатор текущей страницы
      * @param xpath - поисковая строка для требуемоего элемента
      */
-    private void opensNewTabAndChecksPresenceOFElement(String linkTitle, String currentHandle, String xpath) {
+    public static void opensNewTabAndChecksPresenceOFElement(String linkTitle, String currentHandle, String xpath) {
         WebDriver driver = PageFactory.getWebDriver();
         String link = "";
 

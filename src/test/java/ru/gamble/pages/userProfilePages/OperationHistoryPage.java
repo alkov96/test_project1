@@ -53,6 +53,7 @@ public class OperationHistoryPage extends AbstractPage {
 
     /**
      * возвращает true если содержимое страницы обновилось. и false если не обновилось
+     *
      * @param id - предыдущее наполнение страницы
      * @return
      */

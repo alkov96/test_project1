@@ -1,5 +1,6 @@
 package ru.gamble.pages;
 
+import cucumber.api.DataTable;
 import cucumber.api.java.mn.Харин;
 import cucumber.runtime.junit.Assertions;
 import org.apache.http.HttpResponse;
