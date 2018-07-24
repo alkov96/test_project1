@@ -17,12 +17,17 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.mainPages.FooterPage;
+import ru.gamble.pages.mainPages.MainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.JsonLoader;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.pagefactory.exceptions.PageException;
+import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 import sun.rmi.runtime.Log;
@@ -32,8 +37,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.utility.Constants.ELEMENT;
+import static ru.gamble.utility.Constants.LINK;
 import static ru.gamble.utility.Constants.STARTING_URL;
 
 /**
@@ -194,6 +203,7 @@ public class LandingAppPage extends AbstractPage {
         flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_freebet_block_btn")), linkFreeBet);
         LOG.info("Ссылка на фрибет работает");
     }
+
 
     @ActionTitle("смотрит ссылку на правила про выплаты выигрышей")
     public void linkForPrize() {
