@@ -354,4 +354,18 @@ public class VewingEventsPage extends AbstractPage {
         }
     }
 
+
+    @ActionTitle("вычленяет из названия игры одно слово")
+    public void oneWordSearch(String keySearch,String type){
+        List <String> types = Stash.getValue("typeGameKey");
+        int index = types.indexOf(type);
+        List<String> names = Stash.getValue("nameGameKey");
+        for (String str:names.get(index).split(" ")){
+            if (str.length()>3) {
+                Stash.put(keySearch,str);
+                LOG.info(keySearch  + ": " + str);
+                break;
+            }
+        }
+    }
 }

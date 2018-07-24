@@ -93,6 +93,7 @@
     * поиск акаунта со статуом регистрации "=2" "EMAIL"
     * обновляем поля в БД для юзера "EMAIL":
       | offer_state | 0     |
+      | personal_data_state | 1     |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |

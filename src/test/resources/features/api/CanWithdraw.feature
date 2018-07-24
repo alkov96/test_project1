@@ -96,6 +96,8 @@
   Сценарий: Проверка доступных способов вывода пользователя, не вводившего ПД (full,alternative)
 
     * поиск пользователя проходившего ускоренную регистрацию "EMAIL"
+    * обновляем поля в БД для юзера "EMAIL":
+      | registration_stage_id         | 2             |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
@@ -206,6 +208,7 @@
     * поиск акаунта со статуом регистрации "=2" "ALLROWS"
     * обновляем поля в БД для юзера "EMAIL":
       | offer_state | 1     |
+      | personal_data_state | 1     |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
