@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
 import cucumber.api.java.it.Ma;
 import cucumber.api.java.mn.Харин;
+import io.appium.java_client.MobileDriver;
+import io.github.bonigarcia.wdm.ChromeDriverManager;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
@@ -1105,15 +1107,14 @@ public class CommonStepDefs extends GenericStepDefs {
         //************Этот код нужен для соединения по HTTPS
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
+                    }
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
                     }
                 }
         };
@@ -1240,13 +1241,15 @@ public void searchUser(String keyEmail, String sqlRequest){
     @Когда("^переходим на сайт и включаем режим эмуляции$")
     public void goToSiteAndTurnOnEmulationMode(){
         Map<String, String> mobileEmulation = new HashMap<>();
-        String WEBDRIVER_PATH = Props.get("webdriver.drivers.path");
 
-        mobileEmulation.put("deviceName", "Nexus 5");
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
+        System.setProperty("webdriver.chrome.driver", new File(Props.get("webdriver.drivers.path")).getAbsolutePath());
 
-        WebDriver driver = new ChromeDriver(chromeOptions);
+        //mobileEmulation.put("deviceName", "Galaxy S5");
+        //ChromeOptions chromeOptions = new ChromeOptions();
+        //chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
+        MobileDriver driver = PageFactory.getMobileDriver();
+
+        //WebDriver driver = new ChromeDriver(chromeOptions);
         try {
             driver.get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
         } catch (DataException e) {

@@ -17,6 +17,9 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
@@ -35,10 +38,8 @@ public class AuthenticationMainPage extends AbstractPage {
 
     public AuthenticationMainPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(pageTitle,10, 10);
-        //new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
     @ActionTitle("запоминает значение баланса")

@@ -56,6 +56,7 @@ public class EnterPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
+
         for(int j = 0; j < 10; j++) {
             try {
                 new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(inputLogin));
