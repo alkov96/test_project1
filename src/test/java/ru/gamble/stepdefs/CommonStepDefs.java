@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
 import cucumber.api.java.it.Ma;
 import cucumber.api.java.mn.Харин;
+import io.appium.java_client.MobileDriver;
+import io.github.bonigarcia.wdm.ChromeDriverManager;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
@@ -17,6 +19,7 @@ import cucumber.api.java.ru.*;
 import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -33,6 +36,7 @@ import ru.sbtqa.tag.pagefactory.annotations.*;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
+import ru.sbtqa.tag.qautils.properties.Props;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -1103,15 +1107,14 @@ public class CommonStepDefs extends GenericStepDefs {
         //************Этот код нужен для соединения по HTTPS
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
+                    }
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
                     }
                 }
         };
@@ -1235,24 +1238,24 @@ public void searchUser(String keyEmail, String sqlRequest){
         }
     }
 
-//    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
-//    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
-//        Map<String, Object> map;
-//        String key;
-//        Object value, selectedObject = null;
-//        ObjectMapper oMapper = new ObjectMapper();
-//        Object json =  Stash.getValue(keyListTranslation);
-//        map = oMapper.convertValue(json, Map.class);
-//
-//        for (Map.Entry<String, Object> entry : map.entrySet()) {
-//            key = entry.getKey();
-//            value = entry.getValue();
-//            hashMapper(JSONValue.toJSONString(value), "providerName");
-////            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
-//            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
-//        }
-//        Stash.put(keyGameId, selectedObject);
-//    }
+    @Когда("^переходим на сайт и включаем режим эмуляции$")
+    public void goToSiteAndTurnOnEmulationMode(){
+        Map<String, String> mobileEmulation = new HashMap<>();
+
+        System.setProperty("webdriver.chrome.driver", new File(Props.get("webdriver.drivers.path")).getAbsolutePath());
+
+        //mobileEmulation.put("deviceName", "Galaxy S5");
+        //ChromeOptions chromeOptions = new ChromeOptions();
+        //chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
+        MobileDriver driver = PageFactory.getMobileDriver();
+
+        //WebDriver driver = new ChromeDriver(chromeOptions);
+        try {
+            driver.get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
+        } catch (DataException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
 

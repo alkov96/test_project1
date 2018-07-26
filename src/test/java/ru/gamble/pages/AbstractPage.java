@@ -138,7 +138,6 @@ public abstract class AbstractPage extends Page {
 
     public void tryingLoadPage(WebElement element, int count, int waitSeconds) {
         WebDriver driver = PageFactory.getWebDriver();
-        LOG.info("");
         LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
 
         for (int j = 0; j < count; j++) {
@@ -468,6 +467,21 @@ public abstract class AbstractPage extends Page {
             new WebDriverWait(driver, timeInSeconds).until(ExpectedConditions.invisibilityOfElementLocated(xpath("//*[contains(@class,'preloader__container')]")));
         }catch (Exception e){
             throw new AutotestError("Ошибка! Прелоадер не исчез в течение::"+ timeInSeconds + " сек.");
+        }
+    }
+
+    @ActionTitle("закрывает всплывающее окно 'Перейти в ЦУПИС'")
+    public void closePopUpWindowGoToTSUPIS(){
+        WebDriver driver = PageFactory.getWebDriver();
+        String xpathGoToTSUPIS = "//div[contains (@class,'after-reg')]/a[contains(@class,'btn_important')]";
+        try{
+            LOG.info("Ждём появление всплывающего окна.");
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoToTSUPIS)));
+            LOG.info("Появилось окно c кнопкой [" + driver.findElement(By.xpath(xpathGoToTSUPIS)).getText() + "]");
+            driver.findElements(By.xpath("//div/a[@class='modal__closeBtn closeBtn']")).stream().filter(e1 -> e1.isDisplayed()).findFirst().get().click();
+            LOG.info("Закрыли всплывающего окно");
+        }catch (Exception e){
+            LOG.info("Окно не появилось.");
         }
     }
 }

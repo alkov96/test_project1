@@ -1,5 +1,7 @@
 package ru.gamble.pages.livePages;
 
+import cucumber.api.DataTable;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,13 +16,14 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-
-import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @PageEntry(title = "Лайв просмотр событий")
 public class VewingEventsPage extends AbstractPage {
@@ -38,10 +41,10 @@ public class VewingEventsPage extends AbstractPage {
 
 
     /**
-     * Поиск игры в лайве по фильтру видео. И добавление найденно игры в избранное если есть такой параметр
+     * Поиск игры в прематче, подходщей по фильтру по времени. И добавление найденно игры в избранное если есть такой параметр
      *
      * @param video   - искать игру с видео или без
-     * @param adding   - добавлять ли игру в Избранное. если этот параметр = "и добавляет в избранное" - то добавляем в Избранное, в остальных случаях - нет
+     * @param adding   - добавлять ил игру в Избранное. если этот параметр = "и добавляет в избранное" - то добавляем в Избранное, в остальных случаях - нет
      */
     @ActionTitle("находит игру по фильтру видео")
     public void searchGameLiveVideo(String video, String adding) {
@@ -95,7 +98,6 @@ public class VewingEventsPage extends AbstractPage {
 //если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
             if (gameNumber != -1 && !gameIsAdding) {
                 String nameGamefull = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul/li/div/div/ul/li/div[1]/div[1]/div[1]")).get(gameNumber).findElement(By.xpath("../p")).getText();
-                if (!nameGamefull.trim().matches("\\b[a-zA-Zа-яА-Я ).(―-]+\\b")) {continue;}
                 CommonStepDefs.addStash("nameGameKey",nameGamefull);
                 CommonStepDefs.addStash("typeGameKey",typeGame);
                 if (adding) {
@@ -208,6 +210,150 @@ public class VewingEventsPage extends AbstractPage {
         }
         return flag;
     }
+
+
+    /**
+     * Проверка что при свёрнутом левом меню Лайв отображаются иконки видов спорта больше чем указанное число
+     * Проверят что нужная игра будет выделена в левом меню. Проверет что фильтр "с видео" в нужном состоянии
+     * @param number - минимальное число иконок
+     */
+    @ActionTitle("проверяет в свёрнутом левом меню иконок видов спорта больше")
+    public void checksMinimizedLeftMenuPresenceIconsSports (String number){
+        WebDriver driver = PageFactory.getWebDriver();
+        String xpathLeftMenu = "//div[contains(@class,'menu-toggler')]";
+        String xpathTypeOfSports = "//a[contains(@class,'list-item-sport-link')]";
+        WebElement leftMenu = driver.findElement(By.xpath(xpathLeftMenu));
+        if(leftMenu.getAttribute("title").contains("Свернуть всё")){
+            LOG.info("Сворачиваем левое меню.");
+            leftMenu.click();
+        }
+        List<WebElement> list = driver.findElements(By.xpath(xpathTypeOfSports)).stream().filter(e -> (e.isDisplayed() && (!e.getAttribute("title").isEmpty()))).collect(Collectors.toList());
+        for (WebElement el: list) {
+            LOG.info("Найден::" + el.getAttribute("title"));
+        }
+        assertThat(list.size() > Integer.parseInt(number)).as("Ошибка! Иконок видов спорта [" + list.size() + "] меньше [" + number + "]").isTrue();
+        LOG.info("Иконок видов спорта [" + list.size() + "] > [" + number + "]");
+    }
+
+    /**
+     * Проверка что при развёрнутом левом меню Лайв отображаются строгое число постоянных элементов
+     * поле ввода 'Турнир или команда'
+     * иконка 'Группировка по регионам'
+     * иконка 'С видео'
+     * Проверят что нужная игра будет выделена в левом меню. Проверет что фильтр "с видео" в нужном состоянии
+     * @param listItems - список постоянных элементов
+     */
+    @ActionTitle("проверяет, что при развёрнутом левом меню есть элементы с")
+    public void checksThatWhenLeftMenuIsExpandedThereAreItemsWith (DataTable listItems){
+        WebDriver driver = PageFactory.getWebDriver();
+        WebElement menuToggler = driver.findElement(By.id("menu-toggler"));
+        if(menuToggler.getAttribute("title").contains("Показать всё")){
+            LOG.info("Левое меню оказалось свёрнутым. Разворачиваем.");
+            menuToggler.click();
+        }
+        List<String> list = listItems.asList(String.class);
+        for(int i = 0; i < list.size(); i++) {
+            try{
+                driver.findElement(By.xpath("//*[contains(@title,'" + list.get(i) + "')]"));
+                LOG.info("Найден обязательный элемент [" + list.get(i) + "]");
+            }catch (Exception e){
+                throw new AutotestError("Ошибка! Обязательный элемент [" + list.get(i) + "] не найден.");
+            }
+        }
+    }
+
+    @ActionTitle("проверяет, что при активном фильтре 'Группировка по регионам' появлятся родителький класс региона внутри которого есть игры")
+    public void checkGroupingFilterByRegion(){
+        String xpathMainCategoriesOfEvents = "//li[contains (@id,'sport')]";
+        String xpathFlagsWithoutFilter = "//h4[contains(@class,'left-menu')]//span[contains(@class, 'flag')]";
+        String xpathRegionFilter = "//div[contains(@class,'left-menu-filters__item_regions')]";
+        String xpathRegions = "//a[contains(@class,'left-menu__list-item-region-link')]";
+        String xpathRegionInnerCompitition = "//div[contains(@class,'compitition')]";
+
+        LOG.info("Ищем категории вида спорта.");
+        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents));
+        if(list.size() > 0){
+            LOG.info("Найдено видов спорта::" + list.size());
+            for(int i = 0; i < (list.size() < 3 ? list.size() : 3); i++){
+                if(!list.get(i).getAttribute("class").contains("active")){
+                    LOG.info("Меню спорта было свёрнуто. Раскрываем.");
+                    list.get(i).click();
+                }
+                List<WebElement> listFlags = list.get(i).findElements(By.xpath(xpathFlagsWithoutFilter)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                LOG.info("Найдено флагов без фильтра 'Группировка регионов'::" + listFlags.size() );
+
+                WebElement regionFilter = PageFactory.getWebDriver().findElement(By.xpath(xpathRegionFilter));
+                if(!regionFilter.getAttribute("class").contains("active")){
+                    LOG.info("Включаем фильтр");
+                    regionFilter.click();
+                }
+
+                LOG.info("Ищем появились ли регионы");
+                List<WebElement> listRegions = PageFactory.getWebDriver().findElements(By.xpath(xpathRegions))
+                        .stream().filter(e -> (e.isDisplayed() && !e.getText().isEmpty())).collect(Collectors.toList());
+                LOG.info("Найдено регионов после включения фильтра 'Группировка регионов'::" + list.size() );
+                if(listRegions.size()>0){
+                    for (WebElement el: listRegions) {
+                        LOG.info("Раскрываем регион::" + el.getText());
+                        el.click();
+                        List<WebElement> innerGames = el.findElements(By.xpath(xpathRegionInnerCompitition))
+                                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                        if(innerGames.size() > 0){
+                            LOG.info("Нашли игр внутри региона::" + innerGames.size());
+                            for (WebElement game:innerGames) {
+                                LOG.info(game.getText().replaceAll("\n","]-["));
+                            }
+                        }else {
+                            throw new AutotestError("Ошибка! Фильтр не сработал");
+                        }
+                        LOG.info("Закрываем регион::" + el.getText());
+                        el.click();
+                    }
+                }
+                LOG.info("Выключаем фильтр");
+                regionFilter.click();
+            }
+        }else {
+            LOG.info("Нет ни одной строки с видом спорта!");
+        }
+    }
+
+    @ActionTitle("проверяет что при активном фильтре 'С видео' у игр есть иконка в виде монитора со треугольником внутри")
+    public void checkWorkFilterWithVideo(){
+        WebDriver driver = PageFactory.getWebDriver();
+        String xpathFilter = "//div[contains(@class,'left-menu-filters__item_video')]";
+        String xpathMainCategoriesOfEvents = "//li[contains (@id,'sport')]";
+        String xpathGamesWithVideo = "//li[contains(@class,'left-menu__list-item-games')]";
+        WebElement filterGameWithVideo = driver.findElement(By.xpath(xpathFilter));
+        LOG.info("Включаем фильтр");
+        if(!filterGameWithVideo.getAttribute("class").contains("active")) {
+            filterGameWithVideo.click();
+        }
+
+        LOG.info("Ищем категории вида спорта.");
+        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents));
+        if(list.size() > 0) {
+            LOG.info("Найдено видов спорта::" + list.size());
+            for (int i = 0; i < (list.size() < 3 ? list.size() : 3); i++) {
+                if (!list.get(i).getAttribute("class").contains("active")) {
+                    LOG.info("Меню спорта было свёрнуто. Раскрываем.");
+                    list.get(i).click();
+                }
+
+                List<WebElement> gameList = driver.findElements(By.xpath(xpathGamesWithVideo)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                LOG.info("Надено игр::" + gameList.size());
+                if (gameList.size() > 0) {
+                    for (WebElement game : gameList) {
+                        game.findElement(By.xpath("//div[contains(@class, 'icon icon-video-tv')]"));
+                        LOG.info(game.getText().replaceAll("\n","]-["));
+                    }
+                }
+
+
+            }
+        }
+    }
+
 
     @ActionTitle("вычленяет из названия игры одно слово")
     public void oneWordSearch(String keySearch,String type){
