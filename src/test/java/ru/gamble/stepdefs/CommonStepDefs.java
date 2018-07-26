@@ -1240,21 +1240,25 @@ public void searchUser(String keyEmail, String sqlRequest){
 
     @Когда("^переходим на сайт и включаем режим эмуляции$")
     public void goToSiteAndTurnOnEmulationMode(){
-        Map<String, String> mobileEmulation = new HashMap<>();
+        MobileDriver driver = PageFactory.getMobileDriver();
+        driver.get("https://dev-bk-bet-site.tsed.orglot.office");
 
-        System.setProperty("webdriver.chrome.driver", new File(Props.get("webdriver.drivers.path")).getAbsolutePath());
+
+//        Map<String, String> mobileEmulation = new HashMap<>();
+//
+//        System.setProperty("webdriver.chrome.driver", new File(Props.get("webdriver.drivers.path")).getAbsolutePath());
 
         //mobileEmulation.put("deviceName", "Galaxy S5");
         //ChromeOptions chromeOptions = new ChromeOptions();
         //chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
-        MobileDriver driver = PageFactory.getMobileDriver();
+//        MobileDriver driver = PageFactory.getMobileDriver();
 
         //WebDriver driver = new ChromeDriver(chromeOptions);
-        try {
-            driver.get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
-        } catch (DataException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            driver.get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
+//        } catch (DataException e) {
+//            e.printStackTrace();
+//        }
     }
 
 }

@@ -1,8 +1,8 @@
 {
   "dev-bk": {
-    "mainUrl": "https://dev-bk-bet-site2.tsed.orglot.office",
+    "mainUrl": "https://dev-bk-bet-site1.tsed.orglot.office",
     "adminUrl": "http://stage-bet-dbproca.tsed.orglot.office/admin/",
-    "registrationUrl": "https://dev-bk-bet-site2.tsed.orglot.office/test_registration/",
+    "registrationUrl": "https://dev-bk-bet-site1.tsed.orglot.office/test_registration/",
     "login": "demo-bk2016@yandex.ru",
     "loginOLD": "regfordepoit@mailinator.com",
     "password": "Qwerty3211",
@@ -25,7 +25,7 @@
       "password": "lizByr4WO#"
     }
   },
-  "mobile-api": {
+  "mobile-api1": {
     "mainUrl": "https://dev-bk-bet-site.tsed.orglot.office",
     "USER": "regfordepoit@mailinator.com",
     "PASS": "Parol123",
@@ -37,7 +37,7 @@
       "password": "tao9Gu8Waenotahv"
     }
   },
-    "mobile-api1": {
+    "mobile-api": {
       "mainUrl": "https://demo.gamebet.ru",
       "USER": "demo617@mailinator.com",
       "PASS": "Parol123",
