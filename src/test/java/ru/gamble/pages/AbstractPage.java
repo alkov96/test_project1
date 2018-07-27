@@ -47,6 +47,10 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "user-icon")
     protected WebElement userIconButton;
 
+    @ElementTitle("Азбука беттинга")
+    @FindBy(xpath = "//a[@href='/azbuka-bettinga?mb_center=azbuka-bettinga']")
+    protected WebElement azbukaBettinga;
+
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
     protected WebElement burgerBottom;
