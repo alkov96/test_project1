@@ -167,16 +167,23 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^разлогиниваем пользователя$")
     public static void logOut(){
         goToMainPage("site");
-        List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
-                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-        if(!userIcon.isEmpty()){
-            userIcon.get(0).click();
-            List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
+        WebDriver driver = PageFactory.getWebDriver();
+        try {
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
+            List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
                     .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-            if(!logOutButton.isEmpty()) {
-                logOutButton.get(0).click();
+            if(!userIcon.isEmpty()){
+                userIcon.get(0).click();
+                List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
+                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                if(!logOutButton.isEmpty()) {
+                    logOutButton.get(0).click();
+                }
             }
+        }catch (Exception e){
+        LOG.info("На сайте никто не авторизован");
         }
+
     }
 
     // Метод перехода на главную страницу

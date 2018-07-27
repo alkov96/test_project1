@@ -222,6 +222,12 @@ public abstract class AbstractPage extends Page {
             selectMenu(fieldDay, Integer.parseInt(tmp[0]));
             selectMenu(fieldYear, Integer.parseInt(tmp[2]));
         }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        new WebDriverWait(PageFactory.getWebDriver(),2000);
         LOG.info("В итоге ввели::" + fieldDay.getText() + "::" + fieldMonth.getText() + "::" + fieldYear.getText());
     }
 
