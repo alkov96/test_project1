@@ -18,8 +18,10 @@ import ru.gamble.pages.CouponPage;
 import ru.gamble.pages.mainPages.AuthenticationMainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.Constants;
+import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
+import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -31,6 +33,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.numberOfWindowsToBe;
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
@@ -38,6 +41,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.waitEnabled;
 import static ru.gamble.stepdefs.CommonStepDefs.waitToPreloader;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.LOGIN;
+import static ru.gamble.utility.Constants.STARTING_URL;
 
 
 @PageEntry(title = "Мини Личный Кабинет")
@@ -82,7 +86,8 @@ public class PopUPLCPage extends AbstractPage {
     @FindBy(xpath = "//div[@class='payPartner cupis_wallet']")
     private WebElement cupis_deposit;
 
-    @FindBy(xpath = "//div[@class='modal__body modal__body_moneyInOutBox']/button")
+    //@FindBy(xpath = "//div[@class='modal__body modal__body_moneyInOutBox']/button")
+    @FindBy(xpath = "//div[@class='money-in-out__messages']/following-sibling::button[@class='btn_important money-in-out__btn']")
     private WebElement deposit_on; //кнопка Пополнить средства
 
     @ElementTitle("кнопка ВЫВЕСТИ на попапе")
@@ -618,52 +623,87 @@ public class PopUPLCPage extends AbstractPage {
     @ActionTitle("входит в кабинет ЦУПИС и совершает все необходимые операции для потверждения пополнения")
     public void cupicIn(DataTable dataTable) {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
-        String phoneNumber, passwordWord;
+        String phoneNumber = null, passwordWord = null;
         WebDriver driver = PageFactory.getDriver();
         Set<String> allHandles = driver.getWindowHandles();
         String loginId = "form_login_phone";
         String passwordId = "form_login_password";
 
-        phoneNumber = data.get("Телефон");
-        passwordWord = data.get("Пароль_ЦУПИС");
+        try {
+            if (data.get("Телефон").equals(Constants.DEFAULT)) {
+                phoneNumber = JsonLoader.getData().get(STARTING_URL).get("phone").getValue();
+            } else {
+                phoneNumber = data.get("Телефон");
+            }
 
-        LOG.info("Переходим на страницу ЦУПИС");
-        driver.switchTo().window(allHandles.toArray()[1].toString());
+            if (data.get("Пароль_ЦУПИС").equals(Constants.DEFAULT)) {
+                passwordWord = JsonLoader.getData().get(STARTING_URL).get("password").getValue();
 
-        CommonStepDefs.workWithPreloader();
-        waitForElementPresent(By.id(passwordId), 4);
+            } else {
+                passwordWord = data.get("Пароль_ЦУПИС");
+            }
+        } catch (DataException e) {
+        }
 
-        LOG.info("Ищем поле ввода логина");
-        WebElement login = driver.findElement(By.id(loginId));
-        LOG.info("Вводим логин::" + phoneNumber);
-        fillField(login,phoneNumber);
+            LOG.info("Переходим на страницу ЦУПИС");
+            driver.switchTo().window(allHandles.toArray()[1].toString());
 
-        LOG.info("Ищем поле ввода пароля");
-        WebElement password = driver.findElement(By.id(passwordId));
-        fillField(password,passwordWord);
+            CommonStepDefs.workWithPreloader();
+            waitForElementPresent(By.id(passwordId), 4);
 
-        CommonStepDefs.workWithPreloader();
-        driver.findElement(By.id("btn_authorization_enter")).click();
-        CommonStepDefs.workWithPreloader();
-        driver.findElement(By.xpath("//input[@class='ui-button ui-button-final right']")).click();
-        waitForElementPresent(By.xpath("//input[@type='submit']"), 4);
-        driver.findElement(By.xpath("//input[@type='submit']")).click();
-        CommonStepDefs.workWithPreloader();
+            LOG.info("Ищем поле ввода логина");
+            WebElement login = driver.findElement(By.id(loginId));
+            LOG.info("Вводим логин::" + phoneNumber);
+            fillField(login, phoneNumber);
 
-        LOG.info("Переходим обратно в на сайт");
-        driver.switchTo().window(allHandles.toArray()[0].toString());
-    }
+            LOG.info("Ищем поле ввода пароля");
+            WebElement password = driver.findElement(By.id(passwordId));
+            LOG.info("Вводим пароль::" + password);
+            fillField(password, passwordWord);
+
+            CommonStepDefs.workWithPreloader();
+            driver.findElement(By.id("btn_authorization_enter")).click();
+            CommonStepDefs.workWithPreloader();
+
+            List<WebElement> cvvField = PageFactory.getDriver().findElements(By.name("cvv")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+            if(cvvField.size() > 0){
+                LOG.info("В ЦУПИС предлагается ввести CVV карты");
+                String cvv = Generators.randomNumber(3);
+                LOG.info("Вводим в поле CVV::" + cvv);
+                fillField(cvvField.get(0),cvv);
+                LOG.info("Нажимаем на кнопку 'Продолжить'");
+                PageFactory.getDriver().findElements(By.xpath("//input[contains(@value,'Продолжить')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[contains(@value,'Подтвердить')]")));
+                LOG.info("Нажимаем на кнопку 'Подтвердить'");
+                PageFactory.getDriver().findElements(By.xpath("//input[contains(@value,'Подтвердить')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Вернуться к букмекеру')]")));
+                LOG.info("Нажимаем на кнопку 'Вернуться к букмекеру'");
+                PageFactory.getDriver().findElements(By.xpath("//a[contains(text(),'Вернуться к букмекеру')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+                LOG.info("Закрываем текущую вкладку");
+                driver.close();
+            }
+
+
+//            driver.findElement(By.xpath("//input[@class='ui-button ui-button-final right']")).click();
+//            waitForElementPresent(By.xpath("//input[@type='submit']"), 4);
+//            driver.findElement(By.xpath("//input[@type='submit']")).click();
+//            CommonStepDefs.workWithPreloader();
+
+            LOG.info("Переходим обратно в на сайт");
+            driver.switchTo().window(allHandles.toArray()[0].toString());
+        }
 
     @ActionTitle("проверяет, увеличился ли баланс")
     public void checkIsBalance(){
         BigDecimal sumBet;
-        WebDriver driver = PageFactory.getDriver();
+        WebDriver driver = PageFactory.getWebDriver();
         driver.navigate().refresh();
         waitForElementPresent(By.id("topPanelWalletBalance"), 10);
         sumBet = new BigDecimal((String) Stash.getValue("sumBetKey")).setScale(2,RoundingMode.UP).negate();
         Stash.put("sumKey",sumBet.toString());
         CouponPage.balanceIsOK("рубли");
     }
+
 }
 
 

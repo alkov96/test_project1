@@ -227,7 +227,6 @@ public abstract class AbstractPage extends Page {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        new WebDriverWait(PageFactory.getWebDriver(),2000);
         LOG.info("В итоге ввели::" + fieldDay.getText() + "::" + fieldMonth.getText() + "::" + fieldYear.getText());
     }
 

@@ -6,6 +6,7 @@
     "login": "demo-bk2016@yandex.ru",
     "loginOLD": "regfordepoit@mailinator.com",
     "password": "Qwerty3211",
+    "phone": "+70718901845",
     "passwordOLD": "Parol123",
     "db-registration": {
       "url": "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",
