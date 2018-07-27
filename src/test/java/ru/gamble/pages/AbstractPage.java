@@ -47,10 +47,6 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "user-icon")
     protected WebElement userIconButton;
 
-    @ElementTitle("Азбука беттинга")
-    @FindBy(xpath = "//a[@href='/azbuka-bettinga?mb_center=azbuka-bettinga']")
-    protected WebElement azbukaBettinga;
-
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
     protected WebElement burgerBottom;
@@ -103,7 +99,9 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("нажимает кнопку")
-    public static void pressButtonAP(String param) { CommonStepDefs.pressButton(param); }
+    public static void pressButtonAP(String param) {
+        CommonStepDefs.pressButton(param);
+    LOG.info("Нажали на [" + param + "]");}
 
     @ActionTitle("stop")
     public static void stop() {
@@ -140,7 +138,6 @@ public abstract class AbstractPage extends Page {
 
     public void tryingLoadPage(WebElement element, int count, int waitSeconds) {
         WebDriver driver = PageFactory.getWebDriver();
-        LOG.info("");
         LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
 
         for (int j = 0; j < count; j++) {
@@ -225,6 +222,12 @@ public abstract class AbstractPage extends Page {
             selectMenu(fieldDay, Integer.parseInt(tmp[0]));
             selectMenu(fieldYear, Integer.parseInt(tmp[2]));
         }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        LOG.info("В итоге ввели::" + fieldDay.getText() + "::" + fieldMonth.getText() + "::" + fieldYear.getText());
     }
 
     /**
@@ -445,7 +448,15 @@ public abstract class AbstractPage extends Page {
     }
     @ActionTitle("ждет некоторое время")
     public void waiting(String sec) throws InterruptedException {
-        Thread.sleep(Integer.valueOf(sec)*1000);
+        Integer seconds=0;
+        if (sec.matches("^[0-9]+")) {
+            seconds = Integer.valueOf(sec);
+        }
+        else
+        {
+            seconds = Integer.valueOf(Stash.getValue(sec));
+        }
+        Thread.sleep(seconds*1000);
     }
 
     @ActionTitle("очищает купон")
@@ -461,6 +472,21 @@ public abstract class AbstractPage extends Page {
             new WebDriverWait(driver, timeInSeconds).until(ExpectedConditions.invisibilityOfElementLocated(xpath("//*[contains(@class,'preloader__container')]")));
         }catch (Exception e){
             throw new AutotestError("Ошибка! Прелоадер не исчез в течение::"+ timeInSeconds + " сек.");
+        }
+    }
+
+    @ActionTitle("закрывает всплывающее окно 'Перейти в ЦУПИС'")
+    public void closePopUpWindowGoToTSUPIS(){
+        WebDriver driver = PageFactory.getWebDriver();
+        String xpathGoToTSUPIS = "//div[contains (@class,'after-reg')]/a[contains(@class,'btn_important')]";
+        try{
+            LOG.info("Ждём появление всплывающего окна.");
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoToTSUPIS)));
+            LOG.info("Появилось окно c кнопкой [" + driver.findElement(By.xpath(xpathGoToTSUPIS)).getText() + "]");
+            driver.findElements(By.xpath("//div/a[@class='modal__closeBtn closeBtn']")).stream().filter(e1 -> e1.isDisplayed()).findFirst().get().click();
+            LOG.info("Закрыли всплывающего окно");
+        }catch (Exception e){
+            LOG.info("Окно не появилось.");
         }
     }
 }

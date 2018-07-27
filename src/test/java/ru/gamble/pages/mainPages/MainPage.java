@@ -22,6 +22,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 import java.util.ArrayList;
@@ -90,8 +91,7 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-//        tryingLoadPage(pageTitle,5, 10);
-//        workWithPreloader();
+        //if()
         tryingLoadPage(slider,5, 10);
         workWithPreloader();
     }
@@ -108,8 +108,6 @@ public class MainPage extends AbstractPage {
                 break;
         }
 
-        //boolean flag = true;
-        // DemoSingleton allError = DemoSingleton.getInstance();
         WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -143,7 +141,7 @@ public class MainPage extends AbstractPage {
     public  void searchVideoGameBT(String param) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         boolean haveButton = param.equals("с кнопкой Смотреть")?true:false;
-        String ngclick = new String();
+        String ngclick = "";
         List<WebElement> games = new ArrayList<>();
         if (haveButton) {
             ngclick = "button";
@@ -163,6 +161,7 @@ public class MainPage extends AbstractPage {
             if (!games.isEmpty()) {
                 break;
             }
+            if(allSport.get(0).getText().contains("Подходящих игр не найдено")){throw new AutotestError("Ошибка! Подходящих игр не найденою");}
             allSport.get(number).click();
 
             CommonStepDefs.workWithPreloader();
@@ -224,11 +223,16 @@ public class MainPage extends AbstractPage {
             if (!games.isEmpty()) {
                 break;
             }
+            if(allSport.get(0).getText().contains("Подходящих игр не найдено")) {
+             throw new AutotestError("Ошибка! Подходящих игр не найдено");
+            }
+
             allSport.get(number).click();
 
             CommonStepDefs.workWithPreloader();
 
             number++;
+
         } while (number <= allSport.size() - 1);
 
         WebElement selectGame = games.get(0).findElement(By.xpath("ancestor::tr"));

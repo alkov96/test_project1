@@ -1,6 +1,7 @@
 # language: ru
 Функционал: API
 
+
   Предыстория:
     * сохраняем в память
       | DEVID  | randomNumber 4 |

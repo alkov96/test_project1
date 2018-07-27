@@ -38,6 +38,8 @@
   Сценарий: Проверка доступных способов вывода для полностью зарегистрированного пользователя
 
     * поиск акаунта со статуом регистрации "=2" "EMAIL"
+    * обновляем поля в БД для юзера "EMAIL":
+      | registration_stage_id         | 2             |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
@@ -94,6 +96,8 @@
   Сценарий: Проверка доступных способов вывода пользователя, не вводившего ПД (full,alternative)
 
     * поиск пользователя проходившего ускоренную регистрацию "EMAIL"
+    * обновляем поля в БД для юзера "EMAIL":
+      | registration_stage_id         | 2             |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
@@ -204,6 +208,7 @@
     * поиск акаунта со статуом регистрации "=2" "ALLROWS"
     * обновляем поля в БД для юзера "EMAIL":
       | offer_state | 1     |
+#      | personal_data_state | 2     |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
@@ -226,48 +231,55 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
 
-    * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
+#    * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
+#
+#    * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
+#      | gender                  | GENDER           |
+#      | birthplace              | BIRTHPLACE       |
+#      | region                  | Москва           |
+#      | locality                | CITY             |
+#      | street                  | STREET           |
+#      | house                   | HOUSE            |
+#      | construction            |                  |
+#      | housing                 |                  |
+#      | flat                    | FLAT             |
+#      | docNum                  | DOCNUM           |
+#      | docSeries               | DOCSERIES        |
+#      | issueDate               | VALIDISSUEDATE   |
+#      | issuePlace              | ISSUEPLACE       |
+#      | codePlace               | 123-456          |
+#
+#    * запрос к API "api/mobile/v3/submitAndCheckPersonalData" и сохраняем в "RESPONCE_API":
+#      | devId                   | DEVID            |
+#      | authToken               | AUTHTOKEN        |
+#      | source                  | 16               |
+#      | personalData            | PERSONALDATA     |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted     | "code":0 |
+#
+#    * обновляем поля в БД для юзера "EMAIL":
+#      | offer_state | 3     |
+#
+#    * подтверждаем видеорегистрацию "EMAIL"
+#
+#    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+#      | devId       | DEVID |
+#      | email       | EMAIL |
+#      | pass        | PASS  |
+#      | source      | 16    |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted     | "code":0 |
+#
+#    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
-      | gender                  | GENDER           |
-      | birthplace              | BIRTHPLACE       |
-      | region                  | Москва           |
-      | locality                | CITY             |
-      | street                  | STREET           |
-      | house                   | HOUSE            |
-      | construction            |                  |
-      | housing                 |                  |
-      | flat                    | FLAT             |
-      | docNum                  | DOCNUM           |
-      | docSeries               | DOCSERIES        |
-      | issueDate               | VALIDISSUEDATE   |
-      | issuePlace              | ISSUEPLACE       |
-      | codePlace               | 123-456          |
 
-    * запрос к API "api/mobile/v3/submitAndCheckPersonalData" и сохраняем в "RESPONCE_API":
-      | devId                   | DEVID            |
-      | authToken               | AUTHTOKEN        |
-      | source                  | 16               |
-      | personalData            | PERSONALDATA     |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | "code":0 |
-
-    * обновляем поля в БД для юзера "EMAIL":
-      | offer_state | 3     |
-
-    * подтверждаем видеорегистрацию "EMAIL"
-
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId       | DEVID |
-      | email       | EMAIL |
-      | pass        | PASS  |
-      | source      | 16    |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | "code":0 |
-
-    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+    * запрос к API "api/mobile/v3/setOfferAcceptStatus" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID     |
+      | authToken   | AUTHTOKEN |
+      | source      | 16        |
+      | offerAcceptStatus | 2 |
 
     * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
       | devId       | DEVID     |

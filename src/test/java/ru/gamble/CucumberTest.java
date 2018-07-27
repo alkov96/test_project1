@@ -22,7 +22,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
-        tags = {"@AzbukaBettingaLinks_C76652"})
+        tags = {"@NewUserRegistration_C361"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
@@ -52,8 +52,8 @@ public class CucumberTest {
 
     @AfterClass
     public static void afterScenario(){
-           WebDriver driver =  PageFactory.getWebDriver();
            try{
+               WebDriver driver = PageFactory.getWebDriver();
                LOG.info("Закрываем WebDriver");
                driver.quit();
                PageFactory.dispose();

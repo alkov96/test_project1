@@ -7,14 +7,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
 import cucumber.api.java.it.Ma;
+import cucumber.api.java.mn.Харин;
+import io.appium.java_client.MobileDriver;
+import io.github.bonigarcia.wdm.ChromeDriverManager;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
+import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import cucumber.api.java.ru.*;
 import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -31,6 +36,7 @@ import ru.sbtqa.tag.pagefactory.annotations.*;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
+import ru.sbtqa.tag.qautils.properties.Props;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -38,6 +44,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
+import java.net.Socket;
 import java.net.URL;
 import java.security.Key;
 import java.security.cert.CertificateException;
@@ -160,16 +167,23 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^разлогиниваем пользователя$")
     public static void logOut(){
         goToMainPage("site");
-        List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
-                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-        if(!userIcon.isEmpty()){
-            userIcon.get(0).click();
-            List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
+        WebDriver driver = PageFactory.getWebDriver();
+        try {
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
+            List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
                     .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-            if(!logOutButton.isEmpty()) {
-                logOutButton.get(0).click();
+            if(!userIcon.isEmpty()){
+                userIcon.get(0).click();
+                List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
+                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                if(!logOutButton.isEmpty()) {
+                    logOutButton.get(0).click();
+                }
             }
+        }catch (Exception e){
+        LOG.info("На сайте никто не авторизован");
         }
+
     }
 
     // Метод перехода на главную страницу
@@ -230,11 +244,24 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(key, value);
     }
 
+    @Когда("^определяем \"([^\"]*)\" пользователя \"([^\"]*)\"$")
+    public static void getUserID(String key,String keyEmail) {
+        String sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(keyEmail) + "'";
+        String id = workWithDBgetResult(sqlRequest, "id");
+        Stash.put(key,id);
+    }
+
 
     @Когда("^подтверждаем видеорегистрацию \"([^\"]*)\"$")
-    public static void confirmVidochat(String param) {
+    public void confirmVidochat(String param) {
         String sqlRequest = "UPDATE gamebet.`user` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
         workWithDB(sqlRequest);
+//        sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(param) + "'";
+//        String id = workWithDBgetResult(sqlRequest, "id");
+//        Stash.put("customer",id);
+//        String path = "/api/stoloto/identification/approveVideoIdent";
+//
+//        requestToAPI(path, "RESPONSE_API", dataTable);
         LOG.info("Подтвердили видеорегистрацию");
 
     }
@@ -719,10 +746,16 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
 
-    @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\"$")
-    public static void confirmPhone(String keyCode, String keyPhone) {
+    @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\" \\\"([^\\\"]*)\\\"$")
+    public static void confirmPhone(String keyCode, String keyPhone, String type) {
         String phone = Stash.getValue(keyPhone);
-        String sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
+        String sqlRequest = new String();
+        if (type.equals("новый")){
+            sqlRequest="SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone=" + phone + ") ORDER BY creation_date";
+        }
+        else {
+            sqlRequest="SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
+        }
         String code = workWithDBgetResult(sqlRequest, "code");
         Stash.put(keyCode, code);
         LOG.info("Получили код подтверждения телефона: " + code);
@@ -875,7 +908,8 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status,String keyEmail) {
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
+
         searchUser(keyEmail,sqlRequest);
     }
 
@@ -1040,6 +1074,7 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(fullPath,keyStash,"POST",dataTable);
     }
 
+
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public void requestToAPI(String path, String keyStash) {
         String fullPath = collectQueryString(path);
@@ -1079,15 +1114,14 @@ public class CommonStepDefs extends GenericStepDefs {
         //************Этот код нужен для соединения по HTTPS
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
+                    }
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
                     }
                 }
         };
@@ -1129,6 +1163,7 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.error(e1.getMessage(), e1);
         }
     }
+
 
     @Когда("^проверка ответа \"([^\"]*)\" в зависимости от \"([^\"]*)\":$")
     public void checkAnswerDependingOn(String responceAPI, String providerName, DataTable dataTable) {
@@ -1181,24 +1216,57 @@ public void searchUser(String keyEmail, String sqlRequest){
     LOG.info("Подходящий пользователь найден : " + email);
 }
 
-//    @Когда("^достаём видеотрансляцию провайдера \"([^\"]*)\" из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
-//    public void getVideoBroadcastProviderFromListAndSaveInVariable(String keyProvider, String keyListTranslation, String keyGameId) {
-//        Map<String, Object> map;
-//        String key;
-//        Object value, selectedObject = null;
-//        ObjectMapper oMapper = new ObjectMapper();
-//        Object json =  Stash.getValue(keyListTranslation);
-//        map = oMapper.convertValue(json, Map.class);
+
+
+    @Когда("^составляем новый номер телефона \"([^\"]*)\" вместо старого \"([^\"]*)\"$")
+    public void newPhone(String keyNewPhone, String keyOldPhone) {
+        String oldPhone = Stash.getValue(keyOldPhone);
+        String newPhone = "7222" + oldPhone.substring(4,11);
+        Stash.put(keyNewPhone,newPhone);
+        LOG.info("Новый нмоер телефона: " + newPhone);
+    }
+
+
+
+    @Когда("^смотрим какое время обновления баннера \"([^\"]*)\"$")
+    public void delayGromBanner(String keyDelay) {
+        String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='index_main_default'";
+        String delay = workWithDBgetResult(sqlRequest, "delay");
+        Stash.put(keyDelay,delay);
+    }
+
+    @Когда("^включаем экспресс-регистрацию$")
+    public void onExpressReg() {
+        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        if (!activeOpt.contains("fast_registration")){
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt+", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+            workWithDB(sqlRequest);
+        }
+    }
+
+    @Когда("^переходим на сайт и включаем режим эмуляции$")
+    public void goToSiteAndTurnOnEmulationMode(){
+        MobileDriver driver = PageFactory.getMobileDriver();
+        driver.get("https://dev-bk-bet-site.tsed.orglot.office");
+
+
+//        Map<String, String> mobileEmulation = new HashMap<>();
 //
-//        for (Map.Entry<String, Object> entry : map.entrySet()) {
-//            key = entry.getKey();
-//            value = entry.getValue();
-//            hashMapper(JSONValue.toJSONString(value), "providerName");
-////            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
-//            selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
+//        System.setProperty("webdriver.chrome.driver", new File(Props.get("webdriver.drivers.path")).getAbsolutePath());
+
+        //mobileEmulation.put("deviceName", "Galaxy S5");
+        //ChromeOptions chromeOptions = new ChromeOptions();
+        //chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
+//        MobileDriver driver = PageFactory.getMobileDriver();
+
+        //WebDriver driver = new ChromeDriver(chromeOptions);
+//        try {
+//            driver.get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
+//        } catch (DataException e) {
+//            e.printStackTrace();
 //        }
-//        Stash.put(keyGameId, selectedObject);
-//    }
+    }
 
 }
 
