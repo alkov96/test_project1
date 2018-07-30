@@ -15,15 +15,21 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag:page-factory:1.11.1" level="project" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag:datajack:1.2.0" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag:page-factory:1.12.1" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag:datajack:1.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:3.2.2" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.13" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.13" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.13" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-properties-adaptor:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: pl.jalokim.propertiestojson:java-properties-to-json:3.0" level="project" />
+    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.16.6" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-excel-adaptor:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.15" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.15" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.15" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.04" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa.tag:allure-helper:1.4.1" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa.tag:video-recorder:1.0.6" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa:monte-media:1.1.0-JAVA7" level="project" />
@@ -68,6 +74,7 @@
     <orderEntry type="library" name="Maven: org.reflections:reflections:0.9.10" level="project" />
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.19.0-GA" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:annotations:2.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.aspectj:aspectjrt:1.8.13" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-project:2.0.10" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-settings:2.0.10" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-profile:2.0.10" level="project" />
@@ -99,7 +106,6 @@
     <orderEntry type="library" name="Maven: io.qameta.allure:allure2-model-jackson:1.0-BETA6" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.5" level="project" />
-    <orderEntry type="library" name="Maven: org.aspectj:aspectjrt:1.8.10" level="project" />
     <orderEntry type="library" name="Maven: org.jooq:joor:0.9.6" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.21" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.assertj:assertj-core:3.9.1" level="project" />

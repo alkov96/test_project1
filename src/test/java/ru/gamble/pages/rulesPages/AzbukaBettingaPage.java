@@ -44,8 +44,8 @@ public class AzbukaBettingaPage extends AbstractPage {
         y = driver.findElement(By.xpath("//div[@class='abc-betting__tile abc-betting__tile_image']/a")).getLocation().getY() - 100;
         x = driver.findElement(By.xpath("//div[@class='abc-betting__tile abc-betting__tile_image']/a")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
-        String linkTerms = driver.findElement(By.xpath("//div[@class='abc-betting__tile abc-betting__tile_image']/a"));
-        flag &= CommonStepDefs.goLink(driver.findElement(By.xpath("//div[@class='abc-betting__tile abc-betting__tile_image']/a")), linkTerms);
+        //String linkTerms = driver.findElement(By.xpath("//div[@class='abc-betting__tile abc-betting__tile_image']/a"));
+       // flag &= CommonStepDefs.goLink(driver.findElement(By.xpath("//div[@class='abc-betting__tile abc-betting__tile_image']/a")), linkTerms);
         LOG.info("Ссылка на Термины работает");
     }
 }
