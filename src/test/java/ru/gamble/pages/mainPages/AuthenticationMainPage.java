@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.CouponPage;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -17,6 +18,8 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,5 +57,16 @@ public class AuthenticationMainPage extends AbstractPage {
             LOG.info("значение баланса: " + balance);
             Stash.put(key, balance);
         }
+    }
+
+    @ActionTitle("проверяет, увеличился ли баланс на")
+    public void checkIsBalance(String keyAmount){
+        BigDecimal sumBet;
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.navigate().refresh();
+        waitForElementPresent(By.id("topPanelWalletBalance"), 10);
+        sumBet = new BigDecimal((String) Stash.getValue(keyAmount)).setScale(2,RoundingMode.UP).negate();
+        Stash.put("sumKey",sumBet.toString());
+        CouponPage.balanceIsOK("рубли");
     }
 }

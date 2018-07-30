@@ -547,17 +547,35 @@ public class PopUPLCPage extends AbstractPage {
         deposit_on.click();
     }
 
-    @ActionTitle("проверяет, увеличился ли баланс")
-    public void checkIsBalance(){
-        BigDecimal sumBet;
+    @ActionTitle("вводит сумму и выбирает способ пополнения c")
+    public void enterAmountAndSelectDepositMethod(DataTable dataTable)  {
         WebDriver driver = PageFactory.getWebDriver();
-        driver.navigate().refresh();
-        waitForElementPresent(By.id("topPanelWalletBalance"), 10);
-        sumBet = new BigDecimal((String) Stash.getValue("sumBetKey")).setScale(2,RoundingMode.UP).negate();
-        Stash.put("sumKey",sumBet.toString());
-        CouponPage.balanceIsOK("рубли");
-    }
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
+        String amount, depositMethod;
+        amount = data.get("СУММА");
+        depositMethod = data.get("Способ");
+        LOG.info("Cохраняем в память сумму в переменной 'СУММА' и вводим в поле::" + amount);
+        Stash.put("СУММА",amount);
+        fillField(deposit_field,amount);
 
+        if(depositMethod.contains("") && visa_deposit.isDisplayed()){
+            visa_deposit.click();
+            LOG.info("Пополнение проходит через карту [" + depositMethod + "]");
+        } else {
+            if (cupis_deposit.isDisplayed()) {
+                cupis_deposit.click();
+                LOG.info("Пополнение проходит через кошелёк ЦУПИС");
+            } else {
+                Assertions.fail("Нет доступных способов пополнения");
+            }
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.getMessage();
+        }
+        deposit_on.click();
+    }
 }
 
 
