@@ -53,6 +53,7 @@ public class OperationHistoryPage extends AbstractPage {
 
     /**
      * возвращает true если содержимое страницы обновилось. и false если не обновилось
+     *
      * @param id - предыдущее наполнение страницы
      * @return
      */
@@ -75,7 +76,7 @@ public class OperationHistoryPage extends AbstractPage {
         return true;
     }
 
-    public boolean changePage(WebElement page) throws Exception{
+    public boolean changePage(WebElement page) throws Exception {
         WebDriver driver = PageFactory.getDriver();
         Integer currentPage;
         Integer newPage;
@@ -87,7 +88,7 @@ public class OperationHistoryPage extends AbstractPage {
         id.clear();
         operationsId = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell']//span[@class='history__id']/span"));
         operationsId.forEach(element -> id.add(element.getText()));
-        currentPage= Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getText());
+        currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getText());
         page.click();
 
         newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getText());
@@ -133,7 +134,7 @@ public class OperationHistoryPage extends AbstractPage {
         sortList = operationsDate.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList()).equals(operationsDate);//проверка отсортирован ли список по убыванию
         flag &= sortList;
         if (!sortList)
-           Assert.fail("История не отсортирована по дате при открытии");
+            Assert.fail("История не отсортирована по дате при открытии");
 
 
         driver.findElement(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//th[contains(@class,'history__cell-date table__head-cell_sort')]")).click(); //сортируем по дате
@@ -163,7 +164,7 @@ public class OperationHistoryPage extends AbstractPage {
         sortList = operationsBalance.stream().sorted().collect(Collectors.toList()).equals(operationsBalance);
         flag &= sortList;
         if (!sortList)
-           Assert.fail("История не отсортировалась по сумме баланса");
+            Assert.fail("История не отсортировалась по сумме баланса");
 
         driver.findElement(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//th[contains(@class,'history__cell-balance table__head-cell_sort')]")).click(); //сортируем по балансу
         Thread.sleep(1000);
@@ -213,6 +214,5 @@ public class OperationHistoryPage extends AbstractPage {
                 Assert.fail("Поиск не сработал. Искали по подстроке " + randomID + ", но нашлась операция с номером " + element.getText());
             }
         }
-
     }
 }

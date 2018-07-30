@@ -1,5 +1,8 @@
 package ru.gamble.pages;
 
+import cucumber.api.DataTable;
+import cucumber.api.java.mn.Харин;
+import cucumber.runtime.junit.Assertions;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -15,21 +18,32 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.mainPages.FooterPage;
+import ru.gamble.pages.mainPages.MainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.JsonLoader;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.pagefactory.exceptions.PageException;
+import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+import sun.rmi.runtime.Log;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.utility.Constants.ELEMENT;
+import static ru.gamble.utility.Constants.LINK;
 import static ru.gamble.utility.Constants.STARTING_URL;
 
 /**
@@ -162,7 +176,7 @@ public class LandingAppPage extends AbstractPage {
         driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> {
             try {
                 allImg.add(element.getAttribute("src")
-                        .replace(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue()+"/images/landing/mobile_app/", ""));
+                        .replace(JsonLoader.getData().get(STARTING_URL).get("mainUrl") + "https://dev-bk-bet-site1.tsed.orglot.office/images/landing/mobile_app/", ""));
             } catch (DataException e) {
                 LOG.error(e.getMessage());
             }
@@ -190,6 +204,7 @@ public class LandingAppPage extends AbstractPage {
         flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_freebet_block_btn")), linkFreeBet);
         LOG.info("Ссылка на фрибет работает");
     }
+
 
     @ActionTitle("смотрит ссылку на правила про выплаты выигрышей")
     public void linkForPrize() {
@@ -238,7 +253,7 @@ public class LandingAppPage extends AbstractPage {
             hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
             if (!hint.contains("Мы отправили вам ссылку на скачивание")) {
                 flag = false;
-                Assert.fail("После отпраки смс текст подсказки не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
+                Assert.fail("После отпраки смс текст подскази не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
             }
             int count = 0;
             while (!sendPhone.isEnabled() && count != 10) {
@@ -258,7 +273,7 @@ public class LandingAppPage extends AbstractPage {
         hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
         if (!hint.contains("Ошибка. Повторите попытку через 24 часа")) {
             flag = false;
-            Assert.fail("После отпраки 3 смс текст подсказки не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
+            Assert.fail("После отпраки 3 смс текст подскази не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
         }
         else LOG.info("Подсказка с ошибкой появилась.");
 
@@ -268,50 +283,6 @@ public class LandingAppPage extends AbstractPage {
             Assert.fail("После отправки 3 смс кнопка отправить незаблокирована");
         }
     }
-
-
-
-    @ActionTitle("отправляет СМС со страницы лэндинга на телефон")
-    public void sendSMSflag(String phone, String flagError) throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
-        boolean flag = flagError.equals("ожидаем успех");
-        int x, y;
-        WebElement inputPhone=driver.findElement(By.id("app_desctop_sms_block_input_phone"));
-        WebElement sendPhone=driver.findElement(By.id("app_desctop_sms_block_btn_send"));
-        x=inputPhone.getLocation().getX()-100;
-        y=inputPhone.getLocation().getY()-100;
-        CommonStepDefs.scrollPage(x,y);
-
-        String hint;
-        inputPhone.clear();
-        inputPhone.sendKeys(phone);
-        sendPhone.click();
-        LOG.info("Отправили смс на номер "+phone);
-
-        Thread.sleep(1000);
-        hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
-        if (hint.contains("Мы отправили вам ссылку на скачивание")!=flag) {
-            Assert.fail("После отпраки смс текст подсказки не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
-        }
-        int count = 0;
-        while (sendPhone.isEnabled()!=flag && count != 10) {
-            Thread.sleep(1000);
-            count++;
-            if (count == 10) {
-                Assert.fail("Спустя 10 секунд после отправки смс активность кнопки Отправить " + !flag);
-            }
-        }
-        if (hint.contains("Ошибка. Повторите попытку через 24 часа")==flag) {
-            Assert.fail("Текст подсказки не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
-        }
-        else LOG.info("Подсказка с ошибкой появилась.");
-
-        if (!flag){
-            Thread.sleep(9000);
-            Assert.assertFalse("После отправки 3 смс кнопка отправить незаблокирована",sendPhone.isEnabled());
-        }
-    }
-
 }
 
 

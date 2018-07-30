@@ -111,11 +111,13 @@ public class FavouritePage extends AbstractPage {
                 LOG.error("Exception " + e);
                 return;
             }
-            LOG.info("gameis::" + allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title"));
-            //переходим на игру из Избранного и ждем загрузки страницы
+            LOG.info("gameis" + allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title"));
+//переходим на игру из Избранного и ждем загрузки страницы
+            //driver.findElement(By.xpath("//*[@id='private_panel']/li[3]/div[1]/div[1]/div[2]/div[" + (MyGameN + 1) + "]")).click();
             driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']//div[contains(@class,'elected__teams')]")).get(MyGameN).click();
             CommonStepDefs.workWithPreloader();
-                      switch (types.get(index)) {
+            //   switch(typeGame){
+            switch (types.get(index)) {
                 case "PrematchVnePeriod":
                     flag&=EventViewerPage.pagePrematch(teams.get(index), "Любое время");
                     break;
@@ -133,8 +135,12 @@ public class FavouritePage extends AbstractPage {
                     LOG.error("В избранном игра, для которой не сохранился тип");
                     break;
             }
+
+//            driver.findElement(By.className("topLogo888")).click();
+//            inspector.expectation();
             driver.findElement(By.xpath("//*[@id='elected']")).click();
             CommonStepDefs.workWithPreloader();
+//            inspector.expectation();
         }
     }
 
