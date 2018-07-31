@@ -43,9 +43,6 @@ import static ru.gamble.utility.Constants.*;
 public class MainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MainPage.class);
 
-    @FindBy(xpath = "//div[@class='topLogo888']")
-    private WebElement pageTitle;
-
     @FindBy(xpath = "//div[contains(@class,'main-slider__wrapper')]")
     private WebElement slider;
 
@@ -54,7 +51,7 @@ public class MainPage extends AbstractPage {
     private WebElement registrationButton;
 
     @ElementTitle("Вход")
-    @FindBy(id = "log-in")
+    @FindBy(xpath = "//button[contains(text(),'Вход')]")
     private WebElement enterButton;
 
     @ElementTitle("Прематч")
@@ -91,7 +88,7 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(pageTitle,5, 10);
+        tryingLoadPage(enterButton,5, 10);
         workWithPreloader();
     }
 
