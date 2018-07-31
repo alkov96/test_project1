@@ -26,7 +26,6 @@
     * сохраняем в память
       | GENDER | randomSex |
 
-
   @api
   @canDeposit
   @correct
