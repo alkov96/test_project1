@@ -108,11 +108,7 @@ public abstract class AbstractPage extends Page {
         LOG.info("STOP");
     }
 
-    @ActionTitle("закрываем браузер")
-    public static void closeBrowser() {
-        PageFactory.dispose();
-        LOG.info("Браузер закрыт\n");
-    }
+
 
     /**
      * Метод который по имени WebElement находит его на текущей странице,

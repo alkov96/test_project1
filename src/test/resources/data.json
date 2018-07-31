@@ -1,8 +1,23 @@
 {
-  "dev-bk": {
+  "dev-bk1": {
     "mainUrl": "https://dev-bk-bet-site1.tsed.orglot.office",
     "adminUrl": "http://stage-bet-dbproca.tsed.orglot.office/admin/",
     "registrationUrl": "https://dev-bk-bet-site1.tsed.orglot.office/test_registration/",
+    "login": "demo-bk2016@yandex.ru",
+    "loginOLD": "regfordepoit@mailinator.com",
+    "password": "Qwerty3211",
+    "phone": "+70718901845",
+    "passwordOLD": "Parol123",
+    "db-registration": {
+      "url": "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",
+      "user": "webdev_adm",
+      "password": "tao9Gu8Waenotahv"
+    }
+  },
+  "dev-bk": {
+    "mainUrl": "https://dev-bk-bet-mobile-site.tsed.orglot.office/",
+    "adminUrl": "http://stage-bet-dbproca.tsed.orglot.office/admin/",
+    "registrationUrl": "https://dev-bk-bet-mobile-site.tsed.orglot.office/test_registration/",
     "login": "demo-bk2016@yandex.ru",
     "loginOLD": "regfordepoit@mailinator.com",
     "password": "Qwerty3211",
