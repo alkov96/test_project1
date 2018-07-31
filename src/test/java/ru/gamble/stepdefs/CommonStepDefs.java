@@ -751,7 +751,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String phone = Stash.getValue(keyPhone);
         String sqlRequest = new String();
         if (type.equals("новый")){
-            sqlRequest="SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone=" + phone + ") ORDER BY creation_date";
+            sqlRequest="SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "') ORDER BY creation_date";
         }
         else {
             sqlRequest="SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";

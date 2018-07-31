@@ -30,7 +30,6 @@ public class MobileManePage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(buttonProfile,5, 10);
-      //  workWithPreloader();
     }
 
     @ActionTitle("переключение видов спорта")
