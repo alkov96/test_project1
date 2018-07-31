@@ -38,7 +38,6 @@ import static org.junit.Assert.assertFalse;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.*;
 
-
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MainPage.class);
