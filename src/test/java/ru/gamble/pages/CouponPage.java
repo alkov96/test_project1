@@ -75,10 +75,6 @@ public class CouponPage extends AbstractPage {
     @FindBy(id="place-bet-button")
     private WebElement coupon_bet_button;
 
-//    @ElementTitle("поле суммы общей ставки")
-//    @FindBy(id="express-bet-input")
-//    private WebElement coupon_field;
-
     @ElementTitle("поле суммы ставки типа Система")
     @FindBy(id="express-unitbet-input")
     private WebElement coupon_field_System_one;
@@ -97,7 +93,6 @@ public class CouponPage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(coupon,10, 5);
-       // new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
     }
 
     @ActionTitle("убирает события из купона, пока их не станет")
@@ -306,7 +301,6 @@ public class CouponPage extends AbstractPage {
             }
         }
         WebElement selectType = driver.findElement(By.xpath("//li[contains(translate(text(),'ЯЧСМИТЬБЮФЫВАПРОЛДЖЭЙЦУКЕНГШЩЗХЪ', 'ячсмитьбюфывапролджэйцукенгшщзхъ'),'" + type + "')]"));
-        //driver.findElement(By.xpath("//li[contains(@class,'open-type-switcher__item') and contains(lower-case(text()),'"+type+"')]"));
         LOG.info("Переключаем тип ставки на '" + selectType.getText() + "'");
         selectType.click();
     }
@@ -323,7 +317,6 @@ public class CouponPage extends AbstractPage {
     public void inputBet(String sumBet,String one){
         BigDecimal sum;
         WebDriver driver = PageFactory.getDriver();
-       // boolean forOne = one.equals("для каждого разбиения") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
         boolean forOne = !one.equals("") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
 
         WebElement field = forOne?coupon_field_System_one:coupon_field;
