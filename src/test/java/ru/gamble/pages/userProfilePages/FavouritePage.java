@@ -27,6 +27,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.openqa.selenium.By.cssSelector;
@@ -196,25 +197,33 @@ public class FavouritePage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
-        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
-       // AbstractPage.openFavourite();
-        Thread.sleep(1000);
-        WebElement coeff =  driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected-data__event-price ng-binding')]")).get(0);
 
-       // Thread.sleep(3000);
-       previous = coeff.getText();
-        AbstractPage.openFavourite();
+       // AbstractPage.openFavourite();
+        LOG.info("Нажимаем на кнопку с шетсерёнкой");
         preferences.click();
-        list.get(2).click();
-        LOG.info("Переключаемся на '" + list.get(2).getText() + "' формат отображения");
-        AbstractPage.openFavourite();
-        Thread.sleep(350);
-        LOG.info("Предыдущий: " + previous + "Текущий: " + coeff.getText());
-        if (previous.equals(coeff.getText())) {
-            LOG.error("Формат отображения коэффициентов не изменился");
-            org.assertj.core.api.Assertions.fail("Формат отображения коэффициентов не изменился");
-      }
+        List<WebElement> listCoeff = driver.findElements(By.cssSelector("span.prefs__key")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        if(!listCoeff.isEmpty()){
+            Thread.sleep(500);
+            //WebElement coeff =  driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected-data__event-price ng-binding')]")).get(0);
+
+            // Thread.sleep(3000);
+            previous = listCoeff.get(0).getText();
+            AbstractPage.openFavourite();
+            preferences.click();
+            listCoeff.get(2).click();
+            LOG.info("Переключаемся на '" + listCoeff.get(2).getText() + "' формат отображения");
+            AbstractPage.openFavourite();
+            Thread.sleep(500);
+            LOG.info("Предыдущий: " + previous + "Текущий: " + listCoeff.get(2).getText());
+            if (previous.equals(listCoeff.get(2).getText())) {
+                LOG.error("Формат отображения коэффициентов не изменился");
+                org.assertj.core.api.Assertions.fail("Формат отображения коэффициентов не изменился");
+            }
+        }else {
+            throw new AutotestError("Ошибка! Ни один коэффициент не найден.");
+        }
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
+
 }
 

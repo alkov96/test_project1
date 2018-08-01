@@ -178,8 +178,8 @@ public class CouponPage extends AbstractPage {
         String ishod = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[@class='pick ng-binding']")).getText();
         String ishodName = Stash.getValue("ishodKey");//ожидаемое название исхода
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
-            LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + "-" + ishodName);
-        } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: " + ishod + " - " + ishodName);
+            LOG.info("Выбранных исход в купоне совпадает с ожидаемым: [" + ishod + "] - [" + ishodName + "]");
+        } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: [" + ishod + "] - [" + ishodName + "]");
 
     }
 
@@ -216,7 +216,7 @@ public class CouponPage extends AbstractPage {
             Assertions.fail("Коэф изменился, однако сообщение не отображается.");
         }
         LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         if (!driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()
                 || !driver.findElement(xpath("//div[@class='coupon-confirm__btn']")).isDisplayed()) {
             Assertions.fail("При изменении условий ставки не появилось сообщение или кнопка о принятии изменений.");

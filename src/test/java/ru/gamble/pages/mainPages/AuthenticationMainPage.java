@@ -69,4 +69,22 @@ public class AuthenticationMainPage extends AbstractPage {
         Stash.put("sumKey",sumBet.toString());
         CouponPage.balanceIsOK("рубли");
     }
+
+    @ActionTitle("если выскочил PopUp 'Перейти в ЦУПИС', закрываем")
+    public void closePopUpGoTSUPISIfDisplayed(){
+        String xpathGoTSUPIS = "//a[contains(@href,'https://1cupis.ru/auth')]";
+        String xpathCross = "//a[contains(@class,'closeBtn')]";
+//        String xpathCross = "//a[contains(@class,'modal__closeBtn closeBtn')]";
+        try{
+            new WebDriverWait(PageFactory.getWebDriver(),3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoTSUPIS)));
+            LOG.info("Нашли кнопку ["
+                    + PageFactory.getWebDriver().findElements(By.xpath(xpathGoTSUPIS))
+                    .stream().filter(e -> e.isDisplayed()).findFirst().get()
+                    .getText().replaceAll("\n", "").trim()
+                    + "] и нажимаем на крест");
+            PageFactory.getWebDriver().findElements(By.xpath(xpathCross)).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+        }catch (Exception e){
+            LOG.info("Модальное окно 'Перейти в ЦУПИС' не появилось");
+        }
+    }
 }
