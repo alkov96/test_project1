@@ -55,7 +55,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE"
+    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" "777"
 
     * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |

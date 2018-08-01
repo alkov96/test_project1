@@ -51,6 +51,7 @@ public class Constants {
     public static final String TYPE = "Тип";
     public static final String VALUE = "Значение";
     public static final String VARIABLE = "Переменная";
+    public static final String PHONE = "Телефон";
 
     public static final List<String> cities = Arrays.asList("Москва","Санкт-Петербург","Новосибирск","Екатеринбург","Нижний Новгород","Казань","Челябинск","Омск","Самара","Ростов-на-Дону","Уфа","Красноярск","Пермь","Воронеж","Волгоград");
     public static final List<String> sex = Arrays.asList("Мужской","Женский");
