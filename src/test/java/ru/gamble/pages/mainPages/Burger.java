@@ -98,19 +98,19 @@ public class Burger extends AbstractPage {
     private WebElement bonusesBottom;
 
     @ElementTitle("Правила")
-    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[contains(text(),'Правила')]")
+    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[contains(.,'Правила')]")
     private WebElement rulesBottom;
 
     @ElementTitle("Приложения для iOS и Android")
-    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[contains(text(),'Приложения для iOS и Android')]")
+    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[contains(.,'Приложения для iOS и Android')]")
     private WebElement landingAppBottom;
 
     @ElementTitle("Онлайн-чат")
-    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[contains(text(),'Онлайн-чат')]")
+    @FindBy(xpath = "//span[contains(@class,'subMenuArea') and contains(.,'Онлайн-чат')]")
     private WebElement onlineChatBottom;
 
     @ElementTitle("Часто задаваемые вопросы")
-    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[contains(text(),'Часто задаваемые вопросы')]")
+    @FindBy(xpath = "//li[@class='subMenuArea__col-item']/a[contains(.,'Часто задаваемые вопросы')]")
     private WebElement faqBottom;
 
     public Burger() {
