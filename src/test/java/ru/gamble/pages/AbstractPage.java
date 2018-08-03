@@ -485,5 +485,14 @@ public abstract class AbstractPage extends Page {
             LOG.info("Окно не появилось.");
         }
     }
+
+    @ActionTitle("проверяет, что присутствует сообщение")
+    public void checksThatMessageIsPresent(String message){
+        try {
+            new WebDriverWait(PageFactory.getWebDriver(),3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(.,'" + message + "')]")));
+        }catch (Exception e){
+            throw new AutotestError("Ошибка! Текст [" + message + "] не появился");
+        }
+    }
 }
 

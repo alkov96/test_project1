@@ -168,6 +168,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void logOut(){
         goToMainPage("site");
         WebDriver driver = PageFactory.getWebDriver();
+        cleanCookies();
         try {
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
             List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
@@ -205,24 +206,26 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     @Когда("^переходит на страницу '(.+)'$")
     public static void goToMainPage(String siteUrl) {
-        cleanCookies();
+        String currentUrl = null;
         try {
         switch (siteUrl) {
             case "site":
-                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue();
                 break;
             case "admin":
-                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("adminUrl").getValue());
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("adminUrl").getValue();
                 break;
             case "registr":
-                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("registrationUrl").getValue());
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("registrationUrl").getValue();
             default:
-                PageFactory.getWebDriver().get(siteUrl);
+                currentUrl = siteUrl;
                 break;
         }}catch (DataException e) {
             LOG.error(e.getMessage());
         }
-        LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl() + "\n");
+        PageFactory.getDriver().get(currentUrl);
+
+        LOG.info("Перешли на страницу ==>[" + currentUrl + "]");
     }
 
     @Когда("^сохраняем в память таблицу$")
@@ -524,11 +527,13 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^(пользователь |он) очищает cookies$")
     public static void cleanCookies() {
-        try {
-            PageFactory.getWebDriver().manage().deleteAllCookies();
-            LOG.info("Удаляем Cookies");
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
+            if(PageFactory.getWebDriver().manage().getCookies().size()>0) {
+                try {
+                    LOG.info("Удаляем Cookies");
+                    PageFactory.getWebDriver().manage().deleteAllCookies();
+                } catch (Exception e) {
+                    LOG.error("Cookies не было!");
+                }
         }
     }
 

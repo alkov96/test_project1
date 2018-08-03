@@ -130,6 +130,12 @@ public class LiveCalendarPage extends AbstractPage {
         LOG.info("Выбираем вид спорта::" + sport);
         WebElement selectSport = menuSport.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
         selectSport.click();
+        new WebDriverWait(driver,3).until(ExpectedConditions.visibilityOf(menuSport));
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         LOG.info("Нажимаем на выпадающее меню видов спорта");
         menuSport.click();
     }

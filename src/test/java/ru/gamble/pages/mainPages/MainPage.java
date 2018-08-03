@@ -63,8 +63,7 @@ public class MainPage extends AbstractPage {
 
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
-    private WebElement preferences;
-
+    public WebElement preferences;
 
     // Блок новостей
     @ElementTitle("Стрелка-вправо")
@@ -87,7 +86,7 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(enterButton,5, 10);
+        tryingLoadPage(slider,5, 10);
         workWithPreloader();
     }
 
