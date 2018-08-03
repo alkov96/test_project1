@@ -50,16 +50,16 @@ public class CucumberTest {
         }
     };
 
-    @AfterClass
-    public static void afterScenario(){
-           try{
-               WebDriver driver = PageFactory.getWebDriver();
-               LOG.info("Закрываем WebDriver");
-               driver.close();
-           }catch (Exception e){
-               LOG.info("WebDriver уже закрыт");
-           }
-    }
+//    @AfterClass
+//    public static void afterScenario(){
+//           try{
+//               WebDriver driver = PageFactory.getWebDriver();
+//               LOG.info("Закрываем WebDriver");
+//               driver.close();
+//           }catch (Exception e){
+//               LOG.info("WebDriver уже закрыт");
+//           }
+//    }
 }
 
 
