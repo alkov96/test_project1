@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.junit.Assert;
@@ -22,28 +23,18 @@ import ru.gamble.pages.mainPages.FooterPage;
 import ru.gamble.pages.mainPages.MainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.JsonLoader;
-import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
-import ru.sbtqa.tag.pagefactory.exceptions.PageException;
-import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-import sun.rmi.runtime.Log;
 
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-
-import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.xpath;
-import static ru.gamble.utility.Constants.ELEMENT;
-import static ru.gamble.utility.Constants.LINK;
 import static ru.gamble.utility.Constants.STARTING_URL;
 
 /**
@@ -100,7 +91,8 @@ public class LandingAppPage extends AbstractPage {
                 flag = false;
             } else {
                 String link = driver.findElement(By.id("app_desctop_popup_btn_download")).getAttribute("href").trim();
-                HttpClient httpClient = new DefaultHttpClient();
+               // HttpClient httpClient = new DefaultHttpClient();
+                HttpClient httpClient = HttpClientBuilder.create().build();
                 HttpContext localContext = new BasicHttpContext();
                 HttpGet httpGet = new HttpGet(link);
 
