@@ -338,7 +338,7 @@ public class CouponPage extends AbstractPage {
         String xpathMessage = "//div[contains(@class,'accepted-bet-message') and contains(.,'Ваша ставка принята.')]";
 
         LOG.info("Жмём Заключить пари");
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon_bet_button));
+        new WebDriverWait(driver, 20).until(ExpectedConditions.visibilityOf(coupon_bet_button));
         coupon_bet_button.click();
 
         waitingForPreloadertoDisappear(60);
@@ -373,7 +373,7 @@ public class CouponPage extends AbstractPage {
         balanceExpected = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.UP);
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.UP);
 
-        while (count >0){
+        while (count > 0){
             afterBalance = new BigDecimal(driver.findElement(balance).getText()).setScale(2, RoundingMode.UP);
 
             if((balanceExpected.subtract(sumBet).subtract(afterBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.UP))== -1){

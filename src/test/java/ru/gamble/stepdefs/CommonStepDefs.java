@@ -1263,5 +1263,21 @@ public void searchUser(String keyEmail, String sqlRequest){
         LOG.info("Браузер закрыт");
     }
 
+    @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
+    public void userOpenNewUrl(String url){
+        PageFactory.getDriver().get(url);
+    }
+
+    public static void closingCurrtWin(String title) {
+        PageFactory.getWebDriver().close();
+        for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
+            PageFactory.getWebDriver().switchTo().window(windowHandle);
+            if (PageFactory.getWebDriver().getTitle().equals(title)) {
+                return;
+            }
+        }
+        throw new AutotestError("Unable to return to the previously opened page: " + title);
+    }
+
 }
 

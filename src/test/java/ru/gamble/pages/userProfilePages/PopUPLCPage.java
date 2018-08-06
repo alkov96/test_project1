@@ -17,11 +17,7 @@ import ru.gamble.pages.AbstractPage;
 import ru.gamble.pages.CouponPage;
 import ru.gamble.pages.mainPages.AuthenticationMainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.utility.Constants;
-import ru.gamble.utility.Generators;
-import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
-import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -36,13 +32,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.numberOfWindowsToBe;
-import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
 import static ru.gamble.stepdefs.CommonStepDefs.waitEnabled;
 import static ru.gamble.stepdefs.CommonStepDefs.waitToPreloader;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.LOGIN;
-import static ru.gamble.utility.Constants.STARTING_URL;
 
 
 @PageEntry(title = "Мини Личный Кабинет")
