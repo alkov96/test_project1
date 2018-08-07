@@ -26,6 +26,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -188,7 +189,11 @@ public class PopUPLCPage extends AbstractPage {
             minSumElements.get(i).findElement(By.xpath("../../label/div")).click();//кликаем на способ вывода
             waitToPreloader();
             workWithPreloader();
-            ndfl = driver.findElement(By.xpath("//div[contains(@class,'money-in-out__line')]/p/span")).getText();
+            try {
+                ndfl = driver.findElement(By.xpath("//div[contains(@class,'money-in-out__line')]/p/span")).getText();
+            }catch (Exception e){
+                throw new AutotestError("Ошибка! Не найден НДФЛ");
+            }
             sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");//сумма на кнопке
             linkBalance = driver.findElement(By.xpath("//div[@class='smallJsLink__wrapper']/span[1]")).getText().replace(" ", "");//сумма баланса на ссылке;
             ndflFloat = Float.parseFloat(ndfl);
@@ -459,7 +464,8 @@ public class PopUPLCPage extends AbstractPage {
     public void checkLinkSumm() throws Exception {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> summList = Stash.getValue("summListKey");
-        summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"));
+        summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"))
+        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
         LOG.info("Проверка что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода");
         WebElement buttonOk;
         int sumOnButton, sumField;
