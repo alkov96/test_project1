@@ -87,4 +87,16 @@ public class AuthenticationMainPage extends AbstractPage {
             LOG.info("Модальное окно 'Перейти в ЦУПИС' не появилось");
         }
     }
+
+    @ActionTitle("закрываем окно 'Перейти в ЦУПИС' если выскочит")
+    public void closePopUpWindowGoToTSUPISIfOpened(){
+        WebDriver driver = PageFactory.getWebDriver();
+        try{
+            new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(@href,'https://1cupis.ru/auth')]")));
+            LOG.info("Открылось окно 'Перейти в ЦУПИС' - закрываем");
+            driver.findElements(By.xpath("//a[contains(@class,'modal__closeBtn closeBtn')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+        }catch (Exception e){
+            LOG.info("Окно 'Перейти в ЦУПИС' не появилось");
+        }
+    }
 }

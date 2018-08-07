@@ -29,15 +29,30 @@
     "mainUrl": "https://demo.gamebet.ru",
     "adminUrl": "http://demo.gamebet.ru/admin/",
     "registrationUrl": "https://demo.gamebet.ru/test_registration/",
-    "login": "alkov31@mailinator.com",
-    "password": "Parol123Parol",
-    "phone":"76569065980",
+    "login": "alexeyp00+48@mail.ru",
+    "password": "Privet555",
+    "phone":"79155676787",
     "db-registration": {
       "url": "jdbc:mysql://main-demo.wd.orglot.office:3306",
       "user": "stoloto_main",
       "password": "lizByr4WO#"
     }
   },
+
+  "demo1": {
+    "mainUrl": "https://test-int-bet-site.tsed.orglot.office/",
+    "adminUrl": "https://test-int-bet-dbproca.tsed.orglot.office/admin/login?redirect=/",
+    "registrationUrl": "https://test-int-bet-site.tsed.orglot.office/test_registration",
+    "login": "alexeyp00+62@mail.ru",
+    "password": "Privet555",
+    "phone":"74305043630",
+    "db-registration": {
+      "url": "jdbc:mysql://main-demo.wd.orglot.office:3306",
+      "user": "stoloto_main",
+      "password": "lizByr4WO#"
+    }
+  },
+
   "mobile-api1": {
     "mainUrl": "https://dev-bk-bet-site.tsed.orglot.office",
     "USER": "regfordepoit@mailinator.com",
