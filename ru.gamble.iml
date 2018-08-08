@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" version="4">
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Spring" name="Spring">
       <configuration />
@@ -15,11 +15,11 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag:page-factory:1.12.1" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag:page-factory:1.12.3" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa.tag:datajack:1.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:3.2.2" level="project" />
-    <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-properties-adaptor:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-json-adaptor:1.2.0" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-properties-adaptor:1.1.0" level="project" />
     <orderEntry type="library" name="Maven: pl.jalokim.propertiestojson:java-properties-to-json:3.0" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.16.6" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-excel-adaptor:1.1.0" level="project" />
@@ -34,7 +34,6 @@
     <orderEntry type="library" name="Maven: ru.sbtqa.tag:video-recorder:1.0.6" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa:monte-media:1.1.0-JAVA7" level="project" />
     <orderEntry type="library" name="Maven: io.cucumber:cucumber-java:2.4.0" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:cucumber-junit:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa.htmlelements:htmlelements-java:1.17-JAVA7" level="project" />
     <orderEntry type="library" name="Maven: org.seleniumhq.selenium:selenium-java:2.53.0" level="project" />
     <orderEntry type="library" name="Maven: org.seleniumhq.selenium:selenium-edge-driver:2.53.0" level="project" />
@@ -43,11 +42,6 @@
     <orderEntry type="library" name="Maven: org.seleniumhq.selenium:selenium-remote-driver:2.53.1" level="project" />
     <orderEntry type="library" name="Maven: org.seleniumhq.selenium:selenium-api:2.53.1" level="project" />
     <orderEntry type="library" name="Maven: io.appium:java-client:4.1.2" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.7" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.4" level="project" />
-    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
-    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.9" level="project" />
     <orderEntry type="library" name="Maven: commons-validator:commons-validator:1.5.1" level="project" />
     <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.2" level="project" />
     <orderEntry type="library" name="Maven: commons-digester:commons-digester:1.8.1" level="project" />
@@ -99,12 +93,6 @@
     <orderEntry type="library" name="Maven: org.apache.maven:maven-artifact:2.0.10" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-container-default:1.0-alpha-9-stable-1" level="project" />
     <orderEntry type="library" name="Maven: classworlds:classworlds:1.1-alpha-2" level="project" />
-    <orderEntry type="library" name="Maven: com.google.guava:guava:18.0" level="project" />
-    <orderEntry type="library" name="Maven: ru.sbtqa:webdrivermanager:2.2.2" level="project" />
-    <orderEntry type="library" name="Maven: org.rauschig:jarchivelib:0.7.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.9" level="project" />
-    <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.10.2" level="project" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-json-adaptor:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: io.qameta.allure:allure-cucumber2-jvm:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: io.cucumber:cucumber-core:2.3.1" level="project" />
     <orderEntry type="library" name="Maven: info.cukes:cucumber-html:0.2.6" level="project" />
@@ -133,5 +121,21 @@
     <orderEntry type="library" name="Maven: net.minidev:json-smart:2.2.1" level="project" />
     <orderEntry type="library" name="Maven: net.minidev:accessors-smart:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:5.0.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.2.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apiguardian:apiguardian-api:1.0.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-commons:1.2.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.cucumber:cucumber-junit:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa:webdrivermanager:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.6" level="project" />
+    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.9" level="project" />
+    <orderEntry type="library" name="Maven: org.rauschig:jarchivelib:0.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.9" level="project" />
+    <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.10.2" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:21.0" level="project" />
   </component>
 </module>

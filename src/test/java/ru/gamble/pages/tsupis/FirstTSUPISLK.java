@@ -1,5 +1,6 @@
 package ru.gamble.pages.tsupis;
 
+import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -10,10 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.utility.Generators;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -31,11 +34,17 @@ public class FirstTSUPISLK extends AbstractPage {
     @FindBy(xpath = "//input[contains(@value,'Продолжить')]")
     private WebElement buttonContinue;
 
+    @ElementTitle("Код из СМС")
+    @FindBy (name = "validation")
+    private WebElement inputSMSCode;
+
+
     public FirstTSUPISLK() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
+       // driver.getWindowHandle().
     }
 
     @ActionTitle("вводит случайное число в CVV")
@@ -51,9 +60,20 @@ public class FirstTSUPISLK extends AbstractPage {
 
     @ActionTitle("нажимает кнопку 'Вернуться к букмекеру'")
     public void pressKeyBackToBookie(){
-        PageFactory.getDriver().findElement(By.id("success")).click();
+        WebDriver driver = PageFactory.getWebDriver();
+        new WebDriverWait(driver,60).until(ExpectedConditions.visibilityOfElementLocated(By.id("success")));
+        driver.findElement(By.id("success")).click();
+        LOG.info("Нажали на кнопку 'Вернуться к букмекеру'");
 
     }
 
-
+    @ActionTitle("вводит содержимое в поле")
+    public void userEntersСontentInField(String keySMS, String elementTitle) {
+        try {
+            LOG.info("Пытаемя ввести СМС код в нужное поле");
+            fillField(elementTitle, Stash.getValue(keySMS).toString());
+        } catch (PageException e) {
+            e.getMessage();
+        }
+    }
 }

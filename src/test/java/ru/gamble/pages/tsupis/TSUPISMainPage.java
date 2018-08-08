@@ -26,10 +26,6 @@ import java.util.Map;
 public class TSUPISMainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(TSUPISMainPage.class);
 
-    @ElementTitle("Первый ЦУПИС")
-    @FindBy(xpath = "//div/a[contains(@href,'https://23bet.itasystems.ru/frontend/')]")
-    private WebElement pageTitle;
-
     @ElementTitle("Телефон")
     @FindBy(id = "form_login_phone")
     private WebElement inputPhone;
@@ -46,7 +42,7 @@ public class TSUPISMainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(inputPhone));
     }
 
     @ActionTitle("логинится в ЦУПИС с")

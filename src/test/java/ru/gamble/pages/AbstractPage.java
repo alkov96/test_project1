@@ -50,21 +50,27 @@ public abstract class AbstractPage extends Page {
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
     protected WebElement burgerBottom;
+
     @ElementTitle("День")
     @FindBy(className = "inpD")
     protected WebElement fieldDay;
+
     @ElementTitle("Месяц")
     @FindBy(xpath = "//div[contains(@class,'dateInput')]/div[@class='inpM']")
     protected WebElement fieldMonth;
+
     @ElementTitle("Год")
     @FindBy(className = "inpY")
     protected WebElement fieldYear;
+
     @ElementTitle("Подвал")
     @FindBy(xpath = "//*[@class='footer__pin']")
     protected WebElement footerButton;
+
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
     protected WebElement preferences;
+
     @ElementTitle("Активация Быстрой ставки")
     @FindBy(id = "quickbet")
     protected WebElement quickButton;
@@ -78,16 +84,18 @@ public abstract class AbstractPage extends Page {
     @ElementTitle("поле суммы общей ставки")
     @FindBy(id = "express-bet-input")
     protected WebElement coupon_field;
+
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
     private WebElement serviceMessage;
+
     @ElementTitle("Иконка закрытия сервисного сообщения")
     @FindBy(xpath = "//span[contains(@class,'tech-msg__close')]")
     private WebElement closeServiceMessage;
+
     @ElementTitle("Прематч")
     @FindBy(id = "prematch")
     private WebElement prematchBottom;
-
 
     // Метод три раза пытается обновить главную страницу
 
@@ -107,8 +115,6 @@ public abstract class AbstractPage extends Page {
     public static void stop() {
         LOG.info("STOP");
     }
-
-
 
     /**
      * Метод который по имени WebElement находит его на текущей странице,

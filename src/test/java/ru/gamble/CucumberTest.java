@@ -18,11 +18,10 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         monochrome = true,
-        format ={"pretty"},
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
-        plugin= {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
-        tags = {"@CheckNews_C36208"})
+        plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm"},
+        tags = {"@Withdraw_C1045"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
@@ -50,16 +49,16 @@ public class CucumberTest {
         }
     };
 
-    @AfterClass
-    public static void afterScenario(){
-           try{
-               WebDriver driver = PageFactory.getWebDriver();
-               LOG.info("Закрываем WebDriver");
-               driver.close();
-           }catch (Exception e){
-               LOG.info("WebDriver уже закрыт");
-           }
-    }
+//    @AfterClass
+//    public static void afterScenario(){
+//           try{
+//               WebDriver driver = PageFactory.getWebDriver();
+//               LOG.info("Закрываем WebDriver");
+//               driver.close();
+//           }catch (Exception e){
+//               LOG.info("WebDriver уже закрыт");
+//           }
+//    }
 }
 
 

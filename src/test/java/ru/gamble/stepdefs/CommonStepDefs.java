@@ -167,8 +167,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^разлогиниваем пользователя$")
     public static void logOut(){
         goToMainPage("site");
-        WebDriver driver = PageFactory.getWebDriver();
         cleanCookies();
+        WebDriver driver = PageFactory.getWebDriver();
         try {
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
             List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
@@ -206,7 +206,7 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     @Когда("^переходит на страницу '(.+)'$")
     public static void goToMainPage(String siteUrl) {
-        String currentUrl = null;
+        String currentUrl;
         try {
         switch (siteUrl) {
             case "site":
@@ -220,12 +220,13 @@ public class CommonStepDefs extends GenericStepDefs {
             default:
                 currentUrl = siteUrl;
                 break;
-        }}catch (DataException e) {
+        }
+            PageFactory.getDriver().get(currentUrl);
+            LOG.info("Перешли на страницу ==>[" + currentUrl + "]");
+        }catch (DataException e) {
             LOG.error(e.getMessage());
         }
-        PageFactory.getDriver().get(currentUrl);
 
-        LOG.info("Перешли на страницу ==>[" + currentUrl + "]");
     }
 
     @Когда("^сохраняем в память таблицу$")
@@ -527,13 +528,13 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^(пользователь |он) очищает cookies$")
     public static void cleanCookies() {
-            if(PageFactory.getWebDriver().manage().getCookies().size()>0) {
-                try {
-                    LOG.info("Удаляем Cookies");
-                    PageFactory.getWebDriver().manage().deleteAllCookies();
-                } catch (Exception e) {
-                    LOG.error("Cookies не было!");
-                }
+        if(PageFactory.getWebDriver().manage().getCookies().size()>0) {
+            try {
+                LOG.info("Удаляем Cookies");
+                PageFactory.getWebDriver().manage().deleteAllCookies();
+            } catch (Exception e) {
+                LOG.error("Cookies не было!");
+            }
         }
     }
 
@@ -1260,6 +1261,22 @@ public void searchUser(String keyEmail, String sqlRequest){
     public static void closeBrowser() {
         PageFactory.getWebDriver().close();
         LOG.info("Браузер закрыт");
+    }
+
+    @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
+    public void userOpenNewUrl(String url){
+        PageFactory.getDriver().get(url);
+    }
+
+    public static void closingCurrtWin(String title) {
+        PageFactory.getWebDriver().close();
+        for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
+            PageFactory.getWebDriver().switchTo().window(windowHandle);
+            if (PageFactory.getWebDriver().getTitle().equals(title)) {
+                return;
+            }
+        }
+        throw new AutotestError("Unable to return to the previously opened page: " + title);
     }
 
 }
