@@ -23,6 +23,7 @@ import ru.gamble.pages.mainPages.FooterPage;
 import ru.gamble.pages.mainPages.MainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.JsonLoader;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -69,11 +70,20 @@ public class LandingAppPage extends AbstractPage {
         LOG.info("Ссылка " + "itunes.apple.com" + " открылась");
     }
 
+    @ActionTitle("нажимает на кнопку для загрузки приложения на android")
+    public void clickDownloadAndroid(){
+        WebDriver driver = PageFactory.getDriver();
+        driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-android')]")).click();
+    }
+
     @ActionTitle("проверяет скачивание приложения на android")
-    public void downloadAndroid() throws IOException {
+    public void downloadAndroidForLanding() throws IOException {
+        downloadAndroid();
+    }
+
+    public static void downloadAndroid() throws IOException {
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
-        driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-android')]")).click();
         if (!driver.findElement(xpath("//div[@class='modal__body modal__body_app']")).isDisplayed()) {
             Assert.fail("Не открылся попап на скачивание приложения для андроида");
             flag = false;

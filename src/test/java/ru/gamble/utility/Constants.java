@@ -1,5 +1,6 @@
 package ru.gamble.utility;
 
+import org.openqa.selenium.WebElement;
 import ru.sbtqa.tag.qautils.properties.Props;
 
 import java.lang.reflect.Array;

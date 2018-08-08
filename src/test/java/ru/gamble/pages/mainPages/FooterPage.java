@@ -113,7 +113,7 @@ public class FooterPage extends AbstractPage {
     }
 
     @ActionTitle("проверяем ТЕКСТ при переходе по ссылке с")
-    public void checkTextWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
+    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, expectedText;

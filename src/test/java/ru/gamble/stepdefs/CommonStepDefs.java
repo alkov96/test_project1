@@ -1,25 +1,15 @@
 package ru.gamble.stepdefs;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
-import cucumber.api.java.it.Ma;
-import cucumber.api.java.mn.Харин;
-import io.appium.java_client.MobileDriver;
-import io.github.bonigarcia.wdm.ChromeDriverManager;
-import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
-import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import cucumber.api.java.ru.*;
 import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -36,7 +26,6 @@ import ru.sbtqa.tag.pagefactory.annotations.*;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
-import ru.sbtqa.tag.qautils.properties.Props;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -44,10 +33,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
-import java.net.Socket;
 import java.net.URL;
-import java.security.Key;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
 import java.text.ParseException;
@@ -57,7 +43,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
@@ -493,7 +478,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * Проверка что при нажатии на ссылку открывается нужная страница. Проверка идет по url, причем эти url очищаются от всех символов, кроме букв и цифр. т.е. слеши собого значения тут не имеют
      *
      * @param element - на какой элемент жмакать чтобы открылась ссылка
-     * @param pattern - ссылка или ее часть, которая должна открыться
+     * @param pattern - страница, которая должна открыться(можно написать просто часть ссылки)
      * @return true - если все ок.
      */
 
