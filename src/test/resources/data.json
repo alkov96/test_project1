@@ -1,7 +1,7 @@
 {
   "dev-bk": {
     "mainUrl": "https://dev-bk-bet-site.tsed.orglot.office",
-    "adminUrl": "http://stage-bet-dbproca.tsed.orglot.office/admin/",
+    "adminUrl": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
     "registrationUrl": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
     "login": "Testingsto+86@mail.ru",
     "password": "Acer0808",
@@ -14,7 +14,7 @@
   },
   "mobile-site": {
     "mainUrl": "https://dev-bk-bet-mobile-site.tsed.orglot.office/",
-    "adminUrl": "http://stage-bet-dbproca.tsed.orglot.office/admin/",
+    "adminUrl": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
     "registrationUrl": "https://dev-bk-bet-mobile-site.tsed.orglot.office/test_registration/",
     "login": "demo-bk2016@yandex.ru",
     "password": "Qwerty3211",

@@ -106,7 +106,6 @@ public class AzbukaBettingaPage extends AbstractPage {
     @ActionTitle("пролистываем страницу до блока 'Новичку'")
     public void scrollAzbukaNovichok() {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         int x, y;
         y = driver.findElement(By.xpath("//div[@class='abc-betting__tile abc-betting__tile_image']/a")).getLocation().getY() - 100;
         x = driver.findElement(By.xpath("//div[@class='abc-betting__tile abc-betting__tile_image']/a")).getLocation().getX() - 100;
@@ -141,7 +140,6 @@ public class AzbukaBettingaPage extends AbstractPage {
     @ActionTitle("пролистываем страницу до блока 'Платформы'")
     public void scrollAzbukaPlatforms() {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         int x, y;
         y = driver.findElement(By.xpath("//a[@name='platformy']")).getLocation().getY() - 100;
         x = driver.findElement(By.xpath("//a[@name='platformy']")).getLocation().getX() - 100;
@@ -164,8 +162,9 @@ public class AzbukaBettingaPage extends AbstractPage {
 
         }
     }
+
     @ActionTitle("нажимает на кнопку для загрузки приложения на android")
-    public void clickDownloadAndroid(){
+    public void clickDownloadAndroid() {
         WebDriver driver = PageFactory.getDriver();
         driver.findElement(xpath("//i[@class='icon icon-android']")).click();
     }
@@ -174,4 +173,6 @@ public class AzbukaBettingaPage extends AbstractPage {
     public void downloadAndroidForLanding() throws IOException {
         LandingAppPage.downloadAndroid();
     }
+
+
 }
