@@ -300,11 +300,12 @@ public abstract class AbstractPage extends Page {
             Thread.sleep(3000);
             waitForElementPresent(findCoeffs, 10);
             correctMarkets = getWebDriver().findElements(findCoeffs)
-                    .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.26)
+                    .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.260)
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
+                LOG.info("коэф: " + coefficient.getText());
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
@@ -329,14 +330,15 @@ public abstract class AbstractPage extends Page {
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
+                LOG.info("коэф: " + coefficient.getText());
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
             }
         }
-        if (ifForExperss == "no") {
-
-        }
+//        if (ifForExperss == "no") {
+//
+//        }
     }
 
     public void waitForElementPresent(final By by, int timeout) {

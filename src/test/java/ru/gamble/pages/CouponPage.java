@@ -63,9 +63,9 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//div[@id='bonusmoney']")
     private WebElement bonusSwitcher;
 
-    @ElementTitle("фрибет")
+    @ElementTitle("очистка")
     @FindBy(xpath = "//div[@class='coupon-clear-all__inner']")
-    private WebElement freebet;
+    private WebElement clearCoupon;
 
     @ElementTitle("параметры в купоне")
     @FindBy(xpath = "//div[@class='list-bet-block-top']//div[@class='bs-type-switcher__wrapper']//i")
