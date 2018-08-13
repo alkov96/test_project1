@@ -115,26 +115,23 @@ public class AzbukaBettingaPage extends AbstractPage {
     @ActionTitle("в блоке 'Новичку' проверяем ссылку на 'Термины'")
     public void linksOnAzbukaTerms() {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         WebElement link = driver.findElement(By.xpath("//a[@href='/azbuka-bettinga/terminy' and text()='Разобраться в терминах']"));
-        flag &= CommonStepDefs.goLink(link, "azbuka-bettinga/terminy");
+        CommonStepDefs.goLink(link, "azbuka-bettinga/terminy");
         LOG.info("Ссылка на Термины работает");
     }
 
     @ActionTitle("в блоке 'Новичку' проверяем ссылку на 'Стратегии'")
     public void linksOnAzbukaStrategies() {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         WebElement link = driver.findElement(By.xpath("//a[@href='/azbuka-bettinga/igrovye-strategii' and text()='Разобраться в стратегиях']"));
-        flag &= CommonStepDefs.goLink(link, "azbuka-bettinga/igrovye-strategii");
+        CommonStepDefs.goLink(link, "azbuka-bettinga/igrovye-strategii");
     }
 
     @ActionTitle("в блоке 'Новичку' проверяем ссылку на 'Курс молодого бойца'")
     public void linksOnAzbukaNovichok() {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         WebElement link = driver.findElement(By.xpath("//a[@href='/azbuka-bettinga/novichku' and text()='Разобраться в видах ставок']"));
-        flag &= CommonStepDefs.goLink(link, "azbuka-bettinga/novichku");
+        CommonStepDefs.goLink(link, "azbuka-bettinga/novichku");
     }
 
     @ActionTitle("пролистываем страницу до блока 'Платформы'")

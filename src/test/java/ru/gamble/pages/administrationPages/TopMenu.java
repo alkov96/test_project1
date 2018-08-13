@@ -26,7 +26,7 @@ public class TopMenu extends AbstractPage {
     private WebElement topMenu;
 
     @ElementTitle("Сервисы")
-    @FindBy(xpath = "//span[@id='tab-1775-btnInnerEl']")
+    @FindBy(xpath = "//span[@id='tab-1945-btnInnerEl']")
     private WebElement serviceBotton;
 
     public TopMenu() {

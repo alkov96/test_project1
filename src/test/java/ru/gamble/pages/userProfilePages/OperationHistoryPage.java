@@ -157,7 +157,7 @@ public class OperationHistoryPage extends AbstractPage {
         boolean flag = true;
         Boolean sortList;
 
-        String xpath = "//td[contains(@class,'table__body-cell history__cell-balance')]";
+        String xpath = "//td[contains(@class,'table__body-cell history__cell-balance')]"; //путь до суммы баланса
         driver.findElement(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//th[contains(@class,'history__cell-balance table__head-cell_sort')]")).click(); //сортируем по балансу
         Thread.sleep(4000);
         //new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
