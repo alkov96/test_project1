@@ -56,7 +56,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" "новый"
+    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
 
     * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
@@ -153,8 +153,6 @@
       | exepted | "code":0 |
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":12 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "tsupisStatus":3 |
 
     * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -166,8 +164,6 @@
       | exepted | "code":0 |
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":5 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "tsupisStatus":3 |
 
     * запрос к API "api/mobile/v3/requestSkypeCall" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -176,8 +172,6 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":6   |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "tsupisStatus":3   |
 
     * находим и сохраняем "TIMELEFT" из "RESPONCE_API"
 
@@ -207,6 +201,7 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация быстрая
 
+    * включаем экспресс-регистрацию
     * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
     * сохраняем в память
       | EMAIL  | randomEmail |

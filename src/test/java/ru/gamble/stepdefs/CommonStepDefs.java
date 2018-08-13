@@ -980,8 +980,9 @@ public class CommonStepDefs extends GenericStepDefs {
         String line;
         StringBuffer sbt=new StringBuffer("");
         String user = fr.readLine();
-        String phone=user.trim().split("\t")[0];
-        String birthDate = user.trim().split("\t")[1];
+        String separator = user.indexOf("\t")>=0?"\t":" ";
+        String phone=user.trim().split(separator)[0];
+        String birthDate = user.trim().split(separator)[1];
         SimpleDateFormat formatDate = new SimpleDateFormat();
         SimpleDateFormat formatgut = new SimpleDateFormat();
         formatgut.applyPattern("dd.MM.yyyy");
