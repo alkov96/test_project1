@@ -2,6 +2,7 @@ package ru.gamble.utility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.sbtqa.tag.datajack.adaptors.json.JsonDataObjectAdaptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.Properties;
 
 public class PropPoint {
     private static final Logger LOG = LoggerFactory.getLogger(PropPoint.class);
+    private static String sep = File.separator;
     private PropPoint() {
     }
 
@@ -25,8 +27,9 @@ public class PropPoint {
         if (instance == null) {
             instance = new Properties();
 
+
             try {
-                String filename = "email.properties";
+                String filename = "config" + sep + "email.properties";
                 input = PropPoint.class.getClassLoader().getResourceAsStream(filename);
 
                 if (input == null) {

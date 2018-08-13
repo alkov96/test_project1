@@ -107,7 +107,7 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("нажимает кнопку")
-    public static void pressButtonAP(String param) {
+    public static void pressButtonAP(String param){
         CommonStepDefs.pressButton(param);
     LOG.info("Нажали на [" + param + "]");}
 
@@ -177,6 +177,7 @@ public abstract class AbstractPage extends Page {
             e.printStackTrace();
         }
 
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
         LOG.info("Переходим по ссылке из e-mail");
         driver.get(url + "?action=verify&" + link);
 
@@ -208,7 +209,9 @@ public abstract class AbstractPage extends Page {
         return selectMenu(element, 0);
     }
 
-    protected void enterDate(String value) {
+    protected String enterDate(String value) {
+        StringBuilder date = new StringBuilder();
+        String day, month, year;
         if (value.equals(RANDOM)) {
 
             do {
@@ -229,7 +232,10 @@ public abstract class AbstractPage extends Page {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        LOG.info("В итоге ввели::" + fieldDay.getText() + "::" + fieldMonth.getText() + "::" + fieldYear.getText());
+        day = fieldDay.getText();
+        month = fieldMonth.getText();
+        year = fieldYear.getText();
+        return date.append(year).append("-").append(month).append("-").append(day).toString();
     }
 
     /**
@@ -418,9 +424,10 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("перезагружает страницу")
-            public void refresh(){
+    public void refresh(){
         PageFactory.getWebDriver().navigate().refresh();
     }
+
 
     public boolean checkCloseServiceMessage(WebElement element) throws InterruptedException {
             try {
@@ -448,6 +455,7 @@ public abstract class AbstractPage extends Page {
         }
         return false;
     }
+
     @ActionTitle("ждет некоторое время")
     public void waiting(String sec) throws InterruptedException {
         Integer seconds=0;
@@ -500,5 +508,6 @@ public abstract class AbstractPage extends Page {
             throw new AutotestError("Ошибка! Текст [" + message + "] не появился");
         }
     }
+
 }
 

@@ -39,11 +39,9 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.qautils.properties.Props;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.security.Key;
@@ -83,6 +81,23 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (PageException e1) {
             LOG.error(e1.getMessage());
         }
+
+    }
+
+    @Когда("^запрашиваем дату-время и сохраняем в память$")
+    public static void requestAndSaveToMamory(DataTable dataTable){
+        List<String> data = dataTable.asList(String.class);
+        String key, value, date;
+        key = data.get(0);
+        value = data.get(1);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if (value.equals("Current")) {
+            date = formatter.format(System.currentTimeMillis());
+            Stash.put(key,date);
+            LOG.info(key + "<==[" + date + "]");
+        }
+
 
     }
 
@@ -815,6 +830,43 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
+    @Когда("^добавляем данные в JSON массив \"([^\"]*)\" сохраняем в память:$")
+    public void добавляем_данные_в_JSON_массив_сохраняем_в_память(String keyJSONObject, DataTable dataTable) {
+
+        Object jSONString = collectParametersInJSONString(dataTable);
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.add(jSONString);
+        Stash.put(keyJSONObject, jsonArray);
+        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jsonArray.get(0)) + ")");
+
+    }
+
+//    private Object collectParametersInJSONArray(DataTable dataTable) {
+//        Map<String, String> table = dataTable.asMap(String.class, String.class);
+//        JSONObject jsonObject = new JSONObject();
+//
+//        String key;
+//        Object value, params;
+//        Map<String, Object> map;
+//        ObjectMapper mapper;
+//        LOG.info("Собираем параметы в JSON строку");
+//
+//
+//        for (Map.Entry<String, String> entry : table.entrySet()) {
+//            key = entry.getKey();
+//            if (entry.getValue().matches("^[A-Z_]+$")) {
+//                value = Stash.getValue(entry.getValue());
+//            } else {
+//                value = entry.getValue();
+//            }
+//            jsonObject.put(key, JSONValue.parse(String.valueOf(value)));
+//
+//        }
+//        params = jsonObject.toString();
+//        LOG.info(String.valueOf(params));
+//        return params;
+//    }
+
     private Object collectParametersInJSONString(DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         JSONObject jsonObject = new JSONObject();
@@ -832,7 +884,7 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             jsonObject.put(key, JSONValue.parse(String.valueOf(value)));
         }
-        params = jsonObject.toString();
+        params = jsonObject;
         LOG.info(String.valueOf(params));
         return params;
     }
@@ -1106,7 +1158,7 @@ public class CommonStepDefs extends GenericStepDefs {
         return requestFull;
     }
 
-    private void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
+    protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
         if(!(null == dataTable)) { Map<String, String> table = dataTable.asMap(String.class, String.class); }
         Object params = null;
         URL url;
@@ -1136,6 +1188,13 @@ public class CommonStepDefs extends GenericStepDefs {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
+
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
             //************
 
             url = new URL(requestFull);
@@ -1278,6 +1337,13 @@ public void searchUser(String keyEmail, String sqlRequest){
         }
         throw new AutotestError("Unable to return to the previously opened page: " + title);
     }
+
+    @Когда("^эмулируем регистрацию через терминал Wave \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable){
+        requestByHTTPS(path, keyStash, "POST", dataTable);
+    }
+
+
 
 }
 
