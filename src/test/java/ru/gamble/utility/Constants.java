@@ -53,6 +53,11 @@ public class Constants {
     public static final String VALUE = "Значение";
     public static final String VARIABLE = "Переменная";
     public static final String PHONE = "Телефон";
+    public static final String INPUT_FIELD = "Поле ввода";
+    public static final String SAVE_VALUE = "Переменная сохранения";
+    public static final String NAME = "Имя";
+    public static final String LASTNAME = "Фамилия";
+    public static final String PATERNALNAME = "Отчество";
 
     public static final List<String> cities = Arrays.asList("Москва","Санкт-Петербург","Новосибирск","Екатеринбург","Нижний Новгород","Казань","Челябинск","Омск","Самара","Ростов-на-Дону","Уфа","Красноярск","Пермь","Воронеж","Волгоград");
     public static final List<String> sex = Arrays.asList("Мужской","Женский");

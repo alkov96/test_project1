@@ -63,9 +63,9 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//div[@id='bonusmoney']")
     private WebElement bonusSwitcher;
 
-    @ElementTitle("фрибет")
+    @ElementTitle("очистка")
     @FindBy(xpath = "//div[@class='coupon-clear-all__inner']")
-    private WebElement freebet;
+    private WebElement clearCoupon;
 
     @ElementTitle("параметры в купоне")
     @FindBy(xpath = "//div[@class='list-bet-block-top']//div[@class='bs-type-switcher__wrapper']//i")
@@ -74,6 +74,10 @@ public class CouponPage extends AbstractPage {
     @ElementTitle("заключить пари")
     @FindBy(id="place-bet-button")
     private WebElement coupon_bet_button;
+
+    @ElementTitle("поле суммы общей ставки")
+    @FindBy(id="express-bet-input")
+    private WebElement coupon_field;
 
     @ElementTitle("поле суммы ставки типа Система")
     @FindBy(id="express-unitbet-input")
@@ -93,6 +97,7 @@ public class CouponPage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(coupon,10, 5);
+       // new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
     }
 
     @ActionTitle("убирает события из купона, пока их не станет")
@@ -168,7 +173,7 @@ public class CouponPage extends AbstractPage {
         String team1 = Stash.getValue("team1key");
         String team2 = Stash.getValue("team2key");
         if (CommonStepDefs.stringParse(team1  + team2).equals(CommonStepDefs.stringParse(сouponGame))) {
-            LOG.info("Названия команд в купоне совпадают с ожидаемыми: " + team1 + team2 + "=" + сouponGame);
+            LOG.info("Названия команд в купоне совпадают с ожидаемыми: " + team1 + team2 + " <=> " + сouponGame);
         } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: " + team1 + team2 + сouponGame);
     }
 
@@ -178,8 +183,8 @@ public class CouponPage extends AbstractPage {
         String ishod = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[@class='pick ng-binding']")).getText();
         String ishodName = Stash.getValue("ishodKey");//ожидаемое название исхода
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
-            LOG.info("Выбранных исход в купоне совпадает с ожидаемым: [" + ishod + "] - [" + ishodName + "]");
-        } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: [" + ishod + "] - [" + ishodName + "]");
+            LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + " <=> " + ishodName);
+        } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: " + ishod + " - " + ishodName);
 
     }
 
@@ -193,7 +198,7 @@ public class CouponPage extends AbstractPage {
         coefOld = oldString.contains("ng-hide") ? 0.0f : Float.valueOf(driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice_old')]")).getText());//Краткая запись цикла. ? - часть синтаксиса. Здесь показываем чему равен старый коэфицент. если скрыт, то 0.0.
         if (coef != coefCoupon && coef != coefOld) {
             Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCoupon + coef);
-        } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon +" - " + coef);
+        } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon + " <=> " + coef);
 
     }
 
@@ -216,7 +221,7 @@ public class CouponPage extends AbstractPage {
             Assertions.fail("Коэф изменился, однако сообщение не отображается.");
         }
         LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         if (!driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()
                 || !driver.findElement(xpath("//div[@class='coupon-confirm__btn']")).isDisplayed()) {
             Assertions.fail("При изменении условий ставки не появилось сообщение или кнопка о принятии изменений.");
@@ -301,6 +306,7 @@ public class CouponPage extends AbstractPage {
             }
         }
         WebElement selectType = driver.findElement(By.xpath("//li[contains(translate(text(),'ЯЧСМИТЬБЮФЫВАПРОЛДЖЭЙЦУКЕНГШЩЗХЪ', 'ячсмитьбюфывапролджэйцукенгшщзхъ'),'" + type + "')]"));
+        //driver.findElement(By.xpath("//li[contains(@class,'open-type-switcher__item') and contains(lower-case(text()),'"+type+"')]"));
         LOG.info("Переключаем тип ставки на '" + selectType.getText() + "'");
         selectType.click();
     }
@@ -317,6 +323,7 @@ public class CouponPage extends AbstractPage {
     public void inputBet(String sumBet,String one){
         BigDecimal sum;
         WebDriver driver = PageFactory.getDriver();
+       // boolean forOne = one.equals("для каждого разбиения") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
         boolean forOne = !one.equals("") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
 
         WebElement field = forOne?coupon_field_System_one:coupon_field;
@@ -338,7 +345,7 @@ public class CouponPage extends AbstractPage {
         String xpathMessage = "//div[contains(@class,'accepted-bet-message') and contains(.,'Ваша ставка принята.')]";
 
         LOG.info("Жмём Заключить пари");
-        new WebDriverWait(driver, 20).until(ExpectedConditions.visibilityOf(coupon_bet_button));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon_bet_button));
         coupon_bet_button.click();
 
         waitingForPreloadertoDisappear(60);
@@ -373,7 +380,7 @@ public class CouponPage extends AbstractPage {
         balanceExpected = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.UP);
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.UP);
 
-        while (count > 0){
+        while (count >0){
             afterBalance = new BigDecimal(driver.findElement(balance).getText()).setScale(2, RoundingMode.UP);
 
             if((balanceExpected.subtract(sumBet).subtract(afterBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.UP))== -1){
@@ -388,7 +395,6 @@ public class CouponPage extends AbstractPage {
                 e.printStackTrace();
             }
             if (count == 0){
-                driver.navigate().refresh();
                 Assertions.fail("Баланс не соответствует ожидаемому. Баланс сейчас: " + afterBalance + ", ожидалось : " + balanceExpected.subtract(sumBet));
             }
         }
@@ -498,6 +504,4 @@ public class CouponPage extends AbstractPage {
         LOG.info("Купон перключен на ставку БОНУСАМИ");
     }
 }
-
-
 

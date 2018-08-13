@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.utility.Generators;
 import ru.gamble.pages.AbstractPage;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -18,6 +19,9 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -98,78 +102,130 @@ public class PassportDataPage extends AbstractPage {
 
     @ActionTitle("заполняет паспорт с")
     public void fillsPassportDate(DataTable dataTable){
-        Map<String, String> data = dataTable.asMap(String.class, String.class);
-        String serial, number, whoIssued, unitCode, sex, placeOfBirth, house, building, block, flat;
+        List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
+        String inputField, value, saveVariable, date = null, serial, number, whoIssued, unitCode, sex, placeOfBirth, house, building, block, flat;
         String wrongAddressXpath = "//div[@class='message-error']/div[contains(.,'Неправильный адрес')]";
-
-        serial = (data.get(SERIAL).equals(RANDOM))? Generators.randomNumber(4): data.get(SERIAL);
-        LOG.info("Заполняем серию паспорта::" + serial);
-        fillField(passpSerialInput,serial);
-
-        number = (data.get(NUMBER).equals(RANDOM))? Generators.randomNumber(6): data.get(NUMBER);
-        LOG.info("Заполняем номер паспорта::" + number);
-        fillField(passpNumberInput,number);
-
-        // делаем столько попыток ввести дату, пока не пропадёт ошибка
-        // "Дата выдачи не соответсвует дате обязательной  замены паспорта"
-        String errXpath = "//div[@class='inpErrText__inner ng-binding ng-scope']";
-        do {
-            enterDate(data.get(DATEISSUE));
-        } while(!PageFactory.getWebDriver().findElements(By.xpath(errXpath))
-                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).isEmpty());
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MMMM-dd");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
-        whoIssued = (data.get(ISSUEDBY).equals(RANDOM))? Generators.randomString(25) : data.get(ISSUEDBY);
-        LOG.info("Заполняем кем выдан::" + whoIssued);
-        fillField(issuedByInput,whoIssued);
+        for(int i = 0; i < data.size(); i++) {
+            inputField = data.get(i).get(INPUT_FIELD);
+            value = data.get(i).get(VALUE);
+            saveVariable = data.get(i).get(SAVE_VALUE);
 
-        unitCode = (data.get(UNITCODE).equals(RANDOM))? Generators.randomNumber(6) : data.get(ISSUEDBY);
-        LOG.info("Заполняем код подразделения::" + unitCode);
-        fillField(unitCodeInput,unitCode);
-
-        sex = (data.get(SEX).equals(RANDOM))? Generators.randomSex() : data.get(SEX);
-        LOG.info("Выбираем пол::" + sex);
-        PageFactory.getWebDriver().findElement(By.xpath(("//*[text()='" + sex + "']"))).click();
-
-        placeOfBirth = (data.get(PLACEOFBIRTH).equals(RANDOM))? Generators.randomCity() : data.get(PLACEOFBIRTH);
-        LOG.info("Заполняем место рождения::" + placeOfBirth);
-        fillField(placeOfBirthInput,placeOfBirth);
-        for(int g = 0; g < 10; g++ ) {
-            if (data.get(REGION).equals(TRUE)) {
-                LOG.info("Регион");
-                fillAddress(regionInput, true);
+            if(inputField.contains(DATEOFBIRTH)){
+                try {
+                    date = outputFormat.format(inputFormat.parse(enterDate(value)));
+                } catch (ParseException e) {
+                    e.getMessage();
+                }
+                Stash.put(saveVariable,date);
+                LOG.info(saveVariable + "<==[" + date + "]");
+            }
+            if(inputField.contains(SERIAL)){
+                serial = (value.equals(RANDOM))? Generators.randomNumber(4): value;
+                fillField(passpSerialInput,serial);
+                Stash.put(saveVariable,String.valueOf(serial));
+                LOG.info(saveVariable + "<==[" + serial + "]");
+            }
+            if(inputField.contains(NUMBER)){
+                number = (value.equals(RANDOM))? Generators.randomNumber(6): value;
+                fillField(passpNumberInput,number);
+                Stash.put(saveVariable,String.valueOf(number));
+                LOG.info(saveVariable + "<==[" + number + "]");
+            }
+            if(inputField.contains(DATEISSUE)){
+                // делаем столько попыток ввести дату, пока не пропадёт ошибка
+                // "Дата выдачи не соответсвует дате обязательной  замены паспорта"
+                String errXpath = "//div[@class='inpErrText__inner ng-binding ng-scope']";
+                do {
+                    try {
+                        date = outputFormat.format(inputFormat.parse(enterDate(value)));
+                    } catch (ParseException e) {
+                        e.getMessage();
+                    }
+                } while(!PageFactory.getWebDriver().findElements(By.xpath(errXpath))
+                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).isEmpty());
+                Stash.put(saveVariable,date);
+                LOG.info(saveVariable + "<==[" + date + "]");
             }
 
-            if (data.get(LOCALITY).equals(TRUE)) {
-                LOG.info("Населённый пункт");
-                fillAddress(cityInput, true);
+            if(inputField.contains(ISSUEDBY)){
+                whoIssued = (value.equals(RANDOM))? Generators.randomString(25) : value;
+                fillField(issuedByInput,whoIssued);
+                Stash.put(saveVariable,whoIssued);
+                LOG.info(saveVariable + "<==[" + issuedByInput.getAttribute("value") + "]");
             }
 
-            if (data.get(STREET).equals(TRUE)) {
-                LOG.info("Улица");
-                fillAddress(streetInput, true);
+            if(inputField.contains(UNITCODE)){
+                unitCode = (value.equals(RANDOM))? Generators.randomNumber(6) : value;
+                fillField(unitCodeInput,unitCode);
+                Stash.put(saveVariable,unitCodeInput.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + unitCodeInput.getAttribute("value") + "]");
             }
 
-            house = (data.get(HOUSE).equals(RANDOM)) ? Generators.randomNumber(3) : data.get(HOUSE);
-            LOG.info("Заполняем Дом/владение::" + house);
-            fillField(houseInput, house);
+            if(inputField.contains(SEX)){
+                sex = (value.equals(RANDOM))? Generators.randomSex() : value;
+                PageFactory.getWebDriver().findElement(By.xpath(("//*[text()='" + sex + "']"))).click();
+                Stash.put(saveVariable,sex);
+                LOG.info(saveVariable + "<==[" + sex + "]");
+            }
 
-            building = (data.get(BUILDING).equals(RANDOM)) ? Generators.randomNumber(2) : data.get(BUILDING);
-            LOG.info("Заполняем Строение::" + building);
-            fillField(buildingInput, building);
+            if(inputField.contains(PLACEOFBIRTH)){
+                placeOfBirth = (value.equals(RANDOM))? Generators.randomCity() : value;
+                fillField(placeOfBirthInput,placeOfBirth);
+                Stash.put(saveVariable,placeOfBirth);
+                LOG.info(saveVariable + "<==[" + placeOfBirthInput.getAttribute("value") + "]");
+            }
 
-            block = (data.get(BLOCK).equals(RANDOM)) ? Generators.randomNumber(3) : data.get(BLOCK);
-            LOG.info("Заполняем Корпус::" + block);
-            fillField(blockInput, block);
 
-            flat = (data.get(FLAT).equals(RANDOM)) ? Generators.randomNumber(3) : data.get(FLAT);
-            LOG.info("Заполняем Квартира::" + flat);
-            fillField(flatInput, flat);
+                if (inputField.contains(REGION) && value.equals(TRUE)) {
+                    fillAddress(regionInput, true);
+                    Stash.put(saveVariable,regionInput.getAttribute("value"));
+                    LOG.info(saveVariable + "<==[" + regionInput.getAttribute("value") + "]");
+                }
 
-            LOG.info("Нажимаем кнопку 'Отправить'");
-            sendButton.click();
-            if(PageFactory.getWebDriver().findElements(By.xpath(wrongAddressXpath)).isEmpty()){break;}
+                if (inputField.contains(LOCALITY) && value.equals(TRUE)) {
+                    fillAddress(cityInput, true);
+                    Stash.put(saveVariable,cityInput.getAttribute("value"));
+                    LOG.info(saveVariable + "<==[" + cityInput.getAttribute("value") + "]");
+                }
+
+                if (inputField.contains(STREET) && value.equals(TRUE)) {
+                    fillAddress(streetInput, true);
+                    Stash.put(saveVariable,streetInput.getAttribute("value") );
+                    LOG.info(saveVariable + "<==[" + streetInput.getAttribute("value") + "]");
+                }
+
+                if(inputField.contains(HOUSE)){
+                    house = (value.equals(RANDOM)) ? Generators.randomNumber(2) : value;
+                    fillField(houseInput, house);
+                    Stash.put(saveVariable,String.valueOf(house));
+                    LOG.info(saveVariable + "<==[" + house + "]");
+                }
+
+                if(inputField.contains(FLAT)){
+                   flat = (value.equals(RANDOM)) ? Generators.randomNumber(2) : value;
+                   fillField(flatInput, flat);
+                   Stash.put(saveVariable,String.valueOf(flat));
+                   LOG.info(saveVariable + "<==[" + flat + "]");
+                }
+
+
+//                building = (data.get(BUILDING).equals(RANDOM)) ? Generators.randomNumber(2) : data.get(BUILDING);
+//                LOG.info("Заполняем Строение::" + building);
+//                fillField(buildingInput, building);
+//
+//                block = (data.get(BLOCK).equals(RANDOM)) ? Generators.randomNumber(3) : data.get(BLOCK);
+//                LOG.info("Заполняем Корпус::" + block);
+//                fillField(blockInput, block);
+
+
         }
+        LOG.info("Нажимаем кнопку 'Отправить'");
+       // if(PageFactory.getWebDriver().findElements(By.xpath(wrongAddressXpath)).isEmpty()) {
+            sendButton.click();
 
     }
 

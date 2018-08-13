@@ -111,7 +111,7 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("нажимает кнопку")
-    public static void pressButtonAP(String param) {
+    public static void pressButtonAP(String param){
         CommonStepDefs.pressButton(param);
     LOG.info("Нажали на [" + param + "]");}
 
@@ -181,6 +181,7 @@ public abstract class AbstractPage extends Page {
             e.printStackTrace();
         }
 
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
         LOG.info("Переходим по ссылке из e-mail");
         driver.get(url + "?action=verify&" + link);
 
@@ -212,7 +213,9 @@ public abstract class AbstractPage extends Page {
         return selectMenu(element, 0);
     }
 
-    protected void enterDate(String value) {
+    protected String enterDate(String value) {
+        StringBuilder date = new StringBuilder();
+        String day, month, year;
         if (value.equals(RANDOM)) {
 
             do {
@@ -233,7 +236,10 @@ public abstract class AbstractPage extends Page {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        LOG.info("В итоге ввели::" + fieldDay.getText() + "::" + fieldMonth.getText() + "::" + fieldYear.getText());
+        day = fieldDay.getText();
+        month = fieldMonth.getText();
+        year = fieldYear.getText();
+        return date.append(year).append("-").append(month).append("-").append(day).toString();
     }
 
     /**
@@ -311,11 +317,12 @@ public abstract class AbstractPage extends Page {
             Thread.sleep(3000);
             waitForElementPresent(findCoeffs, 10);
             correctMarkets = getWebDriver().findElements(findCoeffs)
-                    .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.26)
+                    .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.260)
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
+                LOG.info("коэф: " + coefficient.getText());
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
@@ -340,14 +347,15 @@ public abstract class AbstractPage extends Page {
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
+                LOG.info("коэф: " + coefficient.getText());
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
             }
         }
-        if (ifForExperss == "no") {
-
-        }
+//        if (ifForExperss == "no") {
+//
+//        }
     }
 
     public void waitForElementPresent(final By by, int timeout) {
@@ -422,9 +430,10 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("перезагружает страницу")
-            public void refresh(){
+    public void refresh(){
         PageFactory.getWebDriver().navigate().refresh();
     }
+
 
     public boolean checkCloseServiceMessage(WebElement element) throws InterruptedException {
             try {
@@ -452,6 +461,7 @@ public abstract class AbstractPage extends Page {
         }
         return false;
     }
+
     @ActionTitle("ждет некоторое время")
     public void waiting(String sec) throws InterruptedException {
         Integer seconds=0;
@@ -504,5 +514,6 @@ public abstract class AbstractPage extends Page {
             throw new AutotestError("Ошибка! Текст [" + message + "] не появился");
         }
     }
+
 }
 
