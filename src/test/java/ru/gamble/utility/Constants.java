@@ -1,5 +1,6 @@
 package ru.gamble.utility;
 
+import org.openqa.selenium.WebElement;
 import ru.sbtqa.tag.qautils.properties.Props;
 
 import java.lang.reflect.Array;
@@ -57,7 +58,6 @@ public class Constants {
     public static final String NAME = "Имя";
     public static final String LASTNAME = "Фамилия";
     public static final String PATERNALNAME = "Отчество";
-
 
     public static final List<String> cities = Arrays.asList("Москва","Санкт-Петербург","Новосибирск","Екатеринбург","Нижний Новгород","Казань","Челябинск","Омск","Самара","Ростов-на-Дону","Уфа","Красноярск","Пермь","Воронеж","Волгоград");
     public static final List<String> sex = Arrays.asList("Мужской","Женский");

@@ -97,6 +97,10 @@ public abstract class AbstractPage extends Page {
     @FindBy(id = "prematch")
     private WebElement prematchBottom;
 
+    @ElementTitle("Азбука беттинга")
+    @FindBy (xpath = "//a[@href='/azbuka-bettinga']")
+    private WebElement azbuka;
+
     // Метод три раза пытается обновить главную страницу
 
     @ActionTitle("открывает Избранное")
