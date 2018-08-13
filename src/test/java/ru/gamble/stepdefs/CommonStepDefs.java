@@ -3,6 +3,7 @@ package ru.gamble.stepdefs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
@@ -30,8 +31,6 @@ import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.*;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.Socket;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -261,12 +260,6 @@ public class CommonStepDefs extends GenericStepDefs {
     public void confirmVidochat(String param) {
         String sqlRequest = "UPDATE gamebet.`user` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
         workWithDB(sqlRequest);
-//        sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(param) + "'";
-//        String id = workWithDBgetResult(sqlRequest, "id");
-//        Stash.put("customer",id);
-//        String path = "/api/stoloto/identification/approveVideoIdent";
-//
-//        requestToAPI(path, "RESPONSE_API", dataTable);
         LOG.info("Подтвердили видеорегистрацию");
 
     }
@@ -494,7 +487,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * Проверка что при нажатии на ссылку открывается нужная страница. Проверка идет по url, причем эти url очищаются от всех символов, кроме букв и цифр. т.е. слеши собого значения тут не имеют
      *
      * @param element - на какой элемент жмакать чтобы открылась ссылка
-     * @param pattern - страница, которая должна открыться(можно написать просто часть ссылки)
+     * @param pattern - ссылка или ее часть, которая должна открыться
      * @return true - если все ок.
      */
 
@@ -827,32 +820,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
-//    private Object collectParametersInJSONArray(DataTable dataTable) {
-//        Map<String, String> table = dataTable.asMap(String.class, String.class);
-//        JSONObject jsonObject = new JSONObject();
-//
-//        String key;
-//        Object value, params;
-//        Map<String, Object> map;
-//        ObjectMapper mapper;
-//        LOG.info("Собираем параметы в JSON строку");
-//
-//
-//        for (Map.Entry<String, String> entry : table.entrySet()) {
-//            key = entry.getKey();
-//            if (entry.getValue().matches("^[A-Z_]+$")) {
-//                value = Stash.getValue(entry.getValue());
-//            } else {
-//                value = entry.getValue();
-//            }
-//            jsonObject.put(key, JSONValue.parse(String.valueOf(value)));
-//
-//        }
-//        params = jsonObject.toString();
-//        LOG.info(String.valueOf(params));
-//        return params;
-//    }
-
     private Object collectParametersInJSONString(DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         JSONObject jsonObject = new JSONObject();
@@ -1008,10 +975,8 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^выбираем fullalt пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchFullAlt(String keyPhone, String keyBD) throws Exception {
-
-
         RandomAccessFile fr = new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r");
-//        RandomAccessFile fr = new RandomAccessFile("src\\test\\resources\\full_alt.txt", "r");
+
         String line;
         StringBuffer sbt=new StringBuffer("");
         String user = fr.readLine();
@@ -1144,7 +1109,7 @@ public class CommonStepDefs extends GenericStepDefs {
         return requestFull;
     }
 
-    private void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
+    protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
         if(!(null == dataTable)) { Map<String, String> table = dataTable.asMap(String.class, String.class); }
         Object params = null;
         URL url;
@@ -1328,7 +1293,6 @@ public void searchUser(String keyEmail, String sqlRequest){
     public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable){
         requestByHTTPS(path, keyStash, "POST", dataTable);
     }
-
 
 
 }
