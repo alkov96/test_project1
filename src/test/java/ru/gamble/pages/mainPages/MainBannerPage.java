@@ -28,7 +28,7 @@ public class MainBannerPage extends AbstractPage{
     @FindBy(xpath = "//div[@class='main-slider__wrapper ng-scope']//ol[@class='flickity-page-dots']")
     private WebElement dotsOnBanner;
 
-    @FindBy(css = "div.flickity-slider")
+    @FindBy(xpath = "//div[contains(@class,'main-slider__wrapper')]/descendant::div[@class='flickity-slider']")
     private WebElement top_banner; //Топ-баннер на главной
 
     public MainBannerPage() {
@@ -36,7 +36,6 @@ public class MainBannerPage extends AbstractPage{
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(dotsOnBanner,5, 10);
-        //new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(dotsOnBanner));
     }
 
 @ActionTitle("запоминает состояние главного баннера")

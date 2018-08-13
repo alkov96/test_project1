@@ -1,35 +1,63 @@
 {
   "dev-bk": {
-    "mainUrl": "https://dev-bk-bet-site2.tsed.orglot.office",
-    "adminUrl": "http://stage-bet-dbproca.tsed.orglot.office/admin/",
-    "registrationUrl": "https://dev-bk-bet-site2.tsed.orglot.office/test_registration/",
-    "login": "demo-bk2016@yandex.ru",
-    "loginOLD": "regfordepoit@mailinator.com",
-    "password": "Qwerty3211",
-    "passwordOLD": "Parol123",
+    "mainUrl": "https://dev-bk-bet-site.tsed.orglot.office",
+    "adminUrl": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
+    "registrationUrl": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
+    "login": "Testingsto+86@mail.ru",
+    "password": "Acer0808",
+    "phone": "79088767878",
     "db-registration": {
       "url": "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",
       "user": "webdev_adm",
       "password": "tao9Gu8Waenotahv"
     }
   },
-  "demo": {
+  "mobile-site": {
+    "mainUrl": "https://dev-bk-bet-mobile-site.tsed.orglot.office/",
+    "adminUrl": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
+    "registrationUrl": "https://dev-bk-bet-mobile-site.tsed.orglot.office/test_registration/",
+    "login": "demo-bk2016@yandex.ru",
+    "password": "Qwerty3211",
+    "phone": "70718901845",
+    "db-registration": {
+      "url": "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",
+      "user": "webdev_adm",
+      "password": "tao9Gu8Waenotahv"
+    }
+  },
+  "demo1": {
     "mainUrl": "https://demo.gamebet.ru",
     "adminUrl": "http://demo.gamebet.ru/admin/",
     "registrationUrl": "https://demo.gamebet.ru/test_registration/",
-    "login": "demo617@mailinator.com",
-    "password": "Parol123",
+    "login": "alexeyp00+66@mail.ru",
+    "password": "Privet555",
+    "phone":"79155676787",
     "db-registration": {
       "url": "jdbc:mysql://main-demo.wd.orglot.office:3306",
       "user": "stoloto_main",
       "password": "lizByr4WO#"
     }
   },
+
+  "demo1": {
+    "mainUrl": "https://test-int-bet-site.tsed.orglot.office/",
+    "adminUrl": "https://test-int-bet-dbproca.tsed.orglot.office/admin/login?redirect=/",
+    "registrationUrl": "https://test-int-bet-site.tsed.orglot.office/test_registration",
+    "login": "alexeyp00+62@mail.ru",
+    "password": "Privet555",
+    "phone":"74305043630",
+    "db-registration": {
+      "url": "jdbc:mysql://main-demo.wd.orglot.office:3306",
+      "user": "stoloto_main",
+      "password": "lizByr4WO#"
+    }
+  },
+
   "mobile-api1": {
     "mainUrl": "https://dev-bk-bet-site.tsed.orglot.office",
     "USER": "regfordepoit@mailinator.com",
     "PASS": "Parol123",
-    "PHONE": "71110020076",
+    "PHONE": "+71110020076",
     "DEVID": "3",
     "db-registration": {
       "url": "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",

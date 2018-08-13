@@ -38,13 +38,9 @@ import static org.junit.Assert.assertFalse;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.*;
 
-
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MainPage.class);
-
-    @FindBy(xpath = "//div[@class='topLogo888']")
-    private WebElement pageTitle;
 
     @FindBy(xpath = "//div[contains(@class,'main-slider__wrapper')]")
     private WebElement slider;
@@ -54,7 +50,7 @@ public class MainPage extends AbstractPage {
     private WebElement registrationButton;
 
     @ElementTitle("Вход")
-    @FindBy(id = "log-in")
+    @FindBy(xpath = "//button[contains(text(),'Вход')]")
     private WebElement enterButton;
 
     @ElementTitle("Прематч")
@@ -67,8 +63,7 @@ public class MainPage extends AbstractPage {
 
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
-    private WebElement preferences;
-
+    public WebElement preferences;
 
     // Блок новостей
     @ElementTitle("Стрелка-вправо")
@@ -91,7 +86,6 @@ public class MainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        //if()
         tryingLoadPage(slider,5, 10);
         workWithPreloader();
     }

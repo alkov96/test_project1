@@ -1,25 +1,16 @@
 package ru.gamble.stepdefs;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
-import cucumber.api.java.it.Ma;
-import cucumber.api.java.mn.Харин;
-import io.appium.java_client.MobileDriver;
-import io.github.bonigarcia.wdm.ChromeDriverManager;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
-import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import cucumber.api.java.ru.*;
 import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -36,18 +27,11 @@ import ru.sbtqa.tag.pagefactory.annotations.*;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
-import ru.sbtqa.tag.qautils.properties.Props;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import java.io.*;
-import java.net.Socket;
 import java.net.URL;
-import java.security.Key;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
 import java.text.ParseException;
@@ -57,7 +41,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
@@ -83,6 +66,23 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (PageException e1) {
             LOG.error(e1.getMessage());
         }
+
+    }
+
+    @Когда("^запрашиваем дату-время и сохраняем в память$")
+    public static void requestAndSaveToMamory(DataTable dataTable){
+        List<String> data = dataTable.asList(String.class);
+        String key, value, date;
+        key = data.get(0);
+        value = data.get(1);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if (value.equals("Current")) {
+            date = formatter.format(System.currentTimeMillis());
+            Stash.put(key,date);
+            LOG.info(key + "<==[" + date + "]");
+        }
+
 
     }
 
@@ -167,16 +167,24 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^разлогиниваем пользователя$")
     public static void logOut(){
         goToMainPage("site");
-        List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
-                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-        if(!userIcon.isEmpty()){
-            userIcon.get(0).click();
-            List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
+        cleanCookies();
+        WebDriver driver = PageFactory.getWebDriver();
+        try {
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
+            List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
                     .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-            if(!logOutButton.isEmpty()) {
-                logOutButton.get(0).click();
+            if(!userIcon.isEmpty()){
+                userIcon.get(0).click();
+                List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
+                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                if(!logOutButton.isEmpty()) {
+                    logOutButton.get(0).click();
+                }
             }
+        }catch (Exception e){
+        LOG.info("На сайте никто не авторизован");
         }
+
     }
 
     // Метод перехода на главную страницу
@@ -198,24 +206,27 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     @Когда("^переходит на страницу '(.+)'$")
     public static void goToMainPage(String siteUrl) {
-        cleanCookies();
+        String currentUrl;
         try {
         switch (siteUrl) {
             case "site":
-                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue();
                 break;
             case "admin":
-                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("adminUrl").getValue());
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("adminUrl").getValue();
                 break;
             case "registr":
-                PageFactory.getWebDriver().get(JsonLoader.getData().get(STARTING_URL).get("registrationUrl").getValue());
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("registrationUrl").getValue();
             default:
-                PageFactory.getWebDriver().get(siteUrl);
+                currentUrl = siteUrl;
                 break;
-        }}catch (DataException e) {
+        }
+            PageFactory.getDriver().get(currentUrl);
+            LOG.info("Перешли на страницу ==>[" + currentUrl + "]");
+        }catch (DataException e) {
             LOG.error(e.getMessage());
         }
-        LOG.info("Перешли на страницу::" + PageFactory.getWebDriver().getCurrentUrl() + "\n");
+
     }
 
     @Когда("^сохраняем в память таблицу$")
@@ -249,12 +260,6 @@ public class CommonStepDefs extends GenericStepDefs {
     public void confirmVidochat(String param) {
         String sqlRequest = "UPDATE gamebet.`user` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
         workWithDB(sqlRequest);
-//        sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(param) + "'";
-//        String id = workWithDBgetResult(sqlRequest, "id");
-//        Stash.put("customer",id);
-//        String path = "/api/stoloto/identification/approveVideoIdent";
-//
-//        requestToAPI(path, "RESPONSE_API", dataTable);
         LOG.info("Подтвердили видеорегистрацию");
 
     }
@@ -517,11 +522,13 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^(пользователь |он) очищает cookies$")
     public static void cleanCookies() {
-        try {
-            PageFactory.getWebDriver().manage().deleteAllCookies();
-            LOG.info("Удаляем Cookies");
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
+        if(PageFactory.getWebDriver().manage().getCookies().size()>0) {
+            try {
+                LOG.info("Удаляем Cookies");
+                PageFactory.getWebDriver().manage().deleteAllCookies();
+            } catch (Exception e) {
+                LOG.error("Cookies не было!");
+            }
         }
     }
 
@@ -744,7 +751,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String phone = Stash.getValue(keyPhone);
         String sqlRequest = new String();
         if (type.equals("новый")){
-            sqlRequest="SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone=" + phone + ") ORDER BY creation_date";
+            sqlRequest="SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "') ORDER BY creation_date";
         }
         else {
             sqlRequest="SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
@@ -802,6 +809,17 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
+    @Когда("^добавляем данные в JSON массив \"([^\"]*)\" сохраняем в память:$")
+    public void добавляем_данные_в_JSON_массив_сохраняем_в_память(String keyJSONObject, DataTable dataTable) {
+
+        Object jSONString = collectParametersInJSONString(dataTable);
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.add(jSONString);
+        Stash.put(keyJSONObject, jsonArray);
+        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jsonArray.get(0)) + ")");
+
+    }
+
     private Object collectParametersInJSONString(DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         JSONObject jsonObject = new JSONObject();
@@ -819,7 +837,7 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             jsonObject.put(key, JSONValue.parse(String.valueOf(value)));
         }
-        params = jsonObject.toString();
+        params = jsonObject;
         LOG.info(String.valueOf(params));
         return params;
     }
@@ -957,10 +975,8 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^выбираем fullalt пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchFullAlt(String keyPhone, String keyBD) throws Exception {
-
-
         RandomAccessFile fr = new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r");
-//        RandomAccessFile fr = new RandomAccessFile("src\\test\\resources\\full_alt.txt", "r");
+
         String line;
         StringBuffer sbt=new StringBuffer("");
         String user = fr.readLine();
@@ -1093,7 +1109,7 @@ public class CommonStepDefs extends GenericStepDefs {
         return requestFull;
     }
 
-    private void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
+    protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
         if(!(null == dataTable)) { Map<String, String> table = dataTable.asMap(String.class, String.class); }
         Object params = null;
         URL url;
@@ -1123,6 +1139,13 @@ public class CommonStepDefs extends GenericStepDefs {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
+
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
             //************
 
             url = new URL(requestFull);
@@ -1240,22 +1263,37 @@ public void searchUser(String keyEmail, String sqlRequest){
 
     @Когда("^переходим на сайт и включаем режим эмуляции$")
     public void goToSiteAndTurnOnEmulationMode(){
-        Map<String, String> mobileEmulation = new HashMap<>();
-
-        System.setProperty("webdriver.chrome.driver", new File(Props.get("webdriver.drivers.path")).getAbsolutePath());
-
-        //mobileEmulation.put("deviceName", "Galaxy S5");
-        //ChromeOptions chromeOptions = new ChromeOptions();
-        //chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
-        MobileDriver driver = PageFactory.getMobileDriver();
-
-        //WebDriver driver = new ChromeDriver(chromeOptions);
-        try {
-            driver.get(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue());
-        } catch (DataException e) {
-            e.printStackTrace();
-        }
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.get("https://dev-bk-bet-mobile-site.tsed.orglot.office");
     }
+
+    @Когда("^закрываем браузер$")
+    public static void closeBrowser() {
+        PageFactory.getWebDriver().close();
+        LOG.info("Браузер закрыт");
+    }
+
+    @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
+    public void userOpenNewUrl(String url){
+        PageFactory.getDriver().get(url);
+    }
+
+    public static void closingCurrtWin(String title) {
+        PageFactory.getWebDriver().close();
+        for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
+            PageFactory.getWebDriver().switchTo().window(windowHandle);
+            if (PageFactory.getWebDriver().getTitle().equals(title)) {
+                return;
+            }
+        }
+        throw new AutotestError("Unable to return to the previously opened page: " + title);
+    }
+
+    @Когда("^эмулируем регистрацию через терминал Wave \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable){
+        requestByHTTPS(path, keyStash, "POST", dataTable);
+    }
+
 
 }
 

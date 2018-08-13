@@ -13,9 +13,11 @@
     * сохраняем в память
       | DEVID  | randomNumber 4 |
 
+
     * определяем незанятый номер телефона и сохраняем в "PHONE"
     * сохраняем в память
       | EMAIL  | randomEmail |
+
     * сохраняем в память
       | PASS  | Default |
     * сохраняем в память
@@ -54,7 +56,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
+    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" "новый"
 
     * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
@@ -151,6 +153,8 @@
       | exepted | "code":0 |
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":12 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "tsupisStatus":3 |
 
     * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -162,6 +166,8 @@
       | exepted | "code":0 |
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":5 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "tsupisStatus":3 |
 
     * запрос к API "api/mobile/v3/requestSkypeCall" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -170,6 +176,8 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":6   |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "tsupisStatus":3   |
 
     * находим и сохраняем "TIMELEFT" из "RESPONCE_API"
 
@@ -185,12 +193,7 @@
 
     * смотрим изменился ли "TIMELEFT" из "RESPONCE_API"
 
-    * определяем "ID" пользователя "EMAIL"
-#    * подтверждаем видеорегистрацию "EMAIL"
-    * запрос к API "api/stoloto/identification/approveVideoIdent" и сохраняем в "RESPONCE_API":
-      | customer  | ID |
-      | type  | skype |
-
+    * подтверждаем видеорегистрацию "EMAIL"
     * подтверждаем от ЦУПИС "EMAIL"
 
 * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
@@ -201,10 +204,9 @@
 
 
   @api
-  @Registration_mobile_quick
+  @Registration_mobile
   Сценарий: Мобильная регистрация быстрая
 
-    * включаем экспресс-регистрацию
     * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
     * сохраняем в память
       | EMAIL  | randomEmail |
@@ -216,7 +218,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
+    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" "лгпго"
 
     * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |

@@ -53,7 +53,7 @@ public class FooterPage extends AbstractPage {
     private WebElement mobileAppLink;
 
     @ElementTitle("Онлайн-чат")
-    @FindBy(xpath = "//div/span[@href='#']")
+    @FindBy(xpath = "//div[@class='js-open-chat']/span")
     private WebElement onlineChatLink;
 
     @ElementTitle("Для iOS")
@@ -113,7 +113,7 @@ public class FooterPage extends AbstractPage {
     }
 
     @ActionTitle("проверяем ТЕКСТ при переходе по ссылке с")
-    public void checkTextWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
+    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, expectedText;
@@ -152,7 +152,7 @@ public class FooterPage extends AbstractPage {
      * @param currentHandle - идентификатор текущей страницы
      * @param xpath - поисковая строка для требуемоего элемента
      */
-    private void opensNewTabAndChecksPresenceOFElement(String linkTitle, String currentHandle, String xpath) {
+    public static void opensNewTabAndChecksPresenceOFElement(String linkTitle, String currentHandle, String xpath) {
         WebDriver driver = PageFactory.getWebDriver();
         String link = "";
 
@@ -189,7 +189,7 @@ public class FooterPage extends AbstractPage {
                     requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
                     LOG.info("Текущая страница::" + driver.getCurrentUrl());
                     if(!requiredElements.isEmpty()){
-                        LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getText());
+                        LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getText().replaceAll("\n", " "));
                         break;
                     }
                 } catch (Exception e){
@@ -217,7 +217,7 @@ public class FooterPage extends AbstractPage {
         List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());;
         int expected = Integer.parseInt(number);
         int actual = list.size();
-        assertThat(actual).as("Количетво иконок платёжных систем [" + actual + "] не соответсвует ожидаемому[" + expected + "]").isEqualTo(expected);
+        assertThat(actual).as("Количетво иконок платёжных систем [" + actual + "] не соответсвует ожидаемому [" + expected + "]").isEqualTo(expected);
     }
 
 }

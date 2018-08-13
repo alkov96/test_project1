@@ -345,9 +345,8 @@ public class EventViewerPage extends AbstractPage {
                         dateGame = formatter.parse(allGames.get(GameInTour).getText());
 
                         if (!gameIsAdding && (dateGame.getTime() <= Period.getTime()) == inPeriod) {
+
                             nameGamefull = driver.findElement(By.xpath("//div[@class = 'prematch-competitions scroll-contain ng-scope']/div[1]/div[1]/div[" + (GameInTour + 1) + "]/div[1]/div[1]/div[1]/div[2]")).getAttribute("title");
-                            //if (!nameGamefull.trim().matches("[ёЁA-Za-zА-Яа-я0-9() .,-]+[―]*[ёЁA-Za-zА-Яа-я0-9() .,-]+")){continue;}
-                            if (!nameGamefull.trim().matches("\\b[a-zA-Zа-яА-Я ).(―-]+\\b")) {continue;}
                             CommonStepDefs.addStash("nameGameKey",nameGamefull);
                             CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
                             CommonStepDefs.addStash("typeGameKey",typeGame);
@@ -483,19 +482,5 @@ public class EventViewerPage extends AbstractPage {
     public void menuCl() {
 
 }
-    @ActionTitle("вычленяет из названия игры одно слово")
-    public void oneWordSearch(String keySearch,String type){
-        List <String> types = Stash.getValue("typeGameKey");
-        int index = types.indexOf(type);
-        List<String> names = Stash.getValue("nameGameKey");
-        for (String str:names.get(index).split(" ")){
-            if (str.length()>3) {
-                Stash.put(keySearch,str);
-                LOG.info(keySearch  + ": " + str);
-                break;
-            }
-        }
-        Stash.asMap().remove("nameGameKey");
-    }
 
 }

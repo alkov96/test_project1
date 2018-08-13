@@ -1,9 +1,13 @@
 package ru.gamble.pages;
 
+import cucumber.api.DataTable;
+import cucumber.api.java.mn.Харин;
+import cucumber.runtime.junit.Assertions;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.junit.Assert;
@@ -15,8 +19,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.mainPages.FooterPage;
+import ru.gamble.pages.mainPages.MainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.JsonLoader;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -28,7 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.utility.Constants.STARTING_URL;
 
@@ -64,11 +70,20 @@ public class LandingAppPage extends AbstractPage {
         LOG.info("Ссылка " + "itunes.apple.com" + " открылась");
     }
 
+    @ActionTitle("нажимает на кнопку для загрузки приложения на android")
+    public void clickDownloadAndroid(){
+        WebDriver driver = PageFactory.getDriver();
+        driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-android')]")).click();
+    }
+
     @ActionTitle("проверяет скачивание приложения на android")
-    public void downloadAndroid() throws IOException {
+    public void downloadAndroidForLanding() throws IOException {
+        downloadAndroid();
+    }
+
+    public static void downloadAndroid() throws IOException {
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
-        driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-android')]")).click();
         if (!driver.findElement(xpath("//div[@class='modal__body modal__body_app']")).isDisplayed()) {
             Assert.fail("Не открылся попап на скачивание приложения для андроида");
             flag = false;
@@ -86,7 +101,8 @@ public class LandingAppPage extends AbstractPage {
                 flag = false;
             } else {
                 String link = driver.findElement(By.id("app_desctop_popup_btn_download")).getAttribute("href").trim();
-                HttpClient httpClient = new DefaultHttpClient();
+               // HttpClient httpClient = new DefaultHttpClient();
+                HttpClient httpClient = HttpClientBuilder.create().build();
                 HttpContext localContext = new BasicHttpContext();
                 HttpGet httpGet = new HttpGet(link);
 
@@ -191,6 +207,7 @@ public class LandingAppPage extends AbstractPage {
         LOG.info("Ссылка на фрибет работает");
     }
 
+
     @ActionTitle("смотрит ссылку на правила про выплаты выигрышей")
     public void linkForPrize() {
         WebDriver driver = PageFactory.getDriver();
@@ -238,7 +255,7 @@ public class LandingAppPage extends AbstractPage {
             hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
             if (!hint.contains("Мы отправили вам ссылку на скачивание")) {
                 flag = false;
-                Assert.fail("После отпраки смс текст подсказки не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
+                Assert.fail("После отпраки смс текст подскази не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
             }
             int count = 0;
             while (!sendPhone.isEnabled() && count != 10) {
@@ -258,7 +275,7 @@ public class LandingAppPage extends AbstractPage {
         hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
         if (!hint.contains("Ошибка. Повторите попытку через 24 часа")) {
             flag = false;
-            Assert.fail("После отпраки 3 смс текст подсказки не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
+            Assert.fail("После отпраки 3 смс текст подскази не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
         }
         else LOG.info("Подсказка с ошибкой появилась.");
 
@@ -268,50 +285,6 @@ public class LandingAppPage extends AbstractPage {
             Assert.fail("После отправки 3 смс кнопка отправить незаблокирована");
         }
     }
-
-
-
-    @ActionTitle("отправляет СМС со страницы лэндинга на телефон")
-    public void sendSMSflag(String phone, String flagError) throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
-        boolean flag = flagError.equals("ожидаем успех");
-        int x, y;
-        WebElement inputPhone=driver.findElement(By.id("app_desctop_sms_block_input_phone"));
-        WebElement sendPhone=driver.findElement(By.id("app_desctop_sms_block_btn_send"));
-        x=inputPhone.getLocation().getX()-100;
-        y=inputPhone.getLocation().getY()-100;
-        CommonStepDefs.scrollPage(x,y);
-
-        String hint;
-        inputPhone.clear();
-        inputPhone.sendKeys(phone);
-        sendPhone.click();
-        LOG.info("Отправили смс на номер "+phone);
-
-        Thread.sleep(1000);
-        hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
-        if (hint.contains("Мы отправили вам ссылку на скачивание")!=flag) {
-            Assert.fail("После отпраки смс текст подсказки не соответсвует ожидаемому. Вместо @Мы отправили вам ссылку на скачивание@ написано " + hint);
-        }
-        int count = 0;
-        while (sendPhone.isEnabled()!=flag && count != 10) {
-            Thread.sleep(1000);
-            count++;
-            if (count == 10) {
-                Assert.fail("Спустя 10 секунд после отправки смс активность кнопки Отправить " + !flag);
-            }
-        }
-        if (hint.contains("Ошибка. Повторите попытку через 24 часа")==flag) {
-            Assert.fail("Текст подсказки не соответсвует ожидаемому. Вместо @Ошибка. Повторите попытку через сутки@ написано " + hint);
-        }
-        else LOG.info("Подсказка с ошибкой появилась.");
-
-        if (!flag){
-            Thread.sleep(9000);
-            Assert.assertFalse("После отправки 3 смс кнопка отправить незаблокирована",sendPhone.isEnabled());
-        }
-    }
-
 }
 
 

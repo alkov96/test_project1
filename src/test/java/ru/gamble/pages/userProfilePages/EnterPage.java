@@ -102,8 +102,12 @@ public class EnterPage extends AbstractPage {
         // КОСТЫЛЬНЫЙ МЕТОД, ТАК-КАК ПОЛЕ ВВОДА ЛОГИНА ДОСТУПНО В СЛУЧАЙНЫЕ ВРЕМЕННЫЕ ПЕРИОДЫ *************************
          int count = 0;
          int count1 = 0;
-         do{
-
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        do{
              do {
                  LOG.info("Водим в поле::" + login);
                  fillField(inputLogin, login);

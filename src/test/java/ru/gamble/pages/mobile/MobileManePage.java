@@ -19,8 +19,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 public class MobileManePage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MobileManePage.class);
 
-    @FindBy(xpath = "//div[@class='top-banner__logo']")
-    private WebElement pageTitle;
+
 
     @ElementTitle("Профиль")
     @FindBy(xpath = "//div/span[contains(@class,'header__button header__profile')]")
@@ -30,8 +29,7 @@ public class MobileManePage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(pageTitle,5, 10);
-        workWithPreloader();
+        tryingLoadPage(buttonProfile,5, 10);
     }
 
     @ActionTitle("переключение видов спорта")

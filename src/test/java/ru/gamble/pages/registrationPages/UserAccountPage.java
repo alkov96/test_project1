@@ -20,8 +20,9 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.util.Map;
-import java.util.Set;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static ru.gamble.utility.Constants.*;
 
@@ -80,40 +81,89 @@ public class UserAccountPage extends AbstractPage{
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
     }
 
     @ActionTitle("заполняет форму с")
     public void fillsForm(DataTable dataTable){
-        Map<String, String> data = dataTable.asMap(String.class, String.class);
+        List<Map<String,String>> table = dataTable.asMaps(String.class,String.class);
+        String inputField, value, saveVariable, date = null;
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MMMM-dd");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        enterDate(data.get(DATEOFBIRTH));
+        for(int i = 0; i < table.size(); i++) {
 
-        if(data.get(FIO).contains(RANDOM)){
-            LOG.info("Вводим случайные ФИО");
-            fillField(inputSurname,Generators.randomString(25));
-            fillField(inputName,Generators.randomString(25));
-            fillField(inputPatronymic,Generators.randomString(25));
-        }else{
-            String[] tmp = data.get(FIO).split("\\s");
-            LOG.info("Вводим ФИО");
-            fillField(inputSurname,tmp[0]);
-            fillField(inputName,tmp[1]);
-            fillField(inputPatronymic,tmp[2]);
+            inputField = table.get(i).get(INPUT_FIELD);
+            value = table.get(i).get(VALUE);
+            saveVariable = table.get(i).get(SAVE_VALUE);
+
+            if(inputField.contains(DATEOFBIRTH)){
+                try {
+                    date = outputFormat.format(inputFormat.parse(enterDate(value)));
+                } catch (ParseException e) {
+                    e.getMessage();
+                }
+                Stash.put(saveVariable,date);
+                LOG.info(saveVariable + "<==[" + date + "]");
+            }
+            if(inputField.contains(LASTNAME)) {
+                if(value.contains(RANDOM)){
+                fillField(inputSurname,Generators.randomString(25));}
+                else {fillField(inputSurname,value); }
+                Stash.put(saveVariable,inputSurname.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + inputSurname.getAttribute("value") + "]");
+            }
+            if(inputField.contains(NAME)) {
+                if (value.contains(RANDOM)) {
+                    fillField(inputName, Generators.randomString(25));
+                } else { fillField(inputName, value); }
+                Stash.put(saveVariable, inputName.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + inputName.getAttribute("value") + "]");
+            }
+            if (inputField.contains(PATERNALNAME)) {
+                if (value.contains(RANDOM)) {
+                    fillField(inputPatronymic, Generators.randomString(25));
+                } else { fillField(inputPatronymic, value); }
+                Stash.put(saveVariable, inputPatronymic.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + inputPatronymic.getAttribute("value") + "]");
+            }
+            if(inputField.contains(EMAIL)){
+                String email = Stash.getValue(("EMAIL"));
+                fillField(inputEmail, email);
+                LOG.info(saveVariable + "<==[" + inputEmail.getAttribute("value") + "]");
+            }
+            if(inputField.contains(PASSWORD)){
+                String password = value;
+                LOG.info("Вводим пароль::" + password);
+                fillField(passwordInput, password);
+                LOG.info("Подтверждаем::" + password);
+                fillField(confirmPasswordInput, password);
+                Stash.put(saveVariable, password);
+            }
+
+            if(inputField.contains(NUMBERPHONE)) {
+                enterSellphone(value);
+                StringBuilder builder = new StringBuilder();
+                builder.append("7").append(cellFoneInput.getAttribute("value").trim().replaceAll("\n","").replaceAll("-","").replaceAll(" ",""));
+                Stash.put(saveVariable, String.valueOf(builder.toString()));
+                LOG.info(saveVariable + "<==[" +  builder.toString() + "]");
+            }
         }
 
-        String email = Stash.getValue(data.get(EMAIL));
-        LOG.info("Вводим e-mail::" + email);
-        fillField(inputEmail, email);
 
-        String password = data.get(PASSWORD);
-        LOG.info("Вводим пароль::" + password);
-        fillField(passwordInput, password);
-        LOG.info("Подтверждаем::" + password);
-        fillField(confirmPasswordInput, password);
 
-        enterSellphone(data.get(NUMBERPHONE));
+//
+//        String email = Stash.getValue(data.get(EMAIL));
+//        LOG.info("Вводим e-mail::" + email);
+//        fillField(inputEmail, email);
+//
+//        String password = data.get(PASSWORD);
+//        LOG.info("Вводим пароль::" + password);
+//        fillField(passwordInput, password);
+//        LOG.info("Подтверждаем::" + password);
+//        fillField(confirmPasswordInput, password);
+//
+//        enterSellphone(data.get(NUMBERPHONE));
     }
 
     /**

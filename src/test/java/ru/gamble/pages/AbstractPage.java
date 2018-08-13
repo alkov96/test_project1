@@ -50,21 +50,27 @@ public abstract class AbstractPage extends Page {
     @ElementTitle("Бургер")
     @FindBy(id = "service-list")
     protected WebElement burgerBottom;
+
     @ElementTitle("День")
     @FindBy(className = "inpD")
     protected WebElement fieldDay;
+
     @ElementTitle("Месяц")
     @FindBy(xpath = "//div[contains(@class,'dateInput')]/div[@class='inpM']")
     protected WebElement fieldMonth;
+
     @ElementTitle("Год")
     @FindBy(className = "inpY")
     protected WebElement fieldYear;
+
     @ElementTitle("Подвал")
     @FindBy(xpath = "//*[@class='footer__pin']")
     protected WebElement footerButton;
+
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
     protected WebElement preferences;
+
     @ElementTitle("Активация Быстрой ставки")
     @FindBy(id = "quickbet")
     protected WebElement quickButton;
@@ -78,16 +84,22 @@ public abstract class AbstractPage extends Page {
     @ElementTitle("поле суммы общей ставки")
     @FindBy(id = "express-bet-input")
     protected WebElement coupon_field;
+
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
     private WebElement serviceMessage;
+
     @ElementTitle("Иконка закрытия сервисного сообщения")
     @FindBy(xpath = "//span[contains(@class,'tech-msg__close')]")
     private WebElement closeServiceMessage;
+
     @ElementTitle("Прематч")
     @FindBy(id = "prematch")
     private WebElement prematchBottom;
 
+    @ElementTitle("Азбука беттинга")
+    @FindBy (xpath = "//a[@href='/azbuka-bettinga']")
+    private WebElement azbuka;
 
     // Метод три раза пытается обновить главную страницу
 
@@ -99,19 +111,13 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("нажимает кнопку")
-    public static void pressButtonAP(String param) {
+    public static void pressButtonAP(String param){
         CommonStepDefs.pressButton(param);
     LOG.info("Нажали на [" + param + "]");}
 
     @ActionTitle("stop")
     public static void stop() {
         LOG.info("STOP");
-    }
-
-    @ActionTitle("закрываем браузер")
-    public static void closeBrowser() {
-        PageFactory.dispose();
-        LOG.info("Браузер закрыт\n");
     }
 
     /**
@@ -175,6 +181,7 @@ public abstract class AbstractPage extends Page {
             e.printStackTrace();
         }
 
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
         LOG.info("Переходим по ссылке из e-mail");
         driver.get(url + "?action=verify&" + link);
 
@@ -206,7 +213,9 @@ public abstract class AbstractPage extends Page {
         return selectMenu(element, 0);
     }
 
-    protected void enterDate(String value) {
+    protected String enterDate(String value) {
+        StringBuilder date = new StringBuilder();
+        String day, month, year;
         if (value.equals(RANDOM)) {
 
             do {
@@ -222,7 +231,15 @@ public abstract class AbstractPage extends Page {
             selectMenu(fieldDay, Integer.parseInt(tmp[0]));
             selectMenu(fieldYear, Integer.parseInt(tmp[2]));
         }
-        LOG.info("В итоге ввели::" + fieldDay.getText() + "::" + fieldMonth.getText() + "::" + fieldYear.getText());
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        day = fieldDay.getText();
+        month = fieldMonth.getText();
+        year = fieldYear.getText();
+        return date.append(year).append("-").append(month).append("-").append(day).toString();
     }
 
     /**
@@ -413,9 +430,10 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("перезагружает страницу")
-            public void refresh(){
+    public void refresh(){
         PageFactory.getWebDriver().navigate().refresh();
     }
+
 
     public boolean checkCloseServiceMessage(WebElement element) throws InterruptedException {
             try {
@@ -443,6 +461,7 @@ public abstract class AbstractPage extends Page {
         }
         return false;
     }
+
     @ActionTitle("ждет некоторое время")
     public void waiting(String sec) throws InterruptedException {
         Integer seconds=0;
@@ -486,5 +505,15 @@ public abstract class AbstractPage extends Page {
             LOG.info("Окно не появилось.");
         }
     }
+
+    @ActionTitle("проверяет, что присутствует сообщение")
+    public void checksThatMessageIsPresent(String message){
+        try {
+            new WebDriverWait(PageFactory.getWebDriver(),3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(.,'" + message + "')]")));
+        }catch (Exception e){
+            throw new AutotestError("Ошибка! Текст [" + message + "] не появился");
+        }
+    }
+
 }
 

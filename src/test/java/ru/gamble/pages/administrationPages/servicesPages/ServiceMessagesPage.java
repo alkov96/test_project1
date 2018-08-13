@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 public class ServiceMessagesPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceMessagesPage.class);
 
-    @FindBy(xpath = "//div[@id='tabpanel-1483-body']")
+    @FindBy(xpath = "//tbody[@id='gridview-1569-body']")
     private WebElement table;
 
     @ElementTitle("Последняя страница")
