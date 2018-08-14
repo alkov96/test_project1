@@ -54,7 +54,7 @@ public class MobileEnterWindow extends AbstractPage {
        // EMAIL = "E-mail";
         if(data.get(EMAIL).equals(Constants.DEFAULT)) {
             try {
-                email = JsonLoader.getData().get(STARTING_URL).get("login").getValue();
+                email = JsonLoader.getData().get(STARTING_URL).get("USER").getValue();
             } catch (DataException e) {
                 e.getMessage();
             }

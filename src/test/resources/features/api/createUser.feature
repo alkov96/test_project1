@@ -20,7 +20,7 @@
     * сохраняем в память
       | EMAIL  | randomEmail |
     * сохраняем в память
-      | PASS  | Default |
+      | PASSWORD  | Default |
 
       * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
         | devId | DEVID |
@@ -46,7 +46,7 @@
       | phone                 | PHONE      |
       | phoneConfirmationCode | CODE       |
       | email                 | EMAIL      |
-      | pass                  | PASS       |
+      | password                  | PASSWORD       |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0,"data":{"status": |

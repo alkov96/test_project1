@@ -8,7 +8,7 @@
       | USER  | Default |
 
     * сохраняем в память
-      | PASS  | Default |
+      | PASSWORD  | Default |
 
     * сохраняем в память
       | SOURCE | 16 |
@@ -19,10 +19,10 @@
   Сценарий: 3_19 Аутентификация пользователя. Позитивный кейс
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | DEVID   |
-      | email  | USER    |
-      | pass   | PASS    |
-      | source | SOURCE  |
+      | devId    | DEVID    |
+      | email    | USER     |
+      | password | PASSWORD |
+      | source   | SOURCE   |
 
     * проверка ответа API из "RESPONCE_API":
     | exepted | "code":0,"data":{ |
@@ -31,10 +31,10 @@
   Сценарий: 3_19 Аутентификация пользователя. Негативный кейс
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | 0 |
-      | email  | 0 |
-      | pass   | 0 |
-      | source | 0 |
+      | devId    | 0 |
+      | email    | 0 |
+      | password | 0 |
+      | source   | 0 |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | {"code":1,"data":{"message": |

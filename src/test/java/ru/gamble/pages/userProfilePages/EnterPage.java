@@ -84,7 +84,7 @@ public class EnterPage extends AbstractPage {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String login, password;
         if(data.get(LOGIN).equals(Constants.DEFAULT)){
-            login = JsonLoader.getData().get(STARTING_URL).get("login").getValue();
+            login = JsonLoader.getData().get(STARTING_URL).get("USER").getValue();
         } else if(data.get(LOGIN).equals("EMAIL")){
             login = Stash.getValue("EMAIL");
         } else {
@@ -92,7 +92,7 @@ public class EnterPage extends AbstractPage {
         }
 
         if(data.get(PASSWORD).equals(Constants.DEFAULT)){
-            password = JsonLoader.getData().get(STARTING_URL).get("password").getValue();
+            password = JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue();
         }
         else if(data.get(PASSWORD).equals("PASSWORD")) {
             password = Stash.getValue("PASSWORD");

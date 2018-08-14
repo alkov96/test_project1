@@ -12,7 +12,7 @@
 
   @smoke
   @NewUserRegistration_C36189
-  Сценарий: Регистрация нового пользователя.
+  Сценарий: Регистрация нового пользователя через Wave
 
     * разлогиниваем пользователя
     * открывается страница "Главная страница"
@@ -66,9 +66,7 @@
     | Корпус            | random   | null                  |
     | Квартира          | random   | FLAT                  |
 
-
     * открывается страница "Способ подтверждения личности"
-
     * добавляем данные в JSON объект "ADDRESS" сохраняем в память:
       | regionKLADR       | null          |
       | region            | REGION        |
@@ -90,7 +88,8 @@
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
-    * эмулируем регистрацию через терминал Wave "https://dev-bk-bet-mobile-site.tsed.orglot.office/api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+#    * эмулируем регистрацию через терминал Wave "https://dev-bk-bet-mobile-site.tsed.orglot.office/api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+    * эмулируем регистрацию через терминал Wave "https://demo.gamebet.ru/api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
     | operationdatetime   | DATE_TIME     |
     | phone               | PHONE         |
     | firstname           | FIRSTNAME     |
@@ -116,8 +115,9 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |
 
-    * открывается страница "Способ подтверждения личности"
-    * пользователь (нажимает кнопку) "Столото"
+    * (stop)
+#    * открывается страница "Способ подтверждения личности"
+#    * пользователь (нажимает кнопку) "Столото"
 
     * открывается страница "Авторизованная Главная страница"
     * пользователь (проверяет присутствие текста) "Вы зарегистрированы"
