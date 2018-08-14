@@ -702,6 +702,7 @@ public class CommonStepDefs extends GenericStepDefs {
             rs = stmt.executeQuery(sqlRequest);
             rs.last();
             result = rs.getString(param);
+            LOG.info("SQL-request [" + result + "]");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -1257,7 +1258,17 @@ public void searchUser(String keyEmail, String sqlRequest){
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
         String activeOpt = workWithDBgetResult(sqlRequest, "value");
         if (!activeOpt.contains("fast_registration")){
-            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt+", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+            workWithDB(sqlRequest);
+        }
+    }
+
+    @Когда("^включаем экспресс-бонус через SQL$")
+    public void onExpressBonus() {
+        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        if (!activeOpt.contains("express_bonus")){
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", express_bonus' WHERE NAME='ENABLED_FEATURES'";
             workWithDB(sqlRequest);
         }
     }
