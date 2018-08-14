@@ -43,6 +43,12 @@
     * сохраняем в память
       | SKYPELOGIN | skypeLoginGenerate |
 
+    * сохраняем в память
+      | INN | 775459885706 |
+
+    * сохраняем в память
+      | SNILS | 37487545236 |
+
 
 
   @api
@@ -152,44 +158,125 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
     * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":12 |
+      | exepted | "status":11 |
 
-    * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
-      | authToken               | AUTHTOKEN        |
-      | source                  | 16               |
-      | snilsNumber             | "000-000-000 00" |
-      | innNumber               |                  |
+#
+#    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+#      | devId                   | DEVID        |
+#      | authToken               | AUTHTOKEN    |
+#      | source                  | 16           |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "identType":[1] |
+#
+#
+#    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+#      | devId                   | DEVID        |
+#      | authToken               | AUTHTOKEN    |
+#      | source                  | 16           |
+#      | identType               |  1           |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+
+
+
+    * приводим дату к формату год-месяц-день "BIRTHDATE"
+    * приводим дату к формату год-месяц-день "VALIDISSUEDATE"
+
+    * добавляем данные в JSON объект "ADDRESS" сохраняем в память:
+      | regionKLADR       | null          |
+      | region            | Москва        |
+      | town              | CITY          |
+      | street            | STREET        |
+      | building          | HOUSE         |
+      | bulk              | null          |
+      | flat              | FLAT          |
+
+    * добавляем данные в JSON массив "DOCUMENTS" сохраняем в память:
+      | type       | passportRus |
+      | series     | DOCSERIES      |
+      | number     | DOCNUM      |
+      | issuer     | ISSUEPLACE      |
+      | issuedate  | VALIDISSUEDATE   |
+      | validto    | null        |
+      | issuercode | 123-456  |
+
+    * запрашиваем дату-время и сохраняем в память
+      | DATE_TIME | Current |
+
+    * эмулируем регистрацию через терминал Wave "https://dev-bk-bet-mobile-site1.tsed.orglot.office/api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+      | operationdatetime   | DATE_TIME     |
+      | phone               | PHONE         |
+      | firstname           | FIRSTNAME     |
+      | lastname            | PATRONYMIC      |
+      | paternalname        | PATERNALNAME  |
+      | sex                 | GENDER           |
+      | birthdate           | BIRTHDATE     |
+      | birthlocation       | BIRTHPLACE |
+      | citizenship         | "RUS"         |
+      | publicperson        | null          |
+      | publicperson        | null          |
+      | address             | ADDRESS       |
+      | documents           | DOCUMENTS     |
+      | operationofficecode | "222"         |
+      | operatorlogin       | "333"         |
+      | inn                 | INN           |
+      | SNILS               | SNILS         |
+      | method              | betshop       |
+      | error               | ""            |
+      | reason              | ""            |
+      | identityState       | "LIMITED"     |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":5 |
+      | exepted     | "state":"ok" |
 
-    * запрос к API "api/mobile/v3/requestSkypeCall" и сохраняем в "RESPONCE_API":
-      | authToken               | AUTHTOKEN        |
-      | source                  | 16               |
-      | skype                   | SKYPELOGIN       |
 
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":6   |
+    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
 
-    * находим и сохраняем "TIMELEFT" из "RESPONCE_API"
-
-    * ожидание "2" сек
-
-    * запрос к API "api/mobile/v3/requestSkypeTimeLeft" и сохраняем в "RESPONCE_API":
-      | devId                   | DEVID            |
-      | authToken               | AUTHTOKEN        |
-      | source                  | 16               |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":6 |
-
-    * смотрим изменился ли "TIMELEFT" из "RESPONCE_API"
-
-    * подтверждаем видеорегистрацию "EMAIL"
+#
+#
+#    * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
+#      | authToken               | AUTHTOKEN        |
+#      | source                  | 16               |
+#      | snilsNumber             | "000-000-000 00" |
+#      | innNumber               |                  |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "status":5 |
+#
+#    * запрос к API "api/mobile/v3/requestSkypeCall" и сохраняем в "RESPONCE_API":
+#      | authToken               | AUTHTOKEN        |
+#      | source                  | 16               |
+#      | skype                   | SKYPELOGIN       |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "status":6   |
+#
+#    * находим и сохраняем "TIMELEFT" из "RESPONCE_API"
+#
+#    * ожидание "2" сек
+#
+#    * запрос к API "api/mobile/v3/requestSkypeTimeLeft" и сохраняем в "RESPONCE_API":
+#      | devId                   | DEVID            |
+#      | authToken               | AUTHTOKEN        |
+#      | source                  | 16               |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "status":6 |
+#
+#    * смотрим изменился ли "TIMELEFT" из "RESPONCE_API"
+#
+#    * подтверждаем видеорегистрацию "EMAIL"
     * подтверждаем от ЦУПИС "EMAIL"
-
+#
 * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID |
       | email  | EMAIL |
@@ -197,59 +284,66 @@
       | source | 16    |
 
 
-  @api
-  @Registration_mobile
-  Сценарий: Мобильная регистрация быстрая
+    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
 
-    * включаем экспресс-регистрацию
-    * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
-    * сохраняем в память
-      | EMAIL  | randomEmail |
 
-    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
-      | devId | DEVID |
-      | phone | PHONE |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-
-    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" "лгпго"
-
-    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
-      |  devId                 | DEVID      |
-      |  source                | 16         |
-      |  first_name            | FIRSTNAME  |
-      |  surname               | SURNAME    |
-      |  patronymic            | PATRONYMIC |
-      |  birth_date            | BIRTHDATE  |
-      |  phone                 | PHONE      |
-      |  phoneConfirmationCode | CODE       |
-      |  email                 | EMAIL      |
-      |  pass                  | PASS       |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-
-    * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
-
-    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
-      | code   | CODEEMAIL |
-      | source | 16        |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":15 |
-
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | DEVID |
-      | email  | EMAIL |
-      | pass   | PASS  |
-      | source | 16    |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":15 |
+#
+#  @api
+#  @Registration_mobile
+#  Сценарий: Мобильная регистрация быстрая
+#
+#    * включаем экспресс-регистрацию
+#    * выбираем fullalt пользователя "PHONE" "BIRTHDATE"
+#    * сохраняем в память
+#      | EMAIL  | randomEmail |
+#
+#    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+#      | devId | DEVID |
+#      | phone | PHONE |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#
+#    * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" "лгпго"
+#
+#    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+#      |  devId                 | DEVID      |
+#      |  source                | 16         |
+#      |  first_name            | FIRSTNAME  |
+#      |  surname               | SURNAME    |
+#      |  patronymic            | PATRONYMIC |
+#      |  birth_date            | BIRTHDATE  |
+#      |  phone                 | PHONE      |
+#      |  phoneConfirmationCode | CODE       |
+#      |  email                 | EMAIL      |
+#      |  pass                  | PASS       |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#
+#    * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
+#
+#    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+#      | code   | CODEEMAIL |
+#      | source | 16        |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "status":15 |
+#
+#    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+#      | devId  | DEVID |
+#      | email  | EMAIL |
+#      | pass   | PASS  |
+#      | source | 16    |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "status":15 |
 
 

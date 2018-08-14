@@ -90,5 +90,5 @@
 
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted     | "status":5 |
+      | exepted     | "status":11 |
 
