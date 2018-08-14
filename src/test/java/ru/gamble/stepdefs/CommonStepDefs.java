@@ -702,6 +702,7 @@ public class CommonStepDefs extends GenericStepDefs {
             rs = stmt.executeQuery(sqlRequest);
             rs.last();
             result = rs.getString(param);
+            LOG.info("SQL-request [" + result + "]");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -980,8 +981,9 @@ public class CommonStepDefs extends GenericStepDefs {
         String line;
         StringBuffer sbt=new StringBuffer("");
         String user = fr.readLine();
-        String phone=user.trim().split("\t")[0];
-        String birthDate = user.trim().split("\t")[1];
+        String separator = user.indexOf("\t")>=0?"\t":" ";
+        String phone=user.trim().split(separator)[0];
+        String birthDate = user.trim().split(separator)[1];
         SimpleDateFormat formatDate = new SimpleDateFormat();
         SimpleDateFormat formatgut = new SimpleDateFormat();
         formatgut.applyPattern("dd.MM.yyyy");
@@ -1256,7 +1258,17 @@ public void searchUser(String keyEmail, String sqlRequest){
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
         String activeOpt = workWithDBgetResult(sqlRequest, "value");
         if (!activeOpt.contains("fast_registration")){
-            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt+", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+            workWithDB(sqlRequest);
+        }
+    }
+
+    @Когда("^включаем экспресс-бонус через SQL$")
+    public void onExpressBonus() {
+        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        if (!activeOpt.contains("express_bonus")){
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", express_bonus' WHERE NAME='ENABLED_FEATURES'";
             workWithDB(sqlRequest);
         }
     }
