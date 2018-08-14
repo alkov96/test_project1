@@ -17,9 +17,9 @@ public class DBUtils {
         Connection con = null;
         String url, user, password;
         try{
-            url = JsonLoader.getData().get(STARTING_URL).get("db-registration").get("url").getValue();
-            user = JsonLoader.getData().get(STARTING_URL).get("db-registration").get("user").getValue();
-            password = JsonLoader.getData().get(STARTING_URL).get("db-registration").get("password").getValue();
+            url = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_URL").getValue();
+            user = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_USER").getValue();
+            password = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_PASSWORD").getValue();
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(url, user, password);
         } catch (DataException e){

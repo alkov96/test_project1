@@ -8,7 +8,7 @@
       | USER  | Default |
 
     * сохраняем в память
-      | PASS  | Default |
+      | PASSWORD  | Default |
 
     * сохраняем в память
       | SOURCE | 16 |
@@ -19,7 +19,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | USER    |
-      | pass   | PASS    |
+      | password   | PASSWORD    |
       | source | SOURCE  |
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"

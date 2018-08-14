@@ -6,7 +6,7 @@
     * сохраняем в память
       | DEVID  | randomNumber 4 |
     * сохраняем в память
-      | PASS  | Default |
+      | PASSWORD  | Default |
     * сохраняем в память
       | ISSUEPLACE  | random |
     * сохраняем в память
@@ -34,10 +34,10 @@
     * поиск акаунта со статуом регистрации "=2" "EMAIL"
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId       | DEVID |
-      | email       | EMAIL |
-      | pass        | PASS  |
-      | source      | 16    |
+      | devId       | DEVID    |
+      | email       | EMAIL    |
+      | password    | PASSWORD |
+      | source      | 16       |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
@@ -67,7 +67,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | pass        | PASS  |
+      | password        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -95,7 +95,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | pass        | PASS  |
+      | password        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":

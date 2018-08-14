@@ -218,6 +218,8 @@ public class PopUPLCPage extends AbstractPage {
      */
     @ActionTitle("вводит минимальную сумму вывода для способа")
     public void inputSum(String way) throws Exception {
+        checkForErrorLoadingPaymentSystems();
+
         int i=0;
         WebDriver driver = PageFactory.getDriver();
         Pattern pattern = Pattern.compile("(?u)[^0-9]");
@@ -286,7 +288,6 @@ public class PopUPLCPage extends AbstractPage {
 
         String siteHandle = driver.getWindowHandle();
         withdrawOk.click();
-//        withdrawCUPIS(siteHandle);
         driver.switchTo().window(siteHandle);
         Thread.sleep(500);
 
@@ -492,7 +493,6 @@ public class PopUPLCPage extends AbstractPage {
                         Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " нет сообщения об ошибке  " + message.toString());
                     }
                     break;
-
             }
         }
     }
@@ -545,8 +545,20 @@ public class PopUPLCPage extends AbstractPage {
         deposit_on.click();
     }
 
+    /**
+     * проверка появления окна "Ошибка при загрузке платежных систем"
+     */
+    private void checkForErrorLoadingPaymentSystems(){
+        WebDriver driver = PageFactory.getWebDriver();
+        if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() > 0){
+            throw new AutotestError("Ошибка при загрузке платежных систем!");
+        }
+    }
+
     @ActionTitle("вводит сумму и выбирает способ пополнения c")
     public void enterAmountAndSelectDepositMethod(DataTable dataTable)  {
+        checkForErrorLoadingPaymentSystems();
+
         WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String amount, depositMethod;
@@ -574,6 +586,7 @@ public class PopUPLCPage extends AbstractPage {
         }
         deposit_on.click();
     }
+
 }
 
 

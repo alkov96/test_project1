@@ -166,22 +166,22 @@ public class CouponPage extends AbstractPage {
         } else LOG.info("Событие " + сouponList.size());
     }
 
-    @ActionTitle("проверяет, совпадают ли события в купоне с ожидаемыми")
-    public void bannerAndTeams() {
+    @ActionTitle("проверяет, совпадают ли события в купоне с ожидаемыми из")
+    public void bannerAndTeams(String team1key, String team2key) {
         WebDriver driver = PageFactory.getDriver();
         String сouponGame = driver.findElement(By.xpath("//div[@class='coupon-bet-list__wrap']/ul[1]/li[1]/span[contains(@class,'bet-event-title')]")).getText();//cuponGame - наше добавленные события в купоне.
-        String team1 = Stash.getValue("team1key");
-        String team2 = Stash.getValue("team2key");
-        if (CommonStepDefs.stringParse(team1  + team2).equals(CommonStepDefs.stringParse(сouponGame))) {
-            LOG.info("Названия команд в купоне совпадают с ожидаемыми: " + team1 + team2 + " <=> " + сouponGame);
-        } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: " + team1 + team2 + сouponGame);
+        String team1 = Stash.getValue(team1key);
+        String team2 = Stash.getValue(team2key);
+        if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(сouponGame))) {
+            LOG.info("Названия команд в купоне совпадают с ожидаемыми: [" + team1 + "] - [" + team2 + "] <=> [" + сouponGame + "]");
+        } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: [" + team1 + "] - [" + team2 + "] <=> [" + сouponGame + "]");
     }
 
     @ActionTitle("проверяет, совпадает ли исход в купоне с ожидаемым")
-    public void checkIshod() {
+    public void checkIshod(String ishodKey) {
         WebDriver driver = PageFactory.getDriver();
         String ishod = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[@class='pick ng-binding']")).getText();
-        String ishodName = Stash.getValue("ishodKey");//ожидаемое название исхода
+        String ishodName = Stash.getValue(ishodKey);//ожидаемое название исхода
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
             LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + " <=> " + ishodName);
         } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: " + ishod + " - " + ishodName);

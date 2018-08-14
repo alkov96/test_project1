@@ -18,6 +18,9 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 public class MethodOfIdentityVerificationPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MethodOfIdentityVerificationPage.class);
 
+    @FindBy(xpath = "//div[contains(.,'Способ подтверждения личности')]")
+    private WebElement pageTitle;
+
     @ElementTitle("Столото")
     @FindBy(xpath = "//div[@class='confirmWay stoloto']")
     private WebElement stolotoButton;
@@ -31,6 +34,6 @@ public class MethodOfIdentityVerificationPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(stolotoButton));
+        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 }

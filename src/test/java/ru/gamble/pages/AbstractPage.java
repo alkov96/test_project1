@@ -172,7 +172,7 @@ public abstract class AbstractPage extends Page {
         String url = "";
 
         try {
-            url = JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue();
+            url = JsonLoader.getData().get(STARTING_URL).get("MAIN_URL").getValue();
             link = YandexPostman.getLinkForAuthentication(email);
         } catch (DataException de) {
             LOG.error("Ошибка! Не смогли получить ссылку сайта");

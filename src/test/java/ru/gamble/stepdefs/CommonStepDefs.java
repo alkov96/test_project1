@@ -27,6 +27,7 @@ import ru.sbtqa.tag.pagefactory.annotations.*;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
+import ru.sbtqa.tag.qautils.properties.Props;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.*;
@@ -99,7 +100,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         if (value.equals(DEFAULT)) {
             try {
-                value = JsonLoader.getData().get(STARTING_URL).get(key).getValue();
+               value = JsonLoader.getData().get(STARTING_URL).get(key).getValue();
             } catch (DataException e) {
                 e.getMessage();
             }
@@ -141,7 +142,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
 
         Stash.put(key, value);
-        LOG.info("key:" + key + "| value::" + value);
+        LOG.info("key::[" + key + "] value::[" + value + "]");
     }
 
     // Метод ожидания появления и изчезновения прелоадера при методе click()
@@ -210,13 +211,13 @@ public class CommonStepDefs extends GenericStepDefs {
         try {
         switch (siteUrl) {
             case "site":
-                currentUrl = JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue();
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("MAIN_URL").getValue();
                 break;
             case "admin":
-                currentUrl = JsonLoader.getData().get(STARTING_URL).get("adminUrl").getValue();
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("ADMIN_URL").getValue();
                 break;
             case "registr":
-                currentUrl = JsonLoader.getData().get(STARTING_URL).get("registrationUrl").getValue();
+                currentUrl = JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
             default:
                 currentUrl = siteUrl;
                 break;
@@ -597,7 +598,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-
     @Когда("^проверка ответа API из \"([^\"]*)\":$")
     public void checkresponceAPI(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
@@ -619,7 +619,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }else {
             tmp = JSONValue.toJSONString(Stash.getValue(sourceString));
         }
-
 
         TypeReference<LinkedHashMap<String, Object>> typeRef = new TypeReference<LinkedHashMap<String, Object>>() {
         };
@@ -702,6 +701,7 @@ public class CommonStepDefs extends GenericStepDefs {
             rs = stmt.executeQuery(sqlRequest);
             rs.last();
             result = rs.getString(param);
+            LOG.info("SQL-request [" + result + "]");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -1120,7 +1120,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String requestUrl, requestPath = path, requestFull = "";
         LOG.info("Собираем строку запроса.");
         try {
-            requestUrl = JsonLoader.getData().get("mobile-api").get("mainUrl").getValue();
+            requestUrl = JsonLoader.getData().get(STARTING_URL).get("MOBILE_API").getValue();
             requestFull = requestUrl + "/" + requestPath;
         } catch (DataException e) {
             e.getMessage();
@@ -1276,7 +1276,17 @@ public void searchUser(String keyEmail, String sqlRequest){
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
         String activeOpt = workWithDBgetResult(sqlRequest, "value");
         if (!activeOpt.contains("fast_registration")){
-            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt+", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+            workWithDB(sqlRequest);
+        }
+    }
+
+    @Когда("^включаем экспресс-бонус через SQL$")
+    public void onExpressBonus() {
+        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        if (!activeOpt.contains("express_bonus")){
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", express_bonus' WHERE NAME='ENABLED_FEATURES'";
             workWithDB(sqlRequest);
         }
     }
@@ -1314,6 +1324,15 @@ public void searchUser(String keyEmail, String sqlRequest){
         requestByHTTPS(path, keyStash, "POST", dataTable);
     }
 
+//    @Когда("^сохраняем включаем экспресс-регистрацию:$")
+//    public void onExpressReg() {
+//        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+//        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+//        if (!activeOpt.contains("fast_registration")){
+//            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+//            workWithDB(sqlRequest);
+//        }
+//    }
 
 }
 

@@ -178,7 +178,7 @@ public class LandingAppPage extends AbstractPage {
         driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> {
             try {
                 allImg.add(element.getAttribute("src")
-                        .replace(JsonLoader.getData().get(STARTING_URL).get("mainUrl").getValue()+"/images/landing/mobile_app/", ""));
+                        .replace(JsonLoader.getData().get(STARTING_URL).get("MAIN_URL").getValue()+"/images/landing/mobile_app/", ""));
             } catch (DataException e) {
                 LOG.error(e.getMessage());
             }

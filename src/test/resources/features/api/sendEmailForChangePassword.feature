@@ -5,7 +5,7 @@
       | DEVID  | randomNumber 4 |
 
     * сохраняем в память
-      | PASS  | Default |
+      | PASSWORD  | Default |
 
     * поиск акаунта со статуом регистрации "=2" "EMAIL"
 
