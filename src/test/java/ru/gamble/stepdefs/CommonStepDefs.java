@@ -820,6 +820,25 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
+
+
+    @Когда("^приводим дату к формату год-месяц-день \"([^\"]*)\"$")
+    public void dataFormatter(String keyData) {
+
+        SimpleDateFormat formatgut = new SimpleDateFormat();
+        SimpleDateFormat formatDate = new SimpleDateFormat();
+        formatDate.applyPattern("dd.MM.yyyy");
+        formatgut.applyPattern("yyyy-MM-dd");
+        String data = Stash.getValue(keyData);
+        try {
+            data=formatgut.format(formatDate.parse(data));
+            Stash.put(keyData, data);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private Object collectParametersInJSONString(DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         JSONObject jsonObject = new JSONObject();

@@ -126,6 +126,6 @@
       | appVersion      |           |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":1 |
+      | exepted | "code":35 |
 
 
