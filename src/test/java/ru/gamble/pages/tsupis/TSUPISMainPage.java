@@ -53,12 +53,12 @@ public class TSUPISMainPage extends AbstractPage {
 
         try {
             if(data.get(PHONE).equals(DEFAULT)){
-                phone = JsonLoader.getData().get(STARTING_URL).get("phone").getValue();
+                phone = JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue();
             } else {
                 phone = data.get(PHONE);
             }
             if(data.get(PASSWORD).equals(DEFAULT)){
-                password = JsonLoader.getData().get(STARTING_URL).get("password").getValue();
+                password = JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue();
                 }else {
                 password = data.get(PASSWORD);
             }
