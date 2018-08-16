@@ -5,7 +5,7 @@
     * сохраняем в память
       | DEVID  | randomNumber 4 |
     * сохраняем в память
-      | PASSWORD  | Default |
+      | PASSWORD  | Parol23 |
     * сохраняем в память
       | ISSUEPLACER  | random |
     * сохраняем в память
@@ -44,7 +44,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | password        | PASSWORD  |
+      | pass        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -73,7 +73,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | password        | PASSWORD  |
+      | pass        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -102,7 +102,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | password        | PASSWORD  |
+      | pass        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -135,7 +135,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | password        | PASSWORD  |
+      | pass        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -213,7 +213,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | password        | PASSWORD  |
+      | pass        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":

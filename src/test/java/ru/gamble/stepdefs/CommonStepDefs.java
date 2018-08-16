@@ -938,7 +938,8 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status,String keyEmail) {
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
+        //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 AND offer_state=3";
 
         searchUser(keyEmail,sqlRequest);
     }
@@ -1323,6 +1324,18 @@ public void searchUser(String keyEmail, String sqlRequest){
     public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable){
         requestByHTTPS(path, keyStash, "POST", dataTable);
     }
+
+    @Когда("^добавляем активную опцию сайта \"([^\"]*)\"$")
+    public void addActive(String option) {
+        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        if (!activeOpt.contains(option)){
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", " + option + "' WHERE NAME='ENABLED_FEATURES'";
+            workWithDB(sqlRequest);
+        }
+    }
+
+
 
 //    @Когда("^сохраняем включаем экспресс-регистрацию:$")
 //    public void onExpressReg() {
