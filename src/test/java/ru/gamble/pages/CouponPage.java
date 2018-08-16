@@ -1,5 +1,6 @@
 package ru.gamble.pages;
 
+import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
 
@@ -91,6 +93,8 @@ public class CouponPage extends AbstractPage {
     @FindBy(id="bonusmoney")
     private WebElement bonusBet;
 
+    @FindBy(className="coupon-banners") //баннеры в купоне
+    private WebElement bannersInCoupon;
 
     public CouponPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -502,6 +506,26 @@ public class CouponPage extends AbstractPage {
             bonusBet.click();
         }
         LOG.info("Купон перключен на ставку БОНУСАМИ");
+    }
+
+    @ActionTitle("проверяет наличие банеров в купоне")
+    public void checkBannerInCoupon(){
+        if (bannersInCoupon.isDisplayed()){
+            LOG.info("Баннер отображается, купон пустой");
+        }
+        else {
+            Assertions.fail("Ошибка! Событий в купоне нет, но банеры при этом не отображаются.");
+        }
+    }
+
+    @ActionTitle("проверяет отсутствие баннеров в купоне")
+    public void checkBannersOutOfCoupon(){
+        if (bannersInCoupon.isDisplayed()){
+            Assertions.fail("Ошибка! Баннер отображается, хотя в купоне есть событие");
+        }
+        else {
+            LOG.info("Баннер не отображается, так как в купоне есть событие");
+        }
     }
 }
 
