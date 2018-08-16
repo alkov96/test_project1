@@ -16,7 +16,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID    |
       | email  | USER     |
-      | password   | PASSWORD     |
+      | pass   | PASSWORD     |
       | source | SOURCE   |
 
     * проверка ответа API из "RESPONCE_API":

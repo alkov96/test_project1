@@ -19,7 +19,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | USER    |
-      | password   | PASSWORD    |
+      | pass   | PASSWORD    |
       | source | SOURCE  |
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"

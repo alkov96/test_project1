@@ -18,7 +18,7 @@
       | EMAIL  | randomEmail |
 
     * сохраняем в память
-      | PASSWORD  | Parol123 |
+      | PASS  | Default |
     * сохраняем в память
       | ISSUEPLACE  | random |
     * сохраняем в память
@@ -76,7 +76,7 @@
       |  phone                 | PHONE      |
       |  phoneConfirmationCode | CODE       |
       |  email                 | EMAIL      |
-      |  pass                  | PASSWORD   |
+      |  pass                  | PASS       |
       |  subscribe_to_sms      | false      |
       |  subscribe_to_email    | false      |
 
@@ -95,7 +95,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID |
       | email  | EMAIL |
-      | pass   | PASSWORD  |
+      | pass   | PASS  |
       | source | 16    |
 
     * проверка ответа API из "RESPONCE_API":
