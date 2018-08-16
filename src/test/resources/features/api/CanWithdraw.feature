@@ -5,7 +5,7 @@
     * сохраняем в память
       | DEVID  | randomNumber 4 |
     * сохраняем в память
-      | PASSWORD  | Parol23 |
+      | PASS  | Parol123 |
     * сохраняем в память
       | ISSUEPLACER  | random |
     * сохраняем в память
@@ -27,7 +27,7 @@
     * сохраняем в память
       | FIRSTNAME | random |
     * сохраняем в память
-      | LASNAME | random |
+      | LASTNAME | random |
     * сохраняем в память
       | PARONIMYC | random |
 
@@ -39,12 +39,14 @@
 
     * поиск акаунта со статуом регистрации "=2" "EMAIL"
     * обновляем поля в БД для юзера "EMAIL":
+      | personal_data_state           | 3             |
+    * обновляем поля в БД для юзера "EMAIL":
       | registration_stage_id         | 2             |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | pass        | PASSWORD  |
+      | pass        | PASS  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -73,7 +75,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | pass        | PASSWORD  |
+      | pass        | PASS  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -102,7 +104,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | pass        | PASSWORD  |
+      | pass        | PASS  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -135,7 +137,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | pass        | PASSWORD  |
+      | pass        | PASS  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -207,13 +209,16 @@
 
     * поиск акаунта со статуом регистрации "=2" "ALLROWS"
     * обновляем поля в БД для юзера "EMAIL":
+      | personal_data_state           | 3             |
+
+    * обновляем поля в БД для юзера "EMAIL":
       | offer_state | 1     |
 #      | personal_data_state | 2     |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | pass        | PASSWORD  |
+      | pass        | PASS  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
