@@ -6,6 +6,7 @@
     "REGISTRATION_URL": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
     "USER": "Testingsto+86@mail.ru",
     "PASSWORD": "Acer0808",
+    "PASS": "Parol123",
     "PHONE": "79088767878",
     "DB_REGISTRATION": {
       "DB_URL": "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",

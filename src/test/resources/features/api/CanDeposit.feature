@@ -6,7 +6,7 @@
     * сохраняем в память
       | DEVID  | randomNumber 4 |
     * сохраняем в память
-      | PASSWORD  | Default |
+      | PASSWORD  | Parol123 |
     * сохраняем в память
       | ISSUEPLACE  | random |
     * сохраняем в память
@@ -36,7 +36,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID    |
       | email       | EMAIL    |
-      | password    | PASSWORD |
+      | pass        | PASSWORD |
       | source      | 16       |
 
     * проверка ответа API из "RESPONCE_API":
@@ -67,7 +67,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | password        | PASSWORD  |
+      | pass        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -90,12 +90,12 @@
   Сценарий: Проверка доступных способов пополнения для пользователя, неподтвердившего офферту
 
     * поиск акаунта со статуом регистрации "=2" "EMAIL"
-    * обновляем оферту пользователю "0" "EMAIL"
+    * обновляем оферту пользователю "1" "EMAIL"
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | password        | PASSWORD  |
+      | pass        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -145,3 +145,7 @@
 
     * подтверждаем видеорегистрацию "EMAIL"
     * подтверждаем от ЦУПИС "EMAIL"
+
+
+
+
