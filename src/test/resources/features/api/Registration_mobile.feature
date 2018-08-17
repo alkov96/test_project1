@@ -323,10 +323,10 @@
     * подтверждаем от ЦУПИС "EMAIL"
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | DEVID |
-      | email  | EMAIL |
-      | pass   | PASSWORD  |
-      | source | 16    |
+      | devId  | DEVID    |
+      | email  | EMAIL    |
+      | pass   | PASSWORD |
+      | source | 16       |
 
 
     * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
