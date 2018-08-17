@@ -103,7 +103,7 @@ public class PassportDataPage extends AbstractPage {
     @ActionTitle("заполняет паспорт с")
     public void fillsPassportDate(DataTable dataTable){
         List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
-        String inputField, value, saveVariable, date = null, serial, number, whoIssued, unitCode, sex, placeOfBirth, house, building, block, flat;
+        String inputField, value, saveVariable, date = "", serial, number, whoIssued, unitCode, sex, placeOfBirth, house, building, block, flat;
         String wrongAddressXpath = "//div[@class='message-error']/div[contains(.,'Неправильный адрес')]";
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MMMM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");

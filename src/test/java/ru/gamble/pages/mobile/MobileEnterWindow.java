@@ -50,7 +50,7 @@ public class MobileEnterWindow extends AbstractPage {
         WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
 
-        String email = null, password = null;
+        String email = "", password = "";
        // EMAIL = "E-mail";
         if(data.get(EMAIL).equals(Constants.DEFAULT)) {
             try {
