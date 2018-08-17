@@ -159,7 +159,7 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через WAVE
 
-
+    * запоминаем значение активных опций сайта "ACTIVE"
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
@@ -259,6 +259,7 @@
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
 
+    * выставляем обратно старое значение активных опций сайта "ACTIVE"
 
 
   @api

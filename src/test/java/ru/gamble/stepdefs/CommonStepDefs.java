@@ -1335,6 +1335,28 @@ public void searchUser(String keyEmail, String sqlRequest){
         }
     }
 
+    @Когда("^запоминаем значение активных опций сайта \"([^\"]*)\"$")
+    public void rememberActive(String key) {
+        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        Stash.put(key,activeOpt);
+        activeOpt=activeOpt.replace(", identification_with_video","");
+        activeOpt=activeOpt.replace(", identification_with_euroset","");
+        activeOpt=activeOpt.replace(",identification_with_video","");
+        activeOpt=activeOpt.replace(",identification_with_euroset","");
+        sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
+        workWithDB(sqlRequest);
+    }
+
+    @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
+    public void changeActive(String key) {
+        String activeOpt = Stash.getValue(key);
+        Stash.put(key,activeOpt);
+        String sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
+        workWithDB(sqlRequest);
+    }
+
+
 
 
 //    @Когда("^сохраняем включаем экспресс-регистрацию:$")
