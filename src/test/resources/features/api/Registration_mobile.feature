@@ -150,8 +150,8 @@
 
   * проверка ответа API из "RESPONCE_API":
   | exepted | "code":0 |
-  * проверка ответа API из "RESPONCE_API":
-  | exepted | "status":11 |
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "status":11 |
 
 
   @api
@@ -213,7 +213,7 @@
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
-    * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
       | firstname           | FIRSTNAME     |
@@ -281,7 +281,7 @@
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
-      | identType               |  3           |
+      | identType               | 3            |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |

@@ -1341,10 +1341,13 @@ public void searchUser(String keyEmail, String sqlRequest){
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
         String activeOpt = workWithDBgetResult(sqlRequest, "value");
         Stash.put(key,activeOpt);
+        LOG.info("Удаление активных опций сайта identification_with_video и identification_with_euroset, и последнего символа, если это запятая");
         activeOpt=activeOpt.replace(", identification_with_video","");
         activeOpt=activeOpt.replace(", identification_with_euroset","");
         activeOpt=activeOpt.replace(",identification_with_video","");
         activeOpt=activeOpt.replace(",identification_with_euroset","");
+        activeOpt=activeOpt.trim();
+        activeOpt = activeOpt.substring(activeOpt.length()-1).equals(",")?activeOpt.substring(0,activeOpt.length()-1):activeOpt;
         sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
         workWithDB(sqlRequest);
     }
