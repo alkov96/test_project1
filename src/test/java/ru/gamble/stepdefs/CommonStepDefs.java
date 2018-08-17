@@ -3,6 +3,7 @@ package ru.gamble.stepdefs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
+import cucumber.api.java.After;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
@@ -1239,7 +1240,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
-public void searchUser(String keyEmail, String sqlRequest){
+    public void searchUser(String keyEmail, String sqlRequest){
     if (keyEmail.equals("ALLROWS")){
         try {
             workWithDBresult(sqlRequest);
@@ -1251,7 +1252,7 @@ public void searchUser(String keyEmail, String sqlRequest){
     String email = workWithDBgetResult(sqlRequest, "email");
     Stash.put(keyEmail, email);
     LOG.info("Подходящий пользователь найден : " + email);
-}
+    }
 
 
 
@@ -1322,21 +1323,10 @@ public void searchUser(String keyEmail, String sqlRequest){
 
     @Когда("^эмулируем регистрацию через терминал Wave \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable){
-        LOG.info("запоминаем значение активных опций сайта в память по ключу 'ACTIVE'");
-        rememberActive("ACTIVE");
-        String fullPath = "";
-
-
-        try{
-
-            fullPath = collectQueryString(path);
-            requestByHTTPS(path, keyStash, "POST", dataTable);
-
-        }finally {
-            LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-            changeActive("ACTIVE");
-        }
+        String fullPath = collectQueryString(path);
+        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
+
 
     @Когда("^добавляем активную опцию сайта \"([^\"]*)\"$")
     public void addActive(String option) {
@@ -1348,20 +1338,22 @@ public void searchUser(String keyEmail, String sqlRequest){
         }
     }
 
-    @Когда("^запоминаем значение активных опций сайта \"([^\"]*)\"$")
-    public void rememberActive(String key) {
+    @Когда("^запоминаем значение активных опций сайта в \\\"([^\\\"]*)\\\" и переключает на \\\"([^\\\"]*)\\\"$")
+    public void rememberActive(String key, String typeRegistration) {
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
         String activeOpt = workWithDBgetResult(sqlRequest, "value");
         Stash.put(key,activeOpt);
-        LOG.info("Удаление активных опций сайта identification_with_video и identification_with_euroset, и последнего символа, если это запятая");
-        activeOpt=activeOpt.replace(", identification_with_video","");
-        activeOpt=activeOpt.replace(", identification_with_euroset","");
-        activeOpt=activeOpt.replace(",identification_with_video","");
-        activeOpt=activeOpt.replace(",identification_with_euroset","");
-        activeOpt=activeOpt.trim();
-        activeOpt = activeOpt.substring(activeOpt.length()-1).equals(",")?activeOpt.substring(0,activeOpt.length()-1):activeOpt;
-        sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
-        workWithDB(sqlRequest);
+        if(typeRegistration.equals("WAVE")) {
+            LOG.info("Удаление активных опций сайта identification_with_video и identification_with_euroset, и последнего символа, если это запятая");
+            activeOpt = activeOpt.replace(", identification_with_video", "");
+            activeOpt = activeOpt.replace(", identification_with_euroset", "");
+            activeOpt = activeOpt.replace(",identification_with_video", "");
+            activeOpt = activeOpt.replace(",identification_with_euroset", "");
+            activeOpt = activeOpt.trim();
+            activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
+            workWithDB(sqlRequest);
+        }
     }
 
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
@@ -1372,39 +1364,11 @@ public void searchUser(String keyEmail, String sqlRequest){
         workWithDB(sqlRequest);
     }
 
-
-
-
-//    @Когда("^устанавливаем регистрацию через \"([^\"]*)\" а предыдущее сохраняем в \"([^\"]*)\"$")
-//    public void setRegistrationThrough(String arg, String keyParams) {
-//        LOG.info("Делаем запрос в базу");
-//        String sqlSelect = "SELECT value FROM gamebet.`params` WHERE name LIKE '%enabled_features%'";
-//        LOG.info("Сохраняем результат стоку");
-//        String activeOpt = workWithDBgetResult(sqlSelect, "value");
-//        Stash.put(keyParams,activeOpt);
-//        if(arg.equals("WAVE")) {
-//            String sqlUpdate = "UPDATE gamebet.`params` SET value = '' WHERE name='ENABLED_FEATURES'";
-//            workWithDBgetResult(sqlUpdate, "value");
-//        }
-////        String sqlUpdate = "UPDATE gamebet.`params` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
-//
-//    }
-
-    @Когда("^возвращаем регистрацию на предыдущий способ из \\\"([^\\\"]*)\\\"$")
-    public void returnRegistrationToPreviousMethod(String keyParams){
-        String sqlUpdate = "UPDATE gamebet.`params` SET value = '" + Stash.getValue(keyParams)  + "'";
-        workWithDBgetResult(sqlUpdate, "value");
+    @After(value = "@NewUserRegistration_C36189")
+    public void returnRegistrationValue(){
+        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
+        changeActive("ACTIVE");
     }
-
-//    @Когда("^сохраняем включаем экспресс-регистрацию:$")
-//    public void onExpressReg() {
-//        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-//        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-//        if (!activeOpt.contains("fast_registration")){
-//            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", fast_registration' WHERE NAME='ENABLED_FEATURES'";
-//            workWithDB(sqlRequest);
-//        }
-//    }
 
 }
 
