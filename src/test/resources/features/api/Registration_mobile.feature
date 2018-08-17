@@ -202,18 +202,18 @@
       | flat              | FLAT          |
 
     * добавляем данные в JSON массив "DOCUMENTS" сохраняем в память:
-      | type       | passportRus |
+      | type       | passportRus    |
       | series     | DOCSERIES      |
-      | number     | DOCNUM      |
-      | issuer     | ISSUEPLACE      |
-      | issuedate  | VALIDISSUEDATE   |
-      | validto    | null        |
-      | issuercode | 123-456  |
+      | number     | DOCNUM         |
+      | issuer     | ISSUEPLACE     |
+      | issuedate  | VALIDISSUEDATE |
+      | validto    | null           |
+      | issuercode | 123-456        |
 
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
-    * эмулируем регистрацию через терминал Wave "https://dev-bk-bet-mobile-site1.tsed.orglot.office/api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+    * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
       | firstname           | FIRSTNAME     |
@@ -248,10 +248,10 @@
     * подтверждаем от ЦУПИС "EMAIL"
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | DEVID |
-      | email  | EMAIL |
-      | pass   | PASSWORD  |
-      | source | 16    |
+      | devId  | DEVID    |
+      | email  | EMAIL    |
+      | pass   | PASSWORD |
+      | source | 16       |
 
 
     * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
