@@ -89,7 +89,15 @@
       | DATE_TIME | Current |
 
 #    * эмулируем регистрацию через терминал Wave "https://dev-bk-bet-mobile-site.tsed.orglot.office/api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
-    * эмулируем регистрацию через терминал Wave "https://demo.gamebet.ru/api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+
+
+    * (stop)
+    * устанавливаем регистрацию через "WAVE" а предыдущее сохраняем в "OLD_PARAMS"
+
+    * открывается страница "Способ подтверждения личности"
+    * пользователь (нажимает кнопку) "Столото"
+
+    * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
     | operationdatetime   | DATE_TIME     |
     | phone               | PHONE         |
     | firstname           | FIRSTNAME     |
@@ -115,12 +123,10 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |
 
-    * (stop)
-#    * открывается страница "Способ подтверждения личности"
-#    * пользователь (нажимает кнопку) "Столото"
-
     * открывается страница "Авторизованная Главная страница"
     * пользователь (проверяет присутствие текста) "Вы зарегистрированы"
+
+    * возвращаем регистрацию на предыдущий способ из "OLD_PARAMS"
 
 
 

@@ -211,11 +211,11 @@
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
       | firstname           | FIRSTNAME     |
-      | lastname            | PATRONYMIC      |
+      | lastname            | PATRONYMIC    |
       | paternalname        | PATERNALNAME  |
-      | sex                 | GENDER           |
+      | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
-      | birthlocation       | BIRTHPLACE |
+      | birthlocation       | BIRTHPLACE    |
       | citizenship         | "RUS"         |
       | publicperson        | null          |
       | publicperson        | null          |

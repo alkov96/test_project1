@@ -1321,7 +1321,29 @@ public void searchUser(String keyEmail, String sqlRequest){
 
     @Когда("^эмулируем регистрацию через терминал Wave \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable){
+        String fullPath = collectQueryString(path);
         requestByHTTPS(path, keyStash, "POST", dataTable);
+    }
+
+    @Когда("^устанавливаем регистрацию через \"([^\"]*)\" а предыдущее сохраняем в \"([^\"]*)\"$")
+    public void setRegistrationThrough(String arg, String keyParams) {
+        LOG.info("Делаем запрос в базу");
+        String sqlSelect = "SELECT value FROM gamebet.`params` WHERE name LIKE '%enabled_features%'";
+        LOG.info("Сохраняем результат стоку");
+        String activeOpt = workWithDBgetResult(sqlSelect, "value");
+        Stash.put(keyParams,activeOpt);
+        if(arg.equals("WAVE")) {
+            String sqlUpdate = "UPDATE gamebet.`params` SET value = '' WHERE name='ENABLED_FEATURES'";
+            workWithDBgetResult(sqlUpdate, "value");
+        }
+//        String sqlUpdate = "UPDATE gamebet.`params` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
+
+    }
+
+    @Когда("^возвращаем регистрацию на предыдущий способ из \\\"([^\\\"]*)\\\"$")
+    public void returnRegistrationToPreviousMethod(String keyParams){
+        String sqlUpdate = "UPDATE gamebet.`params` SET value = '" + Stash.getValue(keyParams)  + "'";
+        workWithDBgetResult(sqlUpdate, "value");
     }
 
 //    @Когда("^сохраняем включаем экспресс-регистрацию:$")

@@ -237,7 +237,7 @@ public class UserAccountPage extends AbstractPage{
         String registrationUrl = "";
 
         try {
-            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("registrationUrl").getValue();
+            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
         } catch (DataException e) {
            LOG.error(e.getMessage());
         }
