@@ -49,7 +49,7 @@ public class TSUPISMainPage extends AbstractPage {
     public void loginInTSUPIS(DataTable dataTable){
         WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
-        String phone = null, password = null;
+        String phone = "", password = "";
 
         try {
             if(data.get(PHONE).equals(DEFAULT)){

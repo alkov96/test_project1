@@ -87,7 +87,7 @@ public class UserAccountPage extends AbstractPage{
     @ActionTitle("заполняет форму с")
     public void fillsForm(DataTable dataTable){
         List<Map<String,String>> table = dataTable.asMaps(String.class,String.class);
-        String inputField, value, saveVariable, date = null;
+        String inputField, value, saveVariable, date = "";
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MMMM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
