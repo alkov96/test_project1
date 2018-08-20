@@ -155,7 +155,6 @@
 
 
   @api
-  @smoke
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через WAVE
 
@@ -263,7 +262,6 @@
 
 
   @api
-  @smoke
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через SKYPE
 
@@ -338,7 +336,6 @@
 
 
   @api
-  @smoke
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через Евросеть
 

@@ -940,9 +940,19 @@ public class CommonStepDefs extends GenericStepDefs {
     public void searchUserStatus2(String status,String keyEmail) {
         //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 AND offer_state=3";
-
         searchUser(keyEmail,sqlRequest);
     }
+
+    @Когда("^ищем пользователя с ограничениями \"([^\"]*)\"$")
+    public void searchUserAlt(String keyEmail) {
+        //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND phone LIKE '7111002%'";
+        searchUser(keyEmail,sqlRequest);
+        }
+
+
+
+
 
     @Когда("^обновляем оферту пользователю \"([^\"]*)\" \"([^\"]*)\"$")
     public static void offertUpdate(String offer_state,String keyEmail) {
@@ -1382,6 +1392,18 @@ public void searchUser(String keyEmail, String sqlRequest){
     public void returnRegistrationToPreviousMethod(String keyParams){
         String sqlUpdate = "UPDATE gamebet.`params` SET value = '" + Stash.getValue(keyParams)  + "'";
         workWithDBgetResult(sqlUpdate, "value");
+    }
+
+    @Когда("^определяем дату завтрашнего дня \\\"([^\\\"]*)\\\"$")
+    public void tomorrowDate(String keyParams){
+        Calendar today = Calendar.getInstance();
+        today.add(Calendar.DATE,1);
+        Date dateTomorrow = new Date();
+        dateTomorrow.setTime(today.getTimeInMillis());
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        String date = format.format(dateTomorrow).toString();
+        Stash.put(keyParams,date);
+        LOG.info("Завтрашняя дата: " + dateTomorrow);
     }
 
 //    @Когда("^сохраняем включаем экспресс-регистрацию:$")
