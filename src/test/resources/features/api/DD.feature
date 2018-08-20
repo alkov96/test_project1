@@ -15,7 +15,6 @@
       | COMMENT  | random |
 
   @api
-  @smoke
   @DD_identification
   Сценарий: Отправка заявки в Домашние Деньги и проверка статуса заявки
 
