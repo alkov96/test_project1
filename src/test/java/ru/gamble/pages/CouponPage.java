@@ -393,6 +393,7 @@ public class CouponPage extends AbstractPage {
             }
             LOG.info("тик-так");
             count--;
+            driver.navigate().refresh();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
