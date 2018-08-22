@@ -48,7 +48,6 @@
 
 
   @api
-  @smoke
   @Registration_fullalt_mobile
   Сценарий: Мобильная регистрация быстрая
 

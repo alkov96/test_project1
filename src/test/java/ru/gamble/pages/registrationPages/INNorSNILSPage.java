@@ -63,6 +63,6 @@ public class INNorSNILSPage extends AbstractPage {
                 fillField(innInput, Stash.getValue(keyINN));
                 LOG.info("Ввели ИНН::" + Stash.getValue(keyINN));
             }
-
     }
+
 }

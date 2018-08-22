@@ -63,10 +63,8 @@ public class CommonStepDefs extends GenericStepDefs {
             button = page.getElementByTitle(param);
             button.click();
             workWithPreloader();
-        } catch (PageInitializationException e) {
+        } catch (PageException e) {
             LOG.error(e.getMessage());
-        } catch (PageException e1) {
-            LOG.error(e1.getMessage());
         }
 
     }
@@ -155,7 +153,7 @@ public class CommonStepDefs extends GenericStepDefs {
     // Ожидание появления элемента на странице
     public static void waitShowElement(By by) {
         WebDriver driver = PageFactory.getWebDriver();
-        WebDriverWait driverWait = new WebDriverWait(driver, 3, 250);
+        WebDriverWait driverWait = new WebDriverWait(driver, 6, 500);
         try {
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
@@ -168,18 +166,23 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^разлогиниваем пользователя$")
     public static void logOut(){
+        WebDriver driver = PageFactory.getWebDriver();
         goToMainPage("site");
         cleanCookies();
-        WebDriver driver = PageFactory.getWebDriver();
         try {
+            LOG.info("Ищем кнопку с силуетом пользователя.");
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
             List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
                     .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
             if(!userIcon.isEmpty()){
+                LOG.info("Нажимаем на кнопку с силуетом пользователя.");
                 userIcon.get(0).click();
+                Thread.sleep(1000);
+                LOG.info("Ищем кнопку выхода");
                 List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
                         .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
                 if(!logOutButton.isEmpty()) {
+                    LOG.info("Нажимаем на кнопку выхода");
                     logOutButton.get(0).click();
                 }
             }
@@ -945,6 +948,17 @@ public class CommonStepDefs extends GenericStepDefs {
         searchUser(keyEmail,sqlRequest);
     }
 
+    @Когда("^ищем пользователя с ограничениями \"([^\"]*)\"$")
+    public void searchUserAlt(String keyEmail) {
+        //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND phone LIKE '7111002%'";
+        searchUser(keyEmail,sqlRequest);
+        }
+
+
+
+
+
     @Когда("^обновляем оферту пользователю \"([^\"]*)\" \"([^\"]*)\"$")
     public static void offertUpdate(String offer_state,String keyEmail) {
         String sqlRequest = "UPDATE gamebet.`user` SET offer_state=" + offer_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
@@ -1301,7 +1315,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^закрываем браузер$")
     public static void closeBrowser() {
-        PageFactory.getWebDriver().close();
+        PageFactory.dispose();
         LOG.info("Браузер закрыт");
     }
 
@@ -1338,11 +1352,22 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^запоминаем значение активных опций сайта в \\\"([^\\\"]*)\\\" и переключает на \\\"([^\\\"]*)\\\"$")
-    public void rememberActive(String key, String typeRegistration) {
-        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-        Stash.put(key,activeOpt);
+    @Когда("^запоминаем значение активных опций сайта в \\\"([^\\\"]*)\\\"$")
+    public void rememberActive (String activeOptionKey){
+        String activeOpt = getActiveOptions();
+        Stash.put(activeOptionKey,activeOpt);
+        LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
+    }
+
+    private String getActiveOptions(){
+        return workWithDBgetResult("SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'", "value");
+    }
+
+    @Когда("^переключаем регистрацию на \\\"([^\\\"]*)\\\"$")
+    public void switchesRegistrationOn(String typeRegistration) {
+        String sqlRequest;
+        String activeOpt = getActiveOptions();
+
         if(typeRegistration.equals("WAVE")) {
             LOG.info("Удаление активных опций сайта identification_with_video и identification_with_euroset, и последнего символа, если это запятая");
             activeOpt = activeOpt.replace(", identification_with_video", "");
@@ -1361,6 +1386,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String activeOpt = Stash.getValue(key);
         Stash.put(key,activeOpt);
         String sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
+        LOG.info("Возвращаем активные значения сайта =>[" + activeOpt + "]");
         workWithDB(sqlRequest);
     }
 
@@ -1368,7 +1394,36 @@ public class CommonStepDefs extends GenericStepDefs {
     public void returnRegistrationValue(){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");
+        closeBrowser();
     }
+
+    @Когда("^возвращаем регистрацию на предыдущий способ из \\\"([^\\\"]*)\\\"$")
+    public void returnRegistrationToPreviousMethod(String keyParams){
+        String sqlUpdate = "UPDATE gamebet.`params` SET value = '" + Stash.getValue(keyParams)  + "'";
+        workWithDBgetResult(sqlUpdate, "value");
+    }
+
+    @Когда("^определяем дату завтрашнего дня \\\"([^\\\"]*)\\\"$")
+    public void tomorrowDate(String keyParams){
+        Calendar today = Calendar.getInstance();
+        today.add(Calendar.DATE,1);
+        Date dateTomorrow = new Date();
+        dateTomorrow.setTime(today.getTimeInMillis());
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        String date = format.format(dateTomorrow).toString();
+        Stash.put(keyParams,date);
+        LOG.info("Завтрашняя дата: " + dateTomorrow);
+    }
+
+//    @Когда("^сохраняем включаем экспресс-регистрацию:$")
+//    public void onExpressReg() {
+//        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+//        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+//        if (!activeOpt.contains("fast_registration")){
+//            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", fast_registration' WHERE NAME='ENABLED_FEATURES'";
+//            workWithDB(sqlRequest);
+//        }
+//    }
 
 }
 
