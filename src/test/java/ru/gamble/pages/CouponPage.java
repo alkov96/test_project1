@@ -384,6 +384,9 @@ public class CouponPage extends AbstractPage {
         balanceExpected = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.UP);
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.UP);
 
+        LOG.info("ожидаемый баланс" + balanceExpected);
+        LOG.info("sumBet" + sumBet);
+
         while (count >0){
             afterBalance = new BigDecimal(driver.findElement(balance).getText()).setScale(2, RoundingMode.UP);
 
@@ -393,7 +396,9 @@ public class CouponPage extends AbstractPage {
             }
             LOG.info("тик-так");
             count--;
-            driver.navigate().refresh();
+            if (count % 10 == 0) {
+                driver.navigate().refresh();
+            }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
