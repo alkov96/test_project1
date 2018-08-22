@@ -224,12 +224,12 @@ public class PopUPLCPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         Pattern pattern = Pattern.compile("(?u)[^0-9]");
         List<WebElement> allWayWithdraw = driver.findElements(By.xpath("//table[@class='moneyInOutTable']//tr[3]/td[2]/div[not(contains(@class,'not-available'))]/span/label[contains(@for, 'withdraw-method')]"));
-        String min = allWayWithdraw.get(i).findElement(By.xpath("span//span[@ng-if='withdrawMethods[type].limit.min']")).getText();//минимум для первого способа вывода
-        String max = allWayWithdraw.get(i).findElement(By.xpath("span//span[@ng-if='withdrawMethods[type].limit.max']")).getText();//минимум для первого способа вывода
+        String min = allWayWithdraw.get(i).findElement(By.xpath("//div/span[@ng-if='method.limit.min']")).getText();//минимум для первого способа вывода
+        String max = allWayWithdraw.get(i).findElement(By.xpath("//div/span[@ng-if='method.limit.max']")).getText();//максимум для первого способа вывода
         max = pattern.matcher(max).replaceAll("");//максимум для вбранного способа вывода
         min = pattern.matcher(min).replaceAll("");//минимум для вбранного способа вывода
 
-        LOG.info("Для выбранного способа вывода " + allWayWithdraw.get(i).findElement(By.xpath("span//div[contains(@class,'payPartner')]")).getAttribute("class"));
+        //LOG.info("Для выбранного способа вывода " + allWayWithdraw.get(i).findElement(By.xpath("span//div[contains(@class,'payPartner')]")).getAttribute("class"));
         LOG.info("Минимальная сумма вывода = " + min);
         LOG.info("Максимальная сумма вывода = " + max);
 
