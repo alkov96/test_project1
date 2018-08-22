@@ -1394,6 +1394,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void returnRegistrationValue(){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");
+        closeBrowser();
     }
 
     @Когда("^возвращаем регистрацию на предыдущий способ из \\\"([^\\\"]*)\\\"$")

@@ -36,6 +36,10 @@ public class MethodOfIdentityVerificationPage extends AbstractPage {
     @FindBy(xpath = "//button/div[contains(@class,'confWayIconCamera')]")
     private WebElement skypeButton;
 
+    @ElementTitle("Связной|Евросеть")
+    @FindBy(xpath = "//button[contains(@class,'btn_confirm btn_upgrade-limit')]")
+    private WebElement evrosetButton;
+
 
     public MethodOfIdentityVerificationPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -48,5 +52,11 @@ public class MethodOfIdentityVerificationPage extends AbstractPage {
     public void pressOnINNOrSNILS(){
         new WebDriverWait(PageFactory.getDriver(),10).until(ExpectedConditions.visibilityOf(skypeButton));
         skypeButton.click();
+    }
+
+    @ActionTitle("нажимает на 'Связной|Евросеть'")
+    public void pressOnEvroset(){
+        new WebDriverWait(PageFactory.getDriver(),10).until(ExpectedConditions.visibilityOf(evrosetButton));
+        evrosetButton.click();
     }
 }
