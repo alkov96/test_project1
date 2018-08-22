@@ -87,70 +87,70 @@
       | DATE_TIME | Current |
 
 
-  @smoke
-  @NewUserRegistration_C36189
-  Сценарий: Регистрация нового пользователя через Wave
-
-    * переключаем регистрацию на "WAVE"
-    * обновляем страницу
-
-    * открывается страница "Способ подтверждения личности"
-    * пользователь (нажимает кнопку) "Столото"
-
-    * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
-    | operationdatetime   | DATE_TIME     |
-    | phone               | PHONE         |
-    | firstname           | FIRSTNAME     |
-    | lastname            | LASTNAME      |
-    | paternalname        | PATERNALNAME  |
-    | sex                 | SEX           |
-    | birthdate           | BIRTHDATE     |
-    | birthlocation       | BIRTHLACATION |
-    | citizenship         | "RUS"         |
-    | publicperson        | null          |
-    | publicperson        | null          |
-    | address             | ADDRESS       |
-    | documents           | DOCUMENTS     |
-    | operationofficecode | "222"         |
-    | operatorlogin       | "333"         |
-    | inn                 | INN           |
-    | SNILS               | SNILS         |
-    | method              | betshop       |
-    | error               | ""            |
-    | reason              | ""            |
-    | identityState       | "LIMITED"     |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | "state":"ok" |
-
-    * (закрываем окно 'Перейти в ЦУПИС' если выскочит)
-    * пользователь (проверяет присутствие текста) "Вы зарегистрированы"
-
-    * закрываем браузер
-
-  @smoke
-  @NewUserRegistration_C36189
-  Сценарий: Регистрация нового пользователя через Skype
-
-    * добавляем активную опцию сайта "identification_with_video"
-    * обновляем страницу
-
-    * открывается страница "Способ подтверждения личности"
-    * пользователь (нажимает на 'ИНН или СНИЛС')
-    * открывается страница "ИНН или СНИЛС"
-
-    * пользователь (заполняет одно из двух полей) "SNILS" "INN"
-    * пользователь (нажимает кнопку) "Продолжить"
-
-    * подтверждаем видеорегистрацию "EMAIL"
-    * подтверждаем от ЦУПИС "EMAIL"
-
-    * обновляем страницу
-
-    * (закрываем окно 'Перейти в ЦУПИС' если выскочит)
-    * пользователь (проверяет присутствие текста) "Вы зарегистрированы"
-
-    * закрываем браузер
+#  @smoke
+#  @NewUserRegistration_C36189
+#  Сценарий: Регистрация нового пользователя через Wave
+#
+#    * переключаем регистрацию на "WAVE"
+#    * обновляем страницу
+#
+#    * открывается страница "Способ подтверждения личности"
+#    * пользователь (нажимает кнопку) "Столото"
+#
+#    * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+#    | operationdatetime   | DATE_TIME     |
+#    | phone               | PHONE         |
+#    | firstname           | FIRSTNAME     |
+#    | lastname            | LASTNAME      |
+#    | paternalname        | PATERNALNAME  |
+#    | sex                 | SEX           |
+#    | birthdate           | BIRTHDATE     |
+#    | birthlocation       | BIRTHLACATION |
+#    | citizenship         | "RUS"         |
+#    | publicperson        | null          |
+#    | publicperson        | null          |
+#    | address             | ADDRESS       |
+#    | documents           | DOCUMENTS     |
+#    | operationofficecode | "222"         |
+#    | operatorlogin       | "333"         |
+#    | inn                 | INN           |
+#    | SNILS               | SNILS         |
+#    | method              | betshop       |
+#    | error               | ""            |
+#    | reason              | ""            |
+#    | identityState       | "LIMITED"     |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted     | "state":"ok" |
+#
+#    * (закрываем окно 'Перейти в ЦУПИС' если выскочит)
+#    * пользователь (проверяет присутствие текста) "Вы зарегистрированы"
+#
+#    * закрываем браузер
+#
+#  @smoke
+#  @NewUserRegistration_C36189
+#  Сценарий: Регистрация нового пользователя через Skype
+#
+#    * добавляем активную опцию сайта "identification_with_video"
+#    * обновляем страницу
+#
+#    * открывается страница "Способ подтверждения личности"
+#    * пользователь (нажимает на 'ИНН или СНИЛС')
+#    * открывается страница "ИНН или СНИЛС"
+#
+#    * пользователь (заполняет одно из двух полей) "SNILS" "INN"
+#    * пользователь (нажимает кнопку) "Продолжить"
+#
+#    * подтверждаем видеорегистрацию "EMAIL"
+#    * подтверждаем от ЦУПИС "EMAIL"
+#
+#    * обновляем страницу
+#
+#    * (закрываем окно 'Перейти в ЦУПИС' если выскочит)
+#    * пользователь (проверяет присутствие текста) "Вы зарегистрированы"
+#
+#    * закрываем браузер
 
   @smoke
   @NewUserRegistration_C36189
