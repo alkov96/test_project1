@@ -63,7 +63,7 @@ public class AuthenticationMainPage extends AbstractPage {
     public void checkIsBalance(String keyAmount){
         BigDecimal sumBet;
         WebDriver driver = PageFactory.getWebDriver();
-        driver.navigate().refresh();
+       // driver.navigate().refresh(); пока при обновлении 404 ошибка
         waitForElementPresent(By.id("topPanelWalletBalance"), 10);
         sumBet = new BigDecimal((String) Stash.getValue(keyAmount)).setScale(2,RoundingMode.UP).negate();
         Stash.put("sumKey",sumBet.toString());
