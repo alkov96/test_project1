@@ -303,21 +303,6 @@ public class PopUPLCPage extends AbstractPage {
        driver.switchTo().window(allHandles.toArray()[1].toString());
    }
 
-    @ActionTitle("проверяет снятие правильной суммы, и бонусов, если они были начислены")
-    public void balanceAfterWithdraw(){
-        LOG.info("Проверка что правильно изменился баланс рублей");
-        BigDecimal sum;
-        sum = new BigDecimal((String) Stash.getValue("withdrawRub")).setScale(2,RoundingMode.UP);
-        Stash.put("sumKey",sum.toString());
-        CouponPage.balanceIsOK("рубли");
-        sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.UP).negate();
-        if(sum.compareTo(new BigDecimal(0)) == 1){
-            LOG.info("Проверка что правильно изменился баланс бонусов");
-            Stash.put("sumKey",sum.toString());
-            CouponPage.balanceIsOK("бонусов");
-        }
-    }
-
 
     @ActionTitle("смотрит, какие способы пополнения доступны")
     public void lookSummList() {

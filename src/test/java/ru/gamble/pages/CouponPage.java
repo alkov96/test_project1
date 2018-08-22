@@ -378,16 +378,16 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         BigDecimal afterBalance, balanceExpected, sumBet;
 
-        By balance=param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть
-        String key = param.equals("бонусов")?"balanceBonusKey":"balanceKey";
+        By balance = param.equals("бонусов") ? By.id("bonus-balance") : By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть
+        String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         int count = 30;
-        balanceExpected = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.UP);
-        sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.UP);
+        balanceExpected = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.HALF_UP);
+        sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.HALF_UP);
 
         while (count >0){
             afterBalance = new BigDecimal(driver.findElement(balance).getText()).setScale(2, RoundingMode.UP);
 
-            if((balanceExpected.subtract(sumBet).subtract(afterBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.UP))== -1){
+            if((balanceExpected.subtract(sumBet).subtract(afterBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.HALF_UP))== -1){
                 LOG.info("Баланс соответствует ожидаемому: " + afterBalance.toString());
                 break;
             }

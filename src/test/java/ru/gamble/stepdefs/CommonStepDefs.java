@@ -1415,15 +1415,22 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Завтрашняя дата: " + dateTomorrow);
     }
 
-//    @Когда("^сохраняем включаем экспресс-регистрацию:$")
-//    public void onExpressReg() {
-//        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-//        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-//        if (!activeOpt.contains("fast_registration")){
-//            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", fast_registration' WHERE NAME='ENABLED_FEATURES'";
-//            workWithDB(sqlRequest);
-//        }
-//    }
+    @Когда("^запоминаем текущую страницу в \\\"([^\\\"]*)\\\"$")
+    public void rememberCurenPageTo(String keyCurrentPage){
+        Stash.put(keyCurrentPage,PageFactory.getDriver().getWindowHandle());
+        LOG.info("Теку");
+    }
+
+    @Когда("^закрываем текущее окно и возвращаемся на \"([^\"]*)\"$")
+    public void closingCurrentWinAndReturnTo(String keyPage) {
+        PageFactory.getWebDriver().close();
+        for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
+            PageFactory.getWebDriver().switchTo().window(Stash.getValue(keyPage));
+            LOG.info("Вернулись на ранее запомненую страницу");
+            return;
+        }
+        throw new AutotestError("Ошибка! Не смогли вернуться на страницу.");
+    }
 
 }
 
