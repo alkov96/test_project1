@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
 import cucumber.api.java.After;
+import cucumber.api.java.ru.Когда;
 import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import cucumber.api.java.ru.*;
-import net.minidev.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -24,11 +24,10 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.*;
+import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
-import ru.sbtqa.tag.qautils.properties.Props;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.*;
@@ -45,8 +44,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.openqa.selenium.By.xpath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.openqa.selenium.By.xpath;
 import static ru.gamble.utility.Constants.*;
 
 
@@ -1116,6 +1115,10 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(fullPath,keyStash,"POST",dataTable);
     }
 
+    @Когда("^запрос по прямому адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestTo(String fullPath, String keyStash, DataTable dataTable) {
+        requestByHTTPS(fullPath,keyStash,"POST",dataTable);
+    }
 
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public void requestToAPI(String path, String keyStash) {
@@ -1230,6 +1233,14 @@ public class CommonStepDefs extends GenericStepDefs {
     public void если_в_провайдер_PERFORM_то_проверяем_JSON(String arg1, DataTable arg2) {
 
     }
+
+    @Когда("^обновим значение минимальной суммы вывода в рублях для вызова инкассатора \"([^\"]*)\"$")
+    public void updateMinCash(String value) {
+        String sqlRequest = "UPDATE gamebet.`params` SET VALUE=" + value + " WHERE NAME='MIN_DEPOSIT_CASH_AMOUNT'";
+        workWithDB(sqlRequest);
+        LOG.info("Установили значение Минимальной сумма для вызова инкасатора = " + value);
+    }
+
     @Когда("^обновим версию мобильного приложения для \"([^\"]*)\" \"([^\"]*)\" до \"([^\"]*)\" \"([^\"]*)\"$")
     public void updateVersionApp(String typeOS, String keyTypeOS, String vers, String hardVers) {
         String type;
@@ -1366,6 +1377,36 @@ public class CommonStepDefs extends GenericStepDefs {
             workWithDB(sqlRequest);
         }
     }
+
+
+
+    @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \\\"([^\\\"]*)\\\"$")
+    public void rememberActiveAndOffOption(String key,DataTable dataTable) {
+        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        Stash.put(key,activeOpt);
+
+        Map<String,String> table = dataTable.asMap(String.class,String.class);
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+            String option = entry.getKey();
+            if (entry.getValue().equals("true")) {
+                activeOpt = activeOpt + ", " + entry.getKey();
+                continue;
+            }
+            activeOpt = activeOpt.replace(", "+option, "");
+            activeOpt = activeOpt.replace("," + option, "");
+            LOG.info("Удаление активной опций сайта " + option);
+        }
+
+        activeOpt = activeOpt.trim();
+        activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
+        sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
+        workWithDB(sqlRequest);
+
+    }
+
+
+
 
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
     public void changeActive(String key) {

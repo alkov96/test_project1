@@ -41,7 +41,7 @@
       | building     |                |
       | housing      |                |
       | flat         | FLAT           |
-      | phone        | PHONE          |
+      | phone        | 1110023309     |
       | comment      | COMMENT        |
       | date         | DATE           |
       | time         | "10:00 - 17:00"|
@@ -54,8 +54,16 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | identificationStatus":1 |
 
 
+    * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID    |
+      | authToken   | AUTHTOKEN|
+      | source      | 16       |
 
-
-
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | identificationStatus":1 |
