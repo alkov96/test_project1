@@ -858,7 +858,13 @@ public class CommonStepDefs extends GenericStepDefs {
             } else {
                 value = entry.getValue();
             }
-            jsonObject.put(key, JSONValue.parse(String.valueOf(value)));
+            //Если в числе лидирующий ноль, то не пропускать через JSONValue.parse, а класть в Map как есть
+            if (value instanceof String && !StringUtils.isBlank((String) value) &&  ((String) value).charAt(0) == '0') {
+                String str  = (String) value;
+                jsonObject.put(key, value);
+            } else {
+                jsonObject.put(key, JSONValue.parse(String.valueOf(value)));
+            }
         }
         params = jsonObject;
         LOG.info(String.valueOf(params));
