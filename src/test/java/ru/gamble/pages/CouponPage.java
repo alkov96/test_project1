@@ -376,30 +376,33 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет изменение баланса")
     public static void balanceIsOK(String param){
         WebDriver driver = PageFactory.getDriver();
-        BigDecimal afterBalance, balanceExpected, sumBet;
+        BigDecimal currentBalance, previousBalance, sumBet;
 
-        By balance=param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть
-        String key = param.equals("бонусов")?"balanceBonusKey":"balanceKey";
+        By balance = param.equals("бонусов") ? By.id("bonus-balance") : By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть
+        String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         int count = 30;
-        balanceExpected = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.UP);
-        sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.UP);
+        previousBalance = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.HALF_UP);
+        sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.HALF_UP);
 
-        while (count >0){
-            afterBalance = new BigDecimal(driver.findElement(balance).getText()).setScale(2, RoundingMode.UP);
+        while (count > 0){
+            currentBalance = new BigDecimal(driver.findElement(balance).getText()).setScale(2, RoundingMode.UP);
 
-            if((balanceExpected.subtract(sumBet).subtract(afterBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.UP))== -1){
-                LOG.info("Баланс соответствует ожидаемому: " + afterBalance.toString());
+            if((previousBalance.subtract(sumBet).subtract(currentBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.HALF_UP))== -1){
+                LOG.info("Баланс соответствует ожидаемому: " + currentBalance.toString());
                 break;
             }
             LOG.info("тик-так");
             count--;
+            if (count % 10 == 0) {
+                driver.navigate().refresh();
+            }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             if (count == 0){
-                Assertions.fail("Баланс не соответствует ожидаемому. Баланс сейчас: " + afterBalance + ", ожидалось : " + balanceExpected.subtract(sumBet));
+                Assertions.fail("Баланс не соответствует ожидаемому. Баланс сейчас: " + currentBalance + ", ожидалось : " + previousBalance.subtract(sumBet));
             }
         }
     }

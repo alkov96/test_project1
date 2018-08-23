@@ -223,13 +223,13 @@ public class PopUPLCPage extends AbstractPage {
         int i=0;
         WebDriver driver = PageFactory.getDriver();
         Pattern pattern = Pattern.compile("(?u)[^0-9]");
-        List<WebElement> allWayWithdraw = driver.findElements(By.xpath("//table[@class='moneyInOutTable']//div[not(contains(@class,'not-available')) and @ng-repeat='type in withdrawalTypes']"));
-        String min = allWayWithdraw.get(i).findElement(By.xpath("span//span[@ng-if='withdrawMethods[type].limit.min']")).getText();//минимум для первого способа вывода
-        String max = allWayWithdraw.get(i).findElement(By.xpath("span//span[@ng-if='withdrawMethods[type].limit.max']")).getText();//минимум для первого способа вывода
+        List<WebElement> allWayWithdraw = driver.findElements(By.xpath("//table[@class='moneyInOutTable']//tr[3]/td[2]/div[not(contains(@class,'not-available'))]/span/label[contains(@for, 'withdraw-method')]"));
+        String min = allWayWithdraw.get(i).findElement(By.xpath("//div/span[@ng-if='method.limit.min']")).getText();//минимум для первого способа вывода
+        String max = allWayWithdraw.get(i).findElement(By.xpath("//div/span[@ng-if='method.limit.max']")).getText();//максимум для первого способа вывода
         max = pattern.matcher(max).replaceAll("");//максимум для вбранного способа вывода
         min = pattern.matcher(min).replaceAll("");//минимум для вбранного способа вывода
 
-        LOG.info("Для выбранного способа вывода " + allWayWithdraw.get(i).findElement(By.xpath("span//div[contains(@class,'payPartner')]")).getAttribute("class"));
+        //LOG.info("Для выбранного способа вывода " + allWayWithdraw.get(i).findElement(By.xpath("span//div[contains(@class,'payPartner')]")).getAttribute("class"));
         LOG.info("Минимальная сумма вывода = " + min);
         LOG.info("Максимальная сумма вывода = " + max);
 
@@ -303,21 +303,6 @@ public class PopUPLCPage extends AbstractPage {
        driver.switchTo().window(allHandles.toArray()[1].toString());
    }
 
-    @ActionTitle("проверяет снятие правильной суммы, и бонусов, если они были начислены")
-    public void balanceAfterWithdraw(){
-        LOG.info("Проверка что правильно изменился баланс рублей");
-        BigDecimal sum;
-        sum = new BigDecimal((String) Stash.getValue("withdrawRub")).setScale(2,RoundingMode.UP);
-        Stash.put("sumKey",sum.toString());
-        CouponPage.balanceIsOK("рубли");
-        sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.UP).negate();
-        if(sum.compareTo(new BigDecimal(0)) == 1){
-            LOG.info("Проверка что правильно изменился баланс бонусов");
-            Stash.put("sumKey",sum.toString());
-            CouponPage.balanceIsOK("бонусов");
-        }
-    }
-
 
     @ActionTitle("смотрит, какие способы пополнения доступны")
     public void lookSummList() {
@@ -369,7 +354,7 @@ public class PopUPLCPage extends AbstractPage {
             sposob.click();
             //waitToPreloader(); //ждем появления прелоадера. т.к. если его не будет - значит и способ пооплнения по сути не изменился - не отправлялась инфа в сварм и вообще
             way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
-            maxSum = driver.findElement(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
+            maxSum = driver.findElement(By.xpath("//table[@class='moneyInOutTable']//div[@class='smallJsLink__wrapper']/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
             max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
             if (!maxForWay.containsKey(way)) {
                 Assertions.fail("Выбранный способ пополнения не описан в Map<String,Integer> maxForWay " + way);
@@ -392,11 +377,11 @@ public class PopUPLCPage extends AbstractPage {
         WebElement buttonOk;
         int sumOnButton, sumField;
         for (WebElement summ : summList) {
-            buttonOk = driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button"));
+            buttonOk =  driver.findElement(By.id("btn-submit-money-in"));
             LOG.info("Вводим сумму с помощью кнопки " + summ.getText());
             summ.click();
             waitEnabled(buttonOk);
-            sumOnButton = Integer.valueOf(buttonOk.findElement(By.xpath("//span[@ng-bind='totalPrice | number']")).getText().replace(" ", ""));
+            sumOnButton = Integer.valueOf(buttonOk.findElement(By.xpath("//span[contains(@ng-bind,'totalPrice | number')]")).getText().replace(" ", ""));
             if (sumOnButton != Float.valueOf(summ.getText().replace(" ", ""))) {
                 Assertions.fail("При клике на кнопку с суммой на кнопке #Пополнить# указана непраивьная сумма");
             }
@@ -425,7 +410,7 @@ public class PopUPLCPage extends AbstractPage {
         if (message.toString().isEmpty() || !message.toString().contains("Сумма меньше минимально допустимой")) {
             Assertions.fail("При сумме пополнения = 1 нет сообщения об ошибке. Сообщение: " + message.toString());
         }
-        if (driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button")).isEnabled()) {
+        if (driver.findElement(By.id("btn-submit-money-in")).isEnabled()) {
             Assertions.fail("При сумме пополнения = 1 кнопка осталась активной.");
         }
     }
@@ -447,7 +432,7 @@ public class PopUPLCPage extends AbstractPage {
         if (message.toString().isEmpty() || !message.toString().contains("Сумма превышает максимальную допустимую")) {
             Assertions.fail("При сумме пополнения = 600.000 нет сообщения об ошибке. Сообщение: " + message.toString());
         }
-        if (driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button")).isEnabled()) {
+        if (driver.findElement(By.id("btn-submit-money-in")).isEnabled()) {
             Assertions.fail("При сумме пополнения = 60000.000 кнопка осталась активной.");
         }
 
@@ -478,7 +463,7 @@ public class PopUPLCPage extends AbstractPage {
             int currentMaxFlag = ((int) maxForWay.get(way)) <= summ ? 0 : 1;//switch не работает с булями, поэтому придется испольоватьвот такой флаг, который равен 0 = если допустимый максимум больше введенно суммы, и 1 - если допустимй максимум меньше введенной суммы
             switch (currentMaxFlag) {
                 case 1:  //т.е. для выбранного способа пополнения введенная сумма разршена
-                    if (!driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button")).isEnabled()) {
+                    if (!driver.findElement(By.id("btn-submit-money-in")).isEnabled()) {
                         Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " кнопка Пополнить недоступна, хотя максимально допустимая сумма " + maxForWay.get(way));
                     }
                     if (message.toString().contains("Сумма превышает максимальную допустимую") || message.toString().contains("Сумма меньше минимально допустимой")) {
@@ -486,7 +471,7 @@ public class PopUPLCPage extends AbstractPage {
                     }
                     break;
                 case 0: //т.е. для выбранного способа пополнения введенная сумма превышает максимум
-                    if (driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']/button")).isEnabled()) {
+                    if (driver.findElement(By.id("btn-submit-money-in")).isEnabled()) {
                         Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " кнопка Пополнить доступна, хотя максимально допустимая сумма " + maxForWay.get(way));
                     }
                     if (!message.toString().contains("Сумма превышает максимальную допустимую")) {
@@ -505,11 +490,11 @@ public class PopUPLCPage extends AbstractPage {
         CommonStepDefs.workWithPreloader();
         Thread.sleep(2000);
         LOG.info("Открываем попап через кнопку #Внести депозит#");
-        driver.findElement(By.xpath("//*[@id='private_panel']//button[contains(.,'Внести депозит')]")).click();
+        driver.findElement(By.id("btn-header-deposit")).click();
         WebElement field = Stash.getValue("fieldKey");
         int sumField = Stash.getValue("sumFieldKey");
         Thread.sleep(1000);
-        if (!driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox']")).isDisplayed()){
+        if (!driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox money-in-out__form']")).isDisplayed()){
             Assertions.fail("При нажатии на кнопку Внести депозит не открылся попап пополнения");
         }
         int randomSum = 100 + (int) Math.random()*900;//рандомное число до от 100 до 1000

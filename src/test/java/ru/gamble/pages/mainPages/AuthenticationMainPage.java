@@ -63,7 +63,7 @@ public class AuthenticationMainPage extends AbstractPage {
     public void checkIsBalance(String keyAmount){
         BigDecimal sumBet;
         WebDriver driver = PageFactory.getWebDriver();
-        driver.navigate().refresh();
+       // driver.navigate().refresh(); пока при обновлении 404 ошибка
         waitForElementPresent(By.id("topPanelWalletBalance"), 10);
         sumBet = new BigDecimal((String) Stash.getValue(keyAmount)).setScale(2,RoundingMode.UP).negate();
         Stash.put("sumKey",sumBet.toString());
@@ -74,7 +74,6 @@ public class AuthenticationMainPage extends AbstractPage {
     public void closePopUpGoTSUPISIfDisplayed(){
         String xpathGoTSUPIS = "//a[contains(@href,'https://1cupis.ru/auth')]";
         String xpathCross = "//a[contains(@class,'closeBtn')]";
-//        String xpathCross = "//a[contains(@class,'modal__closeBtn closeBtn')]";
         try{
             new WebDriverWait(PageFactory.getWebDriver(),3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoTSUPIS)));
             LOG.info("Нашли кнопку ["
@@ -88,15 +87,20 @@ public class AuthenticationMainPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("закрываем окно 'Перейти в ЦУПИС' если выскочит")
-    public void closePopUpWindowGoToTSUPISIfOpened(){
-        WebDriver driver = PageFactory.getWebDriver();
-        try{
-            new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(@href,'https://1cupis.ru/auth')]")));
-            LOG.info("Открылось окно 'Перейти в ЦУПИС' - закрываем");
-            driver.findElements(By.xpath("//a[contains(@class,'modal__closeBtn closeBtn')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
-        }catch (Exception e){
-            LOG.info("Окно 'Перейти в ЦУПИС' не появилось");
+    @ActionTitle("проверяет снятие правильной суммы, и бонусов, если они были начислены")
+    public void balanceAfterWithdraw(){
+        LOG.info("Проверка что правильно изменился баланс рублей");
+        BigDecimal sum;
+        sum = new BigDecimal((String) Stash.getValue("withdrawRub")).setScale(2,RoundingMode.HALF_UP);
+        LOG.info("Было до изменения баланса [" + sum.toString() + "]");
+        Stash.put("sumKey",sum.toString());
+        CouponPage.balanceIsOK("рубли");
+        sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
+        if(sum.compareTo(new BigDecimal(0)) == 1){
+            LOG.info("Проверка что правильно изменился баланс бонусов");
+            Stash.put("sumKey",sum.toString());
+            CouponPage.balanceIsOK("бонусов");
         }
     }
+
 }

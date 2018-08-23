@@ -8,6 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.utility.Constants;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
@@ -85,7 +86,7 @@ public class UserAccountPage extends AbstractPage{
     }
 
     @ActionTitle("заполняет форму с")
-    public void fillsForm(DataTable dataTable){
+    public void fillsForm(DataTable dataTable) throws DataException {
         List<Map<String,String>> table = dataTable.asMaps(String.class,String.class);
         String inputField, value, saveVariable, date = "";
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MMMM-dd");
@@ -133,7 +134,7 @@ public class UserAccountPage extends AbstractPage{
                 LOG.info(saveVariable + "<==[" + inputEmail.getAttribute("value") + "]");
             }
             if(inputField.contains(PASSWORD)){
-                String password = value;
+                String password = (value.equals(Constants.DEFAULT)) ? JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue() : value;
                 LOG.info("Вводим пароль::" + password);
                 fillField(passwordInput, password);
                 LOG.info("Подтверждаем::" + password);
@@ -149,21 +150,6 @@ public class UserAccountPage extends AbstractPage{
                 LOG.info(saveVariable + "<==[" +  builder.toString() + "]");
             }
         }
-
-
-
-//
-//        String email = Stash.getValue(data.get(EMAIL));
-//        LOG.info("Вводим e-mail::" + email);
-//        fillField(inputEmail, email);
-//
-//        String password = data.get(PASSWORD);
-//        LOG.info("Вводим пароль::" + password);
-//        fillField(passwordInput, password);
-//        LOG.info("Подтверждаем::" + password);
-//        fillField(confirmPasswordInput, password);
-//
-//        enterSellphone(data.get(NUMBERPHONE));
     }
 
     /**

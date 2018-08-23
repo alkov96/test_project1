@@ -2,6 +2,7 @@ package ru.gamble.pages;
 
 import cucumber.api.java.en.Then;
 import cucumber.api.java.ru.Когда;
+import net.minidev.json.JSONValue;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -19,6 +20,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.ru.StepDefs;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
@@ -44,6 +46,23 @@ public class TestingServicePage extends AbstractPage{
     @ElementTitle("Выйти")
     @FindBy(id = "log-out-button")
     private WebElement exitButton;
+
+    @ElementTitle("Идентификатор мерчанта")
+    @FindBy(id = "merchantId")
+    private WebElement identMerchantInput;
+
+    @ElementTitle("Код/логин/ид/имя пользователя")
+    @FindBy(id = "customerCode")
+    private WebElement customerCodeInput;
+
+
+    @ElementTitle("Способ идентификации")
+    @FindBy(id = "method")
+    private WebElement methodSelect;
+
+    @ElementTitle("Полная идентификация")
+    @FindBy(xpath = "//input[contains(@value,'Полная идентификация')]")
+    private WebElement fullIdentButton;
 
 
     public TestingServicePage() {
@@ -86,6 +105,15 @@ public class TestingServicePage extends AbstractPage{
         }
     }
 
+    @ActionTitle("вводит в поле")
+    public void inputInField(String inputField, String text){
+        String inputText = (text.matches("^[A-Z_]+$")) ? Stash.getValue(text) : text;
+        try {
+            fillField(inputField, inputText);
+        } catch (PageException e) {
+            e.getMessage();
+        }
+    }
 
 
 }
