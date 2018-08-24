@@ -195,7 +195,8 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("сравнивает коэфиценты")
     public void compareCoef(String keyOutcome) {
         WebDriver driver = PageFactory.getDriver();
-        float coef = Float.parseFloat(Stash.getValue(keyOutcome));
+        String coefString = Stash.getValue(keyOutcome).toString();
+        float coef = Float.valueOf(coefString);
         float coefCoupon = Float.valueOf(driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice')]")).getText());//Кэфицент в купоне
         String oldString = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice_old')]")).getAttribute("class");//oldString - просто переменная, в которую сохраним класс, где лежит старый коэф.
         float coefOld;
