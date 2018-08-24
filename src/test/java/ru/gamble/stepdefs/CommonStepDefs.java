@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.DataTable;
 import cucumber.api.java.After;
+import cucumber.api.java.Before;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,7 @@ import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -1358,11 +1360,17 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^запоминаем значение активных опций сайта в \\\"([^\\\"]*)\\\"$")
-    public void rememberActive (String activeOptionKey){
+    @Before(value = "@NewUserRegistration_C36189")
+    public void saveRegistrationValue(){
+        String activeOptionKey = "ACTIVE";
         String activeOpt = getActiveOptions();
         Stash.put(activeOptionKey,activeOpt);
         LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
+    }
+
+    @Когда("^запоминаем значение активных опций сайта в \\\"([^\\\"]*)\\\"$")
+    public void rememberActive (String activeOptionKey){
+        LOG.info("В памяти лежит: key=>[" + activeOptionKey + "] ; value=>[" + Stash.getValue(activeOptionKey) + "]");
     }
 
     private String getActiveOptions(){
@@ -1424,7 +1432,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^запоминаем текущую страницу в \\\"([^\\\"]*)\\\"$")
     public void rememberCurenPageTo(String keyCurrentPage){
         Stash.put(keyCurrentPage,PageFactory.getDriver().getWindowHandle());
-        LOG.info("Теку");
+        LOG.info("Записали key [" + keyCurrentPage + "] <== value [" + PageFactory.getDriver().getWindowHandle() + "]");
     }
 
     @Когда("^закрываем текущее окно и возвращаемся на \"([^\"]*)\"$")
@@ -1436,6 +1444,36 @@ public class CommonStepDefs extends GenericStepDefs {
             return;
         }
         throw new AutotestError("Ошибка! Не смогли вернуться на страницу.");
+    }
+
+    @Когда("^записываем значение баланса бонусов в \"([^\"]*)\"$")
+    public void writeValueOfBonusBalanceIn(String bonusKey) {
+        List<WebElement> bonusElement = PageFactory.getWebDriver().findElements(By.id("bonus-balance"));
+        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getText();
+        Stash.put(bonusKey,bonus);
+        LOG.info("Записали в key [" + bonusKey + "] <== value [" + bonus + "]");
+    }
+
+    @Когда("^записываем значение баланса в \"([^\"]*)\"$")
+    public void writeValueOfBalanceIn(String balanceKey) {
+        List<WebElement> balanceElement = PageFactory.getWebDriver().findElements(By.id("topPanelWalletBalance"));
+        String balance = balanceElement.isEmpty() ? "0" : balanceElement.get(0).getText();
+        Stash.put(balanceKey,balance);
+        LOG.info("Записали в key [" + balanceKey + "] <== value [" + balance + "]");
+    }
+
+
+    @Когда("^проверяем что с баланса \"([^\"]*)\" снялась сумма \"([^\"]*)\"$")
+    public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
+        try {
+            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+            BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
+            BigDecimal withdrawnAmount = new BigDecimal(Stash.getValue(amountKey).toString());
+            BigDecimal expectedBalance = previousBalance.subtract(withdrawnAmount);
+            assertThat(expectedBalance.compareTo(actualBalance) == 0).as("Ошибка! Ожидаемый баланс [" + expectedBalance.toString() + "] не равен текущему [" + actualBalance.toString() + "]").isTrue();
+        }catch (NumberFormatException nf){
+            new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
+        }
     }
 
 }

@@ -22,15 +22,10 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
-import ru.sbtqa.tag.stepdefs.ru.StepDefs;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-
-import javax.xml.bind.annotation.XmlType;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static ru.gamble.utility.Constants.DEFAULT;
 import static ru.gamble.utility.Constants.STARTING_URL;
 
@@ -80,7 +75,7 @@ public class TestingServicePage extends AbstractPage{
         String currentPage = driver.getCurrentUrl();
         String sms, number = "";
         try {
-            number = keyPhoneNumber.equals(DEFAULT) ? JsonLoader.getData().get(STARTING_URL).get("phone").getValue() : keyPhoneNumber ;
+            number = keyPhoneNumber.equals(DEFAULT) ? JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue() : keyPhoneNumber ;
         } catch (DataException e) {
             e.printStackTrace();
         }
@@ -88,7 +83,6 @@ public class TestingServicePage extends AbstractPage{
         String xpath = "//p[contains(.,'Последние отправленные смс:')]/following-sibling::ul/li[contains(.,'" + number + "')]";
         StringBuilder tmp = new StringBuilder();
 
-        try {
             sms = PageFactory.getDriver().findElement(By.xpath(xpath)).getText();
 
             Pattern pat = Pattern.compile("(?<= код\\s)[\\d]{4}");
@@ -96,13 +90,13 @@ public class TestingServicePage extends AbstractPage{
             while (matcher.find()) {
                 tmp.append(matcher.group());
             }
+            if(tmp.toString().isEmpty()){
+                throw new AutotestError("Ошибка! Не нашли строку с номером телефона [" + number + "]");
+            }else {
+                LOG.info("Сохраняем в памяти key[" + keySMS + "] valie[" + tmp.toString() + "]");
+                Stash.put(keySMS, tmp.toString());
+            }
 
-            LOG.info("Сохраняем в памяти key[" + keySMS + "] valie[" + tmp.toString() + "]");
-            Stash.put(keySMS,tmp.toString());
-
-        }catch (Exception e){
-          throw new AutotestError("Ошибка! Не нашли строку с номером телефона [" + number + "]");
-        }
     }
 
     @ActionTitle("вводит в поле")

@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 import static ru.gamble.stepdefs.CommonStepDefs.waitEnabled;
 import static ru.gamble.stepdefs.CommonStepDefs.waitToPreloader;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+import static ru.gamble.utility.Constants.LINK;
+import static ru.gamble.utility.Constants.TEXT;
 
 
 @PageEntry(title = "Мини Личный Кабинет")
@@ -294,6 +296,7 @@ public class PopUPLCPage extends AbstractPage {
 
 //todo дальше совершение стаки и проверка баланса прямо отсюда
     }
+
 
    @ActionTitle("переходит на страницу 'ЦУПИС'")
    public void goToPageTSUPIS(){

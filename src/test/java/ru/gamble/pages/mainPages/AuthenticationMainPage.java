@@ -1,5 +1,6 @@
 package ru.gamble.pages.mainPages;
 
+import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -23,6 +24,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
@@ -47,8 +49,8 @@ public class AuthenticationMainPage extends AbstractPage {
 
     @ActionTitle("запоминает значение баланса")
     public static void rememberBalnce(String param){
-        By top_balance = param.equals("бонусов")?By.id("bonus-balance"):By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
-        String key = param.equals("бонусов")?"balanceBonusKey":"balanceKey";
+        By top_balance = param.equals("бонусов")? By.id("bonus-balance") : By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
+        String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         if (getWebDriver().findElements(top_balance).isEmpty()) {
             Stash.put(key,"0.00");
         }
@@ -65,7 +67,7 @@ public class AuthenticationMainPage extends AbstractPage {
         WebDriver driver = PageFactory.getWebDriver();
        // driver.navigate().refresh(); пока при обновлении 404 ошибка
         waitForElementPresent(By.id("topPanelWalletBalance"), 10);
-        sumBet = new BigDecimal((String) Stash.getValue(keyAmount)).setScale(2,RoundingMode.UP).negate();
+        sumBet = new BigDecimal((String) Stash.getValue(keyAmount)).setScale(2,RoundingMode.HALF_UP).negate();
         Stash.put("sumKey",sumBet.toString());
         CouponPage.balanceIsOK("рубли");
     }
@@ -88,11 +90,11 @@ public class AuthenticationMainPage extends AbstractPage {
     }
 
     @ActionTitle("проверяет снятие правильной суммы, и бонусов, если они были начислены")
-    public void balanceAfterWithdraw(){
+    public void balanceAfterWithdraw(String keySum){
         LOG.info("Проверка что правильно изменился баланс рублей");
         BigDecimal sum;
-        sum = new BigDecimal((String) Stash.getValue("withdrawRub")).setScale(2,RoundingMode.HALF_UP);
-        LOG.info("Было до изменения баланса [" + sum.toString() + "]");
+        sum = new BigDecimal((String) Stash.getValue(keySum)).setScale(2,RoundingMode.HALF_UP);
+        LOG.info("Ранее была снята сумма [" + sum.toString() + "]");
         Stash.put("sumKey",sum.toString());
         CouponPage.balanceIsOK("рубли");
         sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
@@ -103,4 +105,18 @@ public class AuthenticationMainPage extends AbstractPage {
         }
     }
 
+    @ActionTitle("проверяет снятие суммы")
+    public void checkbalanceAfterWithdraw(String keySum){
+        BigDecimal sum;
+        sum = new BigDecimal((String) Stash.getValue(keySum)).setScale(2,RoundingMode.HALF_UP);
+        LOG.info("Ранее была снята сумма [" + sum.toString() + "]");
+        Stash.put("sumKey",sum.toString());
+        CouponPage.balanceIsOK("рубли");
+        sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
+        if(sum.compareTo(new BigDecimal(0)) == 1){
+            LOG.info("Проверка что правильно изменился баланс бонусов");
+            Stash.put("sumKey",sum.toString());
+            CouponPage.balanceIsOK("бонусов");
+        }
+    }
 }

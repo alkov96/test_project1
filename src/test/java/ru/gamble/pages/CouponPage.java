@@ -383,9 +383,11 @@ public class CouponPage extends AbstractPage {
         int count = 30;
         previousBalance = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.HALF_UP);
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.HALF_UP);
-
+        String currentNumber = "";
         while (count > 0){
-            currentBalance = new BigDecimal(driver.findElement(balance).getText()).setScale(2, RoundingMode.UP);
+            currentNumber = driver.findElements(balance).stream().filter(e -> e.isDisplayed()).findFirst().get().getText();
+
+            currentBalance = new BigDecimal(currentNumber).setScale(2, RoundingMode.HALF_UP);
 
             if((previousBalance.subtract(sumBet).subtract(currentBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.HALF_UP))== -1){
                 LOG.info("Баланс соответствует ожидаемому: " + currentBalance.toString());
