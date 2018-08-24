@@ -349,6 +349,12 @@ public class CouponPage extends AbstractPage {
         String xpathBet = "//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]";
         String xpathMessage = "//div[contains(@class,'accepted-bet-message') and contains(.,'Ваша ставка принята.')]";
 
+        LOG.info("Ищем и нажимаем на шестерёнку в Купоне");
+        PageFactory.getWebDriver().findElement(By.xpath("//div[contains(@class,'coupon-params-icon')]")).click();
+        LOG.info("Ищем и выбираем 'Любые коэффициенты'");
+        PageFactory.getWebDriver().findElements(By.xpath("//span[contains(.,'Любые коэффициенты')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+
+
         LOG.info("Жмём Заключить пари");
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon_bet_button));
         coupon_bet_button.click();
