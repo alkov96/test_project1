@@ -402,6 +402,7 @@ public abstract class AbstractPage extends Page {
         fillField(coupon_field,sumBet.toString());
         LOG.info("Ввелось в поле::" + coupon_field.getAttribute("value"));
         Stash.put("sumKey", sumBet.toString());
+        LOG.info("Сохранили в память key [sumKey] <== value [" + sumBet.toString() + "]");
     }
 
 
