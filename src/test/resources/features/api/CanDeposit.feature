@@ -41,8 +41,9 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | "status":8 |
+  #  * проверка ответа API из "RESPONCE_API":
+      * проверка вариантного ответа API из "RESPONCE_API":
+      | exepted     | "status":8 or "status":7 |
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
