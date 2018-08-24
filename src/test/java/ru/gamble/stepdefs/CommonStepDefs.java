@@ -11,6 +11,7 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -611,6 +612,20 @@ public class CommonStepDefs extends GenericStepDefs {
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
+
+
+
+    @Когда("^проверка вариантного ответа API из \"([^\"]*)\":$")
+    public void checkresponceAPIor(String keyStash, DataTable dataTable) {
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
+        String expected = table.get("exepted");
+        boolean actualsOk = actual.contains(expected.split("or")[0].trim()) || actual.contains(expected.split("or")[1].trim());
+        Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|",actualsOk);
+        LOG.info("|" + expected + "| содержится в |" + actual + "|");
+    }
+
+
 
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
