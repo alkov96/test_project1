@@ -70,6 +70,7 @@ public class DayEventsPage extends AbstractPage {
             Stash.put(keyTeam2, team2);
             //Stash.put(keyOutcome, team2);
             Stash.put(keyOutcome, coef);
+            LOG.info("Сохранили в памяти key [" + keyOutcome + "] <== value [" + coef + "]");
         } else {
             throw new AutotestError("Ошибка! Ни один баннер не найден.");
         }
