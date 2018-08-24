@@ -51,14 +51,11 @@ public class AuthenticationMainPage extends AbstractPage {
     public static void rememberBalnce(String param){
         By top_balance = param.equals("бонусов")? By.id("bonus-balance") : By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
         String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
-        if (getWebDriver().findElements(top_balance).isEmpty()) {
-            Stash.put(key,"0.00");
-        }
-        else {
-            String balance = getWebDriver().findElement(top_balance).getText();
-            LOG.info("значение баланса: " + balance);
-            Stash.put(key, balance);
-        }
+        List<WebElement> balanceElement = getWebDriver().findElements(top_balance);
+
+        String balance = (balanceElement.isEmpty()) ? "0" : balanceElement.get(0).getText();
+        Stash.put(key, balance);
+        LOG.info("Сохранили в память key [" + key + "] <== value [" + balance + "]");
     }
 
     @ActionTitle("проверяет, увеличился ли баланс на")
@@ -69,6 +66,7 @@ public class AuthenticationMainPage extends AbstractPage {
         waitForElementPresent(By.id("topPanelWalletBalance"), 10);
         sumBet = new BigDecimal((String) Stash.getValue(keyAmount)).setScale(2,RoundingMode.HALF_UP).negate();
         Stash.put("sumKey",sumBet.toString());
+        LOG.info("Сохранили в память key [sumKey] <== value [" + sumBet.toString() + "]");
         CouponPage.balanceIsOK("рубли");
     }
 
@@ -94,13 +92,14 @@ public class AuthenticationMainPage extends AbstractPage {
         LOG.info("Проверка что правильно изменился баланс рублей");
         BigDecimal sum;
         sum = new BigDecimal((String) Stash.getValue(keySum)).setScale(2,RoundingMode.HALF_UP);
-        LOG.info("Ранее была снята сумма [" + sum.toString() + "]");
         Stash.put("sumKey",sum.toString());
+        LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
         CouponPage.balanceIsOK("рубли");
         sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
         if(sum.compareTo(new BigDecimal(0)) == 1){
             LOG.info("Проверка что правильно изменился баланс бонусов");
             Stash.put("sumKey",sum.toString());
+            LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
             CouponPage.balanceIsOK("бонусов");
         }
     }
@@ -111,11 +110,13 @@ public class AuthenticationMainPage extends AbstractPage {
         sum = new BigDecimal((String) Stash.getValue(keySum)).setScale(2,RoundingMode.HALF_UP);
         LOG.info("Ранее была снята сумма [" + sum.toString() + "]");
         Stash.put("sumKey",sum.toString());
+        LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
         CouponPage.balanceIsOK("рубли");
         sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
         if(sum.compareTo(new BigDecimal(0)) == 1){
             LOG.info("Проверка что правильно изменился баланс бонусов");
             Stash.put("sumKey",sum.toString());
+            LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
             CouponPage.balanceIsOK("бонусов");
         }
     }

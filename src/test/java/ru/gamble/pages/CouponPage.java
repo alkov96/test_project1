@@ -330,7 +330,7 @@ public class CouponPage extends AbstractPage {
        // boolean forOne = one.equals("для каждого разбиения") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
         boolean forOne = !one.equals("") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
 
-        WebElement field = forOne?coupon_field_System_one:coupon_field;
+        WebElement field = forOne ? coupon_field_System_one : coupon_field;
         field.clear();
         field.sendKeys(String.valueOf(sumBet));
         LOG.info("Вводим сумму ставки : " + sumBet);
@@ -339,6 +339,7 @@ public class CouponPage extends AbstractPage {
         sum = new BigDecimal(sumBet.trim()).setScale(2,RoundingMode.UP).multiply(new BigDecimal(countBet).setScale(0,RoundingMode.UP));
 
         Stash.put("sumKey",sum.toString());
+        LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
     }
 
 
@@ -378,7 +379,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         BigDecimal currentBalance, previousBalance, sumBet;
 
-        By balance = param.equals("бонусов") ? By.id("bonus-balance") : By.id("topPanelWalletBalance");//определяем баланс рублей или бонусов будм првоерть
+        By balance = param.equals("бонусов") ? By.id("bonus-balance") : By.id("topPanelWalletBalance");
         String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         int count = 30;
         previousBalance = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.HALF_UP);
@@ -449,16 +450,15 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("вводит сумму одной ставки Ординар")
     public void inputBetOrdinar(String sum){
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> listBets = driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]"));
+        String xpathBets = "//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]";
+        String xpathInput = "//input[contains(@class,'input_coupon-ordinar')]";
+        List<WebElement> listBets = driver.findElements(By.xpath(xpathBets));
         LOG.info("Вводим для первого события сумму ставки: " + sum);
         WebElement input;
-        input=listBets.size()==1?
-                coupon_field:
-                driver.findElements(By.xpath("//input[contains(@class,'input_coupon-ordinar')]")).get(0);
-        input.clear();
-        input.sendKeys(String.valueOf(sum));
-        String sumBet = sum.trim();
-        Stash.put("sumKey",sumBet);
+        input = (listBets.size() == 1) ? coupon_field : driver.findElements(By.xpath(xpathInput)).get(0);
+        fillField(input,sum);
+        Stash.put("sumKey",sum);
+        LOG.info("Сохранили в память key [sumKey] <== value [" + sum + "]");
     }
 
     @ActionTitle("нажимает кнопку ВНИЗ - дублирование ставки для всех пари")
@@ -481,6 +481,7 @@ public class CouponPage extends AbstractPage {
         LOG.info("Всего ставок в купоне::" + listBets.size());
 
         Stash.put("sumKey",sum.toString());
+        LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
     }
 
     @ActionTitle("переходит в настройки и меняет коэффицент в купоне")

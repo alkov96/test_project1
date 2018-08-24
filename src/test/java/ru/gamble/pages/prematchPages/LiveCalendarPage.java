@@ -93,9 +93,7 @@ public class LiveCalendarPage extends AbstractPage {
     @ActionTitle("добавляет ставки из разных событий в количестве")
     public void addToCouponDifferentBets(String param){
         String xpathCoefficient = "//preceding-sibling::td[contains(@class,'livecal-table__col_event')]";
-        //  List<WebElement> coefficients = driver.findElements(By.cssSelector("td.table__body-cell.livecal-table__col_1"));WebDriver driver = PageFactory.getDriver();
         WebDriver driver = PageFactory.getDriver();
-     //   List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/../.."));
         List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"));
         int count = 0;
         int number = (Integer.valueOf(param)) - 1;
@@ -108,7 +106,7 @@ public class LiveCalendarPage extends AbstractPage {
         }
         do {
             LOG.info("coefficients = " + coefficients.size());
-            num = random.nextInt(coefficients.size()-1-count);
+            num = random.nextInt(coefficients.size() - 1 - count);
             LOG.info("num = " + num);
             if (coefficients.get(num).isDisplayed()) {
                 coefficients.get(num).click();
@@ -138,6 +136,23 @@ public class LiveCalendarPage extends AbstractPage {
         }
         LOG.info("Нажимаем на выпадающее меню видов спорта");
         menuSport.click();
+    }
+
+    @ActionTitle("выбирает следующий день недели с событиями")
+    public void selectsNextDayOfWeek(){
+        String xpathCurrentDayOfWeek = "//li[contains(@class,'tabs__tab tabs__tab_livecal') and contains(@class,'tabs__tab_active')]";
+        String xpathNextDayOfWeek = "following-sibling::li";
+        WebElement currentDayOfWeek = PageFactory.getDriver().findElement(By.xpath(xpathCurrentDayOfWeek));
+        List<WebElement> listOtherDeysOfWeek = currentDayOfWeek.findElements(By.xpath(xpathNextDayOfWeek));
+        for(WebElement el:listOtherDeysOfWeek){
+            do{
+                el.click();
+                workWithPreloader();
+            }while (el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]")).isEmpty());
+            LOG.info("Перешли на::[" + el.getText() + "]");
+            return;
+        }
+        throw new AutotestError("Ошибка! На остальных днях недели не загрузились события");
     }
 
 
