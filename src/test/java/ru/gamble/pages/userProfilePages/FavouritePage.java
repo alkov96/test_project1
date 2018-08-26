@@ -145,25 +145,47 @@ public class FavouritePage extends AbstractPage {
         }
     }
 
+
+
+    @ActionTitle("запоминаем название команд")
+    public void rememberTeamsName(String team1key, String team2key){
+        WebDriver driver = PageFactory.getDriver();
+        WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
+        String nameFavour = game.findElement(xpath("div//div[contains(@class,'elected__teams')]")).getAttribute("title");
+        String team1Name = nameFavour.split(" - ")[0].trim();
+        String team2Name = nameFavour.split(" - ")[1].trim();
+        LOG.info("Название игры: " + team1Name + " - " + team2Name);
+        Stash.put(team1key,team1Name);
+        Stash.put(team2key,team2Name);
+    }
+
+    @ActionTitle("запоминаем значение коэффициента")
+    public void rememberCoef(String coefKey){
+        WebDriver driver = PageFactory.getDriver();
+        WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
+        float coefFavour = Float.valueOf(game.findElement(xpath("div//div[contains(@class,'elected-data__event-price')]")).getText());
+        LOG.info("Значение коэффициента выбранного исхода = " + coefKey);
+        Stash.put(coefKey,coefFavour);
+    }
+
+
+    @ActionTitle("запоминаем название маркета")
+    public void rememberMarket(String ishodKey){
+        WebDriver driver = PageFactory.getDriver();
+        WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
+        String ishod = game.findElement(xpath("div//div[contains(@class,'elected-data__event-content')]")).getAttribute("title").trim();
+        LOG.info("Название исхода: " + ishod);
+        Stash.put(ishodKey,ishod);
+    }
+
+
     @ActionTitle("добавляет ставку в купон")
     public void addToCoupon(){
         WebDriver driver = PageFactory.getDriver();
         WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
-        String nameFavour = game.findElement(xpath("div//div[contains(@class,'elected__teams')]")).getAttribute("title");
-        float coefFavour = Float.valueOf(game.findElement(xpath("div//div[contains(@class,'elected-data__event-price')]")).getText());
-        String typeFavour = driver.findElement(xpath("//div[contains(@class,'elected-data__caption')]")).getAttribute("title").trim();
         LOG.info("Добавляем в купон ставку из Избранного");
         game.findElement(xpath("//div[contains(@class,'elected-data__event-price')]")).click();
         CommonStepDefs.workWithPreloader();
-        String team1Name = nameFavour.split(" - ")[0];
-        String team2Name = nameFavour.split(" - ")[1].trim();
-        String ishod = game.findElement(xpath("div//div[contains(@class,'elected-data__event-content')]")).getAttribute("title").trim();
-        LOG.info("Название игры: " + team1Name + " - " + team2Name);
-        LOG.info("Название исхода: " + ishod);
-        Stash.put("team1key",team1Name);
-        Stash.put("team2key",team2Name);
-        Stash.put("ishodKey",ishod);
-        Stash.put("coefKey",coefFavour);
     }
 
 
