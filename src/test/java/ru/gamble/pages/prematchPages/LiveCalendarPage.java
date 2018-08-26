@@ -20,6 +20,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -149,7 +150,8 @@ public class LiveCalendarPage extends AbstractPage {
                 el.click();
                 LOG.info("Нажали на::[" + el.getText() + "]");
                 workWithPreloader();
-                if(el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]")).size() < Integer.parseInt(numberOfIvents)) {
+                if(el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"))
+                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() < Integer.parseInt(numberOfIvents)) {
                     continue;
                 }else{return;}
         }
