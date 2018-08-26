@@ -151,9 +151,9 @@ public class LiveCalendarPage extends AbstractPage {
                 LOG.info("Нажали на::[" + el.getText() + "]");
                 workWithPreloader();
                 if(el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"))
-                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() < Integer.parseInt(numberOfIvents)) {
-                    continue;
-                }else{return;}
+                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() > Integer.parseInt(numberOfIvents)) {
+                    return;
+                }
         }
         throw new AutotestError("Ошибка! Недостаточно событий");
     }
