@@ -186,7 +186,7 @@ public abstract class AbstractPage extends Page {
         driver.get(url + "?action=verify&" + link);
 
         LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.modal__closeBtn.closeBtn")));
+        new WebDriverWait(driver, 20).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.modal__closeBtn.closeBtn")));
 
         LOG.info("Закрываем уведомление об успешном подтверждении почты");
         driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
