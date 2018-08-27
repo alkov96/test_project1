@@ -158,8 +158,13 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через WAVE
 
-    * запоминаем значение активных опций сайта в "ACTIVE"
-    * переключаем регистрацию на "WAVE"
+#    * запоминаем значение активных опций сайта в "ACTIVE"
+#    * переключаем регистрацию на "WAVE"
+
+    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+      |identification_with_euroset|false|
+      |identification_with_video|false|
+
 
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
@@ -260,14 +265,17 @@
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
 
-    * выставляем обратно старое значение активных опций сайта "ACTIVE"
+#    * выставляем обратно старое значение активных опций сайта "ACTIVE"
 
 
   @api
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через SKYPE
 
-    * добавляем активную опцию сайта "identification_with_video"
+#    * добавляем активную опцию сайта "identification_with_video"
+
+    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+      |identification_with_video|true|
 
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
@@ -341,7 +349,10 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через Евросеть
 
-    * добавляем активную опцию сайта "identification_with_euroset"
+#    * добавляем активную опцию сайта "identification_with_euroset"
+    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+      |identification_with_euroset|true|
+
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |

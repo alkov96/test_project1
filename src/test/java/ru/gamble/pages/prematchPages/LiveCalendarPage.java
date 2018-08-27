@@ -125,6 +125,7 @@ public class LiveCalendarPage extends AbstractPage {
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Нажимаем на выпадающее меню видов спорта");
         WebElement menuSport = driver.findElement(By.xpath("//div[contains(@class,'select__toggler')]"));
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(menuSport));
         menuSport.click();
         LOG.info("Выбираем вид спорта::" + sport);
         WebElement selectSport = menuSport.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
