@@ -20,6 +20,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -138,21 +139,23 @@ public class LiveCalendarPage extends AbstractPage {
         menuSport.click();
     }
 
-    @ActionTitle("выбирает следующий день недели с событиями")
-    public void selectsNextDayOfWeek(){
+    @ActionTitle("выбирает следующий день недели с более чем событиями")
+    public void selectsNextDayOfWeek(String numberOfIvents){
         String xpathCurrentDayOfWeek = "//li[contains(@class,'tabs__tab tabs__tab_livecal') and contains(@class,'tabs__tab_active')]";
         String xpathNextDayOfWeek = "following-sibling::li";
         WebElement currentDayOfWeek = PageFactory.getDriver().findElement(By.xpath(xpathCurrentDayOfWeek));
         List<WebElement> listOtherDeysOfWeek = currentDayOfWeek.findElements(By.xpath(xpathNextDayOfWeek));
+
         for(WebElement el:listOtherDeysOfWeek){
-            do{
                 el.click();
+                LOG.info("Нажали на::[" + el.getText() + "]");
                 workWithPreloader();
-            }while (el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]")).isEmpty());
-            LOG.info("Перешли на::[" + el.getText() + "]");
-            return;
+                if(el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"))
+                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() > Integer.parseInt(numberOfIvents)) {
+                    return;
+                }
         }
-        throw new AutotestError("Ошибка! На остальных днях недели не загрузились события");
+        throw new AutotestError("Ошибка! Недостаточно событий");
     }
 
 
