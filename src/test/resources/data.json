@@ -21,6 +21,7 @@
     "REGISTRATION_URL": "https://demo.gamebet.ru/test_registration/",
     "USER": "alexeyp00+66@mail.ru",
     "PASSWORD": "Privet555",
+    "PASS": "Privet555",
     "PHONE":"79155676787",
     "DB_REGISTRATION": {
       "DB_URL": "jdbc:mysql://main-demo.wd.orglot.office:3306",
