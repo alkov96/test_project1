@@ -2,6 +2,7 @@ package ru.gamble.pages;
 
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
+import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.FindBy;
@@ -334,6 +335,7 @@ public abstract class AbstractPage extends Page {
             waitForElementPresent(findCoeffs, 10);
             List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
             int tryPage = 0;
+            int counter = 10;
             do {
                 try {
                     inCorrectMarkets = getWebDriver().findElements(findCoeffs)
@@ -343,6 +345,8 @@ public abstract class AbstractPage extends Page {
                     tryPage++;
                     allDaysPages.get(tryPage).click();
                 }
+                counter--;
+                Assert.assertFalse("Не нашли достаточное количество некорректных событий.", counter==0);
             } while (inCorrectMarkets.size() < count && tryPage < allDaysPages.size() - 1);
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
