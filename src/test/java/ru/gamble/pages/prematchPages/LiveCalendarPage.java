@@ -1,5 +1,6 @@
 package ru.gamble.pages.prematchPages;
 
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -124,13 +125,15 @@ public class LiveCalendarPage extends AbstractPage {
     public static void inSportsSelectionMenuSelect(String sport){
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Нажимаем на выпадающее меню видов спорта");
-        WebElement menuSport = driver.findElement(By.xpath("//div[contains(@class,'select__toggler')]"));
+        WebElement menuSport = driver.findElement(By.xpath("//div[contains(@class,'select__toggler')]/span[2]"));
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(menuSport));
-        menuSport.click();
+        if (menuSport.isDisplayed()){
+            menuSport.click();
+        } else LOG.error("Элемент не отображается");
         LOG.info("Выбираем вид спорта::" + sport);
         WebElement selectSport = menuSport.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
         selectSport.click();
-        new WebDriverWait(driver,3).until(ExpectedConditions.visibilityOf(menuSport));
+        new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOf(menuSport));
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
