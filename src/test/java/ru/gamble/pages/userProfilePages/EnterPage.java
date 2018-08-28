@@ -2,8 +2,10 @@ package ru.gamble.pages.userProfilePages;
 
 import cucumber.api.DataTable;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -84,7 +86,11 @@ public class EnterPage extends AbstractPage {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String login, password;
         if(data.get(LOGIN).equals(Constants.DEFAULT)){
-            login = JsonLoader.getData().get(STARTING_URL).get("USER").getValue();
+            Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
+            String browserName = caps.getBrowserName();
+            if (browserName.contains("chrome")){
+            login = JsonLoader.getData().get(STARTING_URL).get("USER_CHROME").getValue();}
+            else {login = JsonLoader.getData().get(STARTING_URL).get("USER_FIREFOX").getValue();}
         } else if(data.get(LOGIN).equals("EMAIL")){
             login = Stash.getValue("EMAIL");
         } else {
