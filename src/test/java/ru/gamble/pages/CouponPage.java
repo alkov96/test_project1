@@ -181,6 +181,7 @@ public class CouponPage extends AbstractPage {
         } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: [" + team1 + "] - [" + team2 + "] <=> [" + сouponGame + "]");
     }
 
+
     @ActionTitle("проверяет, совпадает ли исход в купоне с ожидаемым")
     public void checkIshod(String ishodKey) {
         WebDriver driver = PageFactory.getDriver();

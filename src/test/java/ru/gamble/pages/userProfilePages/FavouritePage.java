@@ -147,7 +147,7 @@ public class FavouritePage extends AbstractPage {
 
 
 
-    @ActionTitle("запоминаем название команд")
+    @ActionTitle("запоминаем название команд в избранном")
     public void rememberTeamsName(String team1key, String team2key){
         WebDriver driver = PageFactory.getDriver();
         WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном

@@ -197,8 +197,13 @@ public class MainPage extends AbstractPage {
     }
 
     //добавление коэфа победы первой команды в виджете БТ
-    @ActionTitle("добавляет коэф с виджета в купон")
-    public void addToCouponFromBT(String widget){
+    @ActionTitle("добавляет коэф с виджета в купон и сохраняет название команд, коэф и исход")
+    public void addToCouponFromBT(String widget, DataTable dataTable){
+        List<String> data = dataTable.asList(String.class);
+        String team1key = data.get(0);
+        String team2key = data.get(1);
+        String ishodKey = data.get(2);
+        String coefKey = data.get(3);
         String path;
         switch (widget) {
             case "Горячие ставки":
@@ -230,18 +235,18 @@ public class MainPage extends AbstractPage {
         } while (number <= allSport.size() - 1);
 
         WebElement selectGame = games.get(0).findElement(By.xpath("ancestor::tr"));
-        String team1 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).getAttribute("title").trim();
-        String team2 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div[1]")).getAttribute("title").trim();
+        String bannerTeam1 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).getAttribute("title").trim();
+        String bannerTeam2 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div[1]")).getAttribute("title").trim();
         float p1 = Float.valueOf(selectGame.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div[1]/span")).getText());
-        LOG.info("Игра, на которой будем проверять добавление в купон из виджета БТ: " + team1 + " - " + team2);
+        LOG.info("Игра, на которой будем проверять добавление в купон из виджета БТ: " + bannerTeam1 + " - " + bannerTeam2);
         LOG.info("Коэффициент победы первой команды = " + p1);
         selectGame.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div[1]/span")).click();
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         CommonStepDefs.workWithPreloader();
-        Stash.put("team1key",team1);
-        Stash.put("team2key",team2);
-        Stash.put("ishodKey",team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
-        Stash.put("coefKey",p1);
+        Stash.put(team1key,bannerTeam1);
+        Stash.put(team2key,bannerTeam2);
+        Stash.put(ishodKey,bannerTeam1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
+        Stash.put(coefKey,p1);
     }
 
     @ActionTitle("осуществляет переход на страницу, проверяет, что открылась нужная страница")

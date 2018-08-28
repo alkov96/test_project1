@@ -51,7 +51,7 @@ public class DayEventsPage extends AbstractPage {
     }
 
     @ActionTitle("добавляет событие с баннера в купон и сохраняет в память")
-    public void addEventToCouponFromBanner(String keyTeam1, String keyTeam2, String keyOutcome){
+    public void addEventToCouponFromBanner(String keyTeam1, String keyTeam2, String keyKoef){
         WebDriver driver = PageFactory.getDriver();
         CommonStepDefs.workWithPreloader();
         String xpathEvent = "//div[@class='event-widget-coef']/div[3]/span[2]";
@@ -69,8 +69,8 @@ public class DayEventsPage extends AbstractPage {
             Stash.put(keyTeam1, team1);
             Stash.put(keyTeam2, team2);
             //Stash.put(keyOutcome, team2);
-            Stash.put(keyOutcome, coef);
-            LOG.info("Сохранили в памяти key [" + keyOutcome + "] <== value [" + coef + "]");
+            Stash.put(keyKoef, coef);
+            LOG.info("Сохранили в памяти key [" + keyKoef + "] <== value [" + coef + "]");
         } else {
             throw new AutotestError("Ошибка! Ни один баннер не найден.");
         }
