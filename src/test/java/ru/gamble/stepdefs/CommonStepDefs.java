@@ -1432,7 +1432,7 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlRequest);
     }
 
-    @After(value = "@NewUserRegistration_C36189,@Registration_mobile,@requestVideoChatConfirmation,@Registration_fullalt_mobile")
+    @After(value = "@NewUserRegistration_C36189,@Registration_mobile,@requestVideoChatConfirmation,@Registration_fullalt_mobile,@requestPhoneCall")
     public void returnRegistrationValue(){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");
