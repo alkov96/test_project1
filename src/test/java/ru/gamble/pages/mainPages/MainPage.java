@@ -437,20 +437,35 @@ public class MainPage extends AbstractPage {
         Stash.put("sportKey",sport);
     }
 
-    @ActionTitle("проверяет наличие блока Горячие ставки и переходит на игру")
-    public void checkHBandAddBetToCoupon(){
+    @ActionTitle("проверяет наличие на станице лендинга блока Горячие ставки")
+    public void checkHBandAdd() {
         WebDriver driver = PageFactory.getDriver();
-        WebDriverWait wait = new WebDriverWait(driver,10);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        WebDriverWait wait = new WebDriverWait(driver, 15);
+        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
         //смотрим что есть заголовок Горячие ставки
-        WebElement titleHB = driver.findElement(By.xpath("//ul[@class='landing-sports-wmenu']/li[contains(text(),'ставки')]"));
-        boolean isHide = titleHB.getAttribute("class").contains("hide");
-        assertFalse("На странице лендинга спорта нет горячих ставок",isHide);
+        String pathToTitleHB = "//ul[@class='landing-sports-wmenu']/li[contains(text(),'ставки')]";
+        LOG.info("displayed "+driver.findElement(By.xpath(pathToTitleHB)).isDisplayed());
+        LOG.info("enabled "+driver.findElement(By.xpath(pathToTitleHB)).isEnabled());
+
+        wait.withMessage("На странице лендинга спорта нет блока горячих ставок".toUpperCase()+"\n");
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(pathToTitleHB)));
+        int x = driver.findElement(By.xpath(pathToTitleHB)).getLocation().getX();
+        int y = driver.findElement(By.xpath(pathToTitleHB)).getLocation().getY();
+        CommonStepDefs.scrollPage(x,y);
         LOG.info("На странице лендинга есть блок Горячие ставки");
         LOG.info("Кликаем на заголовок блока ГС");
-        driver.findElement(By.xpath("//ul[@class='landing-sports-wmenu']/li[contains(text(),'ставки')]")).click();//кликаем на заголовк блока Горячих ставок (на тот случай, если есть еще ближашие трансляции или просто соревнование и ГС неактивны
-        wait.until(ExpectedConditions.attributeContains(titleHB,"class","active"));
-
+        driver.findElement(By.xpath(pathToTitleHB)).click();//кликаем на заголовк блока Горячих ставок (на тот случай, если есть еще ближашие трансляции или просто соревнование и ГС неактивны
+        wait.withMessage("Не удалось переключиться на блок Горячих ставок".toUpperCase()+"\n");
+        wait.until(ExpectedConditions.attributeContains(driver.findElement(By.xpath(pathToTitleHB)), "class", "active"));
+    }
+    @ActionTitle("добавляет игру в купон со страницы лендинга, с блока Горячие ставки")
+    public void AddBetToCoupon(DataTable dataTable){
+        WebDriver driver = PageFactory.getDriver();
+        List<String> table = dataTable.asList(String.class);
+        String team1key = table.get(0);
+        String team2key = table.get(1);
+        String ishodKey = table.get(2);
+        String coefKey = table.get(3);
         WebElement hotBet = driver.findElements(By.xpath("//div[@class='bets-widget-table hot-bets']//tr[contains(@class,'bets-widget-table__bets')]")).get(0);
         String team1 = hotBet.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div")).getAttribute("title");
         String team2 = hotBet.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div")).getAttribute("title");
@@ -460,10 +475,10 @@ public class MainPage extends AbstractPage {
         hotBet.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div/span")).click();
         waitForElementPresent(By.cssSelector("div.list-bet-block-top"),10);
 
-        Stash.put("team1key",team1);
-        Stash.put("team2key",team2);
-        Stash.put("ishodKey",team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
-        Stash.put("coefKey",p1);
+        Stash.put(team1key,team1);
+        Stash.put(team2key,team2);
+        Stash.put(ishodKey,team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
+        Stash.put(coefKey,p1);
     }
 
 
