@@ -540,5 +540,6 @@ public class CouponPage extends AbstractPage {
             LOG.info("Баннер не отображается, так как в купоне есть событие");
         }
     }
+
 }
 
