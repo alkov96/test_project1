@@ -655,60 +655,12 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             e.getMessage();
         }
-        valueFingingParams = hashMapper(retMap, keyFingingParams);
+        valueFingingParams = JsonLoader.hashMapper(retMap, keyFingingParams);
         LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + JSONValue.toJSONString(valueFingingParams));
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
-    /**
-     * Метод пробегает по Map of Maps и ищет ключ
-     * и возвращает либо значение по искомогу ключу или null
-     *
-     * @param finding - искомый ключ
-     * @param json     - Object
-     */
-    private Object hashMapper(Object json, String finding) {
-        String key;
-        Object request = null, value;
 
-        if (json instanceof Map) {
-            ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> map = oMapper.convertValue(json, Map.class);
-
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                key = entry.getKey();
-                value = entry.getValue();
-                if ((value instanceof String) || (value instanceof Integer) || (value instanceof Long) || (value instanceof Timestamp) || (value instanceof Boolean)) {
-                    if (key.equalsIgnoreCase(finding)) {
-                       // return request = String.valueOf(value);
-                        return request = value;
-                    }
-                } else if (value instanceof Map) {
-                    Map<String, Object> subMap = (Map<String, Object>) value;
-                    if (key.equalsIgnoreCase(finding)) {
-                        return request = value;
-                    }else{
-                    request = hashMapper(subMap, finding);
-                    }
-                } else if (value instanceof List) {
-                    List list = (List) value;
-                    if (key.equalsIgnoreCase(finding)) {
-                        return request = ((List) list);
-                    } else {
-                        request = hashMapper((Object) list, finding);
-                    }
-                } else {
-                    throw new IllegalArgumentException(String.valueOf(value));
-                }
-            }
-        }else if(json instanceof List){
-            for (int i = 0; i < ((List) json).size(); i++) {
-                Object listItem = ((List) json).get(i);
-                request = hashMapper(listItem, finding);
-            }
-        }
-        return request;
-    }
 
     private static String workWithDBgetResult(String sqlRequest, String param) {
         Connection con = DBUtils.getConnection();
@@ -721,6 +673,26 @@ public class CommonStepDefs extends GenericStepDefs {
             rs = stmt.executeQuery(sqlRequest);
             rs.last();
             result = rs.getString(param);
+            LOG.info("SQL-request [" + result + "]");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtils.closeAll(con, ps, null);
+        }
+        return result;
+    }
+
+    private static String workWithDBgetResult(String sqlRequest) {
+        Connection con = DBUtils.getConnection();
+        Statement stmt = null;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        String result = "";
+        try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlRequest);
+            rs.last();
+            result = rs.getString(1).replaceAll("\n","").replaceAll(" +"," ");
             LOG.info("SQL-request [" + result + "]");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -928,7 +900,7 @@ public class CommonStepDefs extends GenericStepDefs {
         for(int i = 0; i < table.size(); i++) {
             param = table.get(i).get(PARAMETER);
             type = table.get(i).get(TYPE);
-            currentValue = JSONValue.toJSONString(hashMapper(json, param));
+            currentValue = JSONValue.toJSONString(JsonLoader.hashMapper(json, param));
             assertThat(checkType(currentValue, type)).as("Тип параметра[" + param + "] не совпадает с[" + type + "]").isTrue();
             LOG.info("Тип параметра[" + currentValue + "] соответсвует [" + type + "]");
         }
@@ -1014,7 +986,7 @@ public class CommonStepDefs extends GenericStepDefs {
             } else {
                 value = tmp;
             }
-            currentValue = String.valueOf(hashMapper(json, param));
+            currentValue = String.valueOf(JsonLoader.hashMapper(json, param));
             assertThat(currentValue).as("[" + currentValue + "] не совпадает с [" + value + "]").isEqualToIgnoringCase(value);
             LOG.info("[" + currentValue + "] совпадает с [" + value + "]");
         }
@@ -1127,7 +1099,7 @@ public class CommonStepDefs extends GenericStepDefs {
                     LOG.info("Cохранили [" + key.toString() + "]==>[" + keyVariable + "]");
                 }else {
                     value = entry1.getValue();
-                    currentValue = JSONValue.toJSONString(hashMapper(value, param));
+                    currentValue = JSONValue.toJSONString(JsonLoader.hashMapper(value, param));
                     Stash.put(keyVariable, currentValue);
                     LOG.info("Cохранили [" + currentValue + "]==>[" + keyVariable + "]");
                 }
@@ -1531,6 +1503,20 @@ public class CommonStepDefs extends GenericStepDefs {
             new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
         }
     }
+
+    @Когда("^запрашиваем параметры способов пополения и сохраняем в память как \"([^\"]*)\"$")
+    public void requestParametersOfRefillMethodsAndStoreToStash(String KeyInStash){
+        String sqlRequest = "SELECT value FROM gamebet.params WHERE name ='" + KeyInStash + "'";
+        requestFromDBAndSaveToStash(sqlRequest,KeyInStash);
+    }
+
+    private void requestFromDBAndSaveToStash(String sqlRequest, String KeyInStash){
+        String result = workWithDBgetResult(sqlRequest).replaceAll("\n","");
+        Stash.put(KeyInStash,result);
+        LOG.info("Сохранили в память key [" + KeyInStash + "] <== value [" + result + "]");
+    }
+
+
 
 }
 
