@@ -17,7 +17,7 @@
     | team1key  |
     | team2key  |
     | ishodKey  |
-    | coefKey  |
+    | coefKey   |
 
     * пользователь осуществляет переход в "Купон"
 
