@@ -1,8 +1,10 @@
 package ru.gamble.pages.tsupis;
 
 import cucumber.api.DataTable;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -53,7 +55,15 @@ public class TSUPISMainPage extends AbstractPage {
 
         try {
             if(data.get(PHONE).equals(DEFAULT)){
-                phone = JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue();
+                Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
+                String browserName = caps.getBrowserName();
+                if (browserName.contains("chrome")){
+                    phone = JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue();
+                }
+                else {
+                    phone = JsonLoader.getData().get(STARTING_URL).get("PHONE_FIREFOX").getValue();
+                }
+
             } else {
                 phone = data.get(PHONE);
             }
