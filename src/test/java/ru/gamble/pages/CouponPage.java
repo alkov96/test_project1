@@ -223,13 +223,15 @@ public class CouponPage extends AbstractPage {
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
         Thread.sleep(500);
-        if (oldCoef.size() > 0 && !driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()) {
+        WebElement error_message = driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']"));
+        if (oldCoef.size() > 0 && !error_message.isDisplayed()) {
             Assertions.fail("Коэф изменился, однако сообщение не отображается.");
         }
-        LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
-        Thread.sleep(1000);
-        if (!driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()
-                || !driver.findElement(xpath("//div[@class='coupon-confirm__btn']")).isDisplayed()) {
+        //LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
+        Thread.sleep(5000);
+        WebElement btn_accept = driver.findElement(xpath("//div[@class='coupon-confirm__btn']"));
+        if (!error_message.isDisplayed()
+                || !btn_accept.isDisplayed()) {
             Assertions.fail("При изменении условий ставки не появилось сообщение или кнопка о принятии изменений.");
         }
         LOG.info("Появилось сообщение о принятии коэфицента и кнопка");
@@ -282,7 +284,7 @@ public class CouponPage extends AbstractPage {
                }
         }
 
-        if (allBets.size()==0){
+        if (allBets.size() == 0){
             LOG.info("Подходящей ставки не нашлось, поэтому заново добавляем события в купон, сравниваем коэфиценты и удаляем ненужные события");
             DayEventsPage.addEventsToCouponF();
             compareChangeCoef();
