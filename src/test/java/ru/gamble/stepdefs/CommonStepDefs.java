@@ -1022,7 +1022,7 @@ public class CommonStepDefs extends GenericStepDefs {
         while ((line = fr.readLine()) != null){
             sbt.append(line).append(System.lineSeparator());
         }
-        FileWriter fw = new FileWriter("src\\test\\resources\\full_alt.txt");
+        FileWriter fw = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(sbt.toString());
         bw.flush();
