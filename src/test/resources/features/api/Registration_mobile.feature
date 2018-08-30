@@ -445,6 +445,8 @@
     * проверка вариантного ответа API из "RESPONCE_API":
       | exepted     | "status":8 or "status":7 |
 
+    * ожидание "5" сек
+
 
 
 
