@@ -1,5 +1,37 @@
 # language: ru
 Функционал: 2_Пополнение и вывод
+  Предыстория:
+    * сохраняем в память
+      | DEVID | randomNumber 4 |
+
+    * сохраняем в память
+      | USER  | Default |
+
+    * сохраняем в память
+      | PASSWORD  | Default |
+
+    * сохраняем в память
+      | SOURCE | 16 |
+
+    * сохраняем в память
+      | RID | 15355431498522 |
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId    | DEVID    |
+      | email    | USER     |
+      | pass     | PASSWORD |
+      | source   | SOURCE   |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * добавляем данные в JSON объект "PARAMS" сохраняем в память:
+      | auth_token | AUTHTOKEN |
+
+    * запрос к WSS "wss://swarm-test.betfavorit.cf:8443/" и сохраняем в "RESPONCE_WSS":
+    | command | restore_login |
+    | params  | PARAMS        |
+    | rid     | RID           |
+
 
   @regress
   @DepositLimits_C47804
@@ -8,15 +40,12 @@
     * разлогиниваем пользователя
     * открывается страница "Главная страница"
 
-
-
     * пользователь (нажимает кнопку) "Вход"
     * открывается страница "Вход"
 
     * пользователь (логинится с) данными
       | Логин  | Default |
       | Пароль | Default |
-
 
     * открывается страница "Авторизованная Главная страница"
 

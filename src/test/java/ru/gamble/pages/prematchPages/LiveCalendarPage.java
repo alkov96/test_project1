@@ -108,7 +108,7 @@ public class LiveCalendarPage extends AbstractPage {
         }
         do {
             LOG.info("coefficients = " + coefficients.size());
-            num = random.nextInt(coefficients.size() - 1 - count);
+            num = random.nextInt(Math.abs(coefficients.size() - 1 - count));
             LOG.info("num = " + num);
             if (coefficients.get(num).isDisplayed()) {
                 coefficients.get(num).click();
