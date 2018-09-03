@@ -1,10 +1,7 @@
 package ru.gamble.stepdefs;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.util.JSON;
-import com.neovisionaries.ws.client.*;
 import cucumber.api.DataTable;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -37,7 +34,6 @@ import javax.net.ssl.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
-import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -50,7 +46,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.TLS;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.utility.Constants.*;
@@ -1530,75 +1525,75 @@ public class CommonStepDefs extends GenericStepDefs {
 
         String text;
 
-        try {
-
-            WebSocket ws = connect();
-            BufferedWriter out = getOtput();
-
-
-
-
-            LOG.info(JSONValue.toJSONString(JSONValue.parse(out.toString())));
-            ws.sendText(firstRequest);
-            out = getOtput();
-            LOG.info(JSONValue.toJSONString(JSONValue.parse(out.toString())));
-            ws.sendText(secondRequest);
-            out = getOtput();
-            LOG.info(JSONValue.toJSONString(JSONValue.parse(out.toString())));
-            ws.sendText(therdRequest);
-            out = getOtput();
-            LOG.info(JSONValue.toJSONString(JSONValue.parse(out.toString())));
-
+//        try {
 //
-//            if (ws.getSocket().getInputStream().available() != 0 ) {
-//                BufferedReader in = getInput();
-//                String s = JSONValue.toJSONString(JSONValue.parse(in.readLine()));
+////            WebSocket ws = connect();
+////            BufferedWriter out = getOtput();
+////
+////
+////
+////
+////            LOG.info(JSONValue.toJSONString(JSONValue.parse(out.toString())));
+////            ws.sendText(firstRequest);
+////            out = getOtput();
+////            LOG.info(JSONValue.toJSONString(JSONValue.parse(out.toString())));
+////            ws.sendText(secondRequest);
+////            out = getOtput();
+////            LOG.info(JSONValue.toJSONString(JSONValue.parse(out.toString())));
+////            ws.sendText(therdRequest);
+////            out = getOtput();
+////            LOG.info(JSONValue.toJSONString(JSONValue.parse(out.toString())));
+////
+//////
+//////            if (ws.getSocket().getInputStream().available() != 0 ) {
+//////                BufferedReader in = getInput();
+//////                String s = JSONValue.toJSONString(JSONValue.parse(in.readLine()));
+//////
+//////            }
+////
+////
+////
+////            ws.disconnect();
+////
+////        } catch (NoSuchAlgorithmException e) {
+////            e.printStackTrace();
+////        } catch (IOException e) {
+////            e.printStackTrace();
+////        } catch (WebSocketException e) {
+////            e.printStackTrace();
+////        }
+
+    }
+
+//    /**
+//     * Connect to the server.
+//     */
+//    private static WebSocket connect() throws IOException, WebSocketException, NoSuchAlgorithmException {
 //
-//            }
-
-
-
-            ws.disconnect();
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * Connect to the server.
-     */
-    private static WebSocket connect() throws IOException, WebSocketException, NoSuchAlgorithmException {
-
-        SSLContext context = NaiveSSLContext.getInstance("TLS");
-        WebSocketFactory factory = new WebSocketFactory();
-        factory.setSSLContext(context);
-        return new WebSocketFactory()
-                .setSSLContext(context)
-                .setVerifyHostname(false)
-                .setConnectionTimeout(5000)
-                .createSocket("wss://swarm-test.betfavorit.cf:8443/")
-                .addListener(new WebSocketAdapter() {
-                    // A text message arrived from the server.
-                    public void onTextMessage(WebSocket websocket, String message) {
-                        LOG.info(message);
-                    }
-                })
-                .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
-                .connect();
-    }
-
-    /**
-     * Wrap the standard input with BufferedReader.
-     */
-    private static BufferedWriter getOtput() throws IOException {
-        return new BufferedWriter(new OutputStreamWriter(System.out));
-    }
+//        SSLContext context = NaiveSSLContext.getInstance("TLS");
+//        WebSocketFactory factory = new WebSocketFactory();
+//        factory.setSSLContext(context);
+//        return new WebSocketFactory()
+//                .setSSLContext(context)
+//                .setVerifyHostname(false)
+//                .setConnectionTimeout(5000)
+//                .createSocket("wss://swarm-test.betfavorit.cf:8443/")
+//                .addListener(new WebSocketAdapter() {
+//                    // A text message arrived from the server.
+//                    public void onTextMessage(WebSocket websocket, String message) {
+//                        LOG.info(message);
+//                    }
+//                })
+//                .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
+//                .connect();
+//    }
+//
+//    /**
+//     * Wrap the standard input with BufferedReader.
+//     */
+//    private static BufferedWriter getOtput() throws IOException {
+//        return new BufferedWriter(new OutputStreamWriter(System.out));
+//    }
 
 }
 
