@@ -13,7 +13,7 @@
     * сохраняем в память
       | SOURCE | 16 |
 
-
+  @api
   @login
   @correct
   Сценарий: 3_19 Аутентификация пользователя. Позитивный кейс
@@ -21,7 +21,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId    | DEVID    |
       | email    | USER     |
-      | password | PASSWORD |
+      | pass     | PASSWORD |
       | source   | SOURCE   |
 
     * проверка ответа API из "RESPONCE_API":
@@ -33,7 +33,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId    | 0 |
       | email    | 0 |
-      | password | 0 |
+      | pass     | 0 |
       | source   | 0 |
 
     * проверка ответа API из "RESPONCE_API":

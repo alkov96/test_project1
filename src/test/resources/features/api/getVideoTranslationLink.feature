@@ -17,10 +17,10 @@
       | PROVIDER_NAME | IMG |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | DEVID   |
-      | email  | USER    |
-      | pass   | PASSWORD    |
-      | source | SOURCE  |
+      | devId  | DEVID    |
+      | email  | USER     |
+      | pass   | PASSWORD |
+      | source | SOURCE   |
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
