@@ -154,6 +154,99 @@
 #  | exepted | "status":11 |
 
 
+
+
+  @api
+  @Registration_mobile
+  Сценарий: Мобильная регистрация полная через WAVE без выбора способа регистрации
+
+#    * запоминаем значение активных опций сайта в "ACTIVE"
+#    * переключаем регистрацию на "WAVE"
+
+    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+      |identification_with_euroset|false|
+      |identification_with_video|false|
+
+    * приводим дату к формату год-месяц-день "BIRTHDATE"
+    * приводим дату к формату год-месяц-день "VALIDISSUEDATE"
+
+    * добавляем данные в JSON объект "ADDRESS" сохраняем в память:
+      | regionKLADR       | null          |
+      | region            | Москва        |
+      | town              | CITY          |
+      | street            | STREET        |
+      | building          | HOUSE         |
+      | bulk              | null          |
+      | flat              | FLAT          |
+
+    * добавляем данные в JSON массив "DOCUMENTS" сохраняем в память:
+      | type       | passportRus    |
+      | series     | DOCSERIES      |
+      | number     | DOCNUM         |
+      | issuer     | ISSUEPLACE     |
+      | issuedate  | VALIDISSUEDATE |
+      | validto    | null           |
+      | issuercode | 123-456        |
+
+    * запрашиваем дату-время и сохраняем в память
+      | DATE_TIME | Current |
+
+    * запрос к API "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+      | operationdatetime   | DATE_TIME     |
+      | phone               | PHONE         |
+      | firstname           | FIRSTNAME     |
+      | lastname            | PATRONYMIC    |
+      | paternalname        | PATERNALNAME  |
+      | sex                 | GENDER        |
+      | birthdate           | BIRTHDATE     |
+      | birthlocation       | BIRTHPLACE    |
+      | citizenship         | "RUS"         |
+      | publicperson        | null          |
+      | publicperson        | null          |
+      | address             | ADDRESS       |
+      | documents           | DOCUMENTS     |
+      | operationofficecode | "222"         |
+      | operatorlogin       | "333"         |
+      | inn                 | INN           |
+      | SNILS               | SNILS         |
+      | method              | betshop       |
+      | error               | ""            |
+      | reason              | ""            |
+      | identityState       | "LIMITED"     |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "state":"ok" |
+
+
+    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * подтверждаем от ЦУПИС "EMAIL"
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId  | DEVID    |
+      | email  | EMAIL    |
+      | pass   | PASSWORD |
+      | source | 16       |
+
+
+    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * проверка вариантного ответа API из "RESPONCE_API":
+      | exepted     | "status":8 or "status":7 |
+
+    * ожидание "5" сек
+
+#    * выставляем обратно старое значение активных опций сайта "ACTIVE"
+
+
+
+
   @api
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через WAVE
@@ -265,7 +358,14 @@
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
 
+    * проверка вариантного ответа API из "RESPONCE_API":
+      | exepted     | "status":8 or "status":7 |
+
+    * ожидание "10" сек
+
 #    * выставляем обратно старое значение активных опций сайта "ACTIVE"
+
+
 
 
   @api
@@ -341,6 +441,11 @@
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
+
+    * проверка вариантного ответа API из "RESPONCE_API":
+      | exepted     | "status":8 or "status":7 |
+
+    * ожидание "15" сек
 
 
 

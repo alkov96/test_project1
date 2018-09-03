@@ -96,7 +96,7 @@ public class LiveCalendarPage extends AbstractPage {
     public void addToCouponDifferentBets(String param){
         String xpathCoefficient = "//preceding-sibling::td[contains(@class,'livecal-table__col_event')]";
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"));
+        List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')and not(contains(@class,'empty'))]"));
         int count = 0;
         int number = (Integer.valueOf(param)) - 1;
         Random random = new Random();
