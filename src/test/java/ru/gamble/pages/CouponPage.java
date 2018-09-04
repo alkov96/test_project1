@@ -1,6 +1,6 @@
 package ru.gamble.pages;
 
-import org.assertj.core.api.Assert;
+
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
