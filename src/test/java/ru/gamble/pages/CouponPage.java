@@ -1,6 +1,6 @@
 package ru.gamble.pages;
 
-import org.assertj.core.api.Assert;
+
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -61,10 +61,6 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//span[@class='bs-type-switcher__title-text ng-binding']")
     private WebElement betType;
 
-    @ElementTitle("бонусы")
-    @FindBy(xpath = "//div[@id='bonusmoney']")
-    private WebElement bonusSwitcher;
-
     @ElementTitle("очистка")
     @FindBy(xpath = "//div[@class='coupon-clear-all__inner']")
     private WebElement clearCoupon;
@@ -96,12 +92,12 @@ public class CouponPage extends AbstractPage {
     @FindBy(className="coupon-banners") //баннеры в купоне
     private WebElement bannersInCoupon;
 
+
     public CouponPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(coupon,10, 5);
-       // new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon));
     }
 
     @ActionTitle("убирает события из купона, пока их не станет")
@@ -389,10 +385,11 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         BigDecimal currentBalance, previousBalance, sumBet;
 
-        By balance = param.equals("бонусов") ? By.id("bonus-balance") : By.id("topPanelWalletBalance");
+        By balance = param.equals("бонусов") ? By.xpath("//div[contains(@class,'bonusmoney-sum')]") : By.id("topPanelWalletBalance");
         String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         int count = 30;
-        previousBalance = new BigDecimal((String) Stash.getValue(key)).setScale(2, RoundingMode.HALF_UP);
+        previousBalance = new BigDecimal(Stash.getValue(key).toString().replace("Б","").trim()).setScale(2, RoundingMode.HALF_UP);
+
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.HALF_UP);
         String currentNumber = "";
         while (count > 0){
@@ -419,6 +416,7 @@ public class CouponPage extends AbstractPage {
             }
         }
     }
+
 
     @ActionTitle("проверяет изменение количества экспрессов при переключении вида системы")
     public void checkCountExpress(){

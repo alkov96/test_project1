@@ -13,7 +13,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.userProfilePages.PopUPLCPage;
 import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -24,14 +23,12 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static ru.gamble.utility.Constants.PARAMETER;
-import static ru.gamble.utility.Constants.TYPE;
+
 
 @PageEntry(title = "Пополнение счёта")
 public class RefillAccountsPage extends AbstractPage{
@@ -47,6 +44,13 @@ public class RefillAccountsPage extends AbstractPage{
     @ElementTitle("Пополнить")
     @FindBy(id = "btn-submit-money-in")
     private WebElement buttonRefill;
+
+    @ElementTitle("VISA_МИР")
+    @FindBy(xpath = "//div[@class='payPartner cupis_card']")
+    private WebElement visa_mirButton;
+
+    @FindBy(xpath = "//div[@class='payPartner cupis_wallet']")
+    private WebElement cupis_deposit;
 
     public RefillAccountsPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -144,4 +148,69 @@ public class RefillAccountsPage extends AbstractPage{
         }
 
     }
+
+    @ActionTitle("вводит сумму и выбирает способ пополнения c")
+    public void enterAmountAndSelectDepositMethod(DataTable dataTable)  {
+        checkForErrorLoadingPaymentSystems();
+
+        WebDriver driver = PageFactory.getWebDriver();
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
+        String amount, depositMethod;
+        amount = data.get("СУММА");
+        depositMethod = data.get("Способ");
+        LOG.info("Cохраняем в память сумму в переменной 'СУММА' и вводим в поле::" + amount);
+        Stash.put("СУММА",amount);
+        fillField(inputAmount,amount);
+
+        if(depositMethod.contains("") && visa_mirButton.isDisplayed()){
+            visa_mirButton.click();
+            LOG.info("Пополнение проходит через карту [" + depositMethod + "]");
+        } else {
+            if (cupis_deposit.isDisplayed()) {
+                cupis_deposit.click();
+                LOG.info("Пополнение проходит через кошелёк ЦУПИС");
+            } else {
+                Assertions.fail("Нет доступных способов пополнения");
+            }
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.getMessage();
+        }
+        buttonRefill.click();
+    }
+
+    /**
+     * проверка появления окна "Ошибка при загрузке платежных систем"
+     */
+    private void checkForErrorLoadingPaymentSystems(){
+        WebDriver driver = PageFactory.getWebDriver();
+        if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() > 0){
+            throw new AutotestError("Ошибка при загрузке платежных систем!");
+        }
+    }
+
+    @ActionTitle("вводит сумму и выбирает способ пополнения")
+    public void chooseSummAndClick() throws InterruptedException {
+        String sumBet = "1000";
+        Stash.put("sumBetKey",sumBet);
+        fillField(inputAmount,sumBet);
+
+        if (visa_mirButton.isDisplayed()) {
+            visa_mirButton.click();
+            LOG.info("Пополнение проходит через карту Виза");
+        } else {
+            if (cupis_deposit.isDisplayed()) {
+                cupis_deposit.click();
+                LOG.info("Пополнение проходит через кошелёк ЦУПИС");
+            } else {
+                Assertions.fail("Нет доступных способов пополнения");
+            }
+        }
+        Thread.sleep(2000);
+        visa_mirButton.click();
+    }
+
+
 }
