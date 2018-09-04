@@ -40,6 +40,10 @@ public class AuthenticationMainPage extends AbstractPage {
     @FindBy(id = "user-bets")
     private WebElement myBetsButton;
 
+    @ElementTitle("Внести депозит")
+    @FindBy(id = "btn-header-deposit")
+    private WebElement makeDepositButton;
+
 
     public AuthenticationMainPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -49,7 +53,7 @@ public class AuthenticationMainPage extends AbstractPage {
 
     @ActionTitle("запоминает значение баланса")
     public static void rememberBalnce(String param){
-        By top_balance = param.equals("бонусов")? By.id("bonus-balance") : By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
+        By top_balance = param.equals("бонусов") ? By.xpath("//span[contains(@class,'subMenuBonus bonusmoney-text')]") : By.id("topPanelWalletBalance");//запоминать нужно бонусы или рубли
         String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         List<WebElement> balanceElement = getWebDriver().findElements(top_balance);
 

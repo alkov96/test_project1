@@ -59,13 +59,9 @@ public class PopUPLCPage extends AbstractPage {
     @FindBy(id = "user-profile")
     private WebElement profileButton;
 
-    @ElementTitle("Вывод")
+    @ElementTitle("Вывести средства")
     @FindBy(id = "withdraw-button")
     private WebElement withdrawButton;
-
-    @ElementTitle("Пополнение")
-    @FindBy(id = "fulfill-button")
-    private WebElement depositButton;
 
     @FindBy(id = "money_in_amount2")
     private WebElement withdraw_field;
@@ -73,28 +69,17 @@ public class PopUPLCPage extends AbstractPage {
     @FindBy(id = "money_in_amount1")
     private WebElement deposit_field;
 
-    @FindBy(xpath = "//div[@class='payPartner cupis_card']")
-    private WebElement visa_deposit;
-
-    @FindBy(xpath = "//div[@class='payPartner cupis_wallet']")
-    private WebElement cupis_deposit;
-
-
-    @ElementTitle("Пополнить средства")
-    @FindBy(xpath = "//div[@class='money-in-out__messages']/following-sibling::button[@class='btn_important money-in-out__btn']")
-    private WebElement deposit_on; //кнопка Пополнить средства
-
     @ElementTitle("кнопка ВЫВЕСТИ на попапе")
     @FindBy(xpath = "//div[@class='money-in-out__line']/button[contains(@class,'money-in-out__btn')]")
     private WebElement withdrawOk;
 
-    @ElementTitle("поле пароля при входе в ЦУПИС")
-    @FindBy(id="form_login_password")
-    private WebElement passwordCUPIS;
-
-    @ElementTitle("кнопка ВОЙТИ в личный кабинет ЦУПИС")
-    @FindBy (id="btn_authorization_enter")
-    private WebElement authorizCUPIS;
+//    @ElementTitle("поле пароля при входе в ЦУПИС")
+//    @FindBy(id="form_login_password")
+//    private WebElement passwordCUPIS;
+//
+//    @ElementTitle("кнопка ВОЙТИ в личный кабинет ЦУПИС")
+//    @FindBy (id="btn_authorization_enter")
+//    private WebElement authorizCUPIS;
 
 
     public PopUPLCPage() {
@@ -209,92 +194,6 @@ public class PopUPLCPage extends AbstractPage {
 
             }
         }
-    }
-
-
-    /**
-     * попытка найти ту сумму вывода, при которой будет насчитываться НДФЛ, но не максимум
-     * будет начинать с минимума и прибавлять кажды раз 5 рублей
-     * @param way
-     * @throws Exception
-     */
-    @ActionTitle("вводит минимальную сумму вывода для способа")
-    public void inputSum(String way) throws Exception {
-        checkForErrorLoadingPaymentSystems();
-
-        int i=0;
-        WebDriver driver = PageFactory.getDriver();
-        Pattern pattern = Pattern.compile("(?u)[^0-9]");
-        List<WebElement> allWayWithdraw = driver.findElements(By.xpath("//table[@class='moneyInOutTable']//tr[3]/td[2]/div[not(contains(@class,'not-available'))]/span/label[contains(@for, 'withdraw-method')]"));
-        String min = allWayWithdraw.get(i).findElement(By.xpath("//div/span[@ng-if='method.limit.min']")).getText();//минимум для первого способа вывода
-        String max = allWayWithdraw.get(i).findElement(By.xpath("//div/span[@ng-if='method.limit.max']")).getText();//максимум для первого способа вывода
-        max = pattern.matcher(max).replaceAll("");//максимум для вбранного способа вывода
-        min = pattern.matcher(min).replaceAll("");//минимум для вбранного способа вывода
-
-        //LOG.info("Для выбранного способа вывода " + allWayWithdraw.get(i).findElement(By.xpath("span//div[contains(@class,'payPartner')]")).getAttribute("class"));
-        LOG.info("Минимальная сумма вывода = " + min);
-        LOG.info("Максимальная сумма вывода = " + max);
-
-        int sum = Integer.valueOf(min);
-        int allowMax = Integer.valueOf(max);
-        float balanceF = Float.parseFloat(Stash.getValue("balanceKey"));
-        int balance = (int) balanceF;
-        allowMax=Math.min(allowMax,balance); //сумму вывода можно увеличивать либо до ограничения на способе вывода, либо до достижения суммы баланса
-        LOG.info("Максимальная сумма вывода, с учетом текущего баланса = " + allowMax);
-
-        LOG.info("попробуем найти сумму вывода, при которой будет высчитываться НДФЛ");
-        allWayWithdraw.get(i).click(); //выбор первого способа вывода
-       // CommonStepDefs.waitToPreloader();
-        List<WebElement> bonuses = new ArrayList<>();
-        Pattern patternBonus = Pattern.compile("(?u)[^0-9.]");
-
-
-        withdraw_field.clear();
-        withdraw_field.sendKeys(String.valueOf(sum));
-        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
-        //       Thread.sleep(2000);//вместо слипа.вот тут нужно ожидание что кнопка Вывести - активна.
-
-
-        bonuses=driver.findElements(By.xpath("//p[@ng-if and contains(@class,'money-in-out__bonus-money')]"));//проверка появился ли НДФЛ при максимуме вывода
-        if (bonuses.isEmpty()) {//если НДФЛ не появился, то будем выводить минимум. а если НДФл при максимуме есть - то будем искать минимальную сумму, при которой он есть
-            LOG.info("НДФЛ не начисляется. Проверка вывода без начисления бонусов при сумме вывода = " + min);
-            withdraw_field.clear();
-            withdraw_field.sendKeys(String.valueOf(min));
-            Stash.put("bonus", "0");
-            Stash.put("withdrawRub", min);
-            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
-        }
-        else {
-
-            while (sum < allowMax) {
-                withdraw_field.clear();
-                withdraw_field.sendKeys(String.valueOf(sum));
-
-                new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(withdrawOk));
-                //       Thread.sleep(2000);//вместо слипа.вот тут нужно ожидание что кнопка Вывести - активна.
-
-
-                bonuses = driver.findElements(By.xpath("//p[@ng-if and contains(@class,'money-in-out__bonus-money')]"));//проверка появился ли НДФЛ
-                if (!bonuses.isEmpty()) {//если НДФЛ появился, то такую сумму и будем выводить
-                    String bonus = bonuses.get(0).getText();
-                    bonus = patternBonus.matcher(bonus).replaceAll("");
-                    String sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");//сумма на кнопке
-                    Stash.put("bonus", bonus);
-                    Stash.put("withdrawRub", sumOnButton);
-                    LOG.info("Сумма вывода, при которой высчитывается НДФЛ = " + sum + ", НДФЛ = " + bonus);
-                    break;
-                }
-                sum += 100;   //если НДФЛ на такой сумме не высчитывается - увеличим сумму на 5 рублей
-            }
-        }
-
-        String siteHandle = driver.getWindowHandle();
-        withdrawOk.click();
-        driver.switchTo().window(siteHandle);
-        Thread.sleep(500);
-
-
-//todo дальше совершение стаки и проверка баланса прямо отсюда
     }
 
 
@@ -448,68 +347,7 @@ public class PopUPLCPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("вводит сумму и выбирает способ пополнения")
-    public void chooseSummAndClick() throws InterruptedException {
-        String sumBet = "1000";
-        Stash.put("sumBetKey",sumBet);
-        deposit_field.clear();
-        deposit_field.sendKeys(sumBet);
-        if (visa_deposit.isDisplayed()) {
-            visa_deposit.click();
-            LOG.info("Пополнение проходит через карту Виза");
-        } else {
-            if (cupis_deposit.isDisplayed()) {
-                cupis_deposit.click();
-                LOG.info("Пополнение проходит через кошелёк ЦУПИС");
-            } else {
-                Assertions.fail("Нет доступных способов пополнения");
-            }
-        }
-        Thread.sleep(2000);
-        deposit_on.click();
-    }
 
-    /**
-     * проверка появления окна "Ошибка при загрузке платежных систем"
-     */
-    private void checkForErrorLoadingPaymentSystems(){
-        WebDriver driver = PageFactory.getWebDriver();
-        if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() > 0){
-            throw new AutotestError("Ошибка при загрузке платежных систем!");
-        }
-    }
-
-    @ActionTitle("вводит сумму и выбирает способ пополнения c")
-    public void enterAmountAndSelectDepositMethod(DataTable dataTable)  {
-        checkForErrorLoadingPaymentSystems();
-
-        WebDriver driver = PageFactory.getWebDriver();
-        Map<String, String> data = dataTable.asMap(String.class, String.class);
-        String amount, depositMethod;
-        amount = data.get("СУММА");
-        depositMethod = data.get("Способ");
-        LOG.info("Cохраняем в память сумму в переменной 'СУММА' и вводим в поле::" + amount);
-        Stash.put("СУММА",amount);
-        fillField(deposit_field,amount);
-
-        if(depositMethod.contains("") && visa_deposit.isDisplayed()){
-            visa_deposit.click();
-            LOG.info("Пополнение проходит через карту [" + depositMethod + "]");
-        } else {
-            if (cupis_deposit.isDisplayed()) {
-                cupis_deposit.click();
-                LOG.info("Пополнение проходит через кошелёк ЦУПИС");
-            } else {
-                Assertions.fail("Нет доступных способов пополнения");
-            }
-        }
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.getMessage();
-        }
-        deposit_on.click();
-    }
 
 }
 

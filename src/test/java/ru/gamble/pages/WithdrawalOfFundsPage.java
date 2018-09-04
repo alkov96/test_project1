@@ -54,7 +54,7 @@ public class WithdrawalOfFundsPage extends AbstractPage{
 
         String xpathCard = "//label[@for='withdraw-method-cupis_card']";
 
-        LOG.info("Ищем способ 'VISA/МИР' и нажимаем");
+        LOG.info("Ищем способ 'VISA_МИР' и нажимаем");
         driver.findElement(By.xpath(xpathCard)).click();
 
         min = pattern.matcher(min).replaceAll("");
