@@ -1447,11 +1447,11 @@ public class CommonStepDefs extends GenericStepDefs {
         closeBrowser();
     }
 
-    @After(value = "@NewUserRegistration_C36189")
-    public void after(Scenario scenario){
-        final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
-        scenario.embed(screenshot, "image/png");
-    }
+//    @After(value = "@NewUserRegistration_C36189")
+//    public void after(Scenario scenario){
+//        final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
+//        scenario.embed(screenshot, "image/png");
+//    }
 
     @Когда("^возвращаем регистрацию на предыдущий способ из \\\"([^\\\"]*)\\\"$")
     public void returnRegistrationToPreviousMethod(String keyParams){
@@ -1593,9 +1593,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 .addListener(new WebSocketAdapter() {
                     // A text message arrived from the server.
                     public void onTextMessage(WebSocket websocket, String message) {
-//                        LOG.info("Получили ответ::" + message);
-                        builder.append(message);
-                        Stash.put("MESSAGE",builder.toString());
+                        LOG.info("Получили ответ::" + message);
                     }
                 })
                 .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
