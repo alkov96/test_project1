@@ -92,7 +92,6 @@ public class CouponPage extends AbstractPage {
     @FindBy(className="coupon-banners") //баннеры в купоне
     private WebElement bannersInCoupon;
 
-
     public CouponPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
@@ -327,20 +326,20 @@ public class CouponPage extends AbstractPage {
     public void inputBet(String sumBet,String one){
         BigDecimal sum;
         WebDriver driver = PageFactory.getDriver();
-       // boolean forOne = one.equals("для каждого разбиения") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
         boolean forOne = !one.equals("") && !driver.findElement(By.xpath("//span[contains(@class,'bs-type-switcher__title-text')]")).getText().contains("Экспресс");//вводить размер ставки для каждого разбиения в Системе или нет
 
         WebElement field = forOne ? coupon_field_System_one : coupon_field;
-        field.clear();
-        field.sendKeys(String.valueOf(sumBet));
-        LOG.info("Вводим сумму ставки : " + sumBet);
+        LOG.info("Вводим сумму ставки : [" + sumBet + "] в поле [" + field.getAttribute("id") + "]");
+        fillField(field,sumBet);
 
-        String countBet = forOne?driver.findElement(By.xpath("//span[@class='eachway-zone__text ng-binding']")).getText().split(" ")[0]:"1";//количество ставок при выбранном виде систем(2/3,3/5,4/5...)
+        String countBet = forOne ? driver.findElement(By.xpath("//span[@class='eachway-zone__text ng-binding']")).getText().split(" ")[0] : "1";//количество ставок при выбранном виде систем(2/3,3/5,4/5...)
         sum = new BigDecimal(sumBet.trim()).setScale(2,RoundingMode.UP).multiply(new BigDecimal(countBet).setScale(0,RoundingMode.UP));
 
         Stash.put("sumKey",sum.toString());
         LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
     }
+
+
 
 
     @ActionTitle("заключает пари")
@@ -349,14 +348,24 @@ public class CouponPage extends AbstractPage {
         String xpathBet = "//div[@class='coupon-bet-list__wrap']//input[contains(@placeholder,'Ставка')]";
         String xpathMessage = "//div[contains(@class,'accepted-bet-message') and contains(.,'Ваша ставка принята.')]";
 
-        LOG.info("Ищем и нажимаем на шестерёнку в Купоне");
-        PageFactory.getWebDriver().findElement(By.xpath("//div[contains(@class,'coupon-params-icon')]")).click();
-        LOG.info("Ищем и выбираем 'Любые коэффициенты'");
+        for(int i = 0; i < 3; i++){
+        LOG.info("Ищем и нажимаем на шестерёнку в Купоне [" + i + "]");
+        WebElement gear = PageFactory.getWebDriver().findElement(By.xpath("//div[contains(@class,'coupon-params-icon')]"));
+        if(!gear.getAttribute("class").contains("active")) {gear.click();}
+
+        LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
         PageFactory.getWebDriver().findElements(By.xpath("//span[contains(.,'Любые коэффициенты')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
 
-
-        LOG.info("Жмём Заключить пари");
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon_bet_button));
+        LOG.info("Ожидаем появление и возможности назать на кнопку 'Заключить пари' [" + i + "]");
+        try {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(coupon_bet_button));
+            break;
+        }catch (Exception e){
+            LOG.error("Не получилось [" + i + "] раз");
+            e.getMessage();
+        }
+        }
+        LOG.info("Жмём 'Заключить пари'");
         coupon_bet_button.click();
 
         waitingForPreloadertoDisappear(60);
