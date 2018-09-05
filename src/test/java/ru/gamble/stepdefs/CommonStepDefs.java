@@ -1,9 +1,11 @@
 package ru.gamble.stepdefs;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.ws.client.*;
 import cucumber.api.DataTable;
+import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
@@ -13,6 +15,7 @@ import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -851,7 +854,8 @@ public class CommonStepDefs extends GenericStepDefs {
                 value = entry.getValue();
             }
             //Если в числе лидирующий ноль, то не пропускать через JSONValue.parse, а класть в Map как есть
-            if (value instanceof String && !StringUtils.isBlank((String) value) &&  ((String) value).charAt(0) == '0') {
+//            if (value instanceof String && !StringUtils.isBlank((String) value) &&  ((String) value).charAt(0) == '0') {
+            if (value instanceof String && !StringUtils.isBlank((String) value) &&  ((String) value).matches("[0-9]+")) {
                 String str  = (String) value;
                 jsonObject.put(key, value);
             } else {
@@ -1429,7 +1433,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
     public void changeActive(String key) {
-        String activeOpt = Stash.getValue(key);
+        String activeOpt = Stash.getValue(key) == null ? "back_call, remove_limits_btn, identification_with_euroset, identification_with_courier, dentification_with_video, identification_with_wave" : Stash.getValue(key);
         Stash.put(key,activeOpt);
         String sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
         LOG.info("Возвращаем активные значения сайта =>[" + activeOpt + "]");
@@ -1441,6 +1445,12 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");
         closeBrowser();
+    }
+
+    @After(value = "@NewUserRegistration_C36189")
+    public void after(Scenario scenario){
+        final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
+        scenario.embed(screenshot, "image/png");
     }
 
     @Когда("^возвращаем регистрацию на предыдущий способ из \\\"([^\\\"]*)\\\"$")
@@ -1539,23 +1549,29 @@ public class CommonStepDefs extends GenericStepDefs {
             params = collectParametersInJSONString(dataTable);
         }
 
+        String url = "wss://swarm-test.betfavorit.cf:8443/";
+        String firstRequest = "{\"command\":\"request_session\",\"params\":{\"language\":\"rus\",\"site_id\":\"325\"},\"rid\":\"153572449595114\"}";
+        String secondRequest = "{\"command\":\"restore_login\",\"params\":{\"auth_token\":\"B592154E-8893-49F3-A4BD-E4834D4D0DC4\"},\"rid\":\"15355431498522\"}";
+        String therdRequest = "{\"command\":\"payment_services\",\"params\":{},\"rid\":\"15355431498522\"}";
+
         try {
             WebSocket ws = connect();
             ws.sendText(JSONValue.toJSONString(params));
-            ws.sendText("{\"command\":\"payment_services\",\"params\":{},\"rid\":\""+Stash.getValue("RID")+"\"}");
-            ws.getSocket().getChannel();
+            ws.flush();
+            Thread.sleep(1000);
+            ws.sendText(therdRequest);
+            Thread.sleep(1000);
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (WebSocketException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-        String url = "wss://swarm-test.betfavorit.cf:8443/";
-        String firstRequest = "{\"command\":\"request_session\",\"params\":{\"language\":\"rus\",\"site_id\":\"325\"},\"rid\":\"153572449595114\"}";
-        String secondRequest = "{\"command\":\"restore_login\",\"params\":{\"auth_token\":\"A1539A0F-A7D0-4C4B-9853-71C53853D10D\"},\"rid\":\"15355431498522\"}";
-        String therdRequest = "{\"command\":\"payment_services\",\"params\":{},\"rid\":\"15355431504118\"}";
+        String limits = JSONValue.toJSONString(Stash.getValue("MESSAGE"));
 
     }
 
@@ -1565,6 +1581,7 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     private static WebSocket connect() throws IOException, WebSocketException, NoSuchAlgorithmException {
 
+        StringBuilder builder = new StringBuilder();
         SSLContext context = NaiveSSLContext.getInstance("TLS");
         WebSocketFactory factory = new WebSocketFactory();
         factory.setSSLContext(context);
@@ -1576,18 +1593,13 @@ public class CommonStepDefs extends GenericStepDefs {
                 .addListener(new WebSocketAdapter() {
                     // A text message arrived from the server.
                     public void onTextMessage(WebSocket websocket, String message) {
-                        LOG.info(message);
+//                        LOG.info("Получили ответ::" + message);
+                        builder.append(message);
+                        Stash.put("MESSAGE",builder.toString());
                     }
                 })
                 .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
                 .connect();
-    }
-
-    /**
-     * Wrap the standard input with BufferedReader.
-     */
-    private static BufferedWriter getOtput() throws IOException {
-        return new BufferedWriter(new OutputStreamWriter(System.out));
     }
 
 }
