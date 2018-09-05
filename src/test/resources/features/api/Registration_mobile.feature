@@ -11,6 +11,14 @@
   | BIRTHDATE | randomDate |
   * сохраняем в память
   | DEVID  | randomNumber 4 |
+    * сохраняем в память
+      | STREET  | "Волгоградский проспект" |
+    * сохраняем в память
+      | FLAT  | randomNumber 3 |
+    * сохраняем в память
+      | HOUSE  | randomNumber 2 |
+      * сохраняем в память
+        | COMMENT  | random |
 
 
   * определяем незанятый номер телефона и сохраняем в "PHONE"
@@ -488,6 +496,68 @@
 
 
 
+  @api
+  @Registration_mobile
+  Сценарий: Мобильная регистрация полная через DD
+
+  #    * добавляем активную опцию сайта "identification_with_video"
+
+    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+      | identification_with_courier |true|
+
+    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+      | identType               | 6            |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "status":21 |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * добавляем данные в JSON объект "DATA" сохраняем в память:
+      | street       | "Тверская ул." |
+      | house        | HOUSE          |
+      | building     |                |
+      | housing      |                |
+      | flat         | FLAT           |
+      | phone        | 1110023309     |
+      | comment      | COMMENT        |
+      | date         | DATE           |
+      | time         | "10:00 - 17:00"|
+
+    * запрос к API "api/mobile/v5/sendIdentificationOrderToDD" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID    |
+      | authToken   | AUTHTOKEN|
+      | source      | 16       |
+      | data        | DATA     |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | identificationStatus": 1 |
+
+
+   * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID    |
+      | authToken   | AUTHTOKEN|
+      | source      | 16       |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | identificationStatus":7 |
 
 
 
