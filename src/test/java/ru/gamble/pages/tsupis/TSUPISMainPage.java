@@ -44,7 +44,8 @@ public class TSUPISMainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(inputPhone));
+        driver.get("https://23bet.itasystems.ru/frontend/logout");
+        new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(inputPhone));
     }
 
     @ActionTitle("логинится в ЦУПИС с")
