@@ -663,7 +663,7 @@ public class CommonStepDefs extends GenericStepDefs {
             e.getMessage();
         }
         valueFingingParams = JsonLoader.hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память::" + JSONValue.toJSONString(valueFingingParams));
+        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память [" + JSONValue.toJSONString(valueFingingParams) + "]");
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
@@ -680,9 +680,13 @@ public class CommonStepDefs extends GenericStepDefs {
             rs = stmt.executeQuery(sqlRequest);
             rs.last();
             result = rs.getString(param);
+            if(result.isEmpty() || result == null){
+                throw new AutotestError("Ошибка! Запрос к базе вернул [" + result + "]");
+            }
             LOG.info("SQL-request [" + result + "]");
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new AutotestError("Ошибка! Что-то не так в запросе, проверьте руками [" + sqlRequest + "]");
         } finally {
             DBUtils.closeAll(con, ps, null);
         }
@@ -729,6 +733,9 @@ public class CommonStepDefs extends GenericStepDefs {
             for (int i=1; i<=count; i++){
                 String key = allRows.getColumnName(i);
                 String value = rs.getString(key);
+                if(value == null || value.isEmpty()){
+                    throw new AutotestError("Ошибка! Запрос к базе вернул [" + value + "]");
+                }
                 for (String part: key.split("_")){
                     keyNormal.append(part);
                 }
@@ -944,9 +951,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status,String keyEmail) {
-        //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 AND offer_state=3";
-
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3";
         searchUser(keyEmail,sqlRequest);
     }
 
@@ -1211,8 +1216,7 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             br.close();
             con.disconnect();
-            LOG.info("Получаем ответ и записываем в память::" + jsonString.toString());
-            LOG.info("");
+            LOG.info("Получаем ответ и записываем в память [" + jsonString.toString() + "]");
             if (StringUtils.isNoneEmpty(jsonString)) {
                 Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
             } else {
