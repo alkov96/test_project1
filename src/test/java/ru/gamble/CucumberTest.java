@@ -21,7 +21,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm","pretty"},
-        tags = {"@smoke"})
+        tags = {"@api"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
@@ -45,6 +45,7 @@ public class CucumberTest {
                 LOG.info("Driver for screenshot not found");
                 return;
             }
+            LOG.error("Последняя страница:: [" + PageFactory.getWebDriver().getCurrentUrl() + "]");
             saveScreenshot(((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES));
         }
     };

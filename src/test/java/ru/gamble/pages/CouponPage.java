@@ -125,7 +125,7 @@ public class CouponPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("проверяет наличие бонуса к возможному выйгрышу")
+    @ActionTitle("проверяет наличие бонуса к возможному выигрышу")
     public void checkBonusPresent() {
         assertThat(true, equalTo(checkBonus()));
     }

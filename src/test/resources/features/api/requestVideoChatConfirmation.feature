@@ -23,10 +23,10 @@
       |video_identification_in_mobile_app|true|
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
-      | devId  | DEVID   |
+      | devId  | DEVID    |
       | email  | EMAIL    |
-      | pass   | PASSWORD    |
-      | source | SOURCE  |
+      | pass   | PASSWORD |
+      | source | SOURCE   |
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
@@ -39,8 +39,8 @@
       | exepted | "code":0 |
 
     * проверка полей и типов в ответе "DATA":
-      | Параметр          | Тип    |
-      | videochatLink | String   |
+      | Параметр      | Тип    |
+      | videochatLink | String |
 
 
   @api
