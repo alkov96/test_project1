@@ -47,6 +47,7 @@ public class CucumberTest {
             }
             LOG.error("Последняя страница:: [" + PageFactory.getWebDriver().getCurrentUrl() + "]");
             saveScreenshot(((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES));
+            PageFactory.dispose();
         }
     };
 
