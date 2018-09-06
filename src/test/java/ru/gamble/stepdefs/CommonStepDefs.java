@@ -681,7 +681,7 @@ public class CommonStepDefs extends GenericStepDefs {
             rs.last();
             result = rs.getString(param);
             if(result.isEmpty() || result == null){
-                throw new AutotestError("Ошибка! Запрос к базе вернул [" + result + "]");
+                throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
             }
             LOG.info("SQL-request [" + result + "]");
         } catch (SQLException e) {
@@ -730,12 +730,12 @@ public class CommonStepDefs extends GenericStepDefs {
             rs.last();
             ResultSetMetaData allRows = rs.getMetaData();
             int count = allRows.getColumnCount();
-            for (int i=1; i<=count; i++){
+            if(count == 0){
+                throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул кол-во результатов [" + count + "]");
+            }
+            for (int i = 1; i <= count; i++){
                 String key = allRows.getColumnName(i);
                 String value = rs.getString(key);
-                if(value == null || value.isEmpty()){
-                    throw new AutotestError("Ошибка! Запрос к базе вернул [" + value + "]");
-                }
                 for (String part: key.split("_")){
                     keyNormal.append(part);
                 }
