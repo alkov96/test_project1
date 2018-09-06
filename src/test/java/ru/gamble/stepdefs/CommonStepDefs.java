@@ -91,9 +91,8 @@ public class CommonStepDefs extends GenericStepDefs {
             Stash.put(key,date);
             LOG.info(key + "<==[" + date + "]");
         }
-
-
     }
+
 
     @Когда("^сохраняем в память$")
     public static void saveValueToKey(DataTable dataTable) {
@@ -1475,6 +1474,7 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyParams,date);
         LOG.info("Завтрашняя дата: " + dateTomorrow);
     }
+
 
     @Когда("^запоминаем текущую страницу в \\\"([^\\\"]*)\\\"$")
     public void rememberCurenPageTo(String keyCurrentPage){

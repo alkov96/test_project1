@@ -505,6 +505,7 @@
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
       | identification_with_courier |true|
 
+
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
@@ -526,7 +527,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "status":21 |
 
-    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+    #* находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
     * добавляем данные в JSON объект "DATA" сохраняем в память:
       | street       | "Тверская ул." |
@@ -547,9 +548,13 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | "identificationStatus": 1 |
 
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "identificationStatus":1 |
+
+    * проверка полей и типов в ответе "RESPONCE_API":
+      | Параметр                         | Тип    |
+      | courierIdentificationRequestDate | Timestamp   |
 
    * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
       | devId       | DEVID    |
@@ -559,7 +564,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
     * проверка ответа API из "RESPONCE_API":
-      | exepted     | identificationStatus":7 |
+      | exepted     | identificationStatus":1 |
 
 
 
