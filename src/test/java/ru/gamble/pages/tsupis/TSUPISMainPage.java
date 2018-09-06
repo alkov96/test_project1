@@ -44,7 +44,8 @@ public class TSUPISMainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(inputPhone));
+        LOG.info("Перешли на страницу [" + driver.getCurrentUrl() + "]");
+        new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(inputPhone));
     }
 
     @ActionTitle("логинится в ЦУПИС с")
