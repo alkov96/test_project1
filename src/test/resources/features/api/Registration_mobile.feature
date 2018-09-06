@@ -546,7 +546,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
     * проверка ответа API из "RESPONCE_API":
-      | exepted     | identificationStatus": 1 |
+      | exepted     | "identificationStatus": 1 |
 
 
    * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
