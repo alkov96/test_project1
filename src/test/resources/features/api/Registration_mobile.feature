@@ -510,6 +510,8 @@
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
 
+    * определяем дату завтрашнего дня "DATE"
+
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
