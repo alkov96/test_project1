@@ -45,6 +45,7 @@ public class CucumberTest {
                 LOG.info("Driver for screenshot not found");
                 return;
             }
+            LOG.error("Последняя страница:: [" + PageFactory.getWebDriver().getCurrentUrl() + "]");
             saveScreenshot(((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES));
         }
     };
