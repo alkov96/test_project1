@@ -14,6 +14,7 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.openqa.selenium.*;
@@ -1553,20 +1554,15 @@ public class CommonStepDefs extends GenericStepDefs {
         if (!(null == dataTable)) {
             params = collectParametersInJSONString(dataTable);
         }
-
-        String url = "wss://swarm-test.betfavorit.cf:8443/";
-        String firstRequest = "{\"command\":\"request_session\",\"params\":{\"language\":\"rus\",\"site_id\":\"325\"},\"rid\":\"153572449595114\"}";
-        String secondRequest = "{\"command\":\"restore_login\",\"params\":{\"auth_token\":\"B592154E-8893-49F3-A4BD-E4834D4D0DC4\"},\"rid\":\"15355431498522\"}";
         String therdRequest = "{\"command\":\"payment_services\",\"params\":{},\"rid\":\"15355431498522\"}";
+        StringBuilder builder = new StringBuilder();
 
         try {
-            WebSocket ws = connect();
+            WebSocket ws = connect(builder);
             ws.sendText(JSONValue.toJSONString(params));
-            ws.flush();
             Thread.sleep(1000);
             ws.sendText(therdRequest);
             Thread.sleep(1000);
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (WebSocketException e) {
@@ -1576,15 +1572,19 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        String limits = JSONValue.toJSONString(Stash.getValue("MESSAGE"));
+        String limits = builder.toString();
 
+        if(!limits.isEmpty()){
+            Stash.put(keyStash,limits);
+        }else {
+            throw new AutotestError("Ошибка! По WSS получили[" + limits + "]");
+        }
     }
-
 
     /**
      * Connect to the server.
      */
-    private static WebSocket connect() throws IOException, WebSocketException, NoSuchAlgorithmException {
+    private static WebSocket connect(StringBuilder tmp) throws IOException, WebSocketException, NoSuchAlgorithmException {
 
         StringBuilder builder = new StringBuilder();
         SSLContext context = NaiveSSLContext.getInstance("TLS");
@@ -1598,7 +1598,10 @@ public class CommonStepDefs extends GenericStepDefs {
                 .addListener(new WebSocketAdapter() {
                     // A text message arrived from the server.
                     public void onTextMessage(WebSocket websocket, String message) {
-                        LOG.info("Получили ответ::" + message);
+                        if(message.contains("deposit")) {
+                            tmp.append(message);
+                            LOG.info("Получили ответ::" + tmp.toString());
+                        }
                     }
                 })
                 .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)

@@ -169,10 +169,12 @@ public class PopUPLCPage extends AbstractPage {
             workWithPreloader();
             try {
                 ndfl = driver.findElement(By.xpath("//div[contains(@class,'money-in-out__line')]/p/span")).getText();
+                LOG.info("НДФЛ [" + ndfl + "]");
             }catch (Exception e){
                 throw new AutotestError("Ошибка! Не найден НДФЛ");
             }
-            sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");//сумма на кнопке
+            sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");
+            LOG.info("Cумма на кнопке [" + sumOnButton + "]");//сумма на кнопке
             linkBalance = driver.findElement(By.xpath("//div[@class='smallJsLink__wrapper']/span[1]")).getText().replace(" ", "");//сумма баланса на ссылке;
             ndflFloat = Float.parseFloat(ndfl);
             linkBalanceFloat = Float.parseFloat(linkBalance);

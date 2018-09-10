@@ -123,10 +123,11 @@ public class RefillAccountsPage extends AbstractPage{
     }
 
     @ActionTitle("проверяет коректность смены макс.суммы при выборе пополнения с")
-    public void verifiesCorrectnessOfChangeOfMaximumAmountWhenChoosingRefill(String methodsKey){
-        String methodName;
-        BigDecimal maxLimitInDB, maxValueOnPage;
-        Object json =  JSONValue.parse(Stash.getValue(methodsKey).toString());
+    public void verifiesCorrectnessOfChangeOfMaximumAmountWhenChoosingRefill(String methodsKey,String keyJsonByWSS){
+        String methodName, exeptedMaxLimit;
+        BigDecimal maxLimitInDB,maxLimitByWSS, maxValueOnPage;
+        Object jsonByDB =  JSONValue.parse(Stash.getValue(methodsKey).toString());
+        Object jsonByWSS =  JSONValue.parse(Stash.getValue(keyJsonByWSS).toString());
         List<WebElement> methodsOfRefill = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'moneyChnl')]//label/div")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
         LOG.info("Нашли на странице [" + methodsOfRefill.size() + "] элементов способов пополенния");
 
@@ -135,16 +136,23 @@ public class RefillAccountsPage extends AbstractPage{
             methodName = method.getAttribute("class").replace("payPartner ","");
             method.click();
             LOG.info("Нажали на метод [" + methodName + "]");
-            maxLimitInDB = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(json, methodName),"limit"),"max").toString()).divide( new BigDecimal("100"));
-            LOG.info("Достали из JSON по имени способа[" + methodName + "] максимальный лимит[" + maxLimitInDB.toString() + "]");
+            maxLimitInDB = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByDB, methodName),"limit"),"max").toString()).divide( new BigDecimal("100"));
+            LOG.info("Достали из [" + methodsKey + "] по имени способа[" + methodName + "] максимальный лимит[" + maxLimitInDB.toString() + "]");
+            maxLimitByWSS = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByWSS,"data"),"limits"),methodName),"max_deposit").toString()).divide( new BigDecimal("100"));
+            LOG.info("Достали из [" + keyJsonByWSS + "] по имени способа[" + methodName + "] максимальный лимит[" + maxLimitByWSS.toString() + "]");
             List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'smallJsLink')]/span"));
             if(list.isEmpty()){
                 throw new AutotestError("Ошибка! Нет предложений номиналов сумм.");
             }
+
+            LOG.info("Сравниваем два максимума [" + maxLimitInDB.toString() + "] и [" + maxLimitByWSS + "]");
+            exeptedMaxLimit = (maxLimitInDB.compareTo(maxLimitByWSS) == 1) ? maxLimitByWSS.toString() : maxLimitInDB.toString();
+            LOG.info("Ожидаемый максимум должен быть[" + exeptedMaxLimit + "]");
+
             maxValueOnPage = new BigDecimal(list.get(list.size()-1).getText().replaceAll(" +",""));
             assertThat(maxValueOnPage)
-                    .as("Ошибка! максимум на странице[" + maxValueOnPage.toString() + "] не равен максимуму из базы [" + maxLimitInDB.toString() + "]")
-                    .isEqualTo(maxLimitInDB);
+                    .as("Ошибка! Фактический максимум на странице[" + maxValueOnPage.toString() + "] не равен ожидаемому максимуму [" + exeptedMaxLimit + "]")
+                    .isEqualTo(exeptedMaxLimit);
         }
 
     }

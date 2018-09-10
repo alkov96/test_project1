@@ -368,7 +368,7 @@ public class CouponPage extends AbstractPage {
         LOG.info("Жмём 'Заключить пари'");
         coupon_bet_button.click();
 
-        waitingForPreloadertoDisappear(60);
+        waitingForPreloadertoDisappear(30);
 
         if (!driver.findElement(By.cssSelector("div.bet-accepted-noification")).isDisplayed()) {
             LOG.warn("Сообщение об успешной ставке не найдено");
