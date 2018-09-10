@@ -166,7 +166,7 @@ public abstract class AbstractPage extends Page {
      * @param key - ключ по которому получаем е-mail из памяти.
      */
     @ActionTitle("завершает регистрацию перейдя по ссылке в")
-    public void endRegistrationByEmailLink(String key) {
+    public void endRegistrationByEmailLink(String key) throws InterruptedException {
         WebDriver driver = getWebDriver();
         String email = Stash.getValue(key);
         String link = "";
@@ -187,8 +187,10 @@ public abstract class AbstractPage extends Page {
         driver.get(url + "?action=verify&" + link);
 
         LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
-        new WebDriverWait(driver, 20).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.modal__closeBtn.closeBtn")));
-
+        Thread.sleep(5000);
+        if (!driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).isDisplayed()){
+           Assert.fail("Ошибка! Не пояивлось диалоговое окно с надписью 'Спасибо!'");
+        }
         LOG.info("Закрываем уведомление об успешном подтверждении почты");
         driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
     }
