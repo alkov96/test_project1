@@ -80,7 +80,15 @@ public class JsonLoader {
                     } else {
                         request = hashMapper((Object) list, finding);
                     }
-                } else {
+                }
+                //**************Пробная обработка
+                else  if(value == null){
+                    if (key.equalsIgnoreCase(finding)) {
+                        return request = value;
+                    }
+                }
+                //******************************
+                else {
                     throw new IllegalArgumentException(String.valueOf(value));
                 }
             }

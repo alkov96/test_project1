@@ -2,6 +2,7 @@ package ru.gamble.pages;
 
 import cucumber.api.DataTable;
 import net.minidev.json.JSONValue;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -75,7 +76,8 @@ public class RefillAccountsPage extends AbstractPage{
     @ActionTitle("проверяет, что на попапе пополнения есть кнопки-ссылки сумм")
     public void sposobSumm() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"));
+//        List<WebElement> summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"));
+        List<WebElement> summList = driver.findElements(By.xpath("//span[contains(@class,'jsLink smallJsLink')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
         Stash.put("summListKey", summList);
         Thread.sleep(1000);
         if (summList.isEmpty()) {
@@ -126,7 +128,7 @@ public class RefillAccountsPage extends AbstractPage{
     public void verifiesCorrectnessOfChangeOfMaximumAmountWhenChoosingRefill(String methodsKey,String keyJsonByWSS){
         String methodName, exeptedMaxLimit;
         BigDecimal maxLimitInDB,maxLimitByWSS, maxValueOnPage;
-        Object jsonByDB =  JSONValue.parse(Stash.getValue(methodsKey).toString());
+        Object jsonByDB =  JSONValue.parse(Stash.getValue(methodsKey).toString()), checkValueByNull;
         Object jsonByWSS =  JSONValue.parse(Stash.getValue(keyJsonByWSS).toString());
         List<WebElement> methodsOfRefill = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'moneyChnl')]//label/div")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
         LOG.info("Нашли на странице [" + methodsOfRefill.size() + "] элементов способов пополенния");
@@ -136,7 +138,9 @@ public class RefillAccountsPage extends AbstractPage{
             methodName = method.getAttribute("class").replace("payPartner ","");
             method.click();
             LOG.info("Нажали на метод [" + methodName + "]");
-            maxLimitInDB = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByDB, methodName),"limit"),"max").toString()).divide( new BigDecimal("100"));
+//            checkValueByNull = JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByDB, methodName),"limit"),"max").toString();
+            checkValueByNull = JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByDB, methodName),"limit"),"max");
+            maxLimitInDB = new BigDecimal(checkValueByNull == null ? "0" : String.valueOf(checkValueByNull)).divide( new BigDecimal("100"));
             LOG.info("Достали из [" + methodsKey + "] по имени способа[" + methodName + "] максимальный лимит[" + maxLimitInDB.toString() + "]");
             maxLimitByWSS = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByWSS,"data"),"limits"),methodName),"max_deposit").toString()).divide( new BigDecimal("100"));
             LOG.info("Достали из [" + keyJsonByWSS + "] по имени способа[" + methodName + "] максимальный лимит[" + maxLimitByWSS.toString() + "]");

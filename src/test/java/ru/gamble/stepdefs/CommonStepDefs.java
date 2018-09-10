@@ -1560,9 +1560,9 @@ public class CommonStepDefs extends GenericStepDefs {
         try {
             WebSocket ws = connect(builder);
             ws.sendText(JSONValue.toJSONString(params));
-            Thread.sleep(1000);
+            Thread.sleep(2000);
             ws.sendText(therdRequest);
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (WebSocketException e) {
