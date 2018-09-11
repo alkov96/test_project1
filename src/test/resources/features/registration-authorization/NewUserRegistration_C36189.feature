@@ -125,8 +125,8 @@
 
     * закрываем браузер
 
-  @smoke
-  @NewUserRegistration_C36189
+#  @smoke
+#  @NewUserRegistration_C36189
   Сценарий: Регистрация нового пользователя через Skype
 
     * добавляем активную опцию сайта "identification_with_video"
@@ -149,8 +149,8 @@
 
     #* закрываем браузер
 
-  @smoke
-  @NewUserRegistration_C36189
+#  @smoke
+#  @NewUserRegistration_C36189
   Сценарий: Регистрация нового пользователя через Евросеть
 
     * добавляем активную опцию сайта "identification_with_euroset"

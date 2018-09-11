@@ -214,6 +214,7 @@ public class UserAccountPage extends AbstractPage{
 
         } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
 
+
         LOG.info("Копируем смс-код для подтверждения телефона");
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
 
@@ -243,7 +244,7 @@ public class UserAccountPage extends AbstractPage{
         LOG.info("Пытаемся найти код подтверждения телефона");
         for(int y = 0; y < 3; y++) {
             try {
-                new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+                new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
                 numberSring = driver.findElement(By.xpath(xpath));
             } catch (Exception е) {
                 driver.navigate().refresh();
@@ -251,7 +252,7 @@ public class UserAccountPage extends AbstractPage{
             x++;
             if (numberSring != null){break;}
         }
-        LOG.info("Кол-во обновлений страницы для получения телефона и SMS-кода::" + x);
+
         if(numberSring != null && !numberSring.getText().isEmpty()) {
             String code = numberSring.getText().split(" - ")[1];
             driver.switchTo().window(currentHandle);
@@ -260,7 +261,8 @@ public class UserAccountPage extends AbstractPage{
             LOG.info("Вводим SMS-код::" + code);
             fillField(cellFoneConformationInput,code);
         }else {
-            throw new AutotestError("Ошибка! SMS-код не найден.");
+            LOG.error("Кол-во обновлений страницы [" + driver.getCurrentUrl() + "] для получения SMS-кода по номеру[" + x + "]");
+            throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
         }
         Stash.put("PHONE_NUMBER",phone);
         LOG.info("Сохранили номер телефона в память::" + phone + "[PHONE_NUMBER]");
