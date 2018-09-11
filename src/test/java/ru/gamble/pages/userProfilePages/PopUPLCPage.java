@@ -1,20 +1,16 @@
 package ru.gamble.pages.userProfilePages;
 
-import cucumber.api.DataTable;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.pages.CouponPage;
 import ru.gamble.pages.mainPages.AuthenticationMainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
@@ -25,9 +21,6 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -35,8 +28,6 @@ import java.util.stream.Collectors;
 import static ru.gamble.stepdefs.CommonStepDefs.waitEnabled;
 import static ru.gamble.stepdefs.CommonStepDefs.waitToPreloader;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.LINK;
-import static ru.gamble.utility.Constants.TEXT;
 
 
 @PageEntry(title = "Мини Личный Кабинет")
@@ -73,13 +64,9 @@ public class PopUPLCPage extends AbstractPage {
     @FindBy(xpath = "//div[@class='money-in-out__line']/button[contains(@class,'money-in-out__btn')]")
     private WebElement withdrawOk;
 
-//    @ElementTitle("поле пароля при входе в ЦУПИС")
-//    @FindBy(id="form_login_password")
-//    private WebElement passwordCUPIS;
-//
-//    @ElementTitle("кнопка ВОЙТИ в личный кабинет ЦУПИС")
-//    @FindBy (id="btn_authorization_enter")
-//    private WebElement authorizCUPIS;
+    @ElementTitle("Профиль")
+    @FindBy(xpath = "//div[@class='user-menu__item']/a[contains(.,'Профиль')]")
+    private WebElement profile;
 
 
     public PopUPLCPage() {

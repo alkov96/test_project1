@@ -17,6 +17,7 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
+import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -69,11 +70,12 @@ public class FirstTSUPISLK extends AbstractPage {
 
     @ActionTitle("вводит содержимое в поле")
     public void userEntersСontentInField(String keySMS, String elementTitle) {
+            String sms = Stash.getValue(keySMS);
+            LOG.info("Пытаемя ввести СМС код [" + sms + "] в поле 'Код из СМС'");
         try {
-            LOG.info("Пытаемя ввести СМС код в нужное поле");
-            fillField(elementTitle, Stash.getValue(keySMS).toString());
+            fillField(elementTitle, sms);
         } catch (PageException e) {
-            e.getMessage();
+           throw new AutotestError("Ошибка! Не смогли ввести СМС код [" + sms + "] в поле 'Код из СМС'");
         }
     }
 }
