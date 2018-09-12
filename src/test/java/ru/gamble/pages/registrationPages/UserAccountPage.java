@@ -198,12 +198,12 @@ public class UserAccountPage extends AbstractPage{
         do {
             if(value.contains(RANDOM)) {
                 phone = "0" + Generators.randomNumber(9);
-                LOG.info("Вводим случайный номер телефона::+7" + phone);
+                LOG.info("Вводим случайный номер телефона::+7[" + phone + "]");
                 fillField(cellFoneInput,phone);
-            }else {
-                phone = value;
-                LOG.info("Вводим номер телефона::" + phone);
-                fillField(cellFoneInput,phone);
+            } else {
+                phone = (value.matches("^[A-Z_]+$")) ? Stash.getValue(value) : value;
+                LOG.info("Вводим номер телефона без первой 7-ки [" + phone.substring(1,11) + "]");
+                fillField(cellFoneInput,phone.substring(1,11));
             }
 
             LOG.info("Попыток ввести номер::" + count);
@@ -261,7 +261,6 @@ public class UserAccountPage extends AbstractPage{
             LOG.info("Вводим SMS-код::" + code);
             fillField(cellFoneConformationInput,code);
         }else {
-            LOG.error("Кол-во обновлений страницы [" + driver.getCurrentUrl() + "] для получения SMS-кода по номеру[" + x + "]");
             throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
         }
         Stash.put("PHONE_NUMBER",phone);

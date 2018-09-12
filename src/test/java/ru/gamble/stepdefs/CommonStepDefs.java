@@ -1227,18 +1227,18 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-
-    @Когда("^проверка ответа \"([^\"]*)\" в зависимости от \"([^\"]*)\":$")
-    public void checkAnswerDependingOn(String responceAPI, String providerName, DataTable dataTable) {
-        Object json = Stash.getValue(responceAPI);
-        Map<String,String> data = dataTable.asMap(String.class,String.class);
-        for (Map.Entry entry: data.entrySet()) {
-          if(String.valueOf(entry.getKey()).equalsIgnoreCase(providerName)){
-
-          }
-        }
-
-    }
+//
+//    @Когда("^проверка ответа \"([^\"]*)\" в зависимости от \"([^\"]*)\":$")
+//    public void checkAnswerDependingOn(String responceAPI, String providerName, DataTable dataTable) {
+//        Object json = Stash.getValue(responceAPI);
+//        Map<String,String> data = dataTable.asMap(String.class,String.class);
+//        for (Map.Entry entry: data.entrySet()) {
+//          if(String.valueOf(entry.getKey()).equalsIgnoreCase(providerName)){
+//
+//          }
+//        }
+//
+//    }
 
     @Когда("^если в \"([^\"]*)\" провайдер PERFORM, то проверяем JSON:$")
     public void если_в_провайдер_PERFORM_то_проверяем_JSON(String arg1, DataTable arg2) {
