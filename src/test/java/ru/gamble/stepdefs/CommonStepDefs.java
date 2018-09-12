@@ -1513,15 +1513,13 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверяем что с баланса \"([^\"]*)\" снялась сумма \"([^\"]*)\"$")
     public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
-        try {
-            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
-            BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
-            BigDecimal withdrawnAmount = new BigDecimal(Stash.getValue(amountKey).toString());
-            BigDecimal expectedBalance = previousBalance.subtract(withdrawnAmount);
-            assertThat(expectedBalance.compareTo(actualBalance) == 0).as("Ошибка! Ожидаемый баланс [" + expectedBalance.toString() + "] не равен текущему [" + actualBalance.toString() + "]").isTrue();
-        }catch (NumberFormatException nf){
-            new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
-        }
+        BigDecimal actualBalance,previousBalance,withdrawnAmount,expectedBalance;
+        actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+        previousBalance = new BigDecimal((String) Stash.getValue(balanceKey));
+        withdrawnAmount = new BigDecimal((String) Stash.getValue(amountKey));
+        expectedBalance = previousBalance.subtract(withdrawnAmount);
+        assertThat(expectedBalance.compareTo(actualBalance) == 0).as("Ошибка! Ожидаемый баланс [" + expectedBalance.toString() + "] не равен текущему [" + actualBalance.toString() + "]").isTrue();
+
     }
 
     @Когда("^запрашиваем параметры способов пополения и сохраняем в память как \"([^\"]*)\"$")
