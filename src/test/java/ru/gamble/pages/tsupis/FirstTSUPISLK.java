@@ -1,6 +1,5 @@
 package ru.gamble.pages.tsupis;
 
-import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,6 +19,7 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +38,6 @@ public class FirstTSUPISLK extends AbstractPage {
     @ElementTitle("Код из СМС")
     @FindBy (name = "validation")
     private WebElement inputSMSCode;
-
 
     public FirstTSUPISLK() {
         WebDriver driver = PageFactory.getDriver();
@@ -78,4 +77,14 @@ public class FirstTSUPISLK extends AbstractPage {
            throw new AutotestError("Ошибка! Не смогли ввести СМС код [" + sms + "] в поле 'Код из СМС'");
         }
     }
+
+    @ActionTitle("проверяет успешность операции")
+    public void сhecksSuccessOfOperation(){
+        try {
+            new WebDriverWait(PageFactory.getDriver(), 5).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='icon fail']")));
+        }catch (Exception e){
+            throw new AutotestError("Ошибка! Операция не получилось.\n" + e.getMessage());
+        }
+    }
+
 }
