@@ -1479,6 +1479,15 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверяем что с баланса \"([^\"]*)\" снялась сумма \"([^\"]*)\"$")
     public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
+        try {
+            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+            BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
+            BigDecimal withdrawnAmount = new BigDecimal(Stash.getValue(amountKey).toString());
+            BigDecimal expectedBalance = previousBalance.subtract(withdrawnAmount);
+            Assert.assertTrue("Ошибка! Ожидаемый баланс [" + expectedBalance.toString() + "] не равен текущему [" + actualBalance.toString() + "]",expectedBalance.compareTo(actualBalance) == 0 );
+        }catch (NumberFormatException nf){
+            new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
+        }
         BigDecimal actualBalance,previousBalance,withdrawnAmount,expectedBalance;
         actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
         previousBalance = new BigDecimal((String) Stash.getValue(balanceKey));
