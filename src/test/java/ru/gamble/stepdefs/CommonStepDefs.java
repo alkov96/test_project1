@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.ws.client.*;
 import cucumber.api.DataTable;
+import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
@@ -1419,11 +1420,11 @@ public class CommonStepDefs extends GenericStepDefs {
         closeBrowser();
     }
 
-//    @After(value = "@NewUserRegistration_C36189")
-//    public void after(Scenario scenario){
-//        final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
-//        scenario.embed(screenshot, "image/png");
-//    }
+    @After(value = "@NewUserRegistration_C36189")
+    public void after(Scenario scenario){
+        final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
+        scenario.embed(screenshot, "image/png");
+    }
 
     @Когда("^возвращаем регистрацию на предыдущий способ из \\\"([^\\\"]*)\\\"$")
     public void returnRegistrationToPreviousMethod(String keyParams){

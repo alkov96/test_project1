@@ -178,8 +178,8 @@ public abstract class AbstractPage extends Page {
         } catch (DataException de) {
             LOG.error("Ошибка! Не смогли получить ссылку сайта");
         } catch (Exception e) {
-            LOG.error("Ошибка! Не смогли получить ссылку для аутентификации.");
             e.printStackTrace();
+            throw new AutotestError("Ошибка! Не смогли получить ссылку для аутентификации.");
         }
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
