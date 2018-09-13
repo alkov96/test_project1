@@ -1,11 +1,9 @@
 package ru.gamble.stepdefs;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.ws.client.*;
 import cucumber.api.DataTable;
-import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
@@ -14,9 +12,7 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.bouncycastle.util.io.pem.PemWriter;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -283,7 +279,6 @@ public class CommonStepDefs extends GenericStepDefs {
         String sqlRequest = "UPDATE gamebet.`user` SET registered_in_tsupis = TRUE, identified_in_tsupis = TRUE, identState = 1 WHERE `email` ='" + Stash.getValue(param) + "'";
         workWithDB(sqlRequest);
         LOG.info("Подтвердили регистрацию от ЦУПИС");
-
     }
 
     private static void workWithDB(String sqlRequest) {
@@ -408,7 +403,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.debug("Проверка успешно выполнена");
     }
 
-
     /**
      * Провкрутка страницы на х и y
      *
@@ -433,7 +427,6 @@ public class CommonStepDefs extends GenericStepDefs {
         nameGame = m.replaceAll("");
         return nameGame;
     }
-
 
     /**
      * проверка что из Ближвйших трансляци переход на правильную игру
@@ -620,8 +613,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 
-
-
     @Когда("^проверка вариантного ответа API из \"([^\"]*)\":$")
     public void checkresponceAPIor(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
@@ -631,8 +622,6 @@ public class CommonStepDefs extends GenericStepDefs {
         Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|",actualsOk);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
-
-
 
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
@@ -750,8 +739,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-
-
     @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\" \\\"([^\\\"]*)\\\"$")
     public static void confirmPhone(String keyCode, String keyPhone, String type) {
         String phone = Stash.getValue(keyPhone);
@@ -823,10 +810,7 @@ public class CommonStepDefs extends GenericStepDefs {
         jsonArray.add(jSONString);
         Stash.put(keyJSONObject, jsonArray);
         LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jsonArray.get(0)) + ")");
-
     }
-
-
 
     @Когда("^приводим дату к формату год-месяц-день \"([^\"]*)\"$")
     public void dataFormatter(String keyData) {
@@ -843,7 +827,6 @@ public class CommonStepDefs extends GenericStepDefs {
             e.printStackTrace();
         }
     }
-
 
     private Object collectParametersInJSONString(DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
@@ -882,7 +865,6 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyPhone, phone);
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
-
 
     @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\"$")
     public void checkTimeLeft(String keyTimeLeft,String keyResponse) {
@@ -945,7 +927,6 @@ public class CommonStepDefs extends GenericStepDefs {
                 List<Object> items = Collections.singletonList(JSONValue.parse(value));
                 return true;
             }
-
             return false;
     }
 
@@ -960,11 +941,7 @@ public class CommonStepDefs extends GenericStepDefs {
         //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND phone LIKE '7111002%'";
         searchUser(keyEmail,sqlRequest);
-        }
-
-
-
-
+    }
 
     @Когда("^обновляем оферту пользователю \"([^\"]*)\" \"([^\"]*)\"$")
     public static void offertUpdate(String offer_state,String keyEmail) {
@@ -1287,8 +1264,6 @@ public class CommonStepDefs extends GenericStepDefs {
     LOG.info("Подходящий пользователь найден : " + email);
     }
 
-
-
     @Когда("^составляем новый номер телефона \"([^\"]*)\" вместо старого \"([^\"]*)\"$")
     public void newPhone(String keyNewPhone, String keyOldPhone) {
         String oldPhone = Stash.getValue(keyOldPhone);
@@ -1296,8 +1271,6 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyNewPhone,newPhone);
         LOG.info("Новый нмоер телефона: " + newPhone);
     }
-
-
 
     @Когда("^смотрим какое время обновления баннера \"([^\"]*)\"$")
     public void delayGromBanner(String keyDelay) {
@@ -1406,8 +1379,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-
-
     @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \\\"([^\\\"]*)\\\"$")
     public void rememberActiveAndOffOption(String key,DataTable dataTable) {
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
@@ -1430,11 +1401,7 @@ public class CommonStepDefs extends GenericStepDefs {
         activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
         sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
         workWithDB(sqlRequest);
-
     }
-
-
-
 
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
     public void changeActive(String key) {
@@ -1510,7 +1477,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Записали в key [" + balanceKey + "] <== value [" + balance + "]");
     }
 
-
     @Когда("^проверяем что с баланса \"([^\"]*)\" снялась сумма \"([^\"]*)\"$")
     public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
         try {
@@ -1522,6 +1488,12 @@ public class CommonStepDefs extends GenericStepDefs {
         }catch (NumberFormatException nf){
             new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
         }
+        BigDecimal actualBalance,previousBalance,withdrawnAmount,expectedBalance;
+        actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+        previousBalance = new BigDecimal((String) Stash.getValue(balanceKey));
+        withdrawnAmount = new BigDecimal((String) Stash.getValue(amountKey));
+        expectedBalance = previousBalance.subtract(withdrawnAmount);
+        assertThat(expectedBalance.compareTo(actualBalance) == 0).as("Ошибка! Ожидаемый баланс [" + expectedBalance.toString() + "] не равен текущему [" + actualBalance.toString() + "]").isTrue();
     }
 
     @Когда("^запрашиваем параметры способов пополения и сохраняем в память как \"([^\"]*)\"$")
@@ -1535,7 +1507,6 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(KeyInStash,result);
         LOG.info("Сохранили в память key [" + KeyInStash + "] <== value [" + result + "]");
     }
-
 
     @Когда("^запрос к WSS \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestByWSSAndSave(String wSSPath, String KeyInStash, DataTable dataTable){
@@ -1607,6 +1578,5 @@ public class CommonStepDefs extends GenericStepDefs {
                 .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
                 .connect();
     }
-
 }
 

@@ -19,8 +19,6 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 public class MobileManePage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MobileManePage.class);
 
-
-
     @ElementTitle("Профиль")
     @FindBy(xpath = "//div/span[contains(@class,'header__button header__profile')]")
     private WebElement buttonProfile;
