@@ -20,7 +20,7 @@ import static ru.gamble.utility.EmailParameters.*;
 public class MailSearcher {
     private static final Logger LOG = LoggerFactory.getLogger(MailSearcher.class);
 
-    public String getEmailLink(String mail, Properties properties) throws Exception {
+    public String getEmailLink(String mail, Properties properties){
 
         String link;
 

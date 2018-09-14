@@ -236,7 +236,7 @@ public class LandingAppPage extends AbstractPage {
     @ActionTitle("отправляет СМС со страницы лэндинга на телефон")
     public void sendSMS(String phone, String isOk) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = isOk.equals("ожидаем успех")?true:false;
+        boolean flag = isOk.equals("ожидаем успех");
         String hintBefore3times = "Мы отправили вам ссылку на скачивание";
         String hintAfter3times = "Ошибка. Повторите попытку через 24 часа";
         if (phone.matches("^[A-Z_]+$")){

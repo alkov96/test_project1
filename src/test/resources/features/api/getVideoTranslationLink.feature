@@ -50,36 +50,31 @@
     | translationId | TRANSLATION_ID |
 
 
-    * проверка ответа "RESPONCE_API" в зависимости от "PROVIDER_NAME":
-      | IMG          | {"code":0,"data":{"videoTranslation":"https: |
-      | BETCONSTRUCT | {"code":0,"data":{"videoTranslation":        |
-      | PERFORM      | {"code":0,"data":{"performData":             |
-
-    * если в "RESPONCE_API" провайдер PERFORM, то проверяем JSON:
-    | access_token | String |
-    | fixtureId    | String |
-    | outletkey    | String |
-    | token_type   | String |
-    | uuid         | String |
-    | expires_in   | String |
-
-
-
-
-
-
-
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | {"code":0,"data":{"videoTranslation": |
-
-    * находим и сохраняем "VIDEOTRANSLATION" из "RESPONCE_API"
+    #ВСЁ ЧТО НИЖЕ НУЖНО РЕАЛИЗОВАТЬ!!!
+#    * проверка ответа "RESPONCE_API" в зависимости от "PROVIDER_NAME":
+#      | IMG          | {"code":0,"data":{"videoTranslation":"https: |
+#      | BETCONSTRUCT | {"code":0,"data":{"videoTranslation":        |
+#      | PERFORM      | {"code":0,"data":{"performData":             |
+#
+#    * если в "RESPONCE_API" провайдер PERFORM, то проверяем JSON:
+#    | access_token | String |
+#    | fixtureId    | String |
+#    | outletkey    | String |
+#    | token_type   | String |
+#    | uuid         | String |
+#    | expires_in   | String |
+#
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | {"code":0,"data":{"videoTranslation": |
+#
+#    * находим и сохраняем "VIDEOTRANSLATION" из "RESPONCE_API"
 
 #    * сохраняем в память
 #      | VIDEOTRANSLATION | https://stream.betconstruct.tv:7791/927249/index.m3u8?token=2cc3b0ab44698366991fd6f68fa068a0-1531218960-325-16 |
 #  "https:\/\/dge.imggaming.com\/api\/v2\/streaming\/events\/2\/stream?operatorId=91&auth=fe6e49d3f47130c5f34aa57b4c581a19&timestamp=1531222404558&thumbnail=true"
 # {"statusCode":401,"statusText":"Unauthorized","message":null}
-    * запрос к IMG "VIDEOTRANSLATION" и сохраняем в "RESPONCE_IMG"
+#    * запрос к IMG "VIDEOTRANSLATION" и сохраняем в "RESPONCE_IMG"
 
 #    * проверка вариантов ответа
 #

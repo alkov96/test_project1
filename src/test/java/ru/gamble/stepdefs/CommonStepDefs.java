@@ -38,6 +38,7 @@ import javax.net.ssl.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -50,13 +51,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.utility.Constants.*;
 
 
 public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
-    private static String sep = File.separator;
+    private static final String sep = File.separator;
 
     @ActionTitle("нажимает на кнопку")
     public static void pressButton(String param) {
@@ -294,7 +296,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-
     /**
      * Инициализируйте страницу с соответствующим заголовком (определенным через
      * {@link ru.sbtqa.tag.pagefactory.annotations.PageEntry} аннотация)
@@ -309,7 +310,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         PageFactory.getInstance().getPage(title);
     }
-
 
     /**
      * ожидание пока аттрибут без учета регистра будет содержать подстроку
@@ -327,7 +327,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
             @Override
             public Boolean apply(WebDriver driver) {
-                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase()) ? true : false;
+                return driver.findElement(locator).getAttribute(attribute).toLowerCase().contains(value.toLowerCase());
             }
 
             @Override
@@ -346,7 +346,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
             @Override
             public Boolean apply(WebDriver driver) {
-                return element.getAttribute(attribute).toLowerCase().contains(value.toLowerCase()) ? true : false;
+                return element.getAttribute(attribute).toLowerCase().contains(value.toLowerCase());
             }
 
             @Override
@@ -432,7 +432,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      * @throws Exception
      */
-    public void checkLinkToGame() throws Exception {
+    public void checkLinkToGame(){
         WebDriver driver = PageFactory.getDriver();
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         workWithPreloader();
@@ -652,7 +652,6 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-
     private static String workWithDBgetResult(String sqlRequest, String param) {
         Connection con = DBUtils.getConnection();
         Statement stmt = null;
@@ -702,7 +701,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param sqlRequest
      * @return
      */
-    private static void workWithDBresult(String sqlRequest) throws Exception{
+    private static void workWithDBresult(String sqlRequest){
         Connection con = DBUtils.getConnection();
         Statement stmt = null;
         PreparedStatement ps = null;
@@ -734,7 +733,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^получаем и сохраняем в память код подтверждения \\\"([^\\\"]*)\\\" телефона \\\"([^\\\"]*)\\\" \\\"([^\\\"]*)\\\"$")
+    @Когда("^получаем и сохраняем в память код подтверждения \"([^\"]*)\" телефона \"([^\"]*)\" \"([^\"]*)\"$")
     public static void confirmPhone(String keyCode, String keyPhone, String type) {
         String phone = Stash.getValue(keyPhone);
         String sqlRequest = new String();
@@ -749,7 +748,7 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Получили код подтверждения телефона: " + code);
     }
 
-    @Когда("^получаем и сохраняем в память код \\\"([^\\\"]*)\\\" подтверждения почты \\\"([^\\\"]*)\\\"$")
+    @Когда("^получаем и сохраняем в память код \"([^\"]*)\" подтверждения почты \"([^\"]*)\"$")
     public static void confirmEmail(String keyEmailCode, String keyEmail) {
         String email = Stash.getValue(keyEmail);
         String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='" + email + "'";
@@ -851,7 +850,7 @@ public class CommonStepDefs extends GenericStepDefs {
         return params;
     }
 
-    @Когда("^определяем незанятый номер телефона и сохраняем в \\\"([^\\\"]*)\\\"$")
+    @Когда("^определяем незанятый номер телефона и сохраняем в \"([^\"]*)\"$")
     public static void confirmEmail(String keyPhone) {
         String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7111002%' ORDER BY phone";
         String phoneLast = workWithDBgetResult(sqlRequest, "phone");
@@ -869,7 +868,7 @@ public class CommonStepDefs extends GenericStepDefs {
             Assertions.fail("Время ожидани звонка скайп не изменилось");
         }
     }
-    @Когда("^ожидание \\\"([^\\\"]*)\\\" сек$")
+    @Когда("^ожидание \"([^\"]*)\" сек$")
     public static void justsleep(String sleep) throws InterruptedException {
         Long mcsleep = Long.parseLong(sleep) * 1000;
         Thread.sleep(mcsleep);
@@ -1021,13 +1020,11 @@ public class CommonStepDefs extends GenericStepDefs {
         searchUser(keyEmail,sqlRequest);
     }
 
-
     @Когда("^сбрасываем пользователю статус ПД до \"([^\"]*)\" \"([^\"]*)\"$")
     public static void updatePDState(String peronal_data_state,String keyEmail) {
         String sqlRequest = "UPDATE gamebet.`user` SET personal_data_state=" + peronal_data_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
     }
-
 
     @Когда("^обновляем поля в БД для юзера \"([^\"]*)\":$")
     public void NullToField(String keyEmail, DataTable dataTable) {
@@ -1042,7 +1039,6 @@ public class CommonStepDefs extends GenericStepDefs {
         String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length()-1,setter.length()).toString() +  " WHERE email = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
     }
-
 
     @Когда("^достаём случайную видеотрансляцию из списка \"([^\"]*)\" и сохраняем в переменую \"([^\"]*)\"$")
     public void getRandomTranslationFromListAndSaveToVariable(String keyListTranslation, String keyGameId) {
@@ -1069,7 +1065,6 @@ public class CommonStepDefs extends GenericStepDefs {
         Object key = null, value;
         ObjectMapper oMapper = new ObjectMapper();
         Map<String, Object> map;
-        Object selectedObject = null;
         map = oMapper.convertValue(json, Map.class);
 
         for(int i = 0; i < table.size(); i++) {
@@ -1115,15 +1110,14 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     private String collectQueryString(String path){
-        String requestUrl, requestPath = path, requestFull = "";
+        String requestFull = "";
         LOG.info("Собираем строку запроса.");
         try {
-            requestUrl = JsonLoader.getData().get(STARTING_URL).get("MOBILE_API").getValue();
-            requestFull = requestUrl + "/" + requestPath;
+            requestFull = JsonLoader.getData().get(STARTING_URL).get("MOBILE_API").getValue() + "/" + path;
         } catch (DataException e) {
             e.getMessage();
         }
-        LOG.info("requestFull");
+        LOG.info("requestFull [" + requestFull + "]");
         return requestFull;
     }
 
@@ -1175,7 +1169,7 @@ public class CommonStepDefs extends GenericStepDefs {
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
+            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), StandardCharsets.UTF_8);
             if(!(null == dataTable)) { writer.write(String.valueOf(params)); }
             writer.close();
 
@@ -1223,10 +1217,9 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlDel);
         String sqlRequest = "UPDATE gamebet.`appversion` SET version=" + vers + ", hard_update_version=" + hardVers + " WHERE active_version=1 AND type_os=" + type;
         workWithDB(sqlRequest);
-
     }
 
-    public void searchUser(String keyEmail, String sqlRequest){
+    private void searchUser(String keyEmail, String sqlRequest){
     if (keyEmail.equals("ALLROWS")){
         try {
             workWithDBresult(sqlRequest);
@@ -1328,7 +1321,7 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
     }
 
-    @Когда("^запоминаем значение активных опций сайта в \\\"([^\\\"]*)\\\"$")
+    @Когда("^запоминаем значение активных опций сайта в \"([^\"]*)\"$")
     public void rememberActive (String activeOptionKey){
         LOG.info("В памяти лежит: key=>[" + activeOptionKey + "] ; value=>[" + Stash.getValue(activeOptionKey) + "]");
     }
@@ -1337,7 +1330,7 @@ public class CommonStepDefs extends GenericStepDefs {
         return workWithDBgetResult("SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'", "value");
     }
 
-    @Когда("^переключаем регистрацию на \\\"([^\\\"]*)\\\"$")
+    @Когда("^переключаем регистрацию на \"([^\"]*)\"$")
     public void switchesRegistrationOn(String typeRegistration) {
         String sqlRequest;
         String activeOpt = getActiveOptions();
@@ -1355,26 +1348,26 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \\\"([^\\\"]*)\\\"$")
+    @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \"([^\"]*)\"$")
     public void rememberActiveAndOffOption(String key,DataTable dataTable) {
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-        Stash.put(key,activeOpt);
+        StringBuilder activeOpt = new StringBuilder(workWithDBgetResult(sqlRequest, "value"));
+        Stash.put(key, activeOpt.toString());
 
         Map<String,String> table = dataTable.asMap(String.class,String.class);
         for (Map.Entry<String, String> entry : table.entrySet()) {
             String option = entry.getKey();
             if (entry.getValue().equals("true")) {
-                activeOpt = activeOpt + ", " + entry.getKey();
+                activeOpt.append(", ").append(entry.getKey());
                 continue;
             }
-            activeOpt = activeOpt.replace(", "+option, "");
-            activeOpt = activeOpt.replace("," + option, "");
+            activeOpt = new StringBuilder(activeOpt.toString().replace(", " + option, ""));
+            activeOpt = new StringBuilder(activeOpt.toString().replace("," + option, ""));
             LOG.info("Удаление активной опций сайта " + option);
         }
 
-        activeOpt = activeOpt.trim();
-        activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
+        activeOpt = new StringBuilder(activeOpt.toString().trim());
+        activeOpt = new StringBuilder(activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt.toString());
         sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
         workWithDB(sqlRequest);
     }
@@ -1401,13 +1394,13 @@ public class CommonStepDefs extends GenericStepDefs {
         scenario.embed(screenshot, "image/png");
     }
 
-    @Когда("^возвращаем регистрацию на предыдущий способ из \\\"([^\\\"]*)\\\"$")
+    @Когда("^возвращаем регистрацию на предыдущий способ из \"([^\"]*)\"$")
     public void returnRegistrationToPreviousMethod(String keyParams){
         String sqlUpdate = "UPDATE gamebet.`params` SET value = '" + Stash.getValue(keyParams)  + "'";
         workWithDBgetResult(sqlUpdate, "value");
     }
 
-    @Когда("^определяем дату завтрашнего дня \\\"([^\\\"]*)\\\"$")
+    @Когда("^определяем дату завтрашнего дня \"([^\"]*)\"$")
     public void tomorrowDate(String keyParams){
         Calendar today = Calendar.getInstance();
         today.add(Calendar.DATE,1);
@@ -1420,7 +1413,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-    @Когда("^запоминаем текущую страницу в \\\"([^\\\"]*)\\\"$")
+    @Когда("^запоминаем текущую страницу в \"([^\"]*)\"$")
     public void rememberCurenPageTo(String keyCurrentPage){
         Stash.put(keyCurrentPage,PageFactory.getDriver().getWindowHandle());
         LOG.info("Записали key [" + keyCurrentPage + "] <== value [" + PageFactory.getDriver().getWindowHandle() + "]");
@@ -1461,9 +1454,9 @@ public class CommonStepDefs extends GenericStepDefs {
             BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
             BigDecimal withdrawnAmount = new BigDecimal(Stash.getValue(amountKey).toString());
             BigDecimal expectedBalance = previousBalance.subtract(withdrawnAmount);
-            Assert.assertTrue("Ошибка! Ожидаемый баланс [" + expectedBalance.toString() + "] не равен текущему [" + actualBalance.toString() + "]",expectedBalance.compareTo(actualBalance) == 0 );
+            assertEquals("Ошибка! Ожидаемый баланс [" + expectedBalance.toString() + "] не равен текущему [" + actualBalance.toString() + "]", 0, expectedBalance.compareTo(actualBalance));
         }catch (NumberFormatException nf){
-            new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
+           throw new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
         }
         BigDecimal actualBalance,previousBalance,withdrawnAmount,expectedBalance;
         actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
@@ -1487,11 +1480,11 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^запрос к WSS \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestByWSSAndSave(String wSSPath, String KeyInStash, DataTable dataTable){
-        requestToWSS(wSSPath,KeyInStash,"POST",dataTable);
+        requestToWSS(wSSPath,KeyInStash,dataTable);
 
 
     }
-    protected void requestToWSS(String requestFull, String keyStash, String method, DataTable dataTable) {
+    private void requestToWSS(String requestFull, String keyStash, DataTable dataTable) {
         if (!(null == dataTable)) {
             Map<String, String> table = dataTable.asMap(String.class, String.class);
         }
@@ -1506,19 +1499,14 @@ public class CommonStepDefs extends GenericStepDefs {
         StringBuilder builder = new StringBuilder();
 
         try {
-            WebSocket ws = connect(builder);
+            WebSocket ws = connect(builder,requestFull);
             ws.sendText(JSONValue.toJSONString(params));
             Thread.sleep(2000);
             ws.sendText(therdRequest);
             Thread.sleep(2000);
-        } catch (IOException e) {
+        } catch (IOException | WebSocketException | InterruptedException | NoSuchAlgorithmException e) {
             e.printStackTrace();
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new AutotestError("Ошибка! Проблемы с WebSocket.");
         }
         String limits = builder.toString();
 
@@ -1532,7 +1520,7 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * Connect to the server.
      */
-    private static WebSocket connect(StringBuilder tmp) throws IOException, WebSocketException, NoSuchAlgorithmException {
+    private static WebSocket connect(StringBuilder tmp, String requestFull) throws IOException, WebSocketException, NoSuchAlgorithmException {
 
         StringBuilder builder = new StringBuilder();
         SSLContext context = NaiveSSLContext.getInstance("TLS");
@@ -1542,7 +1530,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 .setSSLContext(context)
                 .setVerifyHostname(false)
                 .setConnectionTimeout(5000)
-                .createSocket("wss://swarm-test.betfavorit.cf:8443/")
+                .createSocket(requestFull)
                 .addListener(new WebSocketAdapter() {
                     // A text message arrived from the server.
                     public void onTextMessage(WebSocket websocket, String message) {

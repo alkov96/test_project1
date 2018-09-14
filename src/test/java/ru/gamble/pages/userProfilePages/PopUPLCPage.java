@@ -109,7 +109,7 @@ public class PopUPLCPage extends AbstractPage {
     }
 
     @ActionTitle("вводит сумму меньше минимальной и проверяем для каждого способа")
-    public void summMin() throws InterruptedException {
+    public void summMin(){
         WebDriver driver = PageFactory.getDriver();
         withdraw_field.click();
         withdraw_field.clear();

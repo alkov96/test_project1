@@ -1,7 +1,6 @@
 package ru.gamble.pages.livePages;
 
 import cucumber.api.DataTable;
-import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -22,7 +21,6 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -36,9 +34,6 @@ import static org.openqa.selenium.By.xpath;
  */
 @PageEntry(title = "События дня")
 public class DayEventsPage extends AbstractPage {
-    WebDriver driver = PageFactory.getDriver();
-    WebDriverWait wait = new WebDriverWait(driver,10);
-
     private static final Logger LOG = LoggerFactory.getLogger(DayEventsPage.class);
 
     @FindBy(xpath = "//div[@class='event-widget-game-info']")
@@ -60,7 +55,7 @@ public class DayEventsPage extends AbstractPage {
         CommonStepDefs.workWithPreloader();
         LOG.info("Ищем событие.");
         List <WebElement> events = driver.findElements(By.xpath(xpathEvent))
-                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         if(events.size() > 0) {
             LOG.info("Нажали на событие  " + events.get(0).getText());
             events.get(0).click();//добавляем событие со страницы Событие дня с баннера(вторая команда)
@@ -76,10 +71,7 @@ public class DayEventsPage extends AbstractPage {
         } else {
             throw new AutotestError("Ошибка! Ни один баннер не найден.");
         }
-
     }
-
-
 
     @ActionTitle("проверяет, совпадают ли названия событий на кнопках на баннере и сверху c")
     public void teamsOnBanner(String keyTeam1, String keyTeam2){
@@ -92,7 +84,6 @@ public class DayEventsPage extends AbstractPage {
             LOG.info("Названия команд на баннере и названия команд на баннере на кнопках совпадают: [" + teamname1 + "] - [" + teamname2 + "] = [" + team1 + "] - [" + team2 + "]");
         }
         else Assertions.fail("Названия команд на баннере и названия команд на баннере на кнопках не совпадают: ["  + teamname1 + "] - [" + teamname2 + "] = [" + team1 + "] - ["+ team2 + "]");
-
     }
 
     @ActionTitle("кликает на три вида спорта и проверяет, что игры соответвтвуют выбранному виду")
@@ -104,7 +95,7 @@ public class DayEventsPage extends AbstractPage {
         String activeSport;
         for (WebElement sport : typesSport) { //каждый вэб-элемент спорт это элемент из списка тайпсспорт
             sport.click();//нажала на первую иконку
-            wait.until(ExpectedConditions.attributeContains(sport, "class", "active"));
+            new WebDriverWait(driver,10).until(ExpectedConditions.attributeContains(sport, "class", "active"));
             iconSport = sport.findElement(By.xpath("i")).getAttribute("class").replace("sport-icon icon-", "").toLowerCase();//реплейс - замена подстроки.+привели сроки к низкому регистру
             LOG.info("Нажала на иконку " + iconSport);
             activeSport = driver.findElement(By.xpath("//div[@class='bets-widget bets-widget_wide liveNow']//div[@class='bets-widget-table']/div[1]")).getAttribute("class");
@@ -115,7 +106,6 @@ public class DayEventsPage extends AbstractPage {
             counter++;
             if (counter >= 4) break;
         }
-
     }
 
     @ActionTitle("добавляет событие в избранное")
@@ -140,6 +130,7 @@ public class DayEventsPage extends AbstractPage {
 
     @ActionTitle("проверяет, добавилось ли событие в избранное")
     public void checkIsEventAddToFav() throws Exception {
+        WebDriver driver = PageFactory.getDriver();
         driver.findElement(By.id("elected")).click();
         Thread.sleep(5000);
         if (!driver.findElement(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")).isDisplayed()){
@@ -168,13 +159,11 @@ public class DayEventsPage extends AbstractPage {
         }else {
             throw new AutotestError("Ошибка! Лайв->События дня:: Ни одного события не найдено.");
         }
-
     }
 
     @ActionTitle("добавляет несколько событий в купон")
     public void addEventsToCoupon() throws InterruptedException {
         addEventsToCouponF();
-
     }
 }
 

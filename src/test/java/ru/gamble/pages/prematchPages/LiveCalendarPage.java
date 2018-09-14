@@ -53,7 +53,7 @@ public class LiveCalendarPage extends AbstractPage {
         List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
         int tryPage = 0;
         boolean isCoeffFound = false;
-        while (isCoeffFound == false && tryPage < allDaysPages.size()-1) {
+        while (!isCoeffFound && tryPage < allDaysPages.size()-1) {
             try {
                 waitForElementPresent(By.xpath("//div[contains(@class,'livecal-table__coefficient')]"), 3);
             }catch (Exception e){

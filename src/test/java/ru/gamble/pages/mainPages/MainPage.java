@@ -2,8 +2,6 @@ package ru.gamble.pages.mainPages;
 
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.Когда;
-import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -25,6 +23,7 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +32,9 @@ import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.setRemoveAssertJRelatedElementsFromStackTrace;
-import static org.junit.Assert.assertFalse;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.*;
+import static ru.gamble.utility.Constants.BUTTON;
+import static ru.gamble.utility.Constants.DIRECTION;
 
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
@@ -132,9 +130,9 @@ public class MainPage extends AbstractPage {
      * в Stash сохраняет найденную игру. ключ - "gameBT"
      */
     @ActionTitle("ищет игру на БТ")
-    public  void searchVideoGameBT(String param) throws InterruptedException {
+    public  void searchVideoGameBT(String param){
         WebDriver driver = PageFactory.getDriver();
-        boolean haveButton = param.equals("с кнопкой Смотреть")?true:false;
+        boolean haveButton = param.equals("с кнопкой Смотреть");
         String ngclick = "";
         List<WebElement> games = new ArrayList<>();
         if (haveButton) {
