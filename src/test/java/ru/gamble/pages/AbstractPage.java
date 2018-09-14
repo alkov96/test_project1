@@ -155,7 +155,7 @@ public abstract class AbstractPage extends Page {
 
         for (int j = 0; j < count; j++) {
             try {
-                new WebDriverWait(PageFactory.getDriver(), waitSeconds).until(ExpectedConditions.visibilityOf(element));
+                new WebDriverWait(PageFactory.getDriver(), waitSeconds ).until(ExpectedConditions.visibilityOf(element));
                 break;
             } catch (Exception e) {
                 driver.navigate().refresh();
