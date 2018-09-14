@@ -131,7 +131,7 @@ public class DayEventsPage extends AbstractPage {
         int counter = 0;
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         List<WebElement> allEvents = driver.findElements(xpath("//div[@class='bets-widget bets-widget_wide liveNow']//table[@class='full_width bets-widget-table']//tr/td[5]/div/span")).
-                stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         if(allEvents.size() > 0){
             for (WebElement event : allEvents) {
                 Thread.sleep(1000);

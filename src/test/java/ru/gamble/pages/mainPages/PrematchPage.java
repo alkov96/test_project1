@@ -14,8 +14,6 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.time.LocalTime;
-
 /**
  * @author p.sivak.
  * @since 04.05.2018.

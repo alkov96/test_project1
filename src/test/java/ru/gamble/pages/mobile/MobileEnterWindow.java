@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.utility.Constants;
 import ru.gamble.utility.JsonLoader;
-import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;

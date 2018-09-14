@@ -92,48 +92,54 @@ public class UserAccountPage extends AbstractPage{
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MMMM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        for(int i = 0; i < table.size(); i++) {
+        for (Map<String, String> aTable : table) {
 
-            inputField = table.get(i).get(INPUT_FIELD);
-            value = table.get(i).get(VALUE);
-            saveVariable = table.get(i).get(SAVE_VALUE);
+            inputField = aTable.get(INPUT_FIELD);
+            value = aTable.get(VALUE);
+            saveVariable = aTable.get(SAVE_VALUE);
 
-            if(inputField.contains(DATEOFBIRTH)){
+            if (inputField.contains(DATEOFBIRTH)) {
                 try {
                     date = outputFormat.format(inputFormat.parse(enterDate(value)));
                 } catch (ParseException e) {
                     e.getMessage();
                 }
-                Stash.put(saveVariable,date);
+                Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
             }
-            if(inputField.contains(LASTNAME)) {
-                if(value.contains(RANDOM)){
-                fillField(inputSurname,Generators.randomString(25));}
-                else {fillField(inputSurname,value); }
-                Stash.put(saveVariable,inputSurname.getAttribute("value"));
+            if (inputField.contains(LASTNAME)) {
+                if (value.contains(RANDOM)) {
+                    fillField(inputSurname, Generators.randomString(25));
+                } else {
+                    fillField(inputSurname, value);
+                }
+                Stash.put(saveVariable, inputSurname.getAttribute("value"));
                 LOG.info(saveVariable + "<==[" + inputSurname.getAttribute("value") + "]");
             }
-            if(inputField.contains(NAME)) {
+            if (inputField.contains(NAME)) {
                 if (value.contains(RANDOM)) {
                     fillField(inputName, Generators.randomString(25));
-                } else { fillField(inputName, value); }
+                } else {
+                    fillField(inputName, value);
+                }
                 Stash.put(saveVariable, inputName.getAttribute("value"));
                 LOG.info(saveVariable + "<==[" + inputName.getAttribute("value") + "]");
             }
             if (inputField.contains(PATERNALNAME)) {
                 if (value.contains(RANDOM)) {
                     fillField(inputPatronymic, Generators.randomString(25));
-                } else { fillField(inputPatronymic, value); }
+                } else {
+                    fillField(inputPatronymic, value);
+                }
                 Stash.put(saveVariable, inputPatronymic.getAttribute("value"));
                 LOG.info(saveVariable + "<==[" + inputPatronymic.getAttribute("value") + "]");
             }
-            if(inputField.contains(EMAIL)){
+            if (inputField.contains(EMAIL)) {
                 String email = Stash.getValue(("EMAIL"));
                 fillField(inputEmail, email);
                 LOG.info(saveVariable + "<==[" + inputEmail.getAttribute("value") + "]");
             }
-            if(inputField.contains(PASSWORD)){
+            if (inputField.contains(PASSWORD)) {
                 String password = (value.equals(Constants.DEFAULT)) ? JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue() : value;
                 LOG.info("Вводим пароль::" + password);
                 fillField(passwordInput, password);
@@ -142,12 +148,12 @@ public class UserAccountPage extends AbstractPage{
                 Stash.put(saveVariable, password);
             }
 
-            if(inputField.contains(NUMBERPHONE)) {
+            if (inputField.contains(NUMBERPHONE)) {
                 enterSellphone(value);
                 StringBuilder builder = new StringBuilder();
-                builder.append("7").append(cellFoneInput.getAttribute("value").trim().replaceAll("\n","").replaceAll("-","").replaceAll(" ",""));
+                builder.append("7").append(cellFoneInput.getAttribute("value").trim().replaceAll("\n", "").replaceAll("-", "").replaceAll(" ", ""));
                 Stash.put(saveVariable, String.valueOf(builder.toString()));
-                LOG.info(saveVariable + "<==[" +  builder.toString() + "]");
+                LOG.info(saveVariable + "<==[" + builder.toString() + "]");
             }
         }
     }

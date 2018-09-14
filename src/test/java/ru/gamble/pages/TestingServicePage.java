@@ -1,8 +1,5 @@
 package ru.gamble.pages;
 
-import cucumber.api.java.en.Then;
-import cucumber.api.java.ru.Когда;
-import net.minidev.json.JSONValue;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,8 +8,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.userProfilePages.PopUPLCPage;
-import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;

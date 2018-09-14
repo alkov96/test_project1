@@ -13,8 +13,6 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-
 @PageEntry(title = "Мобильная главная страница")
 public class MobileManePage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MobileManePage.class);

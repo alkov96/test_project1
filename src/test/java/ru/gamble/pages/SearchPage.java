@@ -125,7 +125,7 @@ public class SearchPage extends AbstractPage{
             }
         }
 
-        Assert.assertFalse(number==-1);//нет подходящих игр -значит наша игра через поиск не нашлась - ошибка
+        Assert.assertNotEquals(number, -1);//нет подходящих игр -значит наша игра через поиск не нашлась - ошибка
 
         String whenGame = searchResult.get(number).findElement(xpath("div/div[contains(@class,'result-search__competition-name')]")).getAttribute("title");//время в результатх поиска для игры по номеру number
         int indexTime = whenGame.indexOf(":");

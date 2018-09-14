@@ -24,7 +24,8 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -63,7 +64,7 @@ public class RefillAccountsPage extends AbstractPage{
     @ActionTitle("проверяет, что на попапе пополнения есть кнопки-ссылки сумм")
     public void sposobSumm() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> summList = driver.findElements(By.xpath("//span[contains(@class,'jsLink smallJsLink')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        List<WebElement> summList = driver.findElements(By.xpath("//span[contains(@class,'jsLink smallJsLink')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         Stash.put("summListKey", summList);
         Thread.sleep(1000);
         if (summList.isEmpty()) {
@@ -82,7 +83,7 @@ public class RefillAccountsPage extends AbstractPage{
         BigDecimal maxLimitInDB,maxLimitByWSS, maxValueOnPage;
         Object jsonByDB =  JSONValue.parse(Stash.getValue(methodsKey).toString()), checkValueByNull;
         Object jsonByWSS =  JSONValue.parse(Stash.getValue(keyJsonByWSS).toString());
-        List<WebElement> methodsOfRefill = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'moneyChnl')]//label/div")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        List<WebElement> methodsOfRefill = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'moneyChnl')]//label/div")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         LOG.info("Нашли на странице [" + methodsOfRefill.size() + "] элементов способов пополенния");
 
         LOG.info("Сравниваем максимальный лимит из базы с суммой на web-странице");
@@ -101,7 +102,7 @@ public class RefillAccountsPage extends AbstractPage{
             }
 
             LOG.info("Сравниваем два максимума [" + maxLimitInDB.toString() + "] и [" + maxLimitByWSS + "]");
-            exeptedMaxLimit = (maxLimitInDB.compareTo(maxLimitByWSS) == 1) ? maxLimitByWSS.toString() : maxLimitInDB.toString();
+            exeptedMaxLimit = (maxLimitInDB.compareTo(maxLimitByWSS) > 0) ? maxLimitByWSS.toString() : maxLimitInDB.toString();
             LOG.info("Ожидаемый максимум должен быть[" + exeptedMaxLimit + "]");
 
             maxValueOnPage = new BigDecimal(list.get(list.size()-1).getText().replaceAll(" +",""));
@@ -149,7 +150,7 @@ public class RefillAccountsPage extends AbstractPage{
      */
     private void checkForErrorLoadingPaymentSystems(){
         WebDriver driver = PageFactory.getWebDriver();
-        if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() > 0){
+        if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).size() > 0){
             throw new AutotestError("Ошибка при загрузке платежных систем!");
         }
     }

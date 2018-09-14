@@ -2,7 +2,6 @@ package ru.gamble.utility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.sbtqa.tag.datajack.exceptions.DataException;
 
 import java.util.Properties;
 
@@ -11,7 +10,7 @@ import static ru.gamble.utility.PropPoint.getEmailProperty;
 public class YandexPostman {
     private static final Logger LOG = LoggerFactory.getLogger(YandexPostman.class);
 
-    public static String getLinkForAuthentication(String mail) throws Exception {
+    public static String getLinkForAuthentication(String mail){
         Properties properties = new Properties();
         MailSearcher searcher = new MailSearcher();
 

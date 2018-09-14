@@ -78,10 +78,10 @@ public class AuthenticationMainPage extends AbstractPage {
             new WebDriverWait(PageFactory.getWebDriver(),3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoTSUPIS)));
             LOG.info("Нашли кнопку ["
                     + PageFactory.getWebDriver().findElements(By.xpath(xpathGoTSUPIS))
-                    .stream().filter(e -> e.isDisplayed()).findFirst().get()
+                    .stream().filter(WebElement::isDisplayed).findFirst().get()
                     .getText().replaceAll("\n", "").trim()
                     + "] и нажимаем на крест");
-            PageFactory.getWebDriver().findElements(By.xpath(xpathCross)).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+            PageFactory.getWebDriver().findElements(By.xpath(xpathCross)).stream().filter(WebElement::isDisplayed).findFirst().get().click();
         }catch (Exception e){
             LOG.info("Модальное окно 'Перейти в ЦУПИС' не появилось");
         }
@@ -96,7 +96,7 @@ public class AuthenticationMainPage extends AbstractPage {
         LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
         CouponPage.balanceIsOK("рубли");
         sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
-        if(sum.compareTo(new BigDecimal(0)) == 1){
+        if(sum.compareTo(new BigDecimal(0)) > 0){
             LOG.info("Проверка что правильно изменился баланс бонусов");
             Stash.put("sumKey",sum.toString());
             LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");

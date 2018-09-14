@@ -109,33 +109,33 @@ public class PassportDataPage extends AbstractPage {
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
-        for(int i = 0; i < data.size(); i++) {
-            inputField = data.get(i).get(INPUT_FIELD);
-            value = data.get(i).get(VALUE);
-            saveVariable = data.get(i).get(SAVE_VALUE);
+        for (Map<String, String> aData : data) {
+            inputField = aData.get(INPUT_FIELD);
+            value = aData.get(VALUE);
+            saveVariable = aData.get(SAVE_VALUE);
 
-            if(inputField.contains(DATEOFBIRTH)){
+            if (inputField.contains(DATEOFBIRTH)) {
                 try {
                     date = outputFormat.format(inputFormat.parse(enterDate(value)));
                 } catch (ParseException e) {
                     e.getMessage();
                 }
-                Stash.put(saveVariable,date);
+                Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
             }
-            if(inputField.contains(SERIAL)){
-                serial = (value.equals(RANDOM))? Generators.randomNumber(4): value;
-                fillField(passpSerialInput,serial);
-                Stash.put(saveVariable,String.valueOf(serial));
+            if (inputField.contains(SERIAL)) {
+                serial = (value.equals(RANDOM)) ? Generators.randomNumber(4) : value;
+                fillField(passpSerialInput, serial);
+                Stash.put(saveVariable, String.valueOf(serial));
                 LOG.info(saveVariable + "<==[" + serial + "]");
             }
-            if(inputField.contains(NUMBER)){
-                number = (value.equals(RANDOM))? Generators.randomNumber(6): value;
-                fillField(passpNumberInput,number);
-                Stash.put(saveVariable,String.valueOf(number));
+            if (inputField.contains(NUMBER)) {
+                number = (value.equals(RANDOM)) ? Generators.randomNumber(6) : value;
+                fillField(passpNumberInput, number);
+                Stash.put(saveVariable, String.valueOf(number));
                 LOG.info(saveVariable + "<==[" + number + "]");
             }
-            if(inputField.contains(DATEISSUE)){
+            if (inputField.contains(DATEISSUE)) {
                 // делаем столько попыток ввести дату, пока не пропадёт ошибка
                 // "Дата выдачи не соответсвует дате обязательной  замены паспорта"
                 String errXpath = "//div[@class='inpErrText__inner ng-binding ng-scope']";
@@ -145,88 +145,75 @@ public class PassportDataPage extends AbstractPage {
                     } catch (ParseException e) {
                         e.getMessage();
                     }
-                } while(!PageFactory.getWebDriver().findElements(By.xpath(errXpath))
-                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).isEmpty());
-                Stash.put(saveVariable,date);
+                } while (!PageFactory.getWebDriver().findElements(By.xpath(errXpath))
+                        .stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).isEmpty());
+                Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
             }
 
-            if(inputField.contains(ISSUEDBY)){
-                whoIssued = (value.equals(RANDOM))? Generators.randomString(25) : value;
-                fillField(issuedByInput,whoIssued);
-                Stash.put(saveVariable,whoIssued);
+            if (inputField.contains(ISSUEDBY)) {
+                whoIssued = (value.equals(RANDOM)) ? Generators.randomString(25) : value;
+                fillField(issuedByInput, whoIssued);
+                Stash.put(saveVariable, whoIssued);
                 LOG.info(saveVariable + "<==[" + issuedByInput.getAttribute("value") + "]");
             }
 
-            if(inputField.contains(UNITCODE)){
-                unitCode = (value.equals(RANDOM))? Generators.randomNumber(6) : value;
-                fillField(unitCodeInput,unitCode);
-                Stash.put(saveVariable,unitCodeInput.getAttribute("value"));
+            if (inputField.contains(UNITCODE)) {
+                unitCode = (value.equals(RANDOM)) ? Generators.randomNumber(6) : value;
+                fillField(unitCodeInput, unitCode);
+                Stash.put(saveVariable, unitCodeInput.getAttribute("value"));
                 LOG.info(saveVariable + "<==[" + unitCodeInput.getAttribute("value") + "]");
             }
 
-            if(inputField.contains(SEX)){
-                sex = (value.equals(RANDOM))? Generators.randomSex() : value;
+            if (inputField.contains(SEX)) {
+                sex = (value.equals(RANDOM)) ? Generators.randomSex() : value;
                 PageFactory.getWebDriver().findElement(By.xpath(("//*[text()='" + sex + "']"))).click();
-                Stash.put(saveVariable,sex);
+                Stash.put(saveVariable, sex);
                 LOG.info(saveVariable + "<==[" + sex + "]");
             }
 
-            if(inputField.contains(PLACEOFBIRTH)){
-                placeOfBirth = (value.equals(RANDOM))? Generators.randomCity() : value;
-                fillField(placeOfBirthInput,placeOfBirth);
-                Stash.put(saveVariable,placeOfBirth);
+            if (inputField.contains(PLACEOFBIRTH)) {
+                placeOfBirth = (value.equals(RANDOM)) ? Generators.randomCity() : value;
+                fillField(placeOfBirthInput, placeOfBirth);
+                Stash.put(saveVariable, placeOfBirth);
                 LOG.info(saveVariable + "<==[" + placeOfBirthInput.getAttribute("value") + "]");
             }
 
 
-                if (inputField.contains(REGION) && value.equals(TRUE)) {
-                    fillAddress(regionInput, true);
-                    Stash.put(saveVariable,regionInput.getAttribute("value"));
-                    LOG.info(saveVariable + "<==[" + regionInput.getAttribute("value") + "]");
-                }
+            if (inputField.contains(REGION) && value.equals(TRUE)) {
+                fillAddress(regionInput, true);
+                Stash.put(saveVariable, regionInput.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + regionInput.getAttribute("value") + "]");
+            }
 
-                if (inputField.contains(LOCALITY) && value.equals(TRUE)) {
-                    fillAddress(cityInput, true);
-                    Stash.put(saveVariable,cityInput.getAttribute("value"));
-                    LOG.info(saveVariable + "<==[" + cityInput.getAttribute("value") + "]");
-                }
+            if (inputField.contains(LOCALITY) && value.equals(TRUE)) {
+                fillAddress(cityInput, true);
+                Stash.put(saveVariable, cityInput.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + cityInput.getAttribute("value") + "]");
+            }
 
-                if (inputField.contains(STREET) && value.equals(TRUE)) {
-                    fillAddress(streetInput, true);
-                    Stash.put(saveVariable,streetInput.getAttribute("value") );
-                    LOG.info(saveVariable + "<==[" + streetInput.getAttribute("value") + "]");
-                }
+            if (inputField.contains(STREET) && value.equals(TRUE)) {
+                fillAddress(streetInput, true);
+                Stash.put(saveVariable, streetInput.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + streetInput.getAttribute("value") + "]");
+            }
 
-                if(inputField.contains(HOUSE)){
-                    house = (value.equals(RANDOM)) ? Generators.randomNumber(2) : value;
-                    fillField(houseInput, house);
-                    Stash.put(saveVariable,String.valueOf(house));
-                    LOG.info(saveVariable + "<==[" + house + "]");
-                }
+            if (inputField.contains(HOUSE)) {
+                house = (value.equals(RANDOM)) ? Generators.randomNumber(2) : value;
+                fillField(houseInput, house);
+                Stash.put(saveVariable, String.valueOf(house));
+                LOG.info(saveVariable + "<==[" + house + "]");
+            }
 
-                if(inputField.contains(FLAT)){
-                   flat = (value.equals(RANDOM)) ? Generators.randomNumber(2) : value;
-                   fillField(flatInput, flat);
-                   Stash.put(saveVariable,String.valueOf(flat));
-                   LOG.info(saveVariable + "<==[" + flat + "]");
-                }
-
-
-//                building = (data.get(BUILDING).equals(RANDOM)) ? Generators.randomNumber(2) : data.get(BUILDING);
-//                LOG.info("Заполняем Строение::" + building);
-//                fillField(buildingInput, building);
-//
-//                block = (data.get(BLOCK).equals(RANDOM)) ? Generators.randomNumber(3) : data.get(BLOCK);
-//                LOG.info("Заполняем Корпус::" + block);
-//                fillField(blockInput, block);
-
-
+            if (inputField.contains(FLAT)) {
+                flat = (value.equals(RANDOM)) ? Generators.randomNumber(2) : value;
+                fillField(flatInput, flat);
+                Stash.put(saveVariable, String.valueOf(flat));
+                LOG.info(saveVariable + "<==[" + flat + "]");
+            }
         }
         LOG.info("Нажимаем кнопку 'Отправить'");
-       // if(PageFactory.getWebDriver().findElements(By.xpath(wrongAddressXpath)).isEmpty()) {
             sendButton.click();
-
     }
 
 }

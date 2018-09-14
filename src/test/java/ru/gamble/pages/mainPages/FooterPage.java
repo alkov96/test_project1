@@ -120,9 +120,9 @@ public class FooterPage extends AbstractPage {
         String link = "";
         String currentHandle = driver.getWindowHandle();
 
-        for(int i = 0; i < table.size(); i++) {
-            linkTitle = table.get(i).get(LINK);
-            expectedText = table.get(i).get(TEXT);
+        for (Map<String, String> aTable : table) {
+            linkTitle = aTable.get(LINK);
+            expectedText = aTable.get(TEXT);
             String xpath = "//*[contains(text(),'" + expectedText + "')]";
             opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
         }
@@ -136,9 +136,9 @@ public class FooterPage extends AbstractPage {
         String link = "";
         String currentHandle = driver.getWindowHandle();
 
-        for(int i = 0; i < table.size(); i++) {
-            linkTitle = table.get(i).get(LINK);
-            elementTitle = table.get(i).get(ELEMENT);
+        for (Map<String, String> aTable : table) {
+            linkTitle = aTable.get(LINK);
+            elementTitle = aTable.get(ELEMENT);
             String xpath = "//a[contains(@class,'no-reload-js active')]//*[contains(.,'" + elementTitle + "')]";
             opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
         }
@@ -180,21 +180,14 @@ public class FooterPage extends AbstractPage {
 
             // Цикл обновления страницы в случае неудачи её прогрузки
             for(int j = 0; j < 10; j++) {
-                try {
-                    try {
-                        new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-                    }catch (Exception e){
-                        e.getMessage();
-                    }
-                    requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-                    LOG.info("Текущая страница::" + driver.getCurrentUrl());
-                    if(!requiredElements.isEmpty()){
-                        LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getText().replaceAll("\n", " "));
-                        break;
-                    }
-                } catch (Exception e){
-                    driver.navigate().refresh();
+                new WebDriverWait(driver, 3);
+                requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+                LOG.info("Текущая страница::" + driver.getCurrentUrl());
+                if(!requiredElements.isEmpty()){
+                    LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getText().replaceAll("\n", " "));
+                    break;
                 }
+                driver.navigate().refresh();
                 if(j >= 9){
                     throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
                 }
@@ -214,7 +207,7 @@ public class FooterPage extends AbstractPage {
     @ActionTitle("проверяет что число платёжных систем")
     public void checkNumberPaymentSystem(String number){
         String xpath = "//div[contains(@class,'payment-systems-item')]";
-        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
+        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         int expected = Integer.parseInt(number);
         int actual = list.size();
         assertThat(actual).as("Количетво иконок платёжных систем [" + actual + "] не соответсвует ожидаемому [" + expected + "]").isEqualTo(expected);

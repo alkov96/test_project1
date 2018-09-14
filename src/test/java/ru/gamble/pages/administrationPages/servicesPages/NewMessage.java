@@ -74,8 +74,8 @@ public class NewMessage extends AbstractPage{
         PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + textAreas.get(1).getAttribute("id") + "-inputEl']")).sendKeys(formatForDateStart.format(dateStart));
         SimpleDateFormat formatForMinutesEnd = new SimpleDateFormat("mm");
         SimpleDateFormat formatForHoursEnd = new SimpleDateFormat("kk");
-        int hoursEnd = Integer.parseInt(String.format(formatForHoursEnd.format(dateStart)));
-        int minsEnd = Integer.parseInt(String.format(formatForMinutesEnd.format(dateStart))) + Integer.parseInt(time);
+        int hoursEnd = Integer.parseInt(formatForHoursEnd.format(dateStart));
+        int minsEnd = Integer.parseInt(formatForMinutesEnd.format(dateStart)) + Integer.parseInt(time);
         SimpleDateFormat formatForDateEnd = new SimpleDateFormat("dd.MM.yyyy' 'kk:mm:ss");
         while (minsEnd > 60) {
             minsEnd = minsEnd - 60;
@@ -93,8 +93,8 @@ public class NewMessage extends AbstractPage{
         Date date = new Date();
         SimpleDateFormat formatForMinutesEnd = new SimpleDateFormat("mm");
         SimpleDateFormat formatForHoursEnd = new SimpleDateFormat("kk");
-        int mins = Integer.parseInt(String.format(formatForMinutesEnd.format(date)));
-        int hours = Integer.parseInt(String.format(formatForHoursEnd.format(date)));
+        int mins = Integer.parseInt(formatForMinutesEnd.format(date));
+        int hours = Integer.parseInt(formatForHoursEnd.format(date));
         if (after == 0) {
             return date;
         } else {

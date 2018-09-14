@@ -303,7 +303,7 @@ public class CouponPage extends AbstractPage {
                 new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(typeBetXpath)));
                 driver.findElement(By.xpath(typeBetXpath)).click();
             }catch (Exception e){
-                new AutotestError("ОШИБКА! Не смогли нажать на переключатель типов ставок.");
+                throw new AutotestError("ОШИБКА! Не смогли нажать на переключатель типов ставок.");
             }
         }
         WebElement selectType = driver.findElement(By.xpath("//li[contains(translate(text(),'ЯЧСМИТЬБЮФЫВАПРОЛДЖЭЙЦУКЕНГШЩЗХЪ', 'ячсмитьбюфывапролджэйцукенгшщзхъ'),'" + type + "')]"));
@@ -352,7 +352,7 @@ public class CouponPage extends AbstractPage {
         if(!gear.getAttribute("class").contains("active")) {gear.click();}
 
         LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
-        PageFactory.getWebDriver().findElements(By.xpath("//span[contains(.,'Любые коэффициенты')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+        PageFactory.getWebDriver().findElements(By.xpath("//span[contains(.,'Любые коэффициенты')]")).stream().filter(WebElement::isDisplayed).findFirst().get().click();
 
         LOG.info("Ожидаем появление и возможности назать на кнопку 'Заключить пари' [" + i + "]");
         try {
@@ -398,13 +398,13 @@ public class CouponPage extends AbstractPage {
         previousBalance = new BigDecimal(Stash.getValue(key).toString().replace("Б","").trim()).setScale(2, RoundingMode.HALF_UP);
 
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.HALF_UP);
-        String currentNumber = "";
+        String currentNumber;
         while (count > 0){
-            currentNumber = driver.findElements(balance).stream().filter(e -> e.isDisplayed()).findFirst().get().getText();
+            currentNumber = driver.findElements(balance).stream().filter(WebElement::isDisplayed).findFirst().get().getText();
 
             currentBalance = new BigDecimal(currentNumber).setScale(2, RoundingMode.HALF_UP);
 
-            if((previousBalance.subtract(sumBet).subtract(currentBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.HALF_UP))== -1){
+            if((previousBalance.subtract(sumBet).subtract(currentBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2, RoundingMode.HALF_UP)) < 0){
                 LOG.info("Баланс соответствует ожидаемому: " + currentBalance.toString());
                 break;
             }
@@ -449,7 +449,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет что кнопка Заключить Пари")
     public void checkButtonBet(String status){
         WebDriver driver = PageFactory.getDriver();
-        Boolean disabled = status.equals("активна");
+        boolean disabled = status.equals("активна");
         if (buttonBet.isEnabled()!=disabled){
             Assertions.fail("Кнопка 'Заключить пари' в неправильном состоянии: не " + status);
         }

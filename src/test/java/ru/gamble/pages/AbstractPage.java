@@ -26,7 +26,9 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -133,7 +135,7 @@ public abstract class AbstractPage extends Page {
      */
     @ActionTitle("переходит по ссылке")
     public static void goesByReference(String param) throws PageException {
-        Page page = null;
+        Page page;
         page = PageFactory.getInstance().getCurrentPage();
         String link = page.getElementByTitle(param).getAttribute("href");
         PageFactory.getWebDriver().get(link);
@@ -204,19 +206,17 @@ public abstract class AbstractPage extends Page {
      *
      * @param element - поле где ждем выпадающий список
      * @param max     - максимальный пункт, который можно выбрать (включая этот max). Второго параметра может и не быть. тогда максимум - это длина всего списка
-     * @return Возвращает номер пункта который был выбран
      */
-    protected int selectMenu(WebElement element, int max) {
+    protected void selectMenu(WebElement element, int max) {
         int menuSize = element.findElements(By.xpath("custom-select/div[2]/div")).size();
         menuSize -= (max + 1);
         int select = 1 + (int) (Math.random() * menuSize);
         element.findElement(By.xpath("custom-select")).click();
         element.findElement(By.xpath("custom-select/div[2]/div[" + select + "]")).click();
-        return select;
     }
 
-    protected int selectMenu(WebElement element) {
-        return selectMenu(element, 0);
+    protected void selectMenu(WebElement element) {
+        selectMenu(element, 0);
     }
 
     protected String enterDate(String value) {
@@ -351,8 +351,8 @@ public abstract class AbstractPage extends Page {
                     allDaysPages.get(tryPage).click();
                 }
                 counter--;
-                Assert.assertFalse("Не нашли достаточное количество некорректных событий.", counter==0);
-            } while (inCorrectMarkets.size() < count && tryPage < allDaysPages.size() - 1);
+                Assert.assertNotEquals("Не нашли достаточное количество некорректных событий.", 0, counter);
+            } while (Objects.requireNonNull(inCorrectMarkets).size() < count && tryPage < allDaysPages.size() - 1);
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
@@ -370,12 +370,9 @@ public abstract class AbstractPage extends Page {
     public void waitForElementPresent(final By by, int timeout) {
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(PageFactory.getWebDriver(), timeout)
                 .ignoring(StaleElementReferenceException.class);
-        wait.until(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver webDriver) {
-                WebElement element = webDriver.findElement(by);
-                return element != null && element.isDisplayed();
-            }
+        wait.until((ExpectedCondition<Boolean>) webDriver -> {
+            WebElement element = Objects.requireNonNull(webDriver).findElement(by);
+            return element != null && element.isDisplayed();
         });
     }
 
@@ -393,8 +390,7 @@ public abstract class AbstractPage extends Page {
 
 
     /**
-     * включается быстрая свтака и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
-     *
+     * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
      * @param sum
      */
     @ActionTitle("включает быструю ставку и вводит сумму")
@@ -405,7 +401,7 @@ public abstract class AbstractPage extends Page {
         }
         BigDecimal sumBet;
         BigDecimal one = new BigDecimal(1);
-        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2).add(one): new BigDecimal(sum).setScale(2);
+        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
         //coupon_field.clear();
         LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
         fillField(coupon_field,sumBet.toString());
@@ -466,7 +462,7 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("ждет некоторое время")
     public void waiting(String sec) throws InterruptedException {
-        int seconds=0;
+        int seconds;
         if (sec.matches("^[0-9]+")) {
             seconds = Integer.parseInt(sec);
         }

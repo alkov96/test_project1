@@ -8,9 +8,6 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -43,7 +40,6 @@ public class CucumberTest {
         public void screenshot() {
             if (PageFactory.getWebDriver() == null) {
                 LOG.info("Driver for screenshot not found");
-                return;
             }
         }
     };

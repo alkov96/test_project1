@@ -48,7 +48,7 @@ public class FirstTSUPISLK extends AbstractPage {
 
     @ActionTitle("вводит случайное число в CVV")
     public void entersRandomNumberInCVV(){
-        List<WebElement> cvvField = PageFactory.getDriver().findElements(By.name("cvv")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        List<WebElement> cvvField = PageFactory.getDriver().findElements(By.name("cvv")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         if(cvvField.size() > 0) {
             LOG.info("В ЦУПИС предлагается ввести CVV карты");
             String cvv = Generators.randomNumber(3);

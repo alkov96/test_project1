@@ -19,9 +19,10 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
 /**
@@ -43,16 +44,9 @@ public class OperationHistoryPage extends AbstractPage {
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(historyTable));
     }
 
-    /**
-     * проверка что тсраница перелистнулась в истории операций
-     * @param page - на какую страницу переходим. вперед, назад, или страница по номеру
-     * @return - если все хорошо и страница перелеистнулась и обтия обновились - то вернет True. Если что-то сломалось то вернет false
-     * @throws Exception
-     */
 
     /**
-     * возвращает true если содержимое страницы обновилось. и false если не обновилось
-     *
+     * Метод возвращает true если содержимое страницы обновилось. и false если не обновилось
      * @param id - предыдущее наполнение страницы
      * @return
      */
@@ -60,13 +54,10 @@ public class OperationHistoryPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         Thread.sleep(1000);
         List<WebElement> newList = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell']//span[@class='history__id']/span"));
-        newList.forEach(new Consumer<WebElement>() {
-            @Override
-            public void accept(WebElement element) {
-                if (id.contains(element.getText())) {
-                    id.add("idbad");
-                    Assert.fail("Такой id уже был, значит страница не обновилась + " + element.getText());
-                }
+        newList.forEach(element -> {
+            if (id.contains(element.getText())) {
+                id.add("idbad");
+                Assert.fail("Такой id уже был, значит страница не обновилась + " + element.getText());
             }
         });
         return id.contains("idbad");
@@ -103,20 +94,18 @@ public class OperationHistoryPage extends AbstractPage {
 
         List<WebElement> pages = driver.findElements(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and not(contains(@class,'active'))]"));//неактивные стрницы(без стрелок)
         LOG.info("Листаем на последнюю из видимых страниц");
-        boolean flag = true;
-        flag &= changePage(pages.get(pages.size() - 1));
+        assertTrue(changePage(pages.get(pages.size() - 1)));
         LOG.info("Листаем влево");
-        flag &= changePage(driver.findElement(By.xpath("//div[@class='pagination']//span[contains(@class,'arrow_left')]")));
+        assertTrue(changePage(driver.findElement(By.xpath("//div[@class='pagination']//span[contains(@class,'arrow_left')]"))));
         LOG.info("Листаем вправо");
-        flag &= changePage(driver.findElement(By.xpath("//div[@class='pagination']//span[contains(@class,'arrow_right')]")));
+        assertTrue(changePage(driver.findElement(By.xpath("//div[@class='pagination']//span[contains(@class,'arrow_right')]"))));
 
     }
 
     @ActionTitle("проверяет сортировку по дате")
     public void sortDate() throws ParseException, InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        Boolean sortList;
-        boolean flag = true;
+        boolean sortList;
 
         Locale local = new Locale("ru", "RU");
         SimpleDateFormat format = new SimpleDateFormat("dd MMMMMMM yyyy, HH:mm", local);
@@ -128,9 +117,7 @@ public class OperationHistoryPage extends AbstractPage {
         }
 
         sortList = operationsDate.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList()).equals(operationsDate);//проверка отсортирован ли список по убыванию
-        flag &= sortList;
-        if (!sortList)
-            Assert.fail("История не отсортирована по дате при открытии");
+        assertThat(sortList).as("История не отсортирована по дате при открытии").isTrue();
 
 
         driver.findElement(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//th[contains(@class,'history__cell-date table__head-cell_sort')]")).click(); //сортируем по дате
@@ -142,28 +129,22 @@ public class OperationHistoryPage extends AbstractPage {
             operationsDate.add(format.parse(element.getText()));
         }
         sortList = operationsDate.stream().sorted().collect(Collectors.toList()).equals(operationsDate); //проверка отсортирован ли список теперь по возрастанию
-        flag &= sortList;
-        if (!sortList)
-            Assert.fail("История не отсортировалась по дате после нажатия на сортировку");
+        assertThat(sortList).as("История не отсортировалась по дате после нажатия на сортировку").isTrue();
     }
 
     @ActionTitle("проверяет сортировку по балансу")
     public void sortBal() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
-        Boolean sortList;
+        boolean sortList;
 
         String xpath = "//td[contains(@class,'table__body-cell history__cell-balance')]"; //путь до суммы баланса
         driver.findElement(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//th[contains(@class,'history__cell-balance table__head-cell_sort')]")).click(); //сортируем по балансу
         Thread.sleep(4000);
-        //new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-        List<WebElement> elementsBalance = driver.findElements(By.xpath(xpath)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());//поле с суммой баланса
+        List<WebElement> elementsBalance = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());//поле с суммой баланса
         List<Float> operationsBalance = new ArrayList<>();
         elementsBalance.forEach(element -> operationsBalance.add(Float.valueOf(element.getText())));
         sortList = operationsBalance.stream().sorted().collect(Collectors.toList()).equals(operationsBalance);
-        flag &= sortList;
-        if (!sortList)
-            Assert.fail("История не отсортировалась по сумме баланса");
+        assertThat(sortList).as("История не отсортировалась по сумме баланса").isFalse();
 
         driver.findElement(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//th[contains(@class,'history__cell-balance table__head-cell_sort')]")).click(); //сортируем по балансу
         Thread.sleep(1000);
@@ -171,9 +152,7 @@ public class OperationHistoryPage extends AbstractPage {
         operationsBalance.clear();
         elementsBalance.forEach(element -> operationsBalance.add(Float.valueOf(element.getText())));
         sortList = operationsBalance.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList()).equals(operationsBalance);
-        flag &= sortList;
-        if (!sortList)
-            Assert.fail("История не отсортировалась по сумме баланса в обратную сторону");
+        assertThat(sortList).as("История не отсортировалась по сумме баланса в обратную сторону").isTrue();
     }
 
     @ActionTitle("проверяет поиск")
@@ -208,7 +187,7 @@ public class OperationHistoryPage extends AbstractPage {
             count++;
         }
         for (WebElement element : operationsID) {
-            if (element.getText().indexOf(randomID) < 0) {// indexof<0 только если символы не нашлись в строке. т.е. есди в поиск по подстроке попала запись без этой подстроки
+            if (!element.getText().contains(randomID)) {// indexof<0 только если символы не нашлись в строке. т.е. есди в поиск по подстроке попала запись без этой подстроки
                 flag = false;
                 Assert.fail("Поиск не сработал. Искали по подстроке " + randomID + ", но нашлась операция с номером " + element.getText());
             }

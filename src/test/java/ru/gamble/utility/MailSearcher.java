@@ -38,7 +38,7 @@ public class MailSearcher {
     }
 
     private String linkSearcher(String mail, Properties properties)  {
-        Store store = null;
+        Store store;
         Folder inbox;
         String link = "";
         Message message;
@@ -85,12 +85,6 @@ public class MailSearcher {
             }
             LOG.info("Получено писем::" + String.valueOf(inbox.getMessageCount()));
             inbox.close(true);
-        } catch (NoSuchProviderException nspe) {
-            nspe.printStackTrace();
-        } catch (MessagingException me) {
-            me.printStackTrace();
-        } catch (InterruptedException ie) {
-            ie.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }

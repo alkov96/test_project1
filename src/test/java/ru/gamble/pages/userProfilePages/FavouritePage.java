@@ -1,8 +1,6 @@
 package ru.gamble.pages.userProfilePages;
 
 
-import cucumber.api.java.en_old.Ac;
-import cucumber.runtime.junit.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -12,7 +10,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.ls.LSException;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.pages.livePages.VewingEventsPage;
 import ru.gamble.pages.prematchPages.EventViewerPage;
@@ -30,7 +27,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.fail;
-import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
 
 @PageEntry(title = "Избранное")
@@ -223,7 +219,7 @@ public class FavouritePage extends AbstractPage {
        // AbstractPage.openFavourite();
         LOG.info("Нажимаем на кнопку с шетсерёнкой");
         preferences.click();
-        List<WebElement> listCoeff = driver.findElements(By.cssSelector("span.prefs__key")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        List<WebElement> listCoeff = driver.findElements(By.cssSelector("span.prefs__key")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         if(!listCoeff.isEmpty()){
             Thread.sleep(500);
             //WebElement coeff =  driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected-data__event-price ng-binding')]")).get(0);

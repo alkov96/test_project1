@@ -62,8 +62,8 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @ActionTitle("нажимает на кнопку")
     public static void pressButton(String param) {
-        Page page = null;
-        WebElement button = null;
+        Page page;
+        WebElement button;
         try {
             page = PageFactory.getInstance().getCurrentPage();
             button = page.getElementByTitle(param);
@@ -125,15 +125,15 @@ public class CommonStepDefs extends GenericStepDefs {
         }
 
         if (value.equals(RANDOMDATE)) {
-            Integer day = (int) (Math.floor(1 + Math.random() * 27));
-            Integer mon = (int) (Math.floor(1 + Math.random() * 11));
-            Integer year = (int) (Math.floor(1950 + Math.random() * 49));
+            int day = (int) (Math.floor(1 + Math.random() * 27));
+            int mon = (int) (Math.floor(1 + Math.random() * 11));
+            int year = (int) (Math.floor(1950 + Math.random() * 49));
             String mons;
             if (mon < 10) {
-                mons = "0" + mon.toString();
+                mons = "0" + Integer.toString(mon);
             } else
-                mons = mon.toString();
-            value = day.toString() + "." + mons + "." + year.toString();
+                mons = Integer.toString(mon);
+            value = Integer.toString(day) + "." + mons + "." + Integer.toString(year);
         }
 
         if (value.equals(RANDOME_PHONE)) {
@@ -158,14 +158,11 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void waitShowElement(By by) {
         WebDriver driver = PageFactory.getWebDriver();
         WebDriverWait driverWait = new WebDriverWait(driver, 6, 500);
-        try {
-            driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
-            List<WebElement> preloaders = driver.findElements(by);
-            LOG.info("Найдено прелоадеров::" + preloaders.size());
-            driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
-            LOG.info("Прелоадеры закрылись");
-        } catch (TimeoutException te) {
-        }
+        driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+        List<WebElement> preloaders = driver.findElements(by);
+        LOG.info("Найдено прелоадеров::" + preloaders.size());
+        driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
+        LOG.info("Прелоадеры закрылись");
     }
 
     @Когда("^разлогиниваем пользователя$")
@@ -177,14 +174,14 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info("Ищем кнопку с силуетом пользователя.");
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
             List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
-                    .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                    .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
             if(!userIcon.isEmpty()){
                 LOG.info("Нажимаем на кнопку с силуетом пользователя.");
                 userIcon.get(0).click();
                 Thread.sleep(1000);
                 LOG.info("Ищем кнопку выхода");
                 List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
-                        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                        .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
                 if(!logOutButton.isEmpty()) {
                     LOG.info("Нажимаем на кнопку выхода");
                     logOutButton.get(0).click();
@@ -313,7 +310,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     /**
      * ожидание пока аттрибут без учета регистра будет содержать подстроку
-     *
      * @param locator
      * @param attribute
      * @param value
@@ -428,9 +424,7 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * проверка что из Ближвйших трансляци переход на правильную игру
      * сравнивает на совпадение название спорта, команд и првоеряет есть ли видео если страница Лайв
-     *
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
-     * @throws Exception
      */
     public void checkLinkToGame(){
         WebDriver driver = PageFactory.getDriver();
@@ -537,8 +531,6 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * прелоадер должен обязательно появиться, если его не было - значит способ пополнения как бы и не выбран. поэтому эта ункция ждет чтобы прелоадер точно был,
      * но чтобы был не бесконечен
-     *
-     * @throws Exception
      */
     public static void waitToPreloader() {
         WebDriver driver = PageFactory.getDriver();
@@ -579,7 +571,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     /**
      * функиця, которая ждет пока элмент станет доступным. ждет, но не кликает
-     *
      * @param element
      * @throws Exception
      */
@@ -620,7 +611,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
-        String tmp = "";
+        String tmp;
         Object valueFingingParams, retMap = null;
         ObjectMapper mapper = new ObjectMapper();
 
@@ -654,16 +645,16 @@ public class CommonStepDefs extends GenericStepDefs {
 
     private static String workWithDBgetResult(String sqlRequest, String param) {
         Connection con = DBUtils.getConnection();
-        Statement stmt = null;
+        Statement stmt;
         PreparedStatement ps = null;
         ResultSet rs;
-        String result = "";
+        String result;
         try {
             stmt = con.createStatement();
             rs = stmt.executeQuery(sqlRequest);
             rs.last();
             result = rs.getString(param);
-            if(result.isEmpty() || result == null){
+            if(result.isEmpty()){
                 throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
             }
             LOG.info("SQL-request [" + result + "]");
@@ -671,14 +662,14 @@ public class CommonStepDefs extends GenericStepDefs {
             e.printStackTrace();
             throw new AutotestError("Ошибка! Что-то не так в запросе, проверьте руками [" + sqlRequest + "]");
         } finally {
-            DBUtils.closeAll(con, ps, null);
+            DBUtils.closeAll(con, null, null);
         }
         return result;
     }
 
     private static String workWithDBgetResult(String sqlRequest) {
         Connection con = DBUtils.getConnection();
-        Statement stmt = null;
+        Statement stmt;
         PreparedStatement ps = null;
         ResultSet rs;
         String result = "";
@@ -691,7 +682,7 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DBUtils.closeAll(con, ps, null);
+            DBUtils.closeAll(con, null, null);
         }
         return result;
     }
@@ -699,11 +690,10 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * запрос на БД и сохранение всего ответа в map
      * @param sqlRequest
-     * @return
      */
     private static void workWithDBresult(String sqlRequest){
         Connection con = DBUtils.getConnection();
-        Statement stmt = null;
+        Statement stmt;
         PreparedStatement ps = null;
         ResultSet rs;
         StringBuilder keyNormal = new StringBuilder();
@@ -729,14 +719,14 @@ public class CommonStepDefs extends GenericStepDefs {
             } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DBUtils.closeAll(con, ps, null);
+            DBUtils.closeAll(con, null, null);
         }
     }
 
     @Когда("^получаем и сохраняем в память код подтверждения \"([^\"]*)\" телефона \"([^\"]*)\" \"([^\"]*)\"$")
     public static void confirmPhone(String keyCode, String keyPhone, String type) {
         String phone = Stash.getValue(keyPhone);
-        String sqlRequest = new String();
+        String sqlRequest;
         if (type.equals("новый")){
             sqlRequest="SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "') ORDER BY creation_date";
         }
@@ -870,7 +860,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
     @Когда("^ожидание \"([^\"]*)\" сек$")
     public static void justsleep(String sleep) throws InterruptedException {
-        Long mcsleep = Long.parseLong(sleep) * 1000;
+        long mcsleep = Long.parseLong(sleep) * 1000;
         Thread.sleep(mcsleep);
     }
 
@@ -884,12 +874,12 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^проверка полей и типов в ответе \"([^\"]*)\":$")
     public void checkFieldsAndTypesInResponse(String keyJSONObject, DataTable dataTable) {
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-        String param, type, currentValue = "";
+        String param, type, currentValue;
         Object json =  Stash.getValue(keyJSONObject);
 
-        for(int i = 0; i < table.size(); i++) {
-            param = table.get(i).get(PARAMETER);
-            type = table.get(i).get(TYPE);
+        for (Map<String, String> aTable : table) {
+            param = aTable.get(PARAMETER);
+            type = aTable.get(TYPE);
             currentValue = JSONValue.toJSONString(JsonLoader.hashMapper(json, param));
             assertThat(checkType(currentValue, type)).as("Тип параметра[" + param + "] не совпадает с[" + type + "]").isTrue();
             LOG.info("Тип параметра[" + currentValue + "] соответсвует [" + type + "]");
@@ -958,12 +948,12 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^проверяем значение полей в ответе \"([^\"]*)\":$")
     public void checkValueOfFieldsInResponse(String keyJSONObject, DataTable dataTable) {
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-        String param, value, currentValue = "", tmp;
+        String param, value, currentValue, tmp;
         Object json =  Stash.getValue(keyJSONObject);
 
-        for(int i = 0; i < table.size(); i++) {
-            param = table.get(i).get(PARAMETER);
-            tmp = table.get(i).get(VALUE);
+        for (Map<String, String> aTable : table) {
+            param = aTable.get(PARAMETER);
+            tmp = aTable.get(VALUE);
             if (tmp.matches("^[A-Z_]+$")) {
                 value = JSONValue.toJSONString(Stash.getValue(tmp));
             } else {
@@ -990,9 +980,9 @@ public class CommonStepDefs extends GenericStepDefs {
         RandomAccessFile fr = new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r");
 
         String line;
-        StringBuffer sbt = new StringBuffer("");
+        StringBuilder sbt = new StringBuilder();
         String user = fr.readLine();
-        String separator = user.indexOf("\t")>=0?"\t":"\\s";
+        String separator = user.contains("\t") ?"\t":"\\s";
         String phone = user.trim().split(separator)[0];
         String birthDate = user.trim().split(separator)[1];
         SimpleDateFormat formatDate = new SimpleDateFormat();
@@ -1031,10 +1021,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         StringBuilder setter = new StringBuilder();
-        table.entrySet().forEach(el->
-        {
-            setter.append(el.getKey() + "=" + el.getValue() + ",");
-        });
+        table.forEach((key, value) -> setter.append(key).append("=").append(value).append(","));
         LOG.info(setter.toString());
         String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length()-1,setter.length()).toString() +  " WHERE email = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
@@ -1060,23 +1047,23 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^достаём параметр из \"([^\"]*)\" и сохраняем в переменую:$")
     public void takeParamFromAndSaveInVariable (String keyJSONObject, DataTable dataTable) {
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-        String param, keyVariable, currentValue = "";
+        String param, keyVariable, currentValue;
         Object json =  Stash.getValue(keyJSONObject);
-        Object key = null, value;
+        Object key, value;
         ObjectMapper oMapper = new ObjectMapper();
         Map<String, Object> map;
         map = oMapper.convertValue(json, Map.class);
 
-        for(int i = 0; i < table.size(); i++) {
-            param = table.get(i).get(PARAMETER);
-            keyVariable = table.get(i).get(VARIABLE);
+        for (Map<String, String> aTable : table) {
+            param = aTable.get(PARAMETER);
+            keyVariable = aTable.get(VARIABLE);
 
             for (Map.Entry<String, Object> entry1 : map.entrySet()) {
-                if(param.equals("gameId")){
+                if (param.equals("gameId")) {
                     key = entry1.getKey();
                     Stash.put(keyVariable, key);
                     LOG.info("Cохранили [" + key.toString() + "]==>[" + keyVariable + "]");
-                }else {
+                } else {
                     value = entry1.getValue();
                     currentValue = JSONValue.toJSONString(JsonLoader.hashMapper(value, param));
                     Stash.put(keyVariable, currentValue);
@@ -1148,17 +1135,12 @@ public class CommonStepDefs extends GenericStepDefs {
         };
 
         try {
-//            SSLContext sc = SSLContext.getInstance("SSL");
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
 
-            HostnameVerifier allHostsValid = new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            };
+            HostnameVerifier allHostsValid = (hostname, session) -> true;
             //************
 
             url = new URL(requestFull);
@@ -1407,7 +1389,7 @@ public class CommonStepDefs extends GenericStepDefs {
         Date dateTomorrow = new Date();
         dateTomorrow.setTime(today.getTimeInMillis());
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-        String date = format.format(dateTomorrow).toString();
+        String date = format.format(dateTomorrow);
         Stash.put(keyParams,date);
         LOG.info("Завтрашняя дата: " + dateTomorrow);
     }
