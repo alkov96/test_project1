@@ -1,7 +1,6 @@
 package ru.gamble.pages.livePages;
 
 import cucumber.api.DataTable;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -19,11 +18,12 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.openqa.selenium.By.xpath;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.openqa.selenium.By.xpath;
 
 @PageEntry(title = "Лайв просмотр событий")
 public class VewingEventsPage extends AbstractPage {
@@ -57,7 +57,7 @@ public class VewingEventsPage extends AbstractPage {
         LOG.info("Игра " + video + " найдена: " + Stash.getValue("nameGameKey"));
     }
 
-    public void gameLiveVideo(boolean withVideo, boolean adding) throws Exception {
+    public void gameLiveVideo(boolean withVideo, boolean adding){
         WebDriver driver = PageFactory.getDriver();
         LOG.info("Переходим в лайв");
         driver.findElement(By.id("live")).click();

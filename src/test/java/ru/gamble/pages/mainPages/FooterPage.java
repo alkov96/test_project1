@@ -16,7 +16,6 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
-import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
@@ -114,7 +113,7 @@ public class FooterPage extends AbstractPage {
     }
 
     @ActionTitle("проверяем ТЕКСТ при переходе по ссылке с")
-    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
+    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable){
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, expectedText;
@@ -130,7 +129,7 @@ public class FooterPage extends AbstractPage {
     }
 
     @ActionTitle("проверяем ЭЛЕМЕНТ при переходе по ссылке с")
-    public void checkElementWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
+    public void checkElementWhenClickingOnLinkWith(DataTable dataTable){
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, elementTitle;

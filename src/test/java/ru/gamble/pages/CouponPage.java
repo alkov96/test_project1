@@ -203,7 +203,7 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("устанавливает условие для принятия коэфицентов как 'Никогда'")
-    public void neverAccept() throws InterruptedException {
+    public void neverAccept(){
         WebDriver driver = PageFactory.getDriver();
         button.click();
         driver.findElement(xpath("//label[@class='betslip-settings__option']")).click();
@@ -253,8 +253,7 @@ public class CouponPage extends AbstractPage {
         coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice_old')]")).getText());
         LOG.info("Старый коэф: " + coefOld);
         LOG.info("Текущий коэф: " + coefCoupon);
-        float sum = coefCoupon - coefOld;
-        return sum;
+        return coefCoupon - coefOld;
     }
 
     @ActionTitle("проверяет изменения коэфицентов в купоне при условии 'Повышенные коэфиценты', удаляет из купона все события, кроме событий, у которых повысился коэфицент")
@@ -450,7 +449,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет что кнопка Заключить Пари")
     public void checkButtonBet(String status){
         WebDriver driver = PageFactory.getDriver();
-        Boolean disabled = status.equals("активна")?true:false;
+        Boolean disabled = status.equals("активна");
         if (buttonBet.isEnabled()!=disabled){
             Assertions.fail("Кнопка 'Заключить пари' в неправильном состоянии: не " + status);
         }

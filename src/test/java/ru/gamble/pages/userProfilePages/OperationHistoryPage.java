@@ -1,6 +1,5 @@
 package ru.gamble.pages.userProfilePages;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -57,7 +56,7 @@ public class OperationHistoryPage extends AbstractPage {
      * @param id - предыдущее наполнение страницы
      * @return
      */
-    public boolean pageUpdate(List<String> id) throws InterruptedException {
+    private boolean pageUpdate(List<String> id) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         Thread.sleep(1000);
         List<WebElement> newList = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell']//span[@class='history__id']/span"));
@@ -70,17 +69,14 @@ public class OperationHistoryPage extends AbstractPage {
                 }
             }
         });
-
-        if (id.contains("idbad"))
-            return false;
-        return true;
+        return id.contains("idbad");
     }
 
-    public boolean changePage(WebElement page) throws Exception {
+    private boolean changePage(WebElement page) throws Exception {
         WebDriver driver = PageFactory.getDriver();
         Integer currentPage;
         Integer newPage;
-        Boolean result;
+        boolean result;
 
         List<String> id = new ArrayList<>();//список id - операций
         List<WebElement> operationsId;
@@ -93,7 +89,7 @@ public class OperationHistoryPage extends AbstractPage {
 
         newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getText());
         LOG.info("Перешли на страницу " + newPage);
-        if (newPage == currentPage) {
+        if (newPage.equals(currentPage)) {
             Assert.fail("Страница не перелистнулась!! была активной страница" + currentPage + " стала активно страница " + newPage);
             result = false;
         }
@@ -181,7 +177,7 @@ public class OperationHistoryPage extends AbstractPage {
     }
 
     @ActionTitle("проверяет поиск")
-    public void checkSearch() throws InterruptedException {
+    public void checkSearch(){
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
         WebElement search = driver.findElement(By.xpath("//div[contains(@class,'input-search__wrapper_history')]/input")); //поле поиска

@@ -37,7 +37,7 @@ public class EventViewerPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(EventViewerPage.class);
 
     @FindBy(xpath = "//div[contains(@class,'menu-toggler')]")
-    private WebElement expandСollapseMenusButton;
+    private WebElement expandCollapseMenusButton;
 
     @ElementTitle("Период времени")
     @FindBy(xpath = "//div[contains(@class,'periods__input')]")
@@ -48,13 +48,13 @@ public class EventViewerPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-            new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandСollapseMenusButton));
+            new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandCollapseMenusButton));
             checkMenuIsOpen();
     }
 
     private void checkMenuIsOpen(){
-        if(expandСollapseMenusButton.getAttribute("title").contains("Показать всё")){
-            expandСollapseMenusButton.click();
+        if(expandCollapseMenusButton.getAttribute("title").contains("Показать всё")){
+            expandCollapseMenusButton.click();
             workWithPreloader();
         }
     }

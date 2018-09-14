@@ -41,7 +41,7 @@ public class AnnouncementPage extends AbstractPage {
         String actualText;
 
         List<WebElement> announcementsList = driver.findElements(By.xpath(xpathDigests))
-                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         assertThat(announcementsList.size()).as("Ошибка! Анонсы не найдены").isGreaterThan(0);
 
         for(WebElement announcement: announcementsList){
