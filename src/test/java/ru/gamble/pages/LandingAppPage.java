@@ -107,7 +107,6 @@ public class LandingAppPage extends AbstractPage {
                         break;
                     default:
                         LOG.info("Ошибка при скачивании! Статус ответа = " + httpResponse.getStatusLine().getStatusCode());
-                        flag = false;
                         Assert.fail("Скачивание приложения для андроида не удалось");
                         break;
                 }

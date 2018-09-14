@@ -18,7 +18,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm","pretty"},
-        tags = {"@NewUserRegistration_C36189"})
+        tags = {"@smoke"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
