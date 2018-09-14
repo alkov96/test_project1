@@ -1,6 +1,7 @@
 package ru.gamble.pages.livePages;
 
 import cucumber.api.DataTable;
+import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.openqa.selenium.By.xpath;
 
 /**
@@ -134,6 +136,18 @@ public class DayEventsPage extends AbstractPage {
         }else {
             throw new AutotestError("Ошибка! В Лайв в События дня не нашли ни одного события.");
         }
+    }
+
+    @ActionTitle("проверяет, добавилось ли событие в избранное")
+    public void checkIsEventAddToFav() throws Exception {
+        driver.findElement(By.id("elected")).click();
+        Thread.sleep(5000);
+        if (!driver.findElement(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")).isDisplayed()){
+            LOG.info("Событие не добавилось в избранное, попробуем ещё раз.");
+            addEventToFavourite();
+        }
+        else LOG.info("События добавились в Избранное");
+        driver.findElement(By.id("elected")).click();
     }
 
     public static void addEventsToCouponF () throws InterruptedException {

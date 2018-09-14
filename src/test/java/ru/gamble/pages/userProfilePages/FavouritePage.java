@@ -78,9 +78,11 @@ public class FavouritePage extends AbstractPage {
         }
     }
 
+
     @ActionTitle("сравнивает названия событий на странице и в избранном")
     public void compareEventsAndFav(){
         WebDriver driver = PageFactory.getDriver();
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")));
         String electedGame = driver.findElement(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")).getAttribute("title");  //игра в избранном
         String team1name = Stash.getValue("team1nameKey");
         String team2name = Stash.getValue("team2nameKey");
