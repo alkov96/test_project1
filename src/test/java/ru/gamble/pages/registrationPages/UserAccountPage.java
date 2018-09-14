@@ -246,7 +246,7 @@ public class UserAccountPage extends AbstractPage{
             try {
                 new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
                 numberSring = driver.findElement(By.xpath(xpath));
-            } catch (Exception е) {
+            } catch (Exception e) {
                 driver.navigate().refresh();
             }
             x++;

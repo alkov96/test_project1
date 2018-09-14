@@ -34,7 +34,6 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
-
 import javax.net.ssl.*;
 import java.io.*;
 import java.math.BigDecimal;
@@ -50,11 +49,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.utility.Constants.*;
-
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -73,7 +70,6 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (PageException e) {
             LOG.error(e.getMessage());
         }
-
     }
 
     @Когда("^запрашиваем дату-время и сохраняем в память$")
@@ -458,8 +454,6 @@ public class CommonStepDefs extends GenericStepDefs {
                 Assertions.fail("Из Ближайших трансляций переход на неправильный спорт. Игра " + stringParse(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
             }
             if (driver.findElement(By.xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
-                ;
-                //  if (driver.findElements(By.xpath("//div[@class='field-switcher']/div[contains(@class,'field-switcher__item_icon-video')]")).isEmpty()) {
                 Assertions.fail("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + stringParse(team1 + team2));
             }
             LOG.info("У игры, у которой на виджете БТ есть кнопка Смотреть действительно есть видео. Проверка Успешна");
@@ -795,7 +789,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^добавляем данные в JSON объект \"([^\"]*)\" сохраняем в память:$")
-    public void добавляем_данные_в_JSON_объект_сохраняем_в_память(String keyJSONObject, DataTable dataTable) {
+    public void addDataToJSONObjectStoredInMemory(String keyJSONObject, DataTable dataTable) {
 
         Object jSONString = collectParametersInJSONString(dataTable);
         Stash.put(keyJSONObject, jSONString);
@@ -804,7 +798,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^добавляем данные в JSON массив \"([^\"]*)\" сохраняем в память:$")
-    public void добавляем_данные_в_JSON_массив_сохраняем_в_память(String keyJSONObject, DataTable dataTable) {
+    public void addDataToJSONArrayStoredInMemory(String keyJSONObject, DataTable dataTable) {
 
         Object jSONString = collectParametersInJSONString(dataTable);
         JSONArray jsonArray = new JSONArray();
@@ -844,8 +838,7 @@ public class CommonStepDefs extends GenericStepDefs {
             } else {
                 value = entry.getValue();
             }
-            //Если в числе лидирующий ноль, то не пропускать через JSONValue.parse, а класть в Map как есть
-//            if (value instanceof String && !StringUtils.isBlank((String) value) &&  ((String) value).charAt(0) == '0') {
+            //Если попадются числовые значения, в JSON объект кладём как строку
             if (value instanceof String && !StringUtils.isBlank((String) value) &&  ((String) value).matches("[0-9]+")) {
                 String str  = (String) value;
                 jsonObject.put(key, value);
@@ -1000,7 +993,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String line;
         StringBuffer sbt = new StringBuffer("");
         String user = fr.readLine();
-        String separator = user.indexOf("\t")>=0?"\t":" ";
+        String separator = user.indexOf("\t")>=0?"\t":"\\s";
         String phone = user.trim().split(separator)[0];
         String birthDate = user.trim().split(separator)[1];
         SimpleDateFormat formatDate = new SimpleDateFormat();
@@ -1116,7 +1109,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^запрос к IMG \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
-    public void запрос_к_IMG_и_сохраняем_в(String path, String keyStash) {
+    public void requestToIMGAndSaveIn(String path, String keyStash) {
         String fullPath = (Stash.getValue(path)).toString().replaceAll("\\\\","");
         requestByHTTPS(fullPath, keyStash,"GET",null);
     }
@@ -1203,24 +1196,6 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (Exception e1) {
             LOG.error(e1.getMessage(), e1);
         }
-    }
-
-//
-//    @Когда("^проверка ответа \"([^\"]*)\" в зависимости от \"([^\"]*)\":$")
-//    public void checkAnswerDependingOn(String responceAPI, String providerName, DataTable dataTable) {
-//        Object json = Stash.getValue(responceAPI);
-//        Map<String,String> data = dataTable.asMap(String.class,String.class);
-//        for (Map.Entry entry: data.entrySet()) {
-//          if(String.valueOf(entry.getKey()).equalsIgnoreCase(providerName)){
-//
-//          }
-//        }
-//
-//    }
-
-    @Когда("^если в \"([^\"]*)\" провайдер PERFORM, то проверяем JSON:$")
-    public void если_в_провайдер_PERFORM_то_проверяем_JSON(String arg1, DataTable arg2) {
-
     }
 
     @Когда("^обновим значение минимальной суммы вывода в рублях для вызова инкассатора \"([^\"]*)\"$")
@@ -1453,13 +1428,14 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^закрываем текущее окно и возвращаемся на \"([^\"]*)\"$")
     public void closingCurrentWinAndReturnTo(String keyPage) {
-        PageFactory.getWebDriver().close();
-        for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
-            PageFactory.getWebDriver().switchTo().window(Stash.getValue(keyPage));
+        try {
+            WebDriver driver = PageFactory.getWebDriver();
+            driver.close();
+            driver.switchTo().window(Stash.getValue(keyPage));
             LOG.info("Вернулись на ранее запомненую страницу");
-            return;
+        }catch (Exception e){
+            throw new AutotestError("Ошибка! Не смогли вернуться на страницу.");
         }
-        throw new AutotestError("Ошибка! Не смогли вернуться на страницу.");
     }
 
     @Когда("^записываем значение баланса бонусов в \"([^\"]*)\"$")

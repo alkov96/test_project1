@@ -1,14 +1,16 @@
 package ru.gamble.pages.mainPages;
 
 import cucumber.api.DataTable;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -18,16 +20,15 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-import static org.assertj.core.api.Assertions.assertThat;
-import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.ELEMENT;
-import static ru.gamble.utility.Constants.LINK;
-import static ru.gamble.utility.Constants.TEXT;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+import static ru.gamble.utility.Constants.*;
 
 @PageEntry(title = "Подвал сайта")
 public class FooterPage extends AbstractPage {
@@ -214,7 +215,7 @@ public class FooterPage extends AbstractPage {
     @ActionTitle("проверяет что число платёжных систем")
     public void checkNumberPaymentSystem(String number){
         String xpath = "//div[contains(@class,'payment-systems-item')]";
-        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());;
+        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
         int expected = Integer.parseInt(number);
         int actual = list.size();
         assertThat(actual).as("Количетво иконок платёжных систем [" + actual + "] не соответсвует ожидаемому [" + expected + "]").isEqualTo(expected);

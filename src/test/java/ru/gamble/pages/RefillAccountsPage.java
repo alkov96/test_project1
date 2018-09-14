@@ -2,7 +2,6 @@ package ru.gamble.pages;
 
 import cucumber.api.DataTable;
 import net.minidev.json.JSONValue;
-import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -60,23 +59,10 @@ public class RefillAccountsPage extends AbstractPage{
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    @ActionTitle("смотрит, какие способы пополнения доступны")
-    public void lookSummList() {
-        WebDriver driver = PageFactory.getDriver();
-        LOG.info("Смотрим какие способы пополнения доступны");
-        List<WebElement> depositWays = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[@class='ng-scope moneyChnl']/span/label"));//если способ недоступне, то у имени класса будет строчка not-available и в этот список элемент уже не попадет
-        Stash.put("depositWaysKey", depositWays);
-        if (depositWays.isEmpty()) {
-            LOG.info("Нет доступнх способов пополнения");
-            Assertions.fail("Нет доступнх способов пополнения");
-        }
-        Collections.reverse(depositWays);
-    }
 
     @ActionTitle("проверяет, что на попапе пополнения есть кнопки-ссылки сумм")
     public void sposobSumm() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-//        List<WebElement> summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"));
         List<WebElement> summList = driver.findElements(By.xpath("//span[contains(@class,'jsLink smallJsLink')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
         Stash.put("summListKey", summList);
         Thread.sleep(1000);
@@ -87,40 +73,6 @@ public class RefillAccountsPage extends AbstractPage{
             Actions act = new Actions(driver);
             ((JavascriptExecutor) driver).executeScript("window.scroll(50," + y + ")");
             act.click().build().perform();
-        }
-    }
-
-    @ActionTitle("проверяет смену допустимой макс.суммы при выборе пополнения с")
-    public void checkMax(DataTable dataTable) {
-        Map<String, String> data = dataTable.asMap(String.class, String.class);
-        Map maxForWay = new HashMap<String, Integer>();
-
-        for(Map.Entry entry: data.entrySet() ){
-            maxForWay.put(entry.getKey(),Integer.parseInt(String.valueOf(entry.getValue())));
-        }
-
-        LOG.info("Кладём максимальные суммы в память по ключу::maxForWayKey");
-        Stash.put("maxForWayKey", maxForWay);
-        String way;
-        WebElement maxSum;
-        int max;
-        WebDriver driver = PageFactory.getDriver();
-        List<WebElement> depositWays = Stash.getValue("depositWaysKey");
-        for (WebElement sposob : depositWays) {
-            LOG.info("Выбираем способ пополнения " + sposob.findElement(By.xpath("div")).getAttribute("class"));
-            sposob.click();
-            //waitToPreloader(); //ждем появления прелоадера. т.к. если его не будет - значит и способ пооплнения по сути не изменился - не отправлялась инфа в сварм и вообще
-            way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
-            maxSum = driver.findElement(By.xpath("//table[@class='moneyInOutTable']//div[@class='smallJsLink__wrapper']/span[last()]"));//берем последний элемент из списка кнопочек сумм.Этот элемент и есть последня возможная сумма пополнения
-            max = (int) Integer.valueOf(maxSum.getText().replace(" ", ""));
-            if (!maxForWay.containsKey(way)) {
-                Assertions.fail("Выбранный способ пополнения не описан в Map<String,Integer> maxForWay " + way);
-                continue;
-            }
-            if ((int) maxForWay.get(way) != max) {
-                Assertions.fail("Для способа пополнения " + way + " максимальная сумма = " + max + ", а ожидалось = " + maxForWay.get(way));
-            }
-            Stash.put("wayKey", way);
         }
     }
 
@@ -138,7 +90,6 @@ public class RefillAccountsPage extends AbstractPage{
             methodName = method.getAttribute("class").replace("payPartner ","");
             method.click();
             LOG.info("Нажали на метод [" + methodName + "]");
-//            checkValueByNull = JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByDB, methodName),"limit"),"max").toString();
             checkValueByNull = JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByDB, methodName),"limit"),"max");
             maxLimitInDB = new BigDecimal(checkValueByNull == null ? "0" : String.valueOf(checkValueByNull)).divide( new BigDecimal("100"));
             LOG.info("Достали из [" + methodsKey + "] по имени способа[" + methodName + "] максимальный лимит[" + maxLimitInDB.toString() + "]");

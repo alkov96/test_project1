@@ -1,6 +1,5 @@
 package ru.gamble.pages.prematchPages;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.pages.CouponPage;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -30,8 +28,8 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.gamble.utility.Constants.PERIOD;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+import static ru.gamble.utility.Constants.PERIOD;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 @PageEntry(title = "Просмотр событий")

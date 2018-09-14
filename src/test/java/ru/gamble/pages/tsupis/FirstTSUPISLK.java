@@ -19,7 +19,6 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,7 +67,7 @@ public class FirstTSUPISLK extends AbstractPage {
     }
 
     @ActionTitle("вводит содержимое в поле")
-    public void userEntersСontentInField(String keySMS, String elementTitle) {
+    public void userEntersContentInField(String keySMS, String elementTitle) {
             String sms = Stash.getValue(keySMS);
             LOG.info("Пытаемя ввести СМС код [" + sms + "] в поле 'Код из СМС'");
         try {
@@ -79,7 +78,7 @@ public class FirstTSUPISLK extends AbstractPage {
     }
 
     @ActionTitle("проверяет успешность операции")
-    public void сhecksSuccessOfOperation(){
+    public void checksSuccessOfOperation(){
         try {
             new WebDriverWait(PageFactory.getDriver(), 5).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='icon fail']")));
         }catch (Exception e){
