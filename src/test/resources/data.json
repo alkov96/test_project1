@@ -1,13 +1,13 @@
 {
   "DEV_BK": {
-    "MAIN_URL": "https://888.ru",
+    "MAIN_URL": "https://dev-bk-bet-site.tsed.orglot.office/",
     "ADMIN_URL": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
     "MOBILE_API": "https://dev-bk-bet-mobile-site.tsed.orglot.office",
     "REGISTRATION_URL": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
-    "USER": "centr_vselennoi@mail.ru",
-    "USER_CHROME": "centr_vselennoi@mail.ru",
+    "USER": "testingsto+86@mail.ru",
+    "USER_CHROME": "testingsto+86@mail.ru",
     "USER_FIREFOX": "user_for_firefox@mailinator.com",
-    "PASSWORD": "Zav301190",
+    "PASSWORD": "Acer0808",
     "PASS": "Parol123",
     "PHONE": "79088767878",
     "PHONE_FIREFOX": "70010020701",
