@@ -1,6 +1,5 @@
 package ru.gamble.pages.prematchPages;
 
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -10,7 +9,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.pages.CouponPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
@@ -18,13 +16,10 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
 /**
@@ -53,7 +48,7 @@ public class LiveCalendarPage extends AbstractPage {
         List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
         int tryPage = 0;
         boolean isCoeffFound = false;
-        while (isCoeffFound == false && tryPage < allDaysPages.size()-1) {
+        while (!isCoeffFound && tryPage < allDaysPages.size()-1) {
             try {
                 waitForElementPresent(By.xpath("//div[contains(@class,'livecal-table__coefficient')]"), 3);
             }catch (Exception e){

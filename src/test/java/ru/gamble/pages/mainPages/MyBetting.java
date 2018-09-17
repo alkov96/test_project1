@@ -10,12 +10,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
-import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -29,8 +27,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.BUTTON;
-import static ru.gamble.utility.Constants.DIRECTION;
 
 @PageEntry(title = "Мои пари")
 public class MyBetting extends AbstractPage {
@@ -120,11 +116,11 @@ public class MyBetting extends AbstractPage {
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String typeOfOutcome, betType, selectedOutcome;
-        for(int i = 0; i < table.size(); i++) {
-            typeOfOutcome = table.get(i).get("Тип пари");
-            betType = table.get(i).get("Выбранный исход");
+        for (Map<String, String> aTable : table) {
+            typeOfOutcome = aTable.get("Тип пари");
+            betType = aTable.get("Выбранный исход");
 
-            if(!filterByTypeOfBid.getAttribute("class").contains("expanded")){
+            if (!filterByTypeOfBid.getAttribute("class").contains("expanded")) {
                 LOG.info("Открываем фильтр по типу пари.");
                 filterByTypeOfBid.click();
             }
@@ -134,38 +130,40 @@ public class MyBetting extends AbstractPage {
             workWithPreloader();
 
             List<WebElement> rows = PageFactory.getWebDriver().findElements(By.xpath("//tr[contains(@class,'showBetInfo ')]"))
-                    .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                    .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
             LOG.info("Всего пари::" + rows.size());
             LOG.info("Проверяем, что даты ставок попадают в диапазон");
 
             List<WebElement> subIvens;
-            if(rows.size() > 0) {
+            if (rows.size() > 0) {
                 for (WebElement row : rows) {
-                        selectedOutcome = row.findElement(By.xpath(".//tr[contains(@class,'table')]/td[2]")).getText();
-                        if(betType.contains("!")){
-                            assertThat(selectedOutcome).doesNotContain("Система");
-                            assertThat(selectedOutcome).doesNotContain("Экспресс");
-                        }else {
-                            assertThat(selectedOutcome)
-                                    .as("Ошибка! Текст [" + selectedOutcome + "] не соответсвует [" + betType + "]").contains(betType);
+                    selectedOutcome = row.findElement(By.xpath(".//tr[contains(@class,'table')]/td[2]")).getText();
+                    if (betType.contains("!")) {
+                        assertThat(selectedOutcome).doesNotContain("Система");
+                        assertThat(selectedOutcome).doesNotContain("Экспресс");
+                    } else {
+                        assertThat(selectedOutcome)
+                                .as("Ошибка! Текст [" + selectedOutcome + "] не соответсвует [" + betType + "]").contains(betType);
+                    }
+                    LOG.info("Текст [" + selectedOutcome + "] соответсвует [" + betType + "]");
+                    if (selectedOutcome.contains("Экспресс") || selectedOutcome.contains("Система")) {
+                        LOG.info("Проверяем что в [" + selectedOutcome + "] больше одного события");
+                        subIvens = row.findElements(By.xpath(".//div//tr[contains(@class,'table-inner__row')]"));
+                        if (subIvens.size() > 1) {
+                            subIvens.remove(0);
+                        } //Здесь удаляем мусорную строку
+                        assertThat(subIvens.size())
+                                .as("Ошибка! В типе пари [" + typeOfOutcome + "] меньше чем " + subIvens.size() + " пари").isGreaterThan(1);
+                        for (WebElement subIvent : subIvens) {
+                            LOG.info(subIvent.getText().replaceAll("\n", " "));
                         }
-                        LOG.info("Текст [" + selectedOutcome + "] соответсвует [" + betType + "]");
-                        if(selectedOutcome.contains("Экспресс") || selectedOutcome.contains("Система")){
-                            LOG.info("Проверяем что в [" + selectedOutcome + "] больше одного события");
-                            subIvens = row.findElements(By.xpath(".//div//tr[contains(@class,'table-inner__row')]"));
-                            if(subIvens.size() > 1){ subIvens.remove(0);} //Здесь удаляем мусорную строку
-                            assertThat(subIvens.size())
-                                    .as("Ошибка! В типе пари [" + typeOfOutcome + "] меньше чем " + subIvens.size() + " пари").isGreaterThan(1);
-                            for(WebElement subIvent : subIvens){
-                                LOG.info(subIvent.getText().replaceAll("\n", " "));
-                            }
-                        }
+                    }
                 }
-            }else {
+            } else {
                 LOG.info("Ни одного пари не найдено, нечего проверять.");
             }
 
-            if(filterByTypeOfBid.getAttribute("class").contains("expanded")){
+            if (filterByTypeOfBid.getAttribute("class").contains("expanded")) {
                 LOG.info("Закрываем фильтр по типу пари.");
                 filterByTypeOfBid.click();
             }

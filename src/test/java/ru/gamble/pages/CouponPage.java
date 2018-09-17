@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
 
@@ -159,21 +158,21 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, добавилось ли событие в купон")
     public void checkListOfCoupon() {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> сouponList = driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']/ul"));
-        if (сouponList.isEmpty()) {
+        List<WebElement> couponList= driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']/ul"));
+        if (couponList.isEmpty()) {
             Assertions.fail("События не добавлиись в купон.");
-        } else LOG.info("Событие " + сouponList.size());
+        } else LOG.info("Событие " + couponList.size());
     }
 
     @ActionTitle("проверяет, совпадают ли события в купоне с ожидаемыми из")
     public void bannerAndTeams(String team1key, String team2key) {
         WebDriver driver = PageFactory.getDriver();
-        String сouponGame = driver.findElement(By.xpath("//div[@class='coupon-bet-list__wrap']/ul[1]/li[1]/span[contains(@class,'bet-event-title')]")).getText();//cuponGame - наше добавленные события в купоне.
+        String couponGame = driver.findElement(By.xpath("//div[@class='coupon-bet-list__wrap']/ul[1]/li[1]/span[contains(@class,'bet-event-title')]")).getText();//cuponGame - наше добавленные события в купоне.
         String team1 = Stash.getValue(team1key);
         String team2 = Stash.getValue(team2key);
-        if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(сouponGame))) {
-            LOG.info("Названия команд в купоне совпадают с ожидаемыми: [" + team1 + "] - [" + team2 + "] <=> [" + сouponGame + "]");
-        } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: [" + team1 + "] - [" + team2 + "] <=> [" + сouponGame + "]");
+        if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(couponGame))) {
+            LOG.info("Названия команд в купоне совпадают с ожидаемыми: [" + team1 + "] - [" + team2 + "] <=> [" + couponGame + "]");
+        } else Assertions.fail("Названия команд в купоне не совпадают с ожидаемыми: [" + team1 + "] - [" + team2 + "] <=> [" + couponGame + "]");
     }
 
 
@@ -204,7 +203,7 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("устанавливает условие для принятия коэфицентов как 'Никогда'")
-    public void neverAccept() throws InterruptedException {
+    public void neverAccept(){
         WebDriver driver = PageFactory.getDriver();
         button.click();
         driver.findElement(xpath("//label[@class='betslip-settings__option']")).click();
@@ -254,8 +253,7 @@ public class CouponPage extends AbstractPage {
         coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice_old')]")).getText());
         LOG.info("Старый коэф: " + coefOld);
         LOG.info("Текущий коэф: " + coefCoupon);
-        float sum = coefCoupon - coefOld;
-        return sum;
+        return coefCoupon - coefOld;
     }
 
     @ActionTitle("проверяет изменения коэфицентов в купоне при условии 'Повышенные коэфиценты', удаляет из купона все события, кроме событий, у которых повысился коэфицент")
@@ -305,7 +303,7 @@ public class CouponPage extends AbstractPage {
                 new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(typeBetXpath)));
                 driver.findElement(By.xpath(typeBetXpath)).click();
             }catch (Exception e){
-                new AutotestError("ОШИБКА! Не смогли нажать на переключатель типов ставок.");
+                throw new AutotestError("ОШИБКА! Не смогли нажать на переключатель типов ставок.");
             }
         }
         WebElement selectType = driver.findElement(By.xpath("//li[contains(translate(text(),'ЯЧСМИТЬБЮФЫВАПРОЛДЖЭЙЦУКЕНГШЩЗХЪ', 'ячсмитьбюфывапролджэйцукенгшщзхъ'),'" + type + "')]"));
@@ -354,7 +352,7 @@ public class CouponPage extends AbstractPage {
         if(!gear.getAttribute("class").contains("active")) {gear.click();}
 
         LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
-        PageFactory.getWebDriver().findElements(By.xpath("//span[contains(.,'Любые коэффициенты')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+        PageFactory.getWebDriver().findElements(By.xpath("//span[contains(.,'Любые коэффициенты')]")).stream().filter(WebElement::isDisplayed).findFirst().get().click();
 
         LOG.info("Ожидаем появление и возможности назать на кнопку 'Заключить пари' [" + i + "]");
         try {
@@ -400,13 +398,13 @@ public class CouponPage extends AbstractPage {
         previousBalance = new BigDecimal(Stash.getValue(key).toString().replace("Б","").trim()).setScale(2, RoundingMode.HALF_UP);
 
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.HALF_UP);
-        String currentNumber = "";
+        String currentNumber;
         while (count > 0){
-            currentNumber = driver.findElements(balance).stream().filter(e -> e.isDisplayed()).findFirst().get().getText();
+            currentNumber = driver.findElements(balance).stream().filter(WebElement::isDisplayed).findFirst().get().getText();
 
             currentBalance = new BigDecimal(currentNumber).setScale(2, RoundingMode.HALF_UP);
 
-            if((previousBalance.subtract(sumBet).subtract(currentBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2,RoundingMode.HALF_UP))== -1){
+            if((previousBalance.subtract(sumBet).subtract(currentBalance).abs()).compareTo(new BigDecimal(0.05).setScale(2, RoundingMode.HALF_UP)) < 0){
                 LOG.info("Баланс соответствует ожидаемому: " + currentBalance.toString());
                 break;
             }
@@ -451,7 +449,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет что кнопка Заключить Пари")
     public void checkButtonBet(String status){
         WebDriver driver = PageFactory.getDriver();
-        Boolean disabled = status.equals("активна")?true:false;
+        boolean disabled = status.equals("активна");
         if (buttonBet.isEnabled()!=disabled){
             Assertions.fail("Кнопка 'Заключить пари' в неправильном состоянии: не " + status);
         }

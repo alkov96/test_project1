@@ -17,7 +17,7 @@ import java.util.Map;
 public class JsonLoader {
     private static TestDataObject data;
     private static final Logger LOG = LoggerFactory.getLogger(JsonLoader.class);
-    private static String sep = File.separator;
+    private static final String sep = File.separator;
 
     public static TestDataObject getData() {
             try {
@@ -76,15 +76,15 @@ public class JsonLoader {
                 } else if (value instanceof List) {
                     List list = (List) value;
                     if (key.equalsIgnoreCase(finding)) {
-                        return request = ((List) list);
+                        return request = list;
                     } else {
-                        request = hashMapper((Object) list, finding);
+                        request = hashMapper(list, finding);
                     }
                 }
                 //**************Пробная обработка
                 else  if(value == null){
                     if (key.equalsIgnoreCase(finding)) {
-                        return request = value;
+                        return null;
                     }
                 }
                 //******************************

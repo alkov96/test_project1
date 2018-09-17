@@ -1,12 +1,9 @@
 package ru.gamble.pages.mainPages;
 
 import org.junit.Assert;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
@@ -55,7 +52,7 @@ public void ckeckPositionSlider() {
     String position = top_banner.getAttribute("style");
     LOG.info("позиция новая " + position);
     String oldPosition = Stash.getValue("positionBanner");
-    Assert.assertFalse("Смена баннеров не произошла",position.equals(oldPosition));
+    Assert.assertNotEquals("Смена баннеров не произошла", position, oldPosition);
     LOG.info("Баннер на слайдере сменился");
 }
 }

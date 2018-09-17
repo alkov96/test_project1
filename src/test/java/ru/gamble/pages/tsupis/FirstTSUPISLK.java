@@ -1,6 +1,5 @@
 package ru.gamble.pages.tsupis;
 
-import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -39,7 +38,6 @@ public class FirstTSUPISLK extends AbstractPage {
     @FindBy (name = "validation")
     private WebElement inputSMSCode;
 
-
     public FirstTSUPISLK() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
@@ -50,7 +48,7 @@ public class FirstTSUPISLK extends AbstractPage {
 
     @ActionTitle("вводит случайное число в CVV")
     public void entersRandomNumberInCVV(){
-        List<WebElement> cvvField = PageFactory.getDriver().findElements(By.name("cvv")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        List<WebElement> cvvField = PageFactory.getDriver().findElements(By.name("cvv")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         if(cvvField.size() > 0) {
             LOG.info("В ЦУПИС предлагается ввести CVV карты");
             String cvv = Generators.randomNumber(3);
@@ -69,7 +67,7 @@ public class FirstTSUPISLK extends AbstractPage {
     }
 
     @ActionTitle("вводит содержимое в поле")
-    public void userEntersСontentInField(String keySMS, String elementTitle) {
+    public void userEntersContentInField(String keySMS, String elementTitle) {
             String sms = Stash.getValue(keySMS);
             LOG.info("Пытаемя ввести СМС код [" + sms + "] в поле 'Код из СМС'");
         try {
@@ -78,4 +76,14 @@ public class FirstTSUPISLK extends AbstractPage {
            throw new AutotestError("Ошибка! Не смогли ввести СМС код [" + sms + "] в поле 'Код из СМС'");
         }
     }
+
+    @ActionTitle("проверяет успешность операции")
+    public void checksSuccessOfOperation(){
+        try {
+            new WebDriverWait(PageFactory.getDriver(), 5).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='icon fail']")));
+        }catch (Exception e){
+            throw new AutotestError("Ошибка! Операция не получилось.\n" + e.getMessage());
+        }
+    }
+
 }

@@ -12,7 +12,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -23,11 +22,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.openqa.selenium.By.xpath;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.openqa.selenium.By.xpath;
 import static ru.gamble.stepdefs.CommonStepDefs.stringParse;
 
 @PageEntry(title = "Лайв просмотр событий")
@@ -62,7 +62,7 @@ public class VewingEventsPage extends AbstractPage {
         LOG.info("Игра " + video + " найдена: " + Stash.getValue("nameGameKey"));
     }
 
-    public void gameLiveVideo(boolean withVideo, boolean adding) throws Exception {
+    public void gameLiveVideo(boolean withVideo, boolean adding){
         WebDriver driver = PageFactory.getDriver();
         LOG.info("Переходим в лайв");
         driver.findElement(By.id("live")).click();
@@ -100,7 +100,7 @@ public class VewingEventsPage extends AbstractPage {
             int gamesInSportCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul/li/div/div/ul/li")).size();
             LOG.info("Ищем игру у которой видео-трансляция " + withVideo);
             int gameNumber = hasVideo(sportCategory, gamesInSportCount, withVideo);
-//если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
+            //если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
             if (gameNumber != -1 && !gameIsAdding) {
                 String nameGamefull = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul/li/div/div/ul/li/div[1]/div[1]/div[1]")).get(gameNumber).findElement(By.xpath("../p")).getText();
                 CommonStepDefs.addStash("nameGameKey",nameGamefull);
@@ -111,7 +111,7 @@ public class VewingEventsPage extends AbstractPage {
                 }
                 gameIsAdding = true;
             }
-//сворачиваем снова все виды спорта, чтобы все они помещались на экран. иначе, если не видно элемента (не помещается) на странице он не найдется
+            //сворачиваем снова все виды спорта, чтобы все они помещались на экран. иначе, если не видно элемента (не помещается) на странице он не найдется
             LOG.info("Сворачиваем все виды спорта.");
             if (!menu.getAttribute("class").contains("collapsed")) menu.click();
             driver.findElement(By.id("sports-toggler")).click();
@@ -237,7 +237,6 @@ public class VewingEventsPage extends AbstractPage {
     }
 
 
-
     /**
      * Проверка что при свёрнутом левом меню Лайв отображаются иконки видов спорта больше чем указанное число
      * Проверят что нужная игра будет выделена в левом меню. Проверет что фильтр "с видео" в нужном состоянии
@@ -278,12 +277,12 @@ public class VewingEventsPage extends AbstractPage {
             menuToggler.click();
         }
         List<String> list = listItems.asList(String.class);
-        for(int i = 0; i < list.size(); i++) {
-            try{
-                driver.findElement(By.xpath("//*[contains(@title,'" + list.get(i) + "')]"));
-                LOG.info("Найден обязательный элемент [" + list.get(i) + "]");
-            }catch (Exception e){
-                throw new AutotestError("Ошибка! Обязательный элемент [" + list.get(i) + "] не найден.");
+        for (String aList : list) {
+            try {
+                driver.findElement(By.xpath("//*[contains(@title,'" + aList + "')]"));
+                LOG.info("Найден обязательный элемент [" + aList + "]");
+            } catch (Exception e) {
+                throw new AutotestError("Ошибка! Обязательный элемент [" + aList + "] не найден.");
             }
         }
     }
@@ -305,7 +304,7 @@ public class VewingEventsPage extends AbstractPage {
                     LOG.info("Меню спорта было свёрнуто. Раскрываем.");
                     list.get(i).click();
                 }
-                List<WebElement> listFlags = list.get(i).findElements(By.xpath(xpathFlagsWithoutFilter)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                List<WebElement> listFlags = list.get(i).findElements(By.xpath(xpathFlagsWithoutFilter)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
                 LOG.info("Найдено флагов без фильтра 'Группировка регионов'::" + listFlags.size() );
 
                 WebElement regionFilter = PageFactory.getWebDriver().findElement(By.xpath(xpathRegionFilter));
@@ -323,7 +322,7 @@ public class VewingEventsPage extends AbstractPage {
                         LOG.info("Раскрываем регион::" + el.getText());
                         el.click();
                         List<WebElement> innerGames = el.findElements(By.xpath(xpathRegionInnerCompitition))
-                                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
                         if(innerGames.size() > 0){
                             LOG.info("Нашли игр внутри региона::" + innerGames.size());
                             for (WebElement game:innerGames) {
@@ -366,7 +365,7 @@ public class VewingEventsPage extends AbstractPage {
                     list.get(i).click();
                 }
 
-                List<WebElement> gameList = driver.findElements(By.xpath(xpathGamesWithVideo)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                List<WebElement> gameList = driver.findElements(By.xpath(xpathGamesWithVideo)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
                 LOG.info("Надено игр::" + gameList.size());
                 if (gameList.size() > 0) {
                     for (WebElement game : gameList) {

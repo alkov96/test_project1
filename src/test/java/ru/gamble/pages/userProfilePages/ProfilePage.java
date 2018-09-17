@@ -12,7 +12,6 @@ import ru.gamble.pages.AbstractPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
-import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
@@ -41,9 +40,7 @@ public class ProfilePage extends AbstractPage {
 
 
     @ActionTitle("меняет пароль в Личном кабинете")
-    public void changePassword() throws InterruptedException {
-        String currentPass = "1qwert2ASDF";
-        String newPass = "NewPassword123";
+    public void changePassword(String currentPass, String newPass) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         CommonStepDefs.workWithPreloader();
         driver.findElement(By.cssSelector("span.user-profile__link")).click();
@@ -65,25 +62,27 @@ public class ProfilePage extends AbstractPage {
                 LOG.warn("Уведомление о смене пароля не было отображено");
         }
 
-        driver.findElement(By.xpath("//div[@class='modal__body modal__body_up-pass']/span[@class='modal__closeBtn closeBtn']")).click(); //закрываем окошко поздравления
-        driver.findElement(By.cssSelector("span.user-profile__link")).click();
-        driver.findElement(By.xpath("//input[@type='password']")).clear();
-        driver.findElement(By.xpath("//input[@type='password']")).sendKeys(newPass);
-        driver.findElement(By.name("profile_new_pass")).clear();
-        driver.findElement(By.name("profile_new_pass")).sendKeys(currentPass);
-        LOG.info("Форма заполнена, жмём Сохранить");
-        driver.findElement(By.className("user-profile__group-line")).click(); //кликаем в пустоту
-        driver.findElement(By.cssSelector("div.user-profile__text > button:nth-child(1)")).click(); // Сохранить
+        LOG.info("Текущий пароль - " + newPass);
 
-        Thread.sleep(2000);
-
-        LOG.info("Проверяем уведомление об успешной смене пароля");
-        if (driver.findElement(By.cssSelector("div.modal__body.modal__body_up-pass")).isDisplayed()) {
-            LOG.info("Уведомление присутствует, закрываем его");
-        }
-        else {
-            LOG.warn("Уведомление о смене пароля не было отображено");
-        }
+//        driver.findElement(By.xpath("//div[@class='modal__body modal__body_up-pass']/span[@class='modal__closeBtn closeBtn']")).click(); //закрываем окошко поздравления
+//        driver.findElement(By.cssSelector("span.user-profile__link")).click();
+//        driver.findElement(By.xpath("//input[@type='password']")).clear();
+//        driver.findElement(By.xpath("//input[@type='password']")).sendKeys(newPass);
+//        driver.findElement(By.name("profile_new_pass")).clear();
+//        driver.findElement(By.name("profile_new_pass")).sendKeys(currentPass);
+//        LOG.info("Форма заполнена, жмём Сохранить");
+//        driver.findElement(By.className("user-profile__group-line")).click(); //кликаем в пустоту
+//        driver.findElement(By.cssSelector("div.user-profile__text > button:nth-child(1)")).click(); // Сохранить
+//
+//        Thread.sleep(2000);
+//
+//        LOG.info("Проверяем уведомление об успешной смене пароля");
+//        if (driver.findElement(By.cssSelector("div.modal__body.modal__body_up-pass")).isDisplayed()) {
+//            LOG.info("Уведомление присутствует, закрываем его");
+//        }
+//        else {
+//            LOG.warn("Уведомление о смене пароля не было отображено");
+//        }
         driver.findElement(By.xpath("//div[@class='modal__body modal__body_up-pass']/span[@class='modal__closeBtn closeBtn']")).click();
         Thread.sleep(500);
     }

@@ -1,12 +1,8 @@
 package ru.gamble.pages;
 
-import cucumber.api.DataTable;
-import cucumber.api.java.mn.Харин;
-import cucumber.runtime.junit.Assertions;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -19,8 +15,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.mainPages.FooterPage;
-import ru.gamble.pages.mainPages.MainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
@@ -35,6 +29,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.utility.Constants.STARTING_URL;
 
@@ -59,14 +56,13 @@ public class LandingAppPage extends AbstractPage {
 
     @ActionTitle("проверяет скачивание приложения на ios")
     public void downloadIos() {
-        boolean flag = true;
         WebDriver driver = PageFactory.getDriver();
         int x, y;
         y = driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-mac')]")).getLocation().getY() - 100;
         x = driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-mac')]")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
         WebElement iosLink = driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-mac')]"));
-        flag &= CommonStepDefs.goLink(iosLink, "itunes.apple.com");
+        assertThat(CommonStepDefs.goLink(iosLink, "itunes.apple.com")).isTrue();
         LOG.info("Ссылка " + "itunes.apple.com" + " открылась");
     }
 
@@ -83,25 +79,20 @@ public class LandingAppPage extends AbstractPage {
 
     public static void downloadAndroid() throws IOException {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         if (!driver.findElement(xpath("//div[@class='modal__body modal__body_app']")).isDisplayed()) {
             Assert.fail("Не открылся попап на скачивание приложения для андроида");
-            flag = false;
         } else {
             if (!driver.findElement(By.id("app_desctop_popup_link_more")).isDisplayed()) {
                 Assert.fail("На попапе нет ссылки на правила GP. нет скопки @Подробнее@");
-                flag = false;
             } else {
                 String pattern = "play.google.com/intl/ru_ALL/about/restricted-content/gambling";
                 WebElement rules = driver.findElement(By.id("app_desctop_popup_link_more"));
-                flag &= CommonStepDefs.goLink(rules, pattern);
+                assertTrue(CommonStepDefs.goLink(rules, pattern));
             }
             if (!driver.findElement(By.id("app_desctop_popup_btn_download")).isDisplayed()) {
                 Assert.fail("На попапе нет кнопки на скачивание");
-                flag = false;
             } else {
                 String link = driver.findElement(By.id("app_desctop_popup_btn_download")).getAttribute("href").trim();
-               // HttpClient httpClient = new DefaultHttpClient();
                 HttpClient httpClient = HttpClientBuilder.create().build();
                 HttpContext localContext = new BasicHttpContext();
                 HttpGet httpGet = new HttpGet(link);
@@ -116,7 +107,6 @@ public class LandingAppPage extends AbstractPage {
                         break;
                     default:
                         LOG.info("Ошибка при скачивании! Статус ответа = " + httpResponse.getStatusLine().getStatusCode());
-                        flag = false;
                         Assert.fail("Скачивание приложения для андроида не удалось");
                         break;
                 }
@@ -203,7 +193,7 @@ public class LandingAppPage extends AbstractPage {
         x = driver.findElement(By.id("app_desctop_freebet_block_btn")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
         String linkFreeBet = driver.findElement(By.id("app_desctop_freebet_block_btn")).getAttribute("href");
-        flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_freebet_block_btn")), linkFreeBet);
+        assertTrue(CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_freebet_block_btn")), linkFreeBet));
         LOG.info("Ссылка на фрибет работает");
     }
 
@@ -211,32 +201,30 @@ public class LandingAppPage extends AbstractPage {
     @ActionTitle("смотрит ссылку на правила про выплаты выигрышей")
     public void linkForPrize() {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         int x, y;
         y = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getLocation().getY() - 100;
         x = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
         String linkWithdraw = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getAttribute("href");
-        flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_warranty")), linkWithdraw);
+        assertTrue(CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_warranty")), linkWithdraw));
     }
 
     @ActionTitle("смотрит ссылку на правила про НДФЛ")
     public void linkForNDFL() {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         int x, y;
         y = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getLocation().getY() - 100;
         x = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
         String linkNDFL = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getAttribute("href");
-        flag &= CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")), linkNDFL);
+        assertTrue(CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")), linkNDFL));
     }
 
 
     @ActionTitle("отправляет СМС со страницы лэндинга на телефон")
     public void sendSMS(String phone, String isOk) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = isOk.equals("ожидаем успех")?true:false;
+        boolean flag = isOk.equals("ожидаем успех");
         String hintBefore3times = "Мы отправили вам ссылку на скачивание";
         String hintAfter3times = "Ошибка. Повторите попытку через 24 часа";
         if (phone.matches("^[A-Z_]+$")){

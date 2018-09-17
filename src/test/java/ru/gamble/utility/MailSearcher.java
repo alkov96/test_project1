@@ -20,7 +20,7 @@ import static ru.gamble.utility.EmailParameters.*;
 public class MailSearcher {
     private static final Logger LOG = LoggerFactory.getLogger(MailSearcher.class);
 
-    public String getEmailLink(String mail, Properties properties) throws Exception {
+    public String getEmailLink(String mail, Properties properties){
 
         String link;
 
@@ -38,7 +38,7 @@ public class MailSearcher {
     }
 
     private String linkSearcher(String mail, Properties properties)  {
-        Store store = null;
+        Store store;
         Folder inbox;
         String link = "";
         Message message;
@@ -85,12 +85,6 @@ public class MailSearcher {
             }
             LOG.info("Получено писем::" + String.valueOf(inbox.getMessageCount()));
             inbox.close(true);
-        } catch (NoSuchProviderException nspe) {
-            nspe.printStackTrace();
-        } catch (MessagingException me) {
-            me.printStackTrace();
-        } catch (InterruptedException ie) {
-            ie.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }

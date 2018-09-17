@@ -1,6 +1,5 @@
 package ru.gamble.pages.mainPages;
 
-import cucumber.api.java.ru.Когда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -22,10 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 
@@ -82,10 +78,10 @@ public class AuthenticationMainPage extends AbstractPage {
             new WebDriverWait(PageFactory.getWebDriver(),3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoTSUPIS)));
             LOG.info("Нашли кнопку ["
                     + PageFactory.getWebDriver().findElements(By.xpath(xpathGoTSUPIS))
-                    .stream().filter(e -> e.isDisplayed()).findFirst().get()
+                    .stream().filter(WebElement::isDisplayed).findFirst().get()
                     .getText().replaceAll("\n", "").trim()
                     + "] и нажимаем на крест");
-            PageFactory.getWebDriver().findElements(By.xpath(xpathCross)).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+            PageFactory.getWebDriver().findElements(By.xpath(xpathCross)).stream().filter(WebElement::isDisplayed).findFirst().get().click();
         }catch (Exception e){
             LOG.info("Модальное окно 'Перейти в ЦУПИС' не появилось");
         }
@@ -100,7 +96,7 @@ public class AuthenticationMainPage extends AbstractPage {
         LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
         CouponPage.balanceIsOK("рубли");
         sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
-        if(sum.compareTo(new BigDecimal(0)) == 1){
+        if(sum.compareTo(new BigDecimal(0)) > 0){
             LOG.info("Проверка что правильно изменился баланс бонусов");
             Stash.put("sumKey",sum.toString());
             LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
@@ -108,20 +104,20 @@ public class AuthenticationMainPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("проверяет снятие суммы")
-    public void checkbalanceAfterWithdraw(String keySum){
-        BigDecimal sum;
-        sum = new BigDecimal((String) Stash.getValue(keySum)).setScale(2,RoundingMode.HALF_UP);
-        LOG.info("Ранее была снята сумма [" + sum.toString() + "]");
-        Stash.put("sumKey",sum.toString());
-        LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
-        CouponPage.balanceIsOK("рубли");
-        sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
-        if(sum.compareTo(new BigDecimal(0)) == 1){
-            LOG.info("Проверка что правильно изменился баланс бонусов");
-            Stash.put("sumKey",sum.toString());
-            LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
-            CouponPage.balanceIsOK("бонусов");
-        }
-    }
+//    @ActionTitle("проверяет снятие суммы")
+//    public void checkbalanceAfterWithdraw(String keySum){
+//        BigDecimal sum;
+//        sum = new BigDecimal((String) Stash.getValue(keySum)).setScale(2,RoundingMode.HALF_UP);
+//        LOG.info("Ранее была снята сумма [" + sum.toString() + "]");
+//        Stash.put("sumKey",sum.toString());
+//        LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
+//        CouponPage.balanceIsOK("рубли");
+//        sum = new BigDecimal((String) Stash.getValue("bonus")).setScale(2,RoundingMode.HALF_UP).negate();
+//        if(sum.compareTo(new BigDecimal(0)) == 1){
+//            LOG.info("Проверка что правильно изменился баланс бонусов");
+//            Stash.put("sumKey",sum.toString());
+//            LOG.info("Сохранили в память key [sumKey] <== value [" + sum.toString() + "]");
+//            CouponPage.balanceIsOK("бонусов");
+//        }
+//    }
 }

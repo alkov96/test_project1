@@ -17,7 +17,6 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -66,7 +65,7 @@ public class WithdrawalOfFundsPage extends AbstractPage{
 
     private void checkForErrorLoadingPaymentSystems(){
         WebDriver driver = PageFactory.getWebDriver();
-        if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList()).size() > 0){
+        if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).size() > 0){
             throw new AutotestError("Ошибка при загрузке платежных систем!");
         }
     }

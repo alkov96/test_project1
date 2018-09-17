@@ -3,8 +3,10 @@ package ru.gamble.pages;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
-import org.openqa.selenium.*;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -12,7 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.utility.*;
+import ru.gamble.utility.JsonLoader;
+import ru.gamble.utility.YandexPostman;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
@@ -20,11 +23,13 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
-import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -32,7 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.*;
+import static ru.gamble.utility.Constants.RANDOM;
+import static ru.gamble.utility.Constants.STARTING_URL;
 import static ru.gamble.utility.Generators.randomString;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
@@ -114,7 +120,8 @@ public abstract class AbstractPage extends Page {
     @ActionTitle("нажимает кнопку")
     public static void pressButtonAP(String param){
         CommonStepDefs.pressButton(param);
-    LOG.info("Нажали на [" + param + "]");}
+        LOG.info("Нажали на [" + param + "]");
+    }
 
     @ActionTitle("stop")
     public static void stop() {
@@ -128,8 +135,8 @@ public abstract class AbstractPage extends Page {
      * @param param - имя WebElement
      */
     @ActionTitle("переходит по ссылке")
-    public static void goesByReference(String param) throws PageInitializationException, PageException {
-        Page page = null;
+    public static void goesByReference(String param) throws PageException {
+        Page page;
         page = PageFactory.getInstance().getCurrentPage();
         String link = page.getElementByTitle(param).getAttribute("href");
         PageFactory.getWebDriver().get(link);
@@ -149,7 +156,7 @@ public abstract class AbstractPage extends Page {
 
         for (int j = 0; j < count; j++) {
             try {
-                new WebDriverWait(PageFactory.getDriver(), waitSeconds).until(ExpectedConditions.visibilityOf(element));
+                new WebDriverWait(PageFactory.getDriver(), waitSeconds ).until(ExpectedConditions.visibilityOf(element));
                 break;
             } catch (Exception e) {
                 driver.navigate().refresh();
@@ -178,8 +185,8 @@ public abstract class AbstractPage extends Page {
         } catch (DataException de) {
             LOG.error("Ошибка! Не смогли получить ссылку сайта");
         } catch (Exception e) {
-            LOG.error("Ошибка! Не смогли получить ссылку для аутентификации.");
             e.printStackTrace();
+            throw new AutotestError("Ошибка! Не смогли получить ссылку для аутентификации.");
         }
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
@@ -200,20 +207,17 @@ public abstract class AbstractPage extends Page {
      *
      * @param element - поле где ждем выпадающий список
      * @param max     - максимальный пункт, который можно выбрать (включая этот max). Второго параметра может и не быть. тогда максимум - это длина всего списка
-     * @return Возвращает номер пункта который был выбран
      */
-    protected int selectMenu(WebElement element, int max) {
-        WebDriver driver = PageFactory.getWebDriver();
+    protected void selectMenu(WebElement element, int max) {
         int menuSize = element.findElements(By.xpath("custom-select/div[2]/div")).size();
         menuSize -= (max + 1);
         int select = 1 + (int) (Math.random() * menuSize);
         element.findElement(By.xpath("custom-select")).click();
         element.findElement(By.xpath("custom-select/div[2]/div[" + select + "]")).click();
-        return select;
     }
 
-    protected int selectMenu(WebElement element) {
-        return selectMenu(element, 0);
+    protected void selectMenu(WebElement element) {
+        selectMenu(element, 0);
     }
 
     protected String enterDate(String value) {
@@ -284,7 +288,7 @@ public abstract class AbstractPage extends Page {
     @ActionTitle("проверяет присутствие текста")
     public void checksPresenceOfText(String text) {
         List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath("//*[text()='" + text + "']"))
-                .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
+                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         assertThat(!list.isEmpty()).as("Ошибка.Не найден::[" + text + " ]").isTrue();
     }
 
@@ -299,22 +303,22 @@ public abstract class AbstractPage extends Page {
     }
 
     @ActionTitle("проверяет отсутствие сообщения с текстом после закрытия")
-    public void checkServiceMessageFalseAfterClose() throws InterruptedException {
+    public void checkServiceMessageFalseAfterClose() {
         MatcherAssert.assertThat(false, equalTo(checkCloseServiceMessage(serviceMessage)));
     }
 
     @ActionTitle("проверяет наличие иконки закрытия")
-    public void chectCloseServiceMessageTrue() throws InterruptedException {
+    public void chectCloseServiceMessageTrue(){
         MatcherAssert.assertThat(true, equalTo(checkCloseServiceMessage(closeServiceMessage)));
     }
 
     @ActionTitle("проверяет отсутствие иконки закрытия")
-    public void chectCloseServiceMessageFalse() throws InterruptedException {
+    public void chectCloseServiceMessageFalse(){
         MatcherAssert.assertThat(false, equalTo(checkCloseServiceMessage(closeServiceMessage)));
     }
 
     public void fillCouponFinal(int count, String ifForExperss, By findCoeffs) throws InterruptedException {
-        if (ifForExperss == "correct") {
+        if (ifForExperss.equals("correct")) {
             List<WebElement> eventsInCoupon;
             List<WebElement> correctMarkets;
             Thread.sleep(3000);
@@ -331,7 +335,7 @@ public abstract class AbstractPage extends Page {
                 }
             }
         }
-        if (ifForExperss == "incorrect") {
+        if (ifForExperss.equals("incorrect")) {
             List<WebElement> eventsInCoupon;
             List<WebElement> inCorrectMarkets = null;
             waitForElementPresent(findCoeffs, 10);
@@ -348,8 +352,8 @@ public abstract class AbstractPage extends Page {
                     allDaysPages.get(tryPage).click();
                 }
                 counter--;
-                Assert.assertFalse("Не нашли достаточное количество некорректных событий.", counter==0);
-            } while (inCorrectMarkets.size() < count && tryPage < allDaysPages.size() - 1);
+                Assert.assertNotEquals("Не нашли достаточное количество некорректных событий.", 0, counter);
+            } while (Objects.requireNonNull(inCorrectMarkets).size() < count && tryPage < allDaysPages.size() - 1);
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
@@ -367,12 +371,9 @@ public abstract class AbstractPage extends Page {
     public void waitForElementPresent(final By by, int timeout) {
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(PageFactory.getWebDriver(), timeout)
                 .ignoring(StaleElementReferenceException.class);
-        wait.until(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver webDriver) {
-                WebElement element = webDriver.findElement(by);
-                return element != null && element.isDisplayed();
-            }
+        wait.until((ExpectedCondition<Boolean>) webDriver -> {
+            WebElement element = Objects.requireNonNull(webDriver).findElement(by);
+            return element != null && element.isDisplayed();
         });
     }
 
@@ -390,8 +391,7 @@ public abstract class AbstractPage extends Page {
 
 
     /**
-     * включается быстрая свтака и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
-     *
+     * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
      * @param sum
      */
     @ActionTitle("включает быструю ставку и вводит сумму")
@@ -402,7 +402,7 @@ public abstract class AbstractPage extends Page {
         }
         BigDecimal sumBet;
         BigDecimal one = new BigDecimal(1);
-        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2).add(one): new BigDecimal(sum).setScale(2);
+        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
         //coupon_field.clear();
         LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
         fillField(coupon_field,sumBet.toString());
@@ -442,19 +442,11 @@ public abstract class AbstractPage extends Page {
     }
 
 
-    public boolean checkCloseServiceMessage(WebElement element) throws InterruptedException {
-            try {
-                if (element.isDisplayed()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (NoSuchElementException e){
-                return false;
-            }
+    private boolean checkCloseServiceMessage(WebElement element) {
+        return element.isDisplayed();
     }
 
-    public boolean checkServiceMessage(String text) throws InterruptedException {
+    private boolean checkServiceMessage(String text) throws InterruptedException {
         int count = 0;
         while (count < 40) {
             if (serviceMessage.isDisplayed()) {
@@ -471,13 +463,13 @@ public abstract class AbstractPage extends Page {
 
     @ActionTitle("ждет некоторое время")
     public void waiting(String sec) throws InterruptedException {
-        Integer seconds=0;
+        int seconds;
         if (sec.matches("^[0-9]+")) {
-            seconds = Integer.valueOf(sec);
+            seconds = Integer.parseInt(sec);
         }
         else
         {
-            seconds = Integer.valueOf(Stash.getValue(sec));
+            seconds = Integer.parseInt(Stash.getValue(sec));
         }
         Thread.sleep(seconds*1000);
     }
@@ -489,7 +481,7 @@ public abstract class AbstractPage extends Page {
         }
     }
 
-    public void waitingForPreloadertoDisappear(int timeInSeconds){
+    protected void waitingForPreloadertoDisappear(int timeInSeconds){
         WebDriver driver = PageFactory.getWebDriver();
         try {
             new WebDriverWait(driver, timeInSeconds).until(ExpectedConditions.invisibilityOfElementLocated(xpath("//*[contains(@class,'preloader__container')]")));
@@ -506,7 +498,7 @@ public abstract class AbstractPage extends Page {
             LOG.info("Ждём появление всплывающего окна.");
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoToTSUPIS)));
             LOG.info("Появилось окно c кнопкой [" + driver.findElement(By.xpath(xpathGoToTSUPIS)).getText() + "]");
-            driver.findElements(By.xpath("//div/a[@class='modal__closeBtn closeBtn']")).stream().filter(e1 -> e1.isDisplayed()).findFirst().get().click();
+            driver.findElements(By.xpath("//div/a[@class='modal__closeBtn closeBtn']")).stream().filter(WebElement::isDisplayed).findFirst().get().click();
             LOG.info("Закрыли всплывающего окно");
         }catch (Exception e){
             LOG.info("Окно не появилось.");
@@ -528,7 +520,7 @@ public abstract class AbstractPage extends Page {
         try{
             new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(@href,'https://1cupis.ru/auth')]")));
             LOG.info("Открылось окно 'Перейти в ЦУПИС' - закрываем");
-            driver.findElements(By.xpath("//a[contains(@class,'modal__closeBtn closeBtn')]")).stream().filter(e -> e.isDisplayed()).findFirst().get().click();
+            driver.findElements(By.xpath("//a[contains(@class,'modal__closeBtn closeBtn')]")).stream().filter(WebElement::isDisplayed).findFirst().get().click();
         }catch (Exception e){
             LOG.info("Окно 'Перейти в ЦУПИС' не появилось");
         }

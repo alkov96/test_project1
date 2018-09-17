@@ -1,33 +1,33 @@
 package ru.gamble.pages.mainPages;
 
 import cucumber.api.DataTable;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
-import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-import static org.assertj.core.api.Assertions.assertThat;
-import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.ELEMENT;
-import static ru.gamble.utility.Constants.LINK;
-import static ru.gamble.utility.Constants.TEXT;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
+import static ru.gamble.utility.Constants.*;
 
 @PageEntry(title = "Подвал сайта")
 public class FooterPage extends AbstractPage {
@@ -113,32 +113,32 @@ public class FooterPage extends AbstractPage {
     }
 
     @ActionTitle("проверяем ТЕКСТ при переходе по ссылке с")
-    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
+    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable){
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, expectedText;
         String link = "";
         String currentHandle = driver.getWindowHandle();
 
-        for(int i = 0; i < table.size(); i++) {
-            linkTitle = table.get(i).get(LINK);
-            expectedText = table.get(i).get(TEXT);
+        for (Map<String, String> aTable : table) {
+            linkTitle = aTable.get(LINK);
+            expectedText = aTable.get(TEXT);
             String xpath = "//*[contains(text(),'" + expectedText + "')]";
             opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
         }
     }
 
     @ActionTitle("проверяем ЭЛЕМЕНТ при переходе по ссылке с")
-    public void checkElementWhenClickingOnLinkWith(DataTable dataTable) throws PageInitializationException,PageException {
+    public void checkElementWhenClickingOnLinkWith(DataTable dataTable){
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, elementTitle;
         String link = "";
         String currentHandle = driver.getWindowHandle();
 
-        for(int i = 0; i < table.size(); i++) {
-            linkTitle = table.get(i).get(LINK);
-            elementTitle = table.get(i).get(ELEMENT);
+        for (Map<String, String> aTable : table) {
+            linkTitle = aTable.get(LINK);
+            elementTitle = aTable.get(ELEMENT);
             String xpath = "//a[contains(@class,'no-reload-js active')]//*[contains(.,'" + elementTitle + "')]";
             opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
         }
@@ -180,21 +180,14 @@ public class FooterPage extends AbstractPage {
 
             // Цикл обновления страницы в случае неудачи её прогрузки
             for(int j = 0; j < 10; j++) {
-                try {
-                    try {
-                        new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-                    }catch (Exception e){
-                        e.getMessage();
-                    }
-                    requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
-                    LOG.info("Текущая страница::" + driver.getCurrentUrl());
-                    if(!requiredElements.isEmpty()){
-                        LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getText().replaceAll("\n", " "));
-                        break;
-                    }
-                } catch (Exception e){
-                    driver.navigate().refresh();
+                new WebDriverWait(driver, 3);
+                requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+                LOG.info("Текущая страница::" + driver.getCurrentUrl());
+                if(!requiredElements.isEmpty()){
+                    LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getText().replaceAll("\n", " "));
+                    break;
                 }
+                driver.navigate().refresh();
                 if(j >= 9){
                     throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
                 }
@@ -214,7 +207,7 @@ public class FooterPage extends AbstractPage {
     @ActionTitle("проверяет что число платёжных систем")
     public void checkNumberPaymentSystem(String number){
         String xpath = "//div[contains(@class,'payment-systems-item')]";
-        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());;
+        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         int expected = Integer.parseInt(number);
         int actual = list.size();
         assertThat(actual).as("Количетво иконок платёжных систем [" + actual + "] не соответсвует ожидаемому [" + expected + "]").isEqualTo(expected);

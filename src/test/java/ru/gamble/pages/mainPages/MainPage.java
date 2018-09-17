@@ -2,8 +2,6 @@ package ru.gamble.pages.mainPages;
 
 
 import cucumber.api.DataTable;
-import cucumber.api.java.ru.Когда;
-import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -25,6 +23,7 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +32,9 @@ import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.setRemoveAssertJRelatedElementsFromStackTrace;
-import static org.junit.Assert.assertFalse;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.*;
+import static ru.gamble.utility.Constants.BUTTON;
+import static ru.gamble.utility.Constants.DIRECTION;
 
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
@@ -115,7 +113,6 @@ public class MainPage extends AbstractPage {
             selectSport.click();
             sportName = selectSport.findElement(By.xpath("i")).getAttribute("class").replace("sport-tabs__icon sport-icon icon-", "");
             LOG.info(sportName);
-            path.toString();
             wait.until(CommonStepDefs.attributeContainsLowerCase(
                     By.xpath(path + "//div[contains(@class,'bets-widget-table__inner')]"),"class",sportName));
 
@@ -132,11 +129,11 @@ public class MainPage extends AbstractPage {
      * в Stash сохраняет найденную игру. ключ - "gameBT"
      */
     @ActionTitle("ищет игру на БТ")
-    public  void searchVideoGameBT(String param) throws InterruptedException {
+    public  void searchVideoGameBT(String param){
         WebDriver driver = PageFactory.getDriver();
-        boolean haveButton = param.equals("с кнопкой Смотреть")?true:false;
-        String ngclick = "";
-        List<WebElement> games = new ArrayList<>();
+        boolean haveButton = param.equals("с кнопкой Смотреть");
+        String ngclick;
+        List<WebElement> games;
         if (haveButton) {
             ngclick = "button";
         } else {
@@ -191,7 +188,7 @@ public class MainPage extends AbstractPage {
 
 
     @ActionTitle("проверяет что переход удался")
-    public void openGame() throws Exception {
+    public void openGame(){
         CommonStepDefs commonStepDefs = new CommonStepDefs();
         commonStepDefs.checkLinkToGame();
     }
@@ -214,7 +211,7 @@ public class MainPage extends AbstractPage {
                 break;
         }
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> games = new ArrayList<>();
+        List<WebElement> games;
         List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете
         int number = 0;
         do {
@@ -270,7 +267,7 @@ public class MainPage extends AbstractPage {
         List<String> table = dataTable.asList(String.class);
         String section;
         List<WebElement> main = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'news-widget-head__')]"))
-                .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
+                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
 
             for(int i = 0; i < table.size(); i++) {
                 section = table.get(i);
@@ -342,27 +339,27 @@ public class MainPage extends AbstractPage {
 
         LOG.info("Ищем навигационные точки под слайдером новостей");
          List<WebElement> dots = driver.findElements(By.xpath("//*[contains(@class,'news-widget')]//li[contains(@class,'dot')]"))
-                 .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                 .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
          LOG.info("Всего точек::" + dots.size());
 
-        for(int i = 0; i < table.size(); i++) {
-            direction = table.get(i).get(DIRECTION);
-            buttonName = table.get(i).get(BUTTON);
+        for (Map<String, String> aTable : table) {
+            direction = aTable.get(DIRECTION);
+            buttonName = aTable.get(BUTTON);
 
 
-            if(direction.contains("Вправо")){
+            if (direction.contains("Вправо")) {
                 LOG.info("Нажимаем на самую левую точку");
                 dots.get(0).click();
-                for (int j = 0; j < dots.size(); j++){
-                    if(dots.get(j).getAttribute("class").contains("is-selected")){
+                for (int j = 0; j < dots.size(); j++) {
+                    if (dots.get(j).getAttribute("class").contains("is-selected")) {
                         LOG.info("Нажимаем на::" + buttonName);
                         pressButtonAP(buttonName);
-                        if(j == (dots.size()-1)) {
+                        if (j == (dots.size() - 1)) {
                             assertThat(dots.get(0).getAttribute("class").contains("is-selected"))
                                     .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
                             LOG.info("Первая точка [1] закрашена");
 
-                        }else {
+                        } else {
                             assertThat(dots.get(j + 1).getAttribute("class").contains("is-selected"))
                                     .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
                             LOG.info("Следующая точка [" + (j + 2) + "] закрашена");
@@ -370,19 +367,19 @@ public class MainPage extends AbstractPage {
                         }
                     }
                 }
-            }else if(direction.contains("Влево")){
+            } else if (direction.contains("Влево")) {
                 LOG.info("Нажимаем на самую правую точку");
                 dots.get(dots.size() - 1).click();
-                for (int k = dots.size() - 1; k >= 0; k--){
-                    if(dots.get(k).getAttribute("class").contains("is-selected")){
+                for (int k = dots.size() - 1; k >= 0; k--) {
+                    if (dots.get(k).getAttribute("class").contains("is-selected")) {
                         LOG.info("Нажимаем на::" + buttonName);
                         pressButtonAP(buttonName);
-                        if(k == 0) {
+                        if (k == 0) {
                             assertThat(dots.get(dots.size() - 1).getAttribute("class").contains("is-selected"))
                                     .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
                             LOG.info("Последняя точка [" + dots.size() + "] закрашена");
 
-                        }else {
+                        } else {
                             assertThat(dots.get(k - 1).getAttribute("class").contains("is-selected"))
                                     .as("Ошибка!Предыдующая точка не стала закрашенной").isTrue();
                             LOG.info("Предыдущая точка [" + (k) + "] закрашена");
@@ -401,7 +398,7 @@ public class MainPage extends AbstractPage {
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
-        List<String> sportsLanding = new ArrayList<String>();
+        List<String> sportsLanding = new ArrayList<>();
         driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).forEach(element->
         sportsLanding.add(element.getText().replace("На ","")));
 

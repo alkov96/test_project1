@@ -17,7 +17,6 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +41,7 @@ public class NewsPage extends AbstractPage {
     @ActionTitle("проверяет наличие верхней линейки вкладок")
     public void checksPresenceOfTopRulerOfTabs(){
         List<WebElement> tabsNews = PageFactory.getWebDriver().findElements(By.xpath("//a[contains(@class,'newslist-')]"))
-                .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         assertThat(tabsNews.size()).as("Ошибка! Верхняя линейка вкладок не найдена").isGreaterThan(0);
         for(WebElement tab: tabsNews){
             if(!tab.getText().equals("")){
@@ -71,7 +70,7 @@ public class NewsPage extends AbstractPage {
             //Для ожидание прогрузки
             workWithPreloader();
             List<WebElement> dagestsNews = driver.findElements(By.xpath(xpathDigests))
-                    .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+                    .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
             assertThat(dagestsNews.size()).as("Ошибка! Дайджесты не найдены").isGreaterThan(0);
 
             for(WebElement dagest: dagestsNews){

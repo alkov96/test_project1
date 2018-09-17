@@ -11,14 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.pages.LandingAppPage;
-import ru.gamble.pages.mainPages.FooterPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
-import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -26,8 +24,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.openqa.selenium.By.xpath;
-import static ru.gamble.utility.Constants.ELEMENT;
 import static ru.gamble.utility.Constants.LINK;
 import static ru.gamble.utility.Constants.TEXT;
 
@@ -144,18 +142,17 @@ public class AzbukaBettingaPage extends AbstractPage {
     }
 
     @ActionTitle("проверяем переход на страницы с")
-    public void checkPagesOnPlatforms(DataTable dataTable) throws PageInitializationException, PageException {
+    public void checkPagesOnPlatforms(DataTable dataTable) throws PageException {
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkElement, titleOnLink;
         String currentHandle = driver.getWindowHandle();
         String link = "";
 
-        for (int i = 0; i < table.size(); i++) {
-            linkElement = table.get(i).get(LINK);
-            titleOnLink = table.get(i).get(TEXT);
-            boolean flag = true;
-            flag &= CommonStepDefs.goLink(getElementByTitle(linkElement), titleOnLink);
+        for (Map<String, String> aTable : table) {
+            linkElement = aTable.get(LINK);
+            titleOnLink = aTable.get(TEXT);
+            assertThat(CommonStepDefs.goLink(getElementByTitle(linkElement), titleOnLink)).as("Не перешли на страницу с [" + titleOnLink + "]").isTrue();
 
         }
     }

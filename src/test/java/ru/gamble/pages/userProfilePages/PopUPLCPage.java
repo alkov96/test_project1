@@ -109,7 +109,7 @@ public class PopUPLCPage extends AbstractPage {
     }
 
     @ActionTitle("вводит сумму меньше минимальной и проверяем для каждого способа")
-    public void summMin() throws InterruptedException {
+    public void summMin(){
         WebDriver driver = PageFactory.getDriver();
         withdraw_field.click();
         withdraw_field.clear();
@@ -146,18 +146,18 @@ public class PopUPLCPage extends AbstractPage {
         float linkBalanceFloat;
         float sumOnButtonFloat;
         float sumOnButtonShouldBe;
-        for (int i = 0; i < minSumElements.size(); i++) {//Если нажимаем на сумму на серой ссылке, то должны отображаться бонусы и НДФЛ.
+        for (WebElement minSumElement : minSumElements) {//Если нажимаем на сумму на серой ссылке, то должны отображаться бонусы и НДФЛ.
             Thread.sleep(1000);
             driver.findElement(By.xpath("//div[@class='smallJsLink__wrapper']/span[1]")).click(); //кликаем на сумму на ссылке
             Thread.sleep(1000);
             waitToPreloader();
-            minSumElements.get(i).findElement(By.xpath("../../label/div")).click();//кликаем на способ вывода
+            minSumElement.findElement(By.xpath("../../label/div")).click();//кликаем на способ вывода
             waitToPreloader();
             workWithPreloader();
             try {
                 ndfl = driver.findElement(By.xpath("//div[contains(@class,'money-in-out__line')]/p/span")).getText();
                 LOG.info("НДФЛ [" + ndfl + "]");
-            }catch (Exception e){
+            } catch (Exception e) {
                 throw new AutotestError("Ошибка! Не найден НДФЛ");
             }
             sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");
@@ -199,7 +199,7 @@ public class PopUPLCPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> summList = Stash.getValue("summListKey");
         summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"))
-        .stream().filter(e -> e.isDisplayed()).collect(Collectors.toList());
+        .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         LOG.info("Проверка что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода");
         WebElement buttonOk;
         int sumOnButton, sumField;
@@ -324,13 +324,13 @@ public class PopUPLCPage extends AbstractPage {
         if (!driver.findElement(By.xpath("//div[@class='modal__body modal__body_moneyInOutBox money-in-out__form']")).isDisplayed()){
             Assertions.fail("При нажатии на кнопку Внести депозит не открылся попап пополнения");
         }
-        int randomSum = 100 + (int) Math.random()*900;//рандомное число до от 100 до 1000
+        int randomSum = 100 + (int) (Math.random() * 900);//рандомное число до от 100 до 1000
         field = driver.findElement(By.id("money_in_amount1"));
         LOG.info("Очищаем поле с суммой и затем вводим туда " + randomSum);
         field.clear();
         field.sendKeys(String.valueOf(randomSum));
         Thread.sleep(5000);
-        sumField = (int) Integer.valueOf(driver.findElement(By.id("money_in_amount1")).getAttribute("value"));
+        sumField = Integer.valueOf(driver.findElement(By.id("money_in_amount1")).getAttribute("value"));
         if (sumField != randomSum) {
             Assertions.fail("На кнопке неправильная сумма." + sumField + " вместо " + randomSum);
         }
