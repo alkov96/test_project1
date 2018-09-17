@@ -1606,5 +1606,26 @@ public class CommonStepDefs extends GenericStepDefs {
                 .connect();
     }
 
+
+
+    @Когда("^вычленяем из названия игры одно слово \"([^\"]*)\" \"([^\"]*)\"$")
+    public void oneWordSearch(String keySearch,String type){
+        LOG.info(Stash.getValue("nameGameKey") + " время начала ");
+        List <String> types = Stash.getValue("typeGameKey");
+        int index = types.indexOf(type);
+        List<String> names = Stash.getValue("nameGameKey");
+        for (String str:names.get(index).split(" ")){
+            if (str.length()>3) {
+                Stash.put(keySearch,str);
+                LOG.info(keySearch  + ": " + str);
+                break;
+            }
+        }
+    }
+
+
+
+
+
 }
 

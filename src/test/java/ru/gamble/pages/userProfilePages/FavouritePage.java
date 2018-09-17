@@ -120,16 +120,16 @@ public class FavouritePage extends AbstractPage {
             //   switch(typeGame){
             switch (types.get(index)) {
                 case "PrematchVnePeriod":
-                    flag&=EventViewerPage.pagePrematch(teams.get(index), "Любое время");
+                    flag&=EventViewerPage.pagePrematch(teams.get(index), "Любое время",true);
                     break;
                 case "PrematchInPeriod":
-                    flag&=EventViewerPage.pagePrematch(teams.get(index),  "2 часа");
+                    flag&=EventViewerPage.pagePrematch(teams.get(index),  "2 часа",true);
                     break;
                 case "LiveWithVideo":
-                    flag&=VewingEventsPage.pageLive(teams.get(index),true);
+                    flag&=VewingEventsPage.pageLive(teams.get(index),true,true);
                     break;
                 case "LiveWithoutVideo":
-                    flag&=VewingEventsPage.pageLive(teams.get(index),  true);
+                    flag&=VewingEventsPage.pageLive(teams.get(index),  true,true);
                     break;
                 default:
                     flag=false;
