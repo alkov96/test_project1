@@ -37,6 +37,10 @@ public class MobileEnterWindow extends AbstractPage {
     @FindBy(xpath = "//button[@type='submit']")
     private WebElement buttonEnter;
 
+    @ElementTitle("Регистрация")
+    @FindBy(xpath = "//a[contains(.,'Регистрация')]")
+    private WebElement registrationLink;
+
     public MobileEnterWindow() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(

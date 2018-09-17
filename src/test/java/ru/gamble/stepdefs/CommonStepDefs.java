@@ -1253,10 +1253,15 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^переходим на сайт и включаем режим эмуляции$")
+    @Когда("^переходим на мобильную версию сайта$")
     public void goToSiteAndTurnOnEmulationMode(){
         WebDriver driver = PageFactory.getWebDriver();
-        driver.get("https://dev-bk-bet-mobile-site.tsed.orglot.office");
+        try {
+            driver.get(JsonLoader.getData().get(STARTING_URL).get("MOBILE_API").getValue());
+        } catch (DataException e) {
+            e.printStackTrace();
+            throw new AutotestError("Ошибка! Не смогли перейти на url мобильной версии сайта");
+        }
     }
 
     @Когда("^закрываем браузер$")
