@@ -1,6 +1,8 @@
 package ru.gamble.pages.livePages;
 
 import cucumber.api.DataTable;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -19,11 +21,14 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.util.ArrayList;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.stepdefs.CommonStepDefs.stringParse;
 
 @PageEntry(title = "Лайв просмотр событий")
 public class VewingEventsPage extends AbstractPage {
@@ -161,7 +166,7 @@ public class VewingEventsPage extends AbstractPage {
      * @param filterVideo - ждем ли мы что фильтр "с видео" включен или выключен
      * @param team1Name   - название игры, на которую перешли
      */
-    public static boolean pageLive(String team1Name, boolean filterVideo) {
+    public static boolean pageLive(String team1Name, boolean filterVideo, boolean isFavorit) {
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
 
@@ -173,6 +178,41 @@ public class VewingEventsPage extends AbstractPage {
         }
 
         LOG.info("Проверка страницы Live, когда фильтр по видео = " + filterVideo);
+        if (isFavorit){
+            flag = inLeftMenuGameSelected(team1Name);
+        }
+        else {
+            String nameOnLeftMenu =
+                    driver.findElement(xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]" +
+                            "//p[contains(@class,'left-menu__list-item-games-teams')]")).getText();
+            Assert.assertTrue(
+                    "В левом меню выделена желтым неправильная игра. Вместо " + team1Name + " выделена " +nameOnLeftMenu,
+                    CommonStepDefs.stringParse(nameOnLeftMenu).equals(team1Name));
+        }
+
+        LOG.info("Проверка что в центральной части окна открыта нужная игра");
+        List<WebElement> team = driver.findElements(By.xpath("//div[@class='live-game-summary__game-content']/div[1]/ng-include[1]/div[1]/div/div/p"));
+        String nameOnPage = CommonStepDefs.stringParse(team.get(0).getAttribute("title").trim() + " - " + team.get(1).getAttribute("title").trim());
+        if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameOnPage))) {
+            flag=false;
+            LOG.error("В лайв открылась неправильная игра. " + nameOnPage + " вместо " + team1Name);
+        }
+        LOG.info("Проверка что фильтр 'С видео' в правильном состоянии " + filterVideo);
+        if (driver.findElement(By.id("video-filter-toggler")).getAttribute("class").contains("active") != filterVideo) {
+            flag=false;
+            LOG.error("Фильтр 'с видео' не в том состоянии, что ожидалось." + !filterVideo + ", вместо " + filterVideo);
+        }
+        return flag;
+    }
+
+
+    /**
+     * Проверка что нужная игра есть в Избранном в левом меню и выделена там желтым
+     */
+    public static boolean inLeftMenuGameSelected(String team1Name){
+
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
         LOG.info("Смотрим что нужная игра выделена желтым в левом меню в Моих Играх (если эта игра есть в Избранном)");
         List<WebElement> favouriteGames = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")); // избранные игры, отображаемые в левом меню
         for (int count = 0; count < favouriteGames.size(); count++) {
@@ -187,26 +227,11 @@ public class VewingEventsPage extends AbstractPage {
                 break;
             }
         }
-
         LOG.info("Смотрим что нужная игра выделена желтым в левом меню в общем списке игр");
         String nameActiveGame = driver.findElement(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).getText();////название активной игр
         if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameActiveGame))){
             flag=false;
             LOG.error("В ЛАЙВе игра на которую перешли не выделена активной в левом меню. Название активной игры:" + CommonStepDefs.stringParse(nameActiveGame) + ", а ожидалось" + CommonStepDefs.stringParse(team1Name));
-        }
-
-
-        LOG.info("Проверка что в центральной части окна открыта нужная игра");
-        List<WebElement> team = driver.findElements(By.xpath("//div[@class='live-game-summary__game-content']/div[1]/ng-include[1]/div[1]/div/div/p"));
-        String nameOnPage = CommonStepDefs.stringParse(team.get(0).getAttribute("title").trim() + " - " + team.get(1).getAttribute("title").trim());
-        if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameOnPage))) {
-            flag=false;
-            LOG.error("В лайв открылась неправильная игра. " + nameOnPage + " вместо " + team1Name);
-        }
-        LOG.info("Проверка что фильтр  не сбросился");
-        if (driver.findElement(By.id("video-filter-toggler")).getAttribute("class").contains("active") != filterVideo) {
-            flag=false;
-            LOG.error("Сменился фильтр 'с видео'");
         }
         return flag;
     }
@@ -354,18 +379,4 @@ public class VewingEventsPage extends AbstractPage {
         }
     }
 
-
-    @ActionTitle("вычленяет из названия игры одно слово")
-    public void oneWordSearch(String keySearch,String type){
-        List <String> types = Stash.getValue("typeGameKey");
-        int index = types.indexOf(type);
-        List<String> names = Stash.getValue("nameGameKey");
-        for (String str:names.get(index).split(" ")){
-            if (str.length()>3) {
-                Stash.put(keySearch,str);
-                LOG.info(keySearch  + ": " + str);
-                break;
-            }
-        }
-    }
 }

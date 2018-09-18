@@ -1,6 +1,7 @@
 package ru.gamble.pages.prematchPages;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -271,7 +272,6 @@ public class EventViewerPage extends AbstractPage {
         }
         LOG.info("Игра по фильтру времени " + period + " (" + inPeriod + ") найдена: ");
         LOG.info(Stash.getValue("nameGameKey") + " время начала " + Stash.getValue("timeGameKey"));
-
     }
 
     public void gamePrematchAtPeriod(String period, boolean inPeriod, boolean adding) throws Exception {
@@ -308,6 +308,7 @@ public class EventViewerPage extends AbstractPage {
             //разворачиваем спорт(начнем с тенниса просто потому что не хочу футбол)
             LOG.info("Разворачиваем один спорт");
             driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]")).click();
+            LOG.info(driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/a")).getAttribute("title"));
             CommonStepDefs.workWithPreloader();
             //количество регионов в указанном спорте Например Мир,Европа и т.д.
             int regionsInSport = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/ul[1]/li")).size();
@@ -389,7 +390,7 @@ public class EventViewerPage extends AbstractPage {
     /**
      * проверка что страница Прметач соответсвует ожиданиям (открыта нужная игра и триггер по времени в правильном состоянии
      */
-    public static boolean pagePrematch(String team1, String expectedPeriod) {
+    public static boolean pagePrematch(String team1, String expectedPeriod, boolean isFavorit) {
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
         //если меню свернуто - разворачиваем
@@ -411,11 +412,23 @@ public class EventViewerPage extends AbstractPage {
         LOG.info("Проверим что нужная игра открыта по центарльной части страницы");
         String nameOnPage = driver.findElement(By.xpath("//div[@ng-switch='openGame.sport.id']/div[1]/div[contains(@class,'teams-names')]/span[1]")).getAttribute("title");
         nameOnPage = CommonStepDefs.stringParse(nameOnPage);
-        if (!CommonStepDefs.stringParse(team1).equals(nameOnPage)) {
-            flag=false;
-            LOG.error("В прематче открылась неправильная игра. Открылась игра: "+ nameOnPage + ", а ожидалось " + team1);
+        Assert.assertTrue(
+                "В прематче открылась неправильная игра. Открылась игра: "+ nameOnPage + ", а ожидалось " + team1,
+                CommonStepDefs.stringParse(team1).equals(nameOnPage));
+
+        if (isFavorit){
+            flag &= inLeftMenuGameYellow(team1);
         }
-        LOG.info("Проверяем что нужная игра активна и выделена желтым в левом меню в Моих Пари (если нужная игра есть в Избранном)");
+        return flag;
+    }
+
+    /**
+     * Проверка что нужная игра есть в Избранном в левом меню и выделена там желтым
+     */
+    public static boolean inLeftMenuGameYellow(String team1){
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
+        LOG.info("Проверяем что нужная игра активна и выделена желтым в левом меню в Моих Пари");
         List<WebElement> leftSidePage = driver.findElements(By.xpath("//div[@class='prematch-competition ng-scope']/div/div[1]/div[1]"));
         for (WebElement aLeftSidePage : leftSidePage) {
             String nameGameOnPage = aLeftSidePage.findElement(By.xpath("div[1]/div[2]")).getAttribute("title");
@@ -428,10 +441,8 @@ public class EventViewerPage extends AbstractPage {
                 break;
             }
         }
-
-        return flag;
+        return  flag;
     }
-
 
 
     @ActionTitle("очищает избранное через левое меню")

@@ -72,6 +72,7 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (PageException e) {
             LOG.error(e.getMessage());
         }
+
     }
 
     @Когда("^запрашиваем дату-время и сохраняем в память$")
@@ -278,6 +279,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String sqlRequest = "UPDATE gamebet.`user` SET registered_in_tsupis = TRUE, identified_in_tsupis = TRUE, identState = 1 WHERE `email` ='" + Stash.getValue(param) + "'";
         workWithDB(sqlRequest);
         LOG.info("Подтвердили регистрацию от ЦУПИС");
+
     }
 
     private static void workWithDB(String sqlRequest) {
@@ -296,6 +298,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+
     /**
      * Инициализируйте страницу с соответствующим заголовком (определенным через
      * {@link ru.sbtqa.tag.pagefactory.annotations.PageEntry} аннотация)
@@ -311,8 +314,10 @@ public class CommonStepDefs extends GenericStepDefs {
         PageFactory.getInstance().getPage(title);
     }
 
+
     /**
      * ожидание пока аттрибут без учета регистра будет содержать подстроку
+     *
      * @param locator
      * @param attribute
      * @param value
@@ -399,6 +404,7 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.debug("Проверка успешно выполнена");
     }
 
+
     /**
      * Провкрутка страницы на х и y
      *
@@ -424,9 +430,11 @@ public class CommonStepDefs extends GenericStepDefs {
         return nameGame;
     }
 
+
     /**
      * проверка что из Ближвйших трансляци переход на правильную игру
      * сравнивает на совпадение название спорта, команд и првоеряет есть ли видео если страница Лайв
+     *
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      */
     public void checkLinkToGame(){
@@ -693,6 +701,7 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * запрос на БД и сохранение всего ответа в map
      * @param sqlRequest
+     * @return
      */
     private static void workWithDBresult(String sqlRequest){
         Connection con = DBUtils.getConnection();
@@ -851,6 +860,7 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyPhone, phone);
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
+
 
     @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\"$")
     public void checkTimeLeft(String keyTimeLeft,String keyResponse) {
@@ -1138,6 +1148,7 @@ public class CommonStepDefs extends GenericStepDefs {
         };
 
         try {
+//            SSLContext sc = SSLContext.getInstance("SSL");
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
@@ -1529,5 +1540,27 @@ public class CommonStepDefs extends GenericStepDefs {
                 .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
                 .connect();
     }
+
+
+
+    @Когда("^вычленяем из названия игры одно слово \"([^\"]*)\" \"([^\"]*)\"$")
+    public void oneWordSearch(String keySearch,String type){
+        LOG.info(Stash.getValue("nameGameKey") + " время начала ");
+        List <String> types = Stash.getValue("typeGameKey");
+        int index = types.indexOf(type);
+        List<String> names = Stash.getValue("nameGameKey");
+        for (String str:names.get(index).split(" ")){
+            if (str.length()>3) {
+                Stash.put(keySearch,str);
+                LOG.info(keySearch  + ": " + str);
+                break;
+            }
+        }
+    }
+
+
+
+
+
 }
 
