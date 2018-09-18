@@ -24,7 +24,7 @@ public class MobileUserAccountPage extends AbstractPage {
     private WebElement pageTitle;
 
     @ElementTitle("Дата рождения")
-    @FindBy(name = "birth_date")
+    @FindBy(xpath = "//div[contains(@class,'datepicker__main')]")
     private WebElement birthDateInput;
 
     @ElementTitle("Фамилия")
