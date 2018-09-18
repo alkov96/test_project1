@@ -41,7 +41,7 @@ import static org.openqa.selenium.By.xpath;
 public class CouponPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(CouponPage.class);
 
-    @FindBy(xpath = "//div[@class='list-bet-block-top__title']")
+    @FindBy(xpath = "//div[contains(@class,'list-bet-block')]")
     private WebElement coupon;
 
     @ElementTitle("экспресс-бонус ссылка")
