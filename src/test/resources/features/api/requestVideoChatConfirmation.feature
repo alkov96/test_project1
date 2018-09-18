@@ -11,9 +11,7 @@
     * сохраняем в память
       | DEVID  | randomNumber 4 |
     * сохраняем в память
-      | USER  | testregistrator+1534949443746@yandex.ru |
-    * сохраняем в память
-      | PASSWORD  | Parol123 |
+      | PASSWORD  | Default |
 
 #  * проверка ответа API из "RESPONCE_API":
 #  | exepted | "status":11 |

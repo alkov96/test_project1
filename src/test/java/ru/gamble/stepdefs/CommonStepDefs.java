@@ -725,6 +725,9 @@ public class CommonStepDefs extends GenericStepDefs {
                     keyNormal.append(part);
                 }
                 LOG.info(keyNormal + "=" + value);
+                if(keyNormal.toString().toUpperCase().equals("PASSWORD")){
+                    continue;
+                }
                 Stash.put(keyNormal.toString().toUpperCase(),value);
                 keyNormal.setLength(0);
             }

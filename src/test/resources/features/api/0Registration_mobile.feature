@@ -26,7 +26,7 @@
   | EMAIL  | randomEmail |
 
   * сохраняем в память
-  | PASSWORD  | Parol123 |
+  | PASSWORD  | Default |
   * сохраняем в память
   | ISSUEPLACE  | random |
   * сохраняем в память

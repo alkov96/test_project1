@@ -8,7 +8,7 @@
       | DEVID  | randomNumber 4 |
 
     * сохраняем в память
-      | PASS  | Default |
+      | PASSWORD  | Default |
 
     * поиск акаунта со статуом регистрации "=2" "EMAIL"
 
@@ -18,7 +18,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID  |
       | email  | EMAIL  |
-      | pass   | PASS   |
+      | pass   | PASSWORD   |
       | source | SOURCE |
 
     * проверка ответа API из "RESPONCE_API":
@@ -35,7 +35,7 @@
       | devId       | DEVID     |
       | authToken   | AUTHTOKEN |
       | source      | SOURCE    |
-      | oldPassword | PASS      |
+      | oldPassword | PASSWORD      |
       | newPassword | NEW_PASS  |
 
     * проверка ответа API из "RESPONCE_API":
@@ -58,7 +58,7 @@
       | authToken   | AUTHTOKEN |
       | source      | SOURCE    |
       | oldPassword | NEW_PASS  |
-      | newPassword | PASS      |
+      | newPassword | PASSWORD      |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0,"data" |
@@ -67,7 +67,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID    |
       | email  | EMAIL    |
-      | pass   | PASS     |
+      | pass   | PASSWORD     |
       | source | SOURCE   |
 
     * проверка ответа API из "RESPONCE_API":

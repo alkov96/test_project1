@@ -5,7 +5,7 @@
     * сохраняем в память
       | DEVID  | randomNumber 4 |
     * сохраняем в память
-      | PASS  | Default |
+      | PASSWORD  | Default |
     * сохраняем в память
       | FIRSTNAME  | random |
     * сохраняем в память
@@ -36,7 +36,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID |
       | email       | EMAIL |
-      | pass        | PASS  |
+      | pass        | PASSWORD  |
       | source      | 16    |
 
     * проверка ответа API из "RESPONCE_API":
@@ -63,7 +63,7 @@
       | authToken   | AUTHTOKEN   |
       | source      | 16          |
       | phone       | NEWPHONE   |
-      | pass        | PASS     |
+      | pass        | PASSWORD     |
 
 
     * проверка ответа API из "RESPONCE_API":
