@@ -1382,14 +1382,23 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlRequest);
     }
 
-    @After(value = "@NewUserRegistration_C36189,@Registration_mobile,@requestVideoChatConfirmation,@Registration_fullalt_mobile,@requestPhoneCall")
-    public void returnRegistrationValue(Scenario scenario){
+    @After(value = "@NewUserRegistration_C36189")
+    public void returnRegistrationValueWithScreenshot(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");
         final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
         scenario.embed(screenshot, "image/png");
         closeBrowser();
     }
+
+
+
+    @After(value = "@Registration_mobile,@requestVideoChatConfirmation,@Registration_fullalt_mobile,@requestPhoneCall")
+    public void returnRegistrationValue(Scenario scenario){
+        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
+        changeActive("ACTIVE");
+    }
+
 
     @Когда("^возвращаем регистрацию на предыдущий способ из \"([^\"]*)\"$")
     public void returnRegistrationToPreviousMethod(String keyParams){
