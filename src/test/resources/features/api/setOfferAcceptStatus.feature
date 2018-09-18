@@ -4,7 +4,7 @@
     * сохраняем в память
       | DEVID | randomNumber 4 |
     * сохраняем в память
-      | PASSWORD  | Parol123 |
+      | PASSWORD  | Default |
     * сохраняем в память
       | SOURCE | 16 |
 
