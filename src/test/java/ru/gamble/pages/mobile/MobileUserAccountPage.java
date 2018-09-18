@@ -15,7 +15,7 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-@PageEntry(title = "Учетная запись")
+@PageEntry(title = "Учетная запись мобильная")
 public class MobileUserAccountPage extends AbstractPage {
 
     private static final Logger LOG = LoggerFactory.getLogger(MobileUserAccountPage.class);
