@@ -17,6 +17,7 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,10 +41,11 @@ public class MobileDatepickerPage extends AbstractPage {
     }
 
     @ActionTitle("выбирает дату")
-    public void selectDate(String date){
+    public void selectDate(String date1){
         WebDriver driver = PageFactory.getWebDriver();
-        String format = "12.12.2012";
-        String[] datePieces = format.split(".");
+        String date = "12.12.2012";
+        List<String> datePieces = Arrays.asList(date.split("."));
+        Collections.reverse(datePieces);
 
         //Список датапикеров
         List<WebElement> dataPikersFields = driver.findElements(By.xpath("//div[@class='datepicker-col-1']"));
@@ -51,7 +53,7 @@ public class MobileDatepickerPage extends AbstractPage {
         Collections.reverse(dataPikersFields);
         for(WebElement dataPiker :dataPikersFields){
             WebElement locator = dataPiker.findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
-//            locator.getText().equals()
+            locator.getText().equals("sdf");
             swipeElementOnOneVerticalPosition(locator, -40);
         }
 
@@ -65,6 +67,8 @@ public class MobileDatepickerPage extends AbstractPage {
     }
 
     //TODO написать метод генерации дня рождения, чтобы пользователю было от 18 до 100 лет
+
+    //TODO написать метод
 
     //TODO написать метод проверяющий что год, месяц или день соответсвуют задуманному
     private boolean checkIsSelectedStringMatchesExpected(WebElement element, String expected){
