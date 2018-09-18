@@ -33,6 +33,8 @@ public class LiveCalendarPage extends AbstractPage {
     @FindBy(xpath = "//div[@class='livecal-calendar-wrapper']")
     private WebElement centralMarkets;
 
+    @FindBy(xpath = "//div[contains(@class,'select__toggler')]/span[2]")
+    private WebElement menuForSelectingSports;
 
 
     public LiveCalendarPage() {
@@ -40,6 +42,8 @@ public class LiveCalendarPage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(centralMarkets));
+        tryingLoadPage(menuForSelectingSports,5, 10);
+        workWithPreloader();
     }
 
     @ActionTitle("ищет событие с коэффициентом")
@@ -117,25 +121,21 @@ public class LiveCalendarPage extends AbstractPage {
     }
 
     @ActionTitle("в меню выбора видов спорта выбирает")
-    public static void inSportsSelectionMenuSelect(String sport){
+    public void inSportsSelectionMenuSelect(String sport){
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Нажимаем на выпадающее меню видов спорта");
-        WebElement menuSport = driver.findElement(By.xpath("//div[contains(@class,'select__toggler')]/span[2]"));
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(menuSport));
-        if (menuSport.isDisplayed()){
-            menuSport.click();
-        } else LOG.error("Элемент не отображается");
+        menuForSelectingSports.click();
         LOG.info("Выбираем вид спорта::" + sport);
-        WebElement selectSport = menuSport.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
+        WebElement selectSport = menuForSelectingSports.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
         selectSport.click();
-        new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOf(menuSport));
+        new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOf(menuForSelectingSports));
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         LOG.info("Нажимаем на выпадающее меню видов спорта");
-        menuSport.click();
+        menuForSelectingSports.click();
     }
 
     @ActionTitle("выбирает следующий день недели с более чем событиями")
