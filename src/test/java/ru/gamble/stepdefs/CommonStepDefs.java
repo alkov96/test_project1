@@ -1393,7 +1393,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
 
-    @After(value = "@Registration_mobile,@requestVideoChatConfirmation,@Registration_fullalt_mobile,@requestPhoneCall")
+    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall")
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");
