@@ -146,13 +146,12 @@ public class LiveCalendarPage extends AbstractPage {
         List<WebElement> listOtherDeysOfWeek = currentDayOfWeek.findElements(By.xpath(xpathNextDayOfWeek));
 
         for(WebElement el:listOtherDeysOfWeek){
-                el.click();
-                LOG.info("Нажали на::[" + el.getText() + "]");
-                workWithPreloader();
-                if(el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')]"))
-                        .stream().filter(e -> e.isDisplayed() && e.getText().matches("[0-9]")).collect(Collectors.toList()).size() > Integer.parseInt(numberOfIvents)) {
+                if(el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1') and not(contains(@class,'empty'))]")).stream().collect(Collectors.toList()).size() > Integer.parseInt(numberOfIvents)) {
                     return;
                 }
+                    el.click();
+                    LOG.info("Нажали на::[" + el.getText() + "]");
+                    workWithPreloader();
         }
         throw new AutotestError("Ошибка! Недостаточно событий");
     }
