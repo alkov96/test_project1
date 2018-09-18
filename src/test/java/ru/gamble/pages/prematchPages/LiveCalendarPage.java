@@ -143,19 +143,20 @@ public class LiveCalendarPage extends AbstractPage {
         String xpathCurrentDayOfWeek = "//li[contains(@class,'tabs__tab tabs__tab_livecal') and contains(@class,'tabs__tab_active')]";
         String xpathNextDayOfWeek = "following-sibling::li";
 
-        new WebDriverWait(PageFactory.getWebDriver(), 10).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xpathCurrentDayOfWeek)));
+        new WebDriverWait(PageFactory.getWebDriver(), 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathCurrentDayOfWeek)));
 
         WebElement currentDayOfWeek = PageFactory.getDriver().findElement(By.xpath(xpathCurrentDayOfWeek));
         List<WebElement> listOtherDeysOfWeek = currentDayOfWeek.findElements(By.xpath(xpathNextDayOfWeek));
         int actualIvents = 0;
 
         for(WebElement el:listOtherDeysOfWeek){
+            el.click();
             actualIvents = el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1') and not(contains(@class,'empty'))]"))
                     .stream().collect(Collectors.toList()).size();
             if(actualIvents > Integer.parseInt(numberOfIvents)) {
                 return;
             }
-            el.click();
+
             LOG.info("Нажали на::[" + el.getText() + "]");
             workWithPreloader();
         }
