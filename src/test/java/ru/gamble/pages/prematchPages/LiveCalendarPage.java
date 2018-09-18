@@ -157,7 +157,7 @@ public class LiveCalendarPage extends AbstractPage {
                     return;
                 }
         }
-        throw new AutotestError("Ошибка! Недостаточно событий. Ожидали[" + numberOfIvents + "],а факически[" + count + "]");
+        throw new AutotestError("Ошибка! Недостаточно событий");
     }
 
 
