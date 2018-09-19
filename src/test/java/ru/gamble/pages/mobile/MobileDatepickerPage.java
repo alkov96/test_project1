@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -17,7 +18,10 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,40 +44,48 @@ public class MobileDatepickerPage extends AbstractPage {
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    @ActionTitle("выбирает дату")
-    public void selectDate(String date1){
+    @ActionTitle("выбирает случайную дату и сохраняет в")
+    public void selectDate(String keyBirthDate){
         WebDriver driver = PageFactory.getWebDriver();
-        String date = "12.12.2012";
-        List<String> datePieces = Arrays.asList(date.split("."));
-        Collections.reverse(datePieces);
+        String date = generatingDateInRequiredRange();
+        List<String> datePieces = Arrays.asList(date.split("-"));
 
         //Список датапикеров
         List<WebElement> dataPikersFields = driver.findElements(By.xpath("//div[@class='datepicker-col-1']"));
-        //Разворачиваем список
+        //Развёрнутый список датапикеров
         Collections.reverse(dataPikersFields);
-        for(WebElement dataPiker :dataPikersFields){
-            WebElement locator = dataPiker.findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
-            locator.getText().equals("sdf");
-            swipeElementOnOneVerticalPosition(locator, -40);
-        }
-
-        //Поля колеса
-        PageFactory.getWebDriver().findElements(By.xpath("//div[@class='datepicker-col-1']")).get(2).findElements(By.xpath("div/div/ul/li"));
-        //Локатор выбираемого элемента колеса
-        WebElement element = PageFactory.getWebDriver().findElements(By.xpath("//div[@class='datepicker-col-1']")).get(2).findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
-
-
+        WebElement element;
+         for(int i = 0; i < dataPikersFields.size(); i++){
+             do{
+                 element = dataPikersFields.get(i).findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
+                 if (Integer.parseInt(element.getText()) == Integer.parseInt(datePieces.get(i))) {
+                     Stash.put(keyBirthDate,date);
+                     LOG.info("Сохранили в память key [" + keyBirthDate + "] <== value [" + date + "]");
+                     return;
+                 } else if (Integer.parseInt(element.getText()) > Integer.parseInt(datePieces.get(i))) {
+                     swipeElementOnOneVerticalPosition(element, 40);
+                 } else if (Integer.parseInt(element.getText()) < Integer.parseInt(datePieces.get(i))) {
+                     swipeElementOnOneVerticalPosition(element, -40);
+                 }
+             }while(Integer.parseInt(element.getText()) != Integer.parseInt(datePieces.get(i)));
+         }
 
     }
 
-    //TODO написать метод генерации дня рождения, чтобы пользователю было от 18 до 100 лет
-
-    //TODO написать метод
-
-    //TODO написать метод проверяющий что год, месяц или день соответсвуют задуманному
-    private boolean checkIsSelectedStringMatchesExpected(WebElement element, String expected){
-       return element.getText().equals(expected);
+    /**
+     * Метод возвращает случайную строку даты в вормате "yyyy-MM-dd"
+     * от 18 до 100 лет назад
+     * для использования как даты рождения
+     */
+    private String generatingDateInRequiredRange(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        int randomRange = 6571 + (int) (Math.random() * 26280);
+        cal.add(Calendar.DAY_OF_YEAR, - randomRange);
+        LOG.info(dateFormat.format(cal.getTime()));
+        return dateFormat.format(cal.getTime());
     }
+
 
 
     //TODO написать метод двигающий элемент колеса лет, месяцев или дней на 40 пикселов вниз или вверх
@@ -84,20 +96,9 @@ public class MobileDatepickerPage extends AbstractPage {
      */
     private void swipeElementOnOneVerticalPosition(WebElement element, int displacementByY){
         WebDriver driver = PageFactory.getWebDriver();
-
-        //Локатор выбираемого элемента колеса
-//        WebElement element = PageFactory.getWebDriver().findElements(By.xpath("//div[@class='datepicker-col-1']")).get(2).findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
-//        WebElement element = driver.findElement(By.xpath(locator));
-//        int left_x = element.getLocation().getX();
-//        int right_x = left_x + element.getSize().getWidth();
-//        int middle_x = (left_x + right_x) / 2;
-//        int upper_y = element.getLocation().getY();
-//        int lower_y = upper_y + element.getSize().getHeight();
-//        int middle_y = (upper_y + lower_y) / 2;
-
         Actions actions = new Actions(driver);
         actions
-                .moveToElement(element, 0, displacementByY)
+                .dragAndDropBy(element, 0, displacementByY)
                 .build()
                 .perform();
     }
