@@ -1317,7 +1317,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Before(value = "@NewUserRegistration_C36189,@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation")
+    @Before(value = "@NewUserRegistration_C36189,@api")
     public void saveRegistrationValue(){
         String activeOptionKey = "ACTIVE";
         String activeOpt = getActiveOptions();
