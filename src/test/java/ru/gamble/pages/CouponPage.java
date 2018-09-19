@@ -158,7 +158,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, добавилось ли событие в купон")
     public void checkListOfCoupon() {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> couponList= driver.findElements(By.xpath("//div[@class='coupon-bet-list__wrap']/ul"));
+        List<WebElement> couponList= driver.findElements(By.xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']"));
         if (couponList.isEmpty()) {
             Assertions.fail("События не добавлиись в купон.");
         } else LOG.info("Событие " + couponList.size());
@@ -167,7 +167,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, совпадают ли события в купоне с ожидаемыми из")
     public void bannerAndTeams(String team1key, String team2key) {
         WebDriver driver = PageFactory.getDriver();
-        String couponGame = driver.findElement(By.xpath("//div[@class='coupon-bet-list__wrap']/ul[1]/li[1]/span[contains(@class,'bet-event-title')]")).getText();//cuponGame - наше добавленные события в купоне.
+        String couponGame = driver.findElement(By.xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']")).getText();//cuponGame - наше добавленные события в купоне.
         String team1 = Stash.getValue(team1key);
         String team2 = Stash.getValue(team2key);
         if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(couponGame))) {
@@ -179,7 +179,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, совпадает ли исход в купоне с ожидаемым")
     public void checkIshod(String ishodKey) {
         WebDriver driver = PageFactory.getDriver();
-        String ishod = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[@class='pick ng-binding']")).getText();
+        String ishod = driver.findElement(By.xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getText().split("\n")[1];
         String ishodName = Stash.getValue(ishodKey);//ожидаемое название исхода
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
             LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + " <=> " + ishodName);
@@ -192,11 +192,10 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String coefString = Stash.getValue(keyOutcome).toString();
         float coef = Float.valueOf(coefString);
-        float coefCoupon = Float.valueOf(driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice')]")).getText());//Кэфицент в купоне
-        String oldString = driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice_old')]")).getAttribute("class");//oldString - просто переменная, в которую сохраним класс, где лежит старый коэф.
-        float coefOld;
-        coefOld = oldString.contains("ng-hide") ? 0.0f : Float.valueOf(driver.findElement(By.xpath("//li[@class='coupon-bet-list__item_result']//span[contains(@class,'coupon-betprice_old')]")).getText());//Краткая запись цикла. ? - часть синтаксиса. Здесь показываем чему равен старый коэфицент. если скрыт, то 0.0.
-        if (coef != coefCoupon && coef != coefOld) {
+        float coefCoupon = Float.valueOf(driver.findElement(By.xpath("//div[@class='coupon-bet__coeffs']/span[2]")).getText());//Кэфицент в купоне
+        WebElement oldWebElement = driver.findElement(By.xpath("//span[contains(@class,'coupon-bet__coeff-strikeout')]"));
+        float oldCoef = oldWebElement.isDisplayed()? Float.valueOf(oldWebElement.getText().trim()) : coefCoupon;
+        if (coef != coefCoupon && coef != oldCoef) {
             Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCoupon + coef);
         } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon + " <=> " + coef);
 
