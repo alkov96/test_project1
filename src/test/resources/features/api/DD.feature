@@ -2,7 +2,7 @@
 Функционал: API
   Предыстория:
     * сохраняем в память
-      | PASS  | Parol123 |
+      | PASSWORD  | Default |
     * сохраняем в память
       | DEVID  | randomNumber 4 |
     * сохраняем в память
@@ -25,7 +25,7 @@
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId       | DEVID    |
       | email       | EMAIL    |
-      | pass        | PASS     |
+      | pass        | PASSWORD |
       | source      | 16       |
 
     * проверка ответа API из "RESPONCE_API":

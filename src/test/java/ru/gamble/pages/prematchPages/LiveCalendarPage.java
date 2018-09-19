@@ -150,13 +150,12 @@ public class LiveCalendarPage extends AbstractPage {
         int actualIvents = 0;
 
         for(WebElement el:listOtherDeysOfWeek){
-            el.click();
             actualIvents = el.findElements(By.xpath("//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1') and not(contains(@class,'empty'))]"))
                     .stream().collect(Collectors.toList()).size();
             if(actualIvents > Integer.parseInt(numberOfIvents)) {
                 return;
             }
-
+            el.click();
             LOG.info("Нажали на::[" + el.getText() + "]");
             workWithPreloader();
         }

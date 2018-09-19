@@ -5,15 +5,14 @@
     * сохраняем в память
       | DEVID | randomNumber 4 |
 
-    * сохраняем в память
-      | USER  | Default |
+    * поиск акаунта со статуом регистрации "=2" "EMAIL"
 
     * сохраняем в память
       | PASSWORD  | Default |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID |
-      | email  | USER  |
+      | email  | EMAIL  |
       | pass   | PASSWORD  |
       | source | 16    |
 

@@ -84,7 +84,7 @@ public abstract class AbstractPage extends Page {
     //для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
 
     @ElementTitle("Очистить всё")
-    @FindBy(xpath = "//span[@class='coupon-clear-all__text ng-binding']")
+    @FindBy(xpath = "//span[@class='btn btn_full-width']")
     protected WebElement clearCoupon;
 
 //для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки

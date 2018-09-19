@@ -725,6 +725,9 @@ public class CommonStepDefs extends GenericStepDefs {
                     keyNormal.append(part);
                 }
                 LOG.info(keyNormal + "=" + value);
+                if(keyNormal.toString().toUpperCase().equals("PASSWORD")){
+                    continue;
+                }
                 Stash.put(keyNormal.toString().toUpperCase(),value);
                 keyNormal.setLength(0);
             }
@@ -1314,13 +1317,22 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Before(value = "@NewUserRegistration_C36189")
+    @Before(value = "@NewUserRegistration_C36189,@api")
     public void saveRegistrationValue(){
         String activeOptionKey = "ACTIVE";
         String activeOpt = getActiveOptions();
         Stash.put(activeOptionKey,activeOpt);
         LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
     }
+
+
+
+    @Before()
+    public void lala(Scenario scenario){
+        LOG.info("ВЫПОЛНЯЕМ ТЕСТ");
+        LOG.info("НАЗВАНИЕ СЦЕНАРИЯ: " + scenario.getName() + "    \nТЕГИ: " + scenario.getSourceTagNames() + "    \nID СЦЕНАРИЯ: " + scenario.getId() + "\nПОЕХАЛИ!");
+    }
+
 
     @Когда("^запоминаем значение активных опций сайта в \"([^\"]*)\"$")
     public void rememberActive (String activeOptionKey){
@@ -1393,7 +1405,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
 
-    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall")
+    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation")
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");
