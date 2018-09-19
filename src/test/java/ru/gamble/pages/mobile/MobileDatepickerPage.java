@@ -32,8 +32,8 @@ public class MobileDatepickerPage extends AbstractPage {
     @FindBy(xpath = "//div[@class='datepicker-header']")
     private WebElement pageTitle;
 
-    @ElementTitle("ОК")
-    @FindBy(xpath = "//a[@class='datepicker-navbar-btn']")
+    @ElementTitle("OK")
+    @FindBy(xpath = "//div/a[contains(.,'Ok')]")
     private WebElement okButton;
 
 
@@ -59,9 +59,7 @@ public class MobileDatepickerPage extends AbstractPage {
              do{
                  element = dataPikersFields.get(i).findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
                  if (Integer.parseInt(element.getText()) == Integer.parseInt(datePieces.get(i))) {
-                     Stash.put(keyBirthDate,date);
-                     LOG.info("Сохранили в память key [" + keyBirthDate + "] <== value [" + date + "]");
-                     return;
+                     break;
                  } else if (Integer.parseInt(element.getText()) > Integer.parseInt(datePieces.get(i))) {
                      swipeElementOnOneVerticalPosition(element, 40);
                  } else if (Integer.parseInt(element.getText()) < Integer.parseInt(datePieces.get(i))) {
@@ -69,6 +67,8 @@ public class MobileDatepickerPage extends AbstractPage {
                  }
              }while(Integer.parseInt(element.getText()) != Integer.parseInt(datePieces.get(i)));
          }
+        Stash.put(keyBirthDate,date);
+        LOG.info("Сохранили в память key [" + keyBirthDate + "] <== value [" + date + "]");
 
     }
 

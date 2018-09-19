@@ -1317,7 +1317,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Before(value = "@NewUserRegistration_C36189,@api")
+    @Before(value = "@NewUserRegistration_C36189,@api,@mobile")
     public void saveRegistrationValue(){
         String activeOptionKey = "ACTIVE";
         String activeOpt = getActiveOptions();
@@ -1405,7 +1405,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
 
-    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation")
+    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");

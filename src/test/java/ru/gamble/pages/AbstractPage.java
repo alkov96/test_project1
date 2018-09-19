@@ -189,6 +189,7 @@ public abstract class AbstractPage extends Page {
             throw new AutotestError("Ошибка! Не смогли получить ссылку для аутентификации.");
         }
 
+//        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
         LOG.info("Переходим по ссылке из e-mail");
         driver.get(url + "?action=verify&" + link);
