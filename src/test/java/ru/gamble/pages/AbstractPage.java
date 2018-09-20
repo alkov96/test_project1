@@ -1,5 +1,6 @@
 package ru.gamble.pages;
 
+import cucumber.api.Scenario;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
@@ -177,29 +178,35 @@ public abstract class AbstractPage extends Page {
         String email = Stash.getValue(key);
         String link = "";
         String url = "";
-
+        Scenario scenario;
         try {
-            url = JsonLoader.getData().get(STARTING_URL).get("MAIN_URL").getValue();
+            url = Stash.getValue("MAIN_URL");
             link = YandexPostman.getLinkForAuthentication(email);
-        } catch (DataException de) {
-            LOG.error("Ошибка! Не смогли получить ссылку сайта");
         } catch (Exception e) {
             e.printStackTrace();
             throw new AutotestError("Ошибка! Не смогли получить ссылку для аутентификации.");
         }
 
-//        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
+        if(url.contains("mobile")){
+            new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(.,'Продолжить')]")));
+            driver.findElement(By.xpath("//a[contains(.,'Продолжить')]")).click();
+        }else {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
+        }
         LOG.info("Переходим по ссылке из e-mail");
         driver.get(url + "?action=verify&" + link);
 
-        LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
-        Thread.sleep(5000);
-        if (!driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).isDisplayed()){
-           Assert.fail("Ошибка! Не пояивлось диалоговое окно с надписью 'Спасибо!'");
+        if(url.contains("mobile")){
+           return;
+        }else {
+            LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
+            Thread.sleep(5000);
+            if (!driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).isDisplayed()) {
+                Assert.fail("Ошибка! Не пояивлось диалоговое окно с надписью 'Спасибо!'");
+            }
+            LOG.info("Закрываем уведомление об успешном подтверждении почты");
+            driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
         }
-        LOG.info("Закрываем уведомление об успешном подтверждении почты");
-        driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
     }
 
     /**

@@ -46,14 +46,78 @@
     * (текст появляется на странице) "Подтверждение эл. почты"
 
     * пользователь (завершает регистрацию перейдя по ссылке в) "EMAIL"
+    * (текст появляется на странице) "Учетная запись подтверждена"
+
     * пользователь (нажимает кнопку) "ПРОДОЛЖИТЬ"
+    * открывается страница "Мобильный вход"
+
+    * пользователь (залогинивается с мобильными) данными
+      | E-mail | EMAIL    |
+      | Пароль | PASSWORD |
+    * пользователь (нажимает кнопку) "ВОЙТИ"
+
+    * открывается страница "Укажите паспортные данные"
+    * пользователь (заполняет паспорт с) данными
+      | Поле ввода        | Значение | Переменная сохранения |
+      | Серия             | random   | SERIES                |
+      | Номер             | random   | NUMBER                |
+      | Дата выдачи       | random   | ISSUEDATE             |
+      | Кем выдан         | ОВД      | ISSUER                |
+      | Код подразделения | random   | ISSUERCODE            |
+      | Пол               | random   | SEX                   |
+      | Место рождения    | random   | BIRTHLACATION         |
+      | Регион            | true     | REGION                |
+      | Нас. пункт        | true     | TOWN                  |
+      | Улица             | true     | STREET                |
+      | Дом/владение      | random   | HOUSE                 |
+      | Строение          | random   | null                  |
+      | Корпус            | random   | null                  |
+      | Квартира          | random   | FLAT                  |
+
+
+    * добавляем данные в JSON объект "ADDRESS" сохраняем в память:
+      | regionKLADR       | null          |
+      | region            | REGION        |
+      | town              | TOWN          |
+      | street            | STREET        |
+      | building          | HOUSE         |
+      | bulk              | null          |
+      | flat              | FLAT          |
+
+    * добавляем данные в JSON массив "DOCUMENTS" сохраняем в память:
+      | type       | passportRus |
+      | series     | SERIES      |
+      | number     | NUMBER      |
+      | issuer     | ISSUER      |
+      | issuedate  | ISSUEDATE   |
+      | validto    | null        |
+      | issuercode | ISSUERCODE  |
+
+    * запрашиваем дату-время и сохраняем в память
+      | DATE_TIME | Current |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     * (stop)
 
 
   @mobile
-  @Login_logout
+  @MobileNewUserRegistration_C36189
   Сценарий: Регистрация нового пользователя через Wave
 
     * переходим на мобильную версию сайта
