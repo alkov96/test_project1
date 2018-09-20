@@ -34,6 +34,7 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
+
 import javax.net.ssl.*;
 import java.io.*;
 import java.math.BigDecimal;
@@ -50,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
@@ -1116,7 +1118,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String requestFull = "";
         LOG.info("Собираем строку запроса.");
         try {
-            requestFull = JsonLoader.getData().get(STARTING_URL).get("MOBILE_API").getValue() + "/" + path;
+            requestFull = JsonLoader.getData().get(STARTING_URL).get("MOBILE_URL").getValue() + "/" + path;
         } catch (DataException e) {
             e.getMessage();
         }
@@ -1271,7 +1273,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void goToSiteAndTurnOnEmulationMode(){
         WebDriver driver = PageFactory.getWebDriver();
         try {
-            driver.get(JsonLoader.getData().get(STARTING_URL).get("MOBILE_API").getValue());
+            driver.get(JsonLoader.getData().get(STARTING_URL).get("MOBILE_URL").getValue());
         } catch (DataException e) {
             e.printStackTrace();
             throw new AutotestError("Ошибка! Не смогли перейти на url мобильной версии сайта");
@@ -1317,7 +1319,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Before(value = "@NewUserRegistration_C36189,@api")
+    @Before(value = "@NewUserRegistration_C36189,@api,@mobile")
     public void saveRegistrationValue(){
         String activeOptionKey = "ACTIVE";
         String activeOpt = getActiveOptions();
@@ -1328,9 +1330,23 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Before()
-    public void lala(Scenario scenario){
-        LOG.info("ВЫПОЛНЯЕМ ТЕСТ");
-        LOG.info("НАЗВАНИЕ СЦЕНАРИЯ: " + scenario.getName() + "    \nТЕГИ: " + scenario.getSourceTagNames() + "    \nID СЦЕНАРИЯ: " + scenario.getId() + "\nПОЕХАЛИ!");
+    public void titleTest(Scenario scenario){
+        LOG.info("<================START...TEST================>");
+        LOG.info("NAME: " + scenario.getName());
+        LOG.info("TAGS: " + scenario.getSourceTagNames());
+        LOG.info("ID: " + scenario.getId().replaceAll("\\D+","") );
+        String mainUrl;
+        try {
+            if (scenario.getSourceTagNames().contains("@mobile")) {
+                mainUrl = JsonLoader.getData().get(STARTING_URL).get("MOBILE_URL").getValue();
+            } else {
+                mainUrl = JsonLoader.getData().get(STARTING_URL).get("MAIN_URL").getValue();
+            }
+            Stash.put("MAIN_URL", mainUrl);
+            LOG.info("Сохранили в память key [MAIN_URL] <== value [" + mainUrl + "]");
+        } catch (DataException e) {
+            throw new AutotestError("Ошибка! Что-то не так с URL");
+        }
     }
 
 
@@ -1405,7 +1421,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
 
-    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation")
+    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");

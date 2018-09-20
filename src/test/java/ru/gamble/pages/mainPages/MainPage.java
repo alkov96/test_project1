@@ -13,9 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
-import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -475,32 +473,10 @@ public class MainPage extends AbstractPage {
 
         LOG.info("Нажимаем на коэффициент к1 - победа первой коаманды в Гоячих Ставках");
         hotBet.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div/span")).click();
-        waitForElementPresent(By.cssSelector("div.list-bet-block-top"),10);
 
         Stash.put(team1key,team1);
         Stash.put(team2key,team2);
         Stash.put(ishodKey,team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
         Stash.put(coefKey,p1);
-    }
-
-
-
-    @ActionTitle("получает смс-код для подтверждения телефона")
-    public void getCodeSMS(String key){
-        WebDriver driver = PageFactory.getDriver();
-        String requestUrl,testReg;
-        try {
-            requestUrl = JsonLoader.getData().get("mobile-api").get("url").getValue();
-            testReg = requestUrl + "/test_registration";
-            driver.get(testReg);
-
-        } catch (DataException e) {
-            e.getMessage();
-        }
-
-        WebElement numberSring = driver.findElement(By.xpath("//li/a"));
-        String code = numberSring.getText().split(" - ")[1];
-        Stash.put(key,code);
-
     }
 }
