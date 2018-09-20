@@ -1,7 +1,8 @@
 package ru.gamble.pages.registrationPages;
 
 import cucumber.api.DataTable;
-import org.openqa.selenium.*;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -17,13 +18,13 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
-import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import static ru.gamble.utility.Constants.*;
 
@@ -149,7 +150,7 @@ public class UserAccountPage extends AbstractPage{
             }
 
             if (inputField.contains(NUMBERPHONE)) {
-                enterSellphone(value);
+                super.enterSellphone(value, cellFoneInput, cellFoneConformationInput);
                 StringBuilder builder = new StringBuilder();
                 builder.append("7").append(cellFoneInput.getAttribute("value").trim().replaceAll("\n", "").replaceAll("-", "").replaceAll(" ", ""));
                 Stash.put(saveVariable, String.valueOf(builder.toString()));
@@ -192,87 +193,6 @@ public class UserAccountPage extends AbstractPage{
                 fillField(inputEmail, Stash.getValue(key));
     }
 
-    /**
-     * Метод ввода поле номера телефона
-     *
-     * @param value вводимое значение
-     */
-    private void enterSellphone(String value){
-        WebDriver driver = PageFactory.getWebDriver();
-        String phone;
-        int count = 1;
-        do {
-            if(value.contains(RANDOM)) {
-                phone = "0" + Generators.randomNumber(9);
-                LOG.info("Вводим случайный номер телефона::+7[" + phone + "]");
-                fillField(cellFoneInput,phone);
-            } else {
-                phone = (value.matches("^[A-Z_]+$")) ? Stash.getValue(value) : value;
-                LOG.info("Вводим номер телефона без первой 7-ки [" + phone.substring(1,11) + "]");
-                fillField(cellFoneInput,phone.substring(1,11));
-            }
-
-            LOG.info("Попыток ввести номер::" + count);
-            if (count > 5) {
-                throw new AutotestError("Использовано 5 попыток ввода номера телефона");
-            }
-            ++count;
-
-        } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
-
-
-        LOG.info("Копируем смс-код для подтверждения телефона");
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
-
-        String currentHandle = driver.getWindowHandle();
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-
-        String registrationUrl = "";
-
-        try {
-            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
-        } catch (DataException e) {
-           LOG.error(e.getMessage());
-        }
-
-        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
-
-        Set<String> windows = driver.getWindowHandles();
-        windows.remove(currentHandle);
-        String newWindow = windows.toArray()[0].toString();
-
-        driver.switchTo().window(newWindow);
-
-        String xpath = "//li/a[contains(.,'" + phone + "')]";
-        WebElement numberSring = null;
-        int x = 0;
-
-        LOG.info("Пытаемся найти код подтверждения телефона");
-        for(int y = 0; y < 3; y++) {
-            try {
-                new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-                numberSring = driver.findElement(By.xpath(xpath));
-            } catch (Exception e) {
-                driver.navigate().refresh();
-            }
-            x++;
-            if (numberSring != null){break;}
-        }
-
-        if(numberSring != null && !numberSring.getText().isEmpty()) {
-            String code = numberSring.getText().split(" - ")[1];
-            driver.switchTo().window(currentHandle);
-            js.executeScript("registration_window.close()");
-
-            LOG.info("Вводим SMS-код::" + code);
-            fillField(cellFoneConformationInput,code);
-        }else {
-            throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
-        }
-        Stash.put("PHONE_NUMBER",phone);
-        LOG.info("Сохранили номер телефона в память::" + phone + "[PHONE_NUMBER]");
-
-    }
 
     /**
      * Метод ввода в поля пароля и подтверждения
