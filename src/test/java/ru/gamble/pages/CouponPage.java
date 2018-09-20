@@ -88,7 +88,7 @@ public class CouponPage extends AbstractPage {
     @FindBy(id="bonusmoney")
     private WebElement bonusBet;
 
-    @FindBy(className="coupon-banners") //баннеры в купоне
+    @FindBy(className="coupon__banners") //баннеры в купоне
     private WebElement bannersInCoupon;
 
     public CouponPage() {
