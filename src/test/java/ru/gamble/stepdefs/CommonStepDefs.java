@@ -1118,7 +1118,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String requestFull = "";
         LOG.info("Собираем строку запроса.");
         try {
-            requestFull = JsonLoader.getData().get(STARTING_URL).get("MOBILE_API").getValue() + "/" + path;
+            requestFull = JsonLoader.getData().get(STARTING_URL).get("MOBILE_URL").getValue() + "/" + path;
         } catch (DataException e) {
             e.getMessage();
         }
@@ -1273,7 +1273,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void goToSiteAndTurnOnEmulationMode(){
         WebDriver driver = PageFactory.getWebDriver();
         try {
-            driver.get(JsonLoader.getData().get(STARTING_URL).get("MOBILE_API").getValue());
+            driver.get(JsonLoader.getData().get(STARTING_URL).get("MOBILE_URL").getValue());
         } catch (DataException e) {
             e.printStackTrace();
             throw new AutotestError("Ошибка! Не смогли перейти на url мобильной версии сайта");
@@ -1330,9 +1330,23 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Before()
-    public void lala(Scenario scenario){
-        LOG.info("ВЫПОЛНЯЕМ ТЕСТ");
-        LOG.info("НАЗВАНИЕ СЦЕНАРИЯ: " + scenario.getName() + "    \nТЕГИ: " + scenario.getSourceTagNames() + "    \nID СЦЕНАРИЯ: " + scenario.getId() + "\nПОЕХАЛИ!");
+    public void titleTest(Scenario scenario){
+        LOG.info("<================START...TEST================>");
+        LOG.info("NAME: " + scenario.getName());
+        LOG.info("TAGS: " + scenario.getSourceTagNames());
+        LOG.info("ID: " + scenario.getId().replaceAll("\\D+","") );
+        String mainUrl;
+        try {
+            if (scenario.getSourceTagNames().contains("@mobile")) {
+                mainUrl = JsonLoader.getData().get(STARTING_URL).get("MOBILE_URL").getValue();
+            } else {
+                mainUrl = JsonLoader.getData().get(STARTING_URL).get("MAIN_URL").getValue();
+            }
+            Stash.put("MAIN_URL", mainUrl);
+            LOG.info("Сохранили в память key [MAIN_URL] <== value [" + mainUrl + "]");
+        } catch (DataException e) {
+            throw new AutotestError("Ошибка! Что-то не так с URL");
+        }
     }
 
 

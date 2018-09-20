@@ -74,7 +74,7 @@ public class MobileUserAccountPage extends AbstractPage {
     private WebElement acceptSubscriptionCheckbox;
 
     @ElementTitle("ПРОДОЛЖИТЬ")
-    @FindBy(xpath = "//button[@type = 'submit']")
+    @FindBy(xpath = "//button[contains(.,'Продолжить')]")
     private WebElement submitButton;
 
 

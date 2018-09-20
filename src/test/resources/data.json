@@ -2,7 +2,7 @@
   "DEV_BK": {
     "MAIN_URL": "https://dev-bk-bet-site.tsed.orglot.office/",
     "ADMIN_URL": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
-    "MOBILE_API": "https://dev-bk-bet-mobile-site.tsed.orglot.office",
+    "MOBILE_URL": "https://dev-bk-bet-mobile-site.tsed.orglot.office",
     "REGISTRATION_URL": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
     "USER": "testingsto+86@mail.ru",
     "USER_CHROME": "testingsto+86@mail.ru",
@@ -20,7 +20,7 @@
   "DEMO": {
     "MAIN_URL": "https://demo.gamebet.ru",
     "ADMIN_URL": "http://demo.gamebet.ru/admin/",
-    "MOBILE_API": "https://demo.gamebet.ru",
+    "MOBILE_URL": "https://demo.gamebet.ru",
     "REGISTRATION_URL": "https://demo.gamebet.ru/test_registration/",
     "USER": "testregistrator+1535630785521@yandex.ru",
     "USER_CHROME": "testregistrator+1535630785521@yandex.ru",

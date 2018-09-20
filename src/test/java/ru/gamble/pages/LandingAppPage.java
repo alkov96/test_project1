@@ -16,9 +16,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
-import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
@@ -33,7 +31,6 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.By.xpath;
-import static ru.gamble.utility.Constants.STARTING_URL;
 
 /**
  * @author p.sivak.
@@ -166,12 +163,8 @@ public class LandingAppPage extends AbstractPage {
         );
         List<String> allImg = new ArrayList<>();
         driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> {
-            try {
-                allImg.add(element.getAttribute("src")
-                        .replace(JsonLoader.getData().get(STARTING_URL).get("MAIN_URL").getValue()+"/images/landing/mobile_app/", ""));
-            } catch (DataException e) {
-                LOG.error(e.getMessage());
-            }
+            allImg.add(element.getAttribute("src")
+                    .replace(Stash.getValue("MAIN_URL") + "/images/landing/mobile_app/", ""));
         });
         if (!allImg.containsAll(waitingImg)) {
             flag = false;
