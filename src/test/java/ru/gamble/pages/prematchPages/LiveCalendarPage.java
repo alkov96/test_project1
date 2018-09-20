@@ -124,6 +124,7 @@ public class LiveCalendarPage extends AbstractPage {
     public void inSportsSelectionMenuSelect(String sport){
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Нажимаем на выпадающее меню видов спорта");
+        waitingForPreloadertoDisappear(30);
         menuForSelectingSports.click();
         LOG.info("Выбираем вид спорта::" + sport);
         WebElement selectSport = menuForSelectingSports.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
