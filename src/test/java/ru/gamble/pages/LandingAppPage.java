@@ -76,7 +76,7 @@ public class LandingAppPage extends AbstractPage {
 
     public static void downloadAndroid() throws IOException {
         WebDriver driver = PageFactory.getDriver();
-        if (!driver.findElement(xpath("//div[@class='modal__body modal__body_app']")).isDisplayed()) {
+        if (!driver.findElement(xpath("//div[@class='modal__android-app-text']")).isDisplayed()) {
             Assert.fail("Не открылся попап на скачивание приложения для андроида");
         } else {
             if (!driver.findElement(By.id("app_desctop_popup_link_more")).isDisplayed()) {

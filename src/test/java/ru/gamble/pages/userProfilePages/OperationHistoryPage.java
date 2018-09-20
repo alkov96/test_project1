@@ -53,7 +53,7 @@ public class OperationHistoryPage extends AbstractPage {
     private boolean pageUpdate(List<String> id) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         Thread.sleep(1000);
-        List<WebElement> newList = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell']//span[@class='history__id']/span"));
+        List<WebElement> newList = driver.findElements(By.xpath("//span[@class='history__id']/span"));
         newList.forEach(element -> {
             if (id.contains(element.getText())) {
                 id.add("idbad");
@@ -73,7 +73,8 @@ public class OperationHistoryPage extends AbstractPage {
         List<WebElement> operationsId;
 
         id.clear();
-        operationsId = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell']//span[@class='history__id']/span"));
+
+        operationsId = driver.findElements(By.xpath("//span[@class='history__id']/span"));
         operationsId.forEach(element -> id.add(element.getText()));
         currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getText());
         page.click();
@@ -84,7 +85,7 @@ public class OperationHistoryPage extends AbstractPage {
             Assert.fail("Страница не перелистнулась!! была активной страница" + currentPage + " стала активно страница " + newPage);
             result = false;
         }
-        result = pageUpdate(id);
+        result = !pageUpdate(id);
         return result;
     }
 
