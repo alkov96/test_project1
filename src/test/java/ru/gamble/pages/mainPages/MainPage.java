@@ -475,7 +475,6 @@ public class MainPage extends AbstractPage {
 
         LOG.info("Нажимаем на коэффициент к1 - победа первой коаманды в Гоячих Ставках");
         hotBet.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div/span")).click();
-        waitForElementPresent(By.cssSelector("div.list-bet-block-top"),10);
 
         Stash.put(team1key,team1);
         Stash.put(team2key,team2);
