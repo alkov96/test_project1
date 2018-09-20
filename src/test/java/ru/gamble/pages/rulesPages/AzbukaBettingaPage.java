@@ -149,10 +149,10 @@ public class AzbukaBettingaPage extends AbstractPage {
         String currentHandle = driver.getWindowHandle();
         String link = "";
 
-        for (Map<String, String> aTable : table) {
-            linkElement = aTable.get(LINK);
-            titleOnLink = aTable.get(TEXT);
-            assertThat(CommonStepDefs.goLink(getElementByTitle(linkElement), titleOnLink)).as("Не перешли на страницу с [" + titleOnLink + "]").isTrue();
+        for (int i = 0; i < table.size(); i++) {
+            linkElement = table.get(i).get(LINK);
+            titleOnLink = table.get(i).get(TEXT);
+            CommonStepDefs.goLink(getElementByTitle(linkElement), titleOnLink);
 
         }
     }
