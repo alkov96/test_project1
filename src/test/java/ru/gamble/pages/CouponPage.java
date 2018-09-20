@@ -502,13 +502,14 @@ public class CouponPage extends AbstractPage {
     public void changePreferencesCoeff() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
-        preferences.click();
         String previous;
-        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
-        WebElement coeff = driver.findElement(cssSelector("span.coupon-betprice"));
+        WebElement coeff = driver.findElement(cssSelector("div.coupon-bet__coeffs"));
         previous = coeff.getText();
-        LOG.info("Переключаемся на '" + list.get(2).getText() + "' формат отображения");
-        list.get(2).click();
+        preferences.click();
+        List<WebElement> list_of_pref = driver.findElements(By.cssSelector("span.prefs__key"));
+
+        LOG.info("Переключаемся на '" + list_of_pref.get(2).getText() + "' формат отображения");
+        list_of_pref.get(2).click();
         LOG.info("Текущее значение коэффициента : " + coeff.getText());
         Thread.sleep(350);
         if (previous.equals(coeff.getText())) {
@@ -516,7 +517,7 @@ public class CouponPage extends AbstractPage {
             Assertions.fail("Формат отображения коэффициентов не изменился");
         }
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
-        list.get(0).click();
+        list_of_pref.get(0).click();
     }
 
     @ActionTitle("выбирает ставку бонусами")

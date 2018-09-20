@@ -74,7 +74,7 @@ public abstract class AbstractPage extends Page {
     protected WebElement footerButton;
 
     @ElementTitle("Настройки")
-    @FindBy(xpath = "//span[@class='coupon-tabs__item-link coupon-text-h']")
+    @FindBy(id = "preferences")
     protected WebElement preferences;
 
     @ElementTitle("Активация Быстрой ставки")
