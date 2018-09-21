@@ -85,11 +85,6 @@ public class MobileUserAccountPage extends AbstractPage {
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    @ActionTitle("нажимает в поле ввода")
-    public void clickInputField(String inputFieldName) {
-        pressButtonAP(inputFieldName);
-    }
-
     @ActionTitle("заполняет форму с")
     public void fillsForm(DataTable dataTable) throws DataException {
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
@@ -148,95 +143,5 @@ public class MobileUserAccountPage extends AbstractPage {
             }
         }
     }
-
-//        /**
-//         * Метод ввода поле номера телефона
-//         *
-//         * @param value вводимое значение
-//         */
-//        private void enterSellphone (String value){
-//            WebDriver driver = PageFactory.getWebDriver();
-//            String phone;
-//            int count = 1;
-//            do {
-//                if (value.contains(RANDOM)) {
-//                    phone = "0" + Generators.randomNumber(9);
-//                    LOG.info("Вводим случайный номер телефона::+7[" + phone + "]");
-//                    fillField(phoneInput, phone);
-//                } else {
-//                    phone = (value.matches("^[A-Z_]+$")) ? Stash.getValue(value) : value;
-//                    LOG.info("Вводим номер телефона без первой 7-ки [" + phone.substring(1, 11) + "]");
-//                    fillField(phoneInput, phone.substring(1, 11));
-//                    ((JavascriptExecutor) driver).executeScript("");
-//                }
-//
-//                LOG.info("Попыток ввести номер::" + count);
-//                if (count > 5) {
-//                    throw new AutotestError("Использовано 5 попыток ввода номера телефона");
-//                }
-//                ++count;
-//
-//            } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
-//
-//
-//            LOG.info("Копируем смс-код для подтверждения телефона");
-//            try {
-//                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("phoneConfirmationCode")));
-//            }catch (Exception e){
-//                throw new AutotestError("Ошибка! Не появлось поле для ввода СМС-кода");
-//            }
-//            WebElement cellFoneConformationInput = driver.findElement(By.id("phoneConfirmationCode"));
-//
-//            String currentHandle = driver.getWindowHandle();
-//            JavascriptExecutor js = (JavascriptExecutor) driver;
-//
-//            String registrationUrl = "";
-//
-//            try {
-//                registrationUrl = JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
-//            } catch (DataException e) {
-//                LOG.error(e.getMessage());
-//            }
-//
-//            js.executeScript("registration_window = window.open('" + registrationUrl + "')");
-//
-//            Set<String> windows = driver.getWindowHandles();
-//            windows.remove(currentHandle);
-//            String newWindow = windows.toArray()[0].toString();
-//
-//            driver.switchTo().window(newWindow);
-//
-//            String xpath = "//li/a[contains(.,'" + phone + "')]";
-//            WebElement numberSring = null;
-//            int x = 0;
-//
-//            LOG.info("Пытаемся найти код подтверждения телефона");
-//            for (int y = 0; y < 3; y++) {
-//                try {
-//                    new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-//                    numberSring = driver.findElement(By.xpath(xpath));
-//                } catch (Exception e) {
-//                    driver.navigate().refresh();
-//                }
-//                x++;
-//                if (numberSring != null) {
-//                    break;
-//                }
-//            }
-//
-//            if (numberSring != null && !numberSring.getText().isEmpty()) {
-//                String code = numberSring.getText().split(" - ")[1];
-//                driver.switchTo().window(currentHandle);
-//                js.executeScript("registration_window.close()");
-//
-//                LOG.info("Вводим SMS-код::" + code);
-//                fillField(cellFoneConformationInput,code);
-//            } else {
-//                throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" + phone + "]");
-//            }
-//            Stash.put("PHONE_NUMBER", phone);
-//            LOG.info("Сохранили номер телефона в память::" + phone + "[PHONE_NUMBER]");
-//
-//        }
 
 }

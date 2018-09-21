@@ -17,11 +17,7 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,7 +32,6 @@ public class MobileDatepickerPage extends AbstractPage {
     @FindBy(xpath = "//div/a[contains(.,'Ok')]")
     private WebElement okButton;
 
-
     public MobileDatepickerPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
@@ -44,10 +39,11 @@ public class MobileDatepickerPage extends AbstractPage {
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    @ActionTitle("выбирает случайную дату и сохраняет в")
+    @ActionTitle("выбирает дату из")
     public void selectDate(String keyBirthDate){
         WebDriver driver = PageFactory.getWebDriver();
-        String date = generatingDateInRequiredRange();
+
+        String date = Stash.getValue(keyBirthDate);
         List<String> datePieces = Arrays.asList(date.split("-"));
 
         //Список датапикеров
@@ -67,28 +63,8 @@ public class MobileDatepickerPage extends AbstractPage {
                  }
              }while(Integer.parseInt(element.getText()) != Integer.parseInt(datePieces.get(i)));
          }
-        Stash.put(keyBirthDate,date);
-        LOG.info("Сохранили в память key [" + keyBirthDate + "] <== value [" + date + "]");
-
     }
 
-    /**
-     * Метод возвращает случайную строку даты в вормате "yyyy-MM-dd"
-     * от 18 до 100 лет назад
-     * для использования как даты рождения
-     */
-    private String generatingDateInRequiredRange(){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar cal = Calendar.getInstance();
-        int randomRange = 6571 + (int) (Math.random() * 26280);
-        cal.add(Calendar.DAY_OF_YEAR, - randomRange);
-        LOG.info(dateFormat.format(cal.getTime()));
-        return dateFormat.format(cal.getTime());
-    }
-
-
-
-    //TODO написать метод двигающий элемент колеса лет, месяцев или дней на 40 пикселов вниз или вверх
     /**
      * Метод перетаскивает элемент по координате Y(вниз или вверх)
      * @param element - локатор элемента
@@ -102,6 +78,4 @@ public class MobileDatepickerPage extends AbstractPage {
                 .build()
                 .perform();
     }
-
-
 }

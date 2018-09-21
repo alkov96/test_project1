@@ -49,7 +49,6 @@ public class MobileEnterWindow extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         waitingForPreloadertoDisappear(30);
         tryingLoadPage(inputEmail,5, 10);
-
     }
 
     @ActionTitle("залогинивается с мобильными")

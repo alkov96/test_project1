@@ -1595,9 +1595,20 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    @Когда("^генерируем дату рождения от 18 до 100 лет и сохраняем в \"([^\"]*)\"$")
+    public void generationRandomBerthDate(String keyBirthDate){
+        String birthDate = Generators.generateDateInRequiredRange();
+        Stash.put(keyBirthDate, birthDate);
+        LOG.info("Сохранили в память key [" + keyBirthDate + "] <== value [" + birthDate + "]");
+    }
 
-
-
+    @Когда("^генерируем дату выдачи паспорта в зависимости от \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
+    public void generationPassportIssueDate(String keyBirthDate, String keyIssueDate) throws ParseException {
+        String birthDate = Stash.getValue(keyBirthDate);
+        String issueDate = Generators.generatePassportIssueDate(birthDate);
+        Stash.put(keyIssueDate,issueDate);
+        LOG.info("Сохранили в память key [" + keyIssueDate + "] <== value [" + issueDate + "]");
+    }
 
 }
 
