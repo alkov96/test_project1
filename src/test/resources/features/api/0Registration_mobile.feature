@@ -285,7 +285,7 @@
       | exepted | "code":0 |
 
 
-    * запрос к API "mobile/v5/sendEmailInstructions" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v5/sendEmailInstructions" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -483,7 +483,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * запрос к API "mobile/v5/sendEmailInstructions" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v5/sendEmailInstructions" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
