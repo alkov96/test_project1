@@ -148,6 +148,7 @@ public class LandingAppPage extends AbstractPage {
     public void picsAndFooter() {
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
+        String fullURL = (Stash.getValue("MAIN_URL") + "/images/landing/mobile_app/").replace("//i","/i");
         List<String> waitingImg = Arrays.asList(
                 "ipad_screen1.png",
                 "ipad_screen6.png",
@@ -164,7 +165,7 @@ public class LandingAppPage extends AbstractPage {
         List<String> allImg = new ArrayList<>();
         driver.findElements(xpath("//img[contains(@src,'/images/landing/mobile_app')]")).forEach(element -> {
             allImg.add(element.getAttribute("src")
-                    .replace(Stash.getValue("MAIN_URL") + "/images/landing/mobile_app/", ""));
+                    .replace(fullURL, ""));
         });
         if (!allImg.containsAll(waitingImg)) {
             flag = false;
