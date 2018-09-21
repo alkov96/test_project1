@@ -260,6 +260,7 @@ public abstract class AbstractPage extends Page {
      * @param authFill - булев параметр, говорит о том обязательно ли выбирать из списка (true), или можно заполнить рандомом (false)
      */
     public void fillAddress(WebElement field, boolean authFill) {
+        WebDriver driver = PageFactory.getWebDriver();
         List<WebElement> list;
         int count = 10;
         do {
@@ -272,10 +273,11 @@ public abstract class AbstractPage extends Page {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            list = field.findElements(By.xpath("../ul[1]/li"));
+                list = field.findElements(By.xpath("../ul[1]/li"));
             count--;
             if(count<=0){ break;}
         } while (list.isEmpty() && authFill);
+
         if (field.findElements(By.xpath("../ul[1]/li")).isEmpty()) {
             field.clear();
             field.sendKeys(randomString(20));
@@ -617,8 +619,52 @@ public abstract class AbstractPage extends Page {
             throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
         }
         Stash.put("PHONE_NUMBER",phone);
-        LOG.info("Сохранили номер телефона в память::" + phone + "[PHONE_NUMBER]");
+        LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
+    }
 
+    @ActionTitle("нажимает в поле ввода")
+    public void clickInputField(String inputFieldName) {
+        pressButtonAP(inputFieldName);
+    }
+
+    /**
+     * В выбранном поле вводит один символ и если появляется выпадающий список - выбирает первый пункт из него.
+     * Иначе либо заново вводит символ и ждет список, либо заполняет поле рандомной последовательностью
+     *
+     * @param field    - поле, которое заполняем
+     * @param authFill - булев параметр, говорит о том обязательно ли выбирать из списка (true), или можно заполнить рандомом (false)
+     */
+    public void fillAddressForMobile(WebElement field, boolean authFill) {
+        WebDriver driver = PageFactory.getWebDriver();
+        List<WebElement> list;
+        String xpath = "//div[@class='form-input-menu__item']";
+        int count = 10;
+        do {
+            field.clear();
+            StringBuilder n = new StringBuilder();
+            n.append((char) ('А' + new Random().nextInt(64)));
+            field.sendKeys(n);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+                list = field.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+
+            count--;
+            if(count<=0){ break;}
+        } while (list.isEmpty() && authFill);
+
+        if (field.findElements(By.xpath(xpath)).isEmpty()) {
+            field.clear();
+            field.sendKeys(randomString(20));
+        } else
+            field.findElements(By.xpath(xpath)).get(new Random().nextInt(list.size())).click();
+
+        if (field.getAttribute("value").length() == 0) {
+            LOG.info("ОШИБКА. Нажали на пункт в выпадающем списке для города,а знчение не выбралось!!");
+            field.sendKeys(randomString(20));
+        }
     }
 }
 
