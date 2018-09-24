@@ -256,7 +256,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^генерим email в \"([^\"]*)\"$")
     public static void generateEmailAndSave(String key) {
         String value = "testregistrator+" + System.currentTimeMillis() + "@yandex.ru";
-        LOG.info("Сохраняем в память key:" + key + "|value::" + value);
+        LOG.info("Сохраняем в память key[" + key + "] <== value[" + value + "]");
         Stash.put(key, value);
     }
 
@@ -1603,9 +1603,15 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^генерируем дату выдачи паспорта в зависимости от \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
-    public void generationPassportIssueDate(String keyBirthDate, String keyIssueDate) throws ParseException {
+    public void generationPassportIssueDate(String keyBirthDate, String keyIssueDate) {
         String birthDate = Stash.getValue(keyBirthDate);
-        String issueDate = Generators.generatePassportIssueDate(birthDate);
+        String issueDate = null;
+        try {
+            issueDate = Generators.generatePassportIssueDate(birthDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new AutotestError("Ошибка! Что-то не так с форматом даты");
+        }
         Stash.put(keyIssueDate,issueDate);
         LOG.info("Сохранили в память key [" + keyIssueDate + "] <== value [" + issueDate + "]");
     }

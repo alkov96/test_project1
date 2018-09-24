@@ -32,7 +32,7 @@
     * пользователь (нажимает кнопку) "OK"
 
     * открывается страница "Учетная запись мобильная"
-    * пользователь (заполняет форму с) данными
+    * пользователь (заполняет мобильную форму с) данными
       | Поле ввода        | Значение | Переменная сохранения |
       | Фамилия           | random   | LASTNAME              |
       | Имя               | random   | FIRSTNAME             |
@@ -102,26 +102,46 @@
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
-    * (stop)
 
   @mobile
   @MobileNewUserRegistration_C36189
   Сценарий: Регистрация нового пользователя через Wave
 
-    * переходим на мобильную версию сайта
-    * открывается страница "Мобильная главная страница"
+
+    * (текст появляется на странице) "Шаг 3 из 3. Идентификация"
+    * (текст появляется на странице) "«Столото»"
+
+    * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+      | operationdatetime   | DATE_TIME     |
+      | phone               | PHONE         |
+      | firstname           | FIRSTNAME     |
+      | lastname            | LASTNAME      |
+      | paternalname        | PATERNALNAME  |
+      | sex                 | "Мужской"     |
+      | birthdate           | BIRTH_DATE    |
+      | birthlocation       | BIRTHLACATION |
+      | citizenship         | "RUS"         |
+      | publicperson        | null          |
+      | publicperson        | null          |
+      | address             | ADDRESS       |
+      | documents           | DOCUMENTS     |
+      | operationofficecode | "222"         |
+      | operatorlogin       | "333"         |
+      | inn                 | INN           |
+      | SNILS               | SNILS         |
+      | method              | betshop       |
+      | error               | ""            |
+      | reason              | ""            |
+      | identityState       | "LIMITED"     |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "state":"ok" |
 
     * (stop)
 
-    * пользователь (нажимает кнопку) "Профиль"
-    * открывается страница "Мобильный вход"
+    * (текст появляется на странице) "Вы зарегистрированы"
 
-    * пользователь (залогинивается с мобильными) данными
-    | E-mail | Default |
-    | Пароль | Default |
-
-    * пользователь (нажимает кнопку) "Войти"
-    * открывается страница "Мобильная Залогиненная страница"
+    * закрываем браузер
 
 
 

@@ -85,8 +85,8 @@ public class MobileUserAccountPage extends AbstractPage {
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    @ActionTitle("заполняет форму с")
-    public void fillsForm(DataTable dataTable) throws DataException {
+    @ActionTitle("заполняет мобильную форму с")
+    public void fillsMobileForm(DataTable dataTable) throws DataException {
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String inputField, value, saveVariable, date = "";
 
