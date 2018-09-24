@@ -70,27 +70,23 @@ public abstract class AbstractPage extends Page {
     @FindBy(className = "inpY")
     protected WebElement fieldYear;
 
-    @ElementTitle("Подвал")
-    @FindBy(xpath = "//*[@class='footer__pin']")
-    protected WebElement footerButton;
-
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
     protected WebElement preferences;
 
     @ElementTitle("Активация Быстрой ставки")
-    @FindBy(id = "quickbet")
+    @FindBy(xpath = "//div[@class='coupon__toggler']/label")
     protected WebElement quickButton;
     //для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
+
+
+    @ElementTitle("Флаг активности быстрой ставки")
+    @FindBy(xpath = "//div[@class='coupon__toggler']/input")
+    protected WebElement quickBetFlag;
 
     @ElementTitle("Очистить всё")
     @FindBy(xpath = "//span[@class='btn btn_full-width']")
     protected WebElement clearCoupon;
-
-//для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
-    @ElementTitle("поле суммы общей ставки")
-    @FindBy(id = "express-bet-input")
-    protected WebElement coupon_field;
 
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
@@ -264,6 +260,7 @@ public abstract class AbstractPage extends Page {
      * @param authFill - булев параметр, говорит о том обязательно ли выбирать из списка (true), или можно заполнить рандомом (false)
      */
     public void fillAddress(WebElement field, boolean authFill) {
+        WebDriver driver = PageFactory.getWebDriver();
         List<WebElement> list;
         int count = 10;
         do {
@@ -276,10 +273,11 @@ public abstract class AbstractPage extends Page {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            list = field.findElements(By.xpath("../ul[1]/li"));
+                list = field.findElements(By.xpath("../ul[1]/li"));
             count--;
             if(count<=0){ break;}
         } while (list.isEmpty() && authFill);
+
         if (field.findElements(By.xpath("../ul[1]/li")).isEmpty()) {
             field.clear();
             field.sendKeys(randomString(20));
@@ -393,47 +391,60 @@ public abstract class AbstractPage extends Page {
         }
     }
 
+//
+//    /**
+//     * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
+//     * @param sum
+//     */
+//    @ActionTitle("включает быструю ставку и вводит сумму")
+//    public void onQuickBet(String sum) {
+//        if (!quickBetFlag.getAttribute("class").contains("not-empty")){
+//            quickButton.click();
+//        }
+//        BigDecimal sumBet;
+//        BigDecimal one = new BigDecimal(1);
+//        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
+//        //coupon_field.clear();
+//        LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
+//        WebElement quickBetInput = getWebDriver().findElement(By.xpath("//div[@class='coupon__quickbet-input-group']//input[@type='text']"));
+//        fillField(quickBetInput,sumBet.toString());
+//        LOG.info("Ввелось в поле::" + quickBetInput.getAttribute("value"));
+//        Stash.put("sumKey", sumBet.toString());
+//        LOG.info("Сохранили в память key [sumKey] <== value [" + sumBet.toString() + "]");
+//    }
+//
+//
+////    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
+////    public void checkError(String pattern) {
+////        WebDriver driver = PageFactory.getWebDriver();
+////        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+////        List<WebElement> listErrors = driver.findElements(By.xpath("//div[contains(@class,'bet-notification__warning_visible')]"));
+////        if (listErrors.isEmpty()) {
+////            Assertions.fail("Нет никаких предупреждений в купоне");
+////        }
+////        for (WebElement error : listErrors) {
+////            if (error.getText().contains(pattern)) {
+////                LOG.info("Искомое предупреждение в купоне найдено: " + pattern);
+////                break;
+////            }
+////            if (listErrors.indexOf(error) == (listErrors.size() - 1)) {
+////                Assertions.fail("Искомого предупреждения нет в купоне!");
+////            }
+////        }
+////    }
+//
+//    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
+//    public void checkErrorsInCoupon(String expectedError){
+//        WebDriver driver = PageFactory.getWebDriver();
+//        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+//        List<WebElement> errorMessages = driver.findElements(By.xpath("//div[contains(@class,'coupon__message_error')]//span"));
+//        for (WebElement error: errorMessages){
+//            if (error.getText().contains(expectedError)) return;
+//        }
+//        Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
+//    }
 
-    /**
-     * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
-     * @param sum
-     */
-    @ActionTitle("включает быструю ставку и вводит сумму")
-    public void onQuickBet(String sum) {
-        if (!quickButton.findElement(By.xpath("..")).getAttribute("class").contains("active")) {
 
-            quickButton.click();
-        }
-        BigDecimal sumBet;
-        BigDecimal one = new BigDecimal(1);
-        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
-        //coupon_field.clear();
-        LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
-        fillField(coupon_field,sumBet.toString());
-        LOG.info("Ввелось в поле::" + coupon_field.getAttribute("value"));
-        Stash.put("sumKey", sumBet.toString());
-        LOG.info("Сохранили в память key [sumKey] <== value [" + sumBet.toString() + "]");
-    }
-
-
-    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
-    public void checkError(String pattern) {
-        WebDriver driver = PageFactory.getWebDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        List<WebElement> listErrors = driver.findElements(By.xpath("//div[contains(@class,'bet-notification__warning_visible')]"));
-        if (listErrors.isEmpty()) {
-            Assertions.fail("Нет никаких предупреждений в купоне");
-        }
-        for (WebElement error : listErrors) {
-            if (error.getText().contains(pattern)) {
-                LOG.info("Искомое предупреждение в купоне найдено: " + pattern);
-                break;
-            }
-            if (listErrors.indexOf(error) == (listErrors.size() - 1)) {
-                Assertions.fail("Искомого предупреждения нет в купоне!");
-            }
-        }
-    }
     @ActionTitle("ждёт мс")
     public void whait(String ms) throws InterruptedException {
         int time = Integer.parseInt(ms);
@@ -560,7 +571,14 @@ public abstract class AbstractPage extends Page {
 
 
         LOG.info("Копируем смс-код для подтверждения телефона");
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
+        try {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
+        }catch (Exception e){
+            e.getMessage();
+            throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
+        }
+
+
 
         String currentHandle = driver.getWindowHandle();
         JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -608,8 +626,52 @@ public abstract class AbstractPage extends Page {
             throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
         }
         Stash.put("PHONE_NUMBER",phone);
-        LOG.info("Сохранили номер телефона в память::" + phone + "[PHONE_NUMBER]");
+        LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
+    }
 
+    @ActionTitle("нажимает в поле ввода")
+    public void clickInputField(String inputFieldName) {
+        pressButtonAP(inputFieldName);
+    }
+
+    /**
+     * В выбранном поле вводит один символ и если появляется выпадающий список - выбирает первый пункт из него.
+     * Иначе либо заново вводит символ и ждет список, либо заполняет поле рандомной последовательностью
+     *
+     * @param field    - поле, которое заполняем
+     * @param authFill - булев параметр, говорит о том обязательно ли выбирать из списка (true), или можно заполнить рандомом (false)
+     */
+    public void fillAddressForMobile(WebElement field, boolean authFill) {
+        WebDriver driver = PageFactory.getWebDriver();
+        List<WebElement> list;
+        String xpath = "//div[@class='form-input-menu__item']";
+        int count = 10;
+        do {
+            field.clear();
+            StringBuilder n = new StringBuilder();
+            n.append((char) ('А' + new Random().nextInt(64)));
+            field.sendKeys(n);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+                list = field.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+
+            count--;
+            if(count<=0){ break;}
+        } while (list.isEmpty() && authFill);
+
+        if (field.findElements(By.xpath(xpath)).isEmpty()) {
+            field.clear();
+            field.sendKeys(randomString(20));
+        } else
+            field.findElements(By.xpath(xpath)).get(new Random().nextInt(list.size())).click();
+
+        if (field.getAttribute("value").length() == 0) {
+            LOG.info("ОШИБКА. Нажали на пункт в выпадающем списке для города,а знчение не выбралось!!");
+            field.sendKeys(randomString(20));
+        }
     }
 }
 
