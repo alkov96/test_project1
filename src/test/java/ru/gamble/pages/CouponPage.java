@@ -34,6 +34,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
+import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 /**
  * @author p.sivak.
@@ -45,6 +46,20 @@ public class CouponPage extends AbstractPage {
 
     @FindBy(xpath = "//div[contains(@class,'list-bet-block')]")
     private WebElement coupon;
+
+    @ElementTitle("Активация Быстрой ставки")
+    @FindBy(xpath = "//div[@class='coupon__toggler']/label")
+    protected WebElement quickButton;
+    //для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
+
+
+    @ElementTitle("Флаг активности быстрой ставки")
+    @FindBy(xpath = "//div[@class='coupon__toggler']/input")
+    protected WebElement quickBetFlag;
+
+    @ElementTitle("Очистить всё")
+    @FindBy(xpath = "//span[@class='btn btn_full-width']")
+    protected WebElement clearCoupon;
 
     @ElementTitle("экспресс-бонус ссылка")
     @FindBy(xpath = "//div[@class='coupon-bonus-info coupon-bonus-info-link']")
@@ -316,14 +331,66 @@ public class CouponPage extends AbstractPage {
         }
     }
 
+//    public void checkErrorsInCoupon(String expectedError){
+//        List<WebElement> errorMessages = PageFactory.getDriver().findElements(By.xpath("//div[contains(@class,'coupon__message_error')]//span"));
+//        for (WebElement error: errorMessages){
+//            if (error.getText().contains(expectedError)) return;
+//        }
+//        Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
+//    }
+
+
+    /**
+     * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
+     * @param sum
+     */
+    @ActionTitle("включает быструю ставку и вводит сумму")
+    public void onQuickBet(String sum) {
+        if (!quickBetFlag.getAttribute("class").contains("not-empty")){
+            quickButton.click();
+        }
+        BigDecimal sumBet;
+        BigDecimal one = new BigDecimal(1);
+        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
+        //coupon_field.clear();
+        LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
+        WebElement quickBetInput = getWebDriver().findElement(By.xpath("//div[@class='coupon__quickbet-input-group']//input[@type='text']"));
+        fillField(quickBetInput,sumBet.toString());
+        LOG.info("Ввелось в поле::" + quickBetInput.getAttribute("value"));
+        Stash.put("sumKey", sumBet.toString());
+        LOG.info("Сохранили в память key [sumKey] <== value [" + sumBet.toString() + "]");
+    }
+
+
+//    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
+//    public void checkError(String pattern) {
+//        WebDriver driver = PageFactory.getWebDriver();
+//        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+//        List<WebElement> listErrors = driver.findElements(By.xpath("//div[contains(@class,'bet-notification__warning_visible')]"));
+//        if (listErrors.isEmpty()) {
+//            Assertions.fail("Нет никаких предупреждений в купоне");
+//        }
+//        for (WebElement error : listErrors) {
+//            if (error.getText().contains(pattern)) {
+//                LOG.info("Искомое предупреждение в купоне найдено: " + pattern);
+//                break;
+//            }
+//            if (listErrors.indexOf(error) == (listErrors.size() - 1)) {
+//                Assertions.fail("Искомого предупреждения нет в купоне!");
+//            }
+//        }
+//    }
+
+    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
     public void checkErrorsInCoupon(String expectedError){
-        List<WebElement> errorMessages = PageFactory.getDriver().findElements(By.xpath("//div[contains(@class,'coupon__message_error')]//span"));
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        List<WebElement> errorMessages = driver.findElements(By.xpath("//div[contains(@class,'coupon__message_error')]//span"));
         for (WebElement error: errorMessages){
             if (error.getText().contains(expectedError)) return;
         }
         Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
     }
-
 
 
 

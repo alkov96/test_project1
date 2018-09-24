@@ -70,27 +70,23 @@ public abstract class AbstractPage extends Page {
     @FindBy(className = "inpY")
     protected WebElement fieldYear;
 
-    @ElementTitle("Подвал")
-    @FindBy(xpath = "//*[@class='footer__pin']")
-    protected WebElement footerButton;
-
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
     protected WebElement preferences;
 
     @ElementTitle("Активация Быстрой ставки")
-    @FindBy(id = "quickbet")
+    @FindBy(xpath = "//div[@class='coupon__toggler']/label")
     protected WebElement quickButton;
     //для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
+
+
+    @ElementTitle("Флаг активности быстрой ставки")
+    @FindBy(xpath = "//div[@class='coupon__toggler']/input")
+    protected WebElement quickBetFlag;
 
     @ElementTitle("Очистить всё")
     @FindBy(xpath = "//span[@class='btn btn_full-width']")
     protected WebElement clearCoupon;
-
-//для ставок экспресс, быстрой ставки - т.е. там где 1 поле для ставки
-    @ElementTitle("поле суммы общей ставки")
-    @FindBy(id = "express-bet-input")
-    protected WebElement coupon_field;
 
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
@@ -395,47 +391,60 @@ public abstract class AbstractPage extends Page {
         }
     }
 
+//
+//    /**
+//     * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
+//     * @param sum
+//     */
+//    @ActionTitle("включает быструю ставку и вводит сумму")
+//    public void onQuickBet(String sum) {
+//        if (!quickBetFlag.getAttribute("class").contains("not-empty")){
+//            quickButton.click();
+//        }
+//        BigDecimal sumBet;
+//        BigDecimal one = new BigDecimal(1);
+//        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
+//        //coupon_field.clear();
+//        LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
+//        WebElement quickBetInput = getWebDriver().findElement(By.xpath("//div[@class='coupon__quickbet-input-group']//input[@type='text']"));
+//        fillField(quickBetInput,sumBet.toString());
+//        LOG.info("Ввелось в поле::" + quickBetInput.getAttribute("value"));
+//        Stash.put("sumKey", sumBet.toString());
+//        LOG.info("Сохранили в память key [sumKey] <== value [" + sumBet.toString() + "]");
+//    }
+//
+//
+////    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
+////    public void checkError(String pattern) {
+////        WebDriver driver = PageFactory.getWebDriver();
+////        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+////        List<WebElement> listErrors = driver.findElements(By.xpath("//div[contains(@class,'bet-notification__warning_visible')]"));
+////        if (listErrors.isEmpty()) {
+////            Assertions.fail("Нет никаких предупреждений в купоне");
+////        }
+////        for (WebElement error : listErrors) {
+////            if (error.getText().contains(pattern)) {
+////                LOG.info("Искомое предупреждение в купоне найдено: " + pattern);
+////                break;
+////            }
+////            if (listErrors.indexOf(error) == (listErrors.size() - 1)) {
+////                Assertions.fail("Искомого предупреждения нет в купоне!");
+////            }
+////        }
+////    }
+//
+//    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
+//    public void checkErrorsInCoupon(String expectedError){
+//        WebDriver driver = PageFactory.getWebDriver();
+//        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+//        List<WebElement> errorMessages = driver.findElements(By.xpath("//div[contains(@class,'coupon__message_error')]//span"));
+//        for (WebElement error: errorMessages){
+//            if (error.getText().contains(expectedError)) return;
+//        }
+//        Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
+//    }
 
-    /**
-     * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
-     * @param sum
-     */
-    @ActionTitle("включает быструю ставку и вводит сумму")
-    public void onQuickBet(String sum) {
-        if (!quickButton.findElement(By.xpath("..")).getAttribute("class").contains("active")) {
 
-            quickButton.click();
-        }
-        BigDecimal sumBet;
-        BigDecimal one = new BigDecimal(1);
-        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
-        //coupon_field.clear();
-        LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
-        fillField(coupon_field,sumBet.toString());
-        LOG.info("Ввелось в поле::" + coupon_field.getAttribute("value"));
-        Stash.put("sumKey", sumBet.toString());
-        LOG.info("Сохранили в память key [sumKey] <== value [" + sumBet.toString() + "]");
-    }
-
-
-    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
-    public void checkError(String pattern) {
-        WebDriver driver = PageFactory.getWebDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        List<WebElement> listErrors = driver.findElements(By.xpath("//div[contains(@class,'bet-notification__warning_visible')]"));
-        if (listErrors.isEmpty()) {
-            Assertions.fail("Нет никаких предупреждений в купоне");
-        }
-        for (WebElement error : listErrors) {
-            if (error.getText().contains(pattern)) {
-                LOG.info("Искомое предупреждение в купоне найдено: " + pattern);
-                break;
-            }
-            if (listErrors.indexOf(error) == (listErrors.size() - 1)) {
-                Assertions.fail("Искомого предупреждения нет в купоне!");
-            }
-        }
-    }
     @ActionTitle("ждёт мс")
     public void whait(String ms) throws InterruptedException {
         int time = Integer.parseInt(ms);
