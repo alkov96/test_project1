@@ -93,7 +93,7 @@ public class CouponPage extends AbstractPage {
     private WebElement buttonBet;
 
     @ElementTitle("переключатель ставки на бонусы")
-    @FindBy(id="bonusmoney")
+    @FindBy(xpath="//li[contains(@class, 'coupon-bet__row coupon-bet__row_inputs')]/div[@class='coupon__button-group']/label[2]")
     private WebElement bonusBet;
 
     @FindBy(className="coupon__banners") //баннеры в купоне
@@ -582,7 +582,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("выбирает ставку бонусами")
     public void onBonus(){
         WebDriver driver = PageFactory.getDriver();
-        if (!driver.findElement(xpath("//div[@id='bonusmoney']/..")).getAttribute("class").contains("active")){
+        if (driver.findElement(xpath("//span[contains(@class,'bonusmoney-text')]")).isDisplayed()) {
             bonusBet.click();
         }
         LOG.info("Купон перключен на ставку БОНУСАМИ");

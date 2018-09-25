@@ -571,7 +571,14 @@ public abstract class AbstractPage extends Page {
 
 
         LOG.info("Копируем смс-код для подтверждения телефона");
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
+        try {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
+        }catch (Exception e){
+            e.getMessage();
+            throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
+        }
+
+
 
         String currentHandle = driver.getWindowHandle();
         JavascriptExecutor js = (JavascriptExecutor) driver;

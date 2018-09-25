@@ -9,9 +9,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Random;
 
 public class Generators {
@@ -97,36 +97,65 @@ public class Generators {
 
     /**
      * Метод возвращает случайную строку даты в вормате "yyyy-MM-dd"
-     * от вчерашней даты до 1995 года если дата рождения на 1995 год была более 14 лет
-     * и oт вчерашней даты до 14 лет от даты рождения если на 1995 год человеку было менее 14 лет
+     * от '1997-10-01' до текущей даты в зависимости от текущего возраста пользователя
      */
     public static String generatePassportIssueDate(String birthDate) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        ZoneId defaultZoneId = ZoneId.systemDefault();
         Random random = new Random();
         Calendar cal = Calendar.getInstance();
-        //Сохраняем текущую дату
-        Date currentDate = cal.getTime();
+        LocalDate randomBirthDate = null;
 
-        //Сохраняем нижнюю границу выдачи паспорта в России
-        Date lowerBorderDate = dateFormat.parse("1995-01-01");
+        int minDay;
 
-        //Cохраняем дату рождения
-        Date date = dateFormat.parse(birthDate);
+        //Преобразуем текущую дату в LocalDate
+        LocalDate currentDate = cal.getTime().toInstant().atZone(defaultZoneId).toLocalDate();
 
-        //Устанавливаем и сохраняем дату рождения + 14 лет
-        cal.setTime(date);
-        cal.add(Calendar.DAY_OF_YEAR,+14);
-        Date birthDatePlusForthteen = dateFormat.parse(dateFormat.format(cal.getTime()));
+        //Преобразуем дату рождения в LocalDate
+        LocalDate birthday = dateFormat.parse(birthDate).toInstant().atZone(defaultZoneId).toLocalDate();
 
-        int minDay = (birthDatePlusForthteen.before(lowerBorderDate))
-                ? (int) lowerBorderDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay()
-                : (int) birthDatePlusForthteen.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay();
+        //Устанавливаем сколько полных лет человеку на текущую дату
+        int fullYearsOld = Period.between(birthday, currentDate).getYears();
 
-        int maxDay = (int) currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay();
-        int randomRange = minDay + random.nextInt(maxDay - minDay);
-        LocalDate randomBirthDate = LocalDate.ofEpochDay(randomRange);
+        //Преобразуем первый день перехода на современный Российский паспорт в LocalDate
+        LocalDate firstDateRussinPassport = dateFormat.parse("1997-10-01").toInstant().atZone(defaultZoneId).toLocalDate();
+
+
+        // Если ему 45 и более
+        if(fullYearsOld >= 45){
+            // Вычисляем дату 45-летия равную или позже 1997 года
+
+            cal.set(birthday.getYear(),birthday.getMonthValue(),birthday.getDayOfMonth());
+            cal.add(Calendar.DAY_OF_YEAR, +45);
+            LocalDate dirthdayPlus45 = dateFormat.parse(dateFormat.format(cal.getTime())).toInstant().atZone(defaultZoneId).toLocalDate();
+
+            minDay = (dirthdayPlus45.isBefore(firstDateRussinPassport))
+                    ? (int) firstDateRussinPassport.toEpochDay()
+                    : (int) dirthdayPlus45.toEpochDay();
+
+            // Если ему от 20 до 45
+        }else if(fullYearsOld < 45 && fullYearsOld >= 20){
+            // Вычисляем дату 20-летия равную и позже 1997 года
+            cal.set(birthday.getYear(),birthday.getMonthValue(),birthday.getDayOfMonth());
+            cal.add(Calendar.DAY_OF_YEAR, +20);
+            LocalDate dirthdayPlus20 = dateFormat.parse(dateFormat.format(cal.getTime())).toInstant().atZone(defaultZoneId).toLocalDate();
+
+            minDay = (dirthdayPlus20.isBefore(firstDateRussinPassport))
+                    ? (int) firstDateRussinPassport.toEpochDay()
+                    : (int) dirthdayPlus20.toEpochDay();
+
+        }else {
+            // Вычисляем дату 14-летия
+            cal.set(birthday.getYear(),birthday.getMonthValue(),birthday.getDayOfMonth());
+            cal.add(Calendar.DAY_OF_YEAR, +14);
+            LocalDate dirthdayPlus14 = dateFormat.parse(dateFormat.format(cal.getTime())).toInstant().atZone(defaultZoneId).toLocalDate();
+
+            minDay = (int) dirthdayPlus14.toEpochDay();
+        }
+            int maxDay = (int) currentDate.toEpochDay();
+            int randomRange = minDay + random.nextInt(maxDay - minDay);
+            randomBirthDate = LocalDate.ofEpochDay(randomRange);
 
         return randomBirthDate.toString();
     }
-
 }
