@@ -386,25 +386,6 @@ public class CouponPage extends AbstractPage {
     }
 
 
-//    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
-//    public void checkError(String pattern) {
-//        WebDriver driver = PageFactory.getWebDriver();
-//        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-//        List<WebElement> listErrors = driver.findElements(By.xpath("//div[contains(@class,'bet-notification__warning_visible')]"));
-//        if (listErrors.isEmpty()) {
-//            Assertions.fail("Нет никаких предупреждений в купоне");
-//        }
-//        for (WebElement error : listErrors) {
-//            if (error.getText().contains(pattern)) {
-//                LOG.info("Искомое предупреждение в купоне найдено: " + pattern);
-//                break;
-//            }
-//            if (listErrors.indexOf(error) == (listErrors.size() - 1)) {
-//                Assertions.fail("Искомого предупреждения нет в купоне!");
-//            }
-//        }
-//    }
-
     @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
     public void checkErrorsInCoupon(String expectedError){
         WebDriver driver = PageFactory.getWebDriver();
@@ -608,5 +589,24 @@ public class CouponPage extends AbstractPage {
         }
     }
 
+    @ActionTitle("выбирает авто-переключение купона на")
+    public void autoSelectCoupon(String autoSelect ){
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("Переключаемся на вкладку настроек купона");
+        driver.findElement(By.xpath("//i[contains(@class,'coupon-tabs__item-icon')]")).click();
+        LOG.info("Выбираем пункт " + autoSelect);
+         driver.findElement(By.xpath("//span[@class='coupon-settings__radio-label-text' and normalize-space(text())='" + autoSelect + "']")).click();
+         LOG.info("Возвращаемся во вкладку Купон");
+        driver.findElement(By.xpath("//li[contains(@class,'coupon-tabs__item')]/span[normalize-space(text())='Купон']")).click();
+    }
+
+    @ActionTitle("проверяет что текущий тип купона")
+    public void checkCurrentTypeCoupon(String expectedType){
+        String currentType = getWebDriver().findElement(
+                By.xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]/span")).getText();
+        assertTrue(
+                "Текущий тип купона неправильный! Ожидалось " + expectedType + ", а на самом деле " + currentType,
+                currentType.trim().equalsIgnoreCase(expectedType));
+    }
 }
 
