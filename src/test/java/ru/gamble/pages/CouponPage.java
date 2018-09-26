@@ -400,7 +400,7 @@ public class CouponPage extends AbstractPage {
 
 
     @ActionTitle("заключает пари")
-    public void doBet() throws AuthenticationException {
+    public void doBet() throws AuthenticationException, InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         String xpathBet ="//input[contains(@class,'input coupon__input') and not(@id='bet-input')]";
 
@@ -426,7 +426,12 @@ public class CouponPage extends AbstractPage {
         waitingForPreloadertoDisappear(30);
 
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
-        new WebDriverWait(driver, 10).until(ExpectedConditions.numberOfElementsToBe(By.xpath(xpathBet),expectedCouponSize));
+        Thread.sleep(10000);
+        if (driver.findElements(By.xpath("//ul[@class='coupon-bet__content']")).size()>expectedCouponSize){
+            Assertions.fail("Ставка не принялась!");
+        } else LOG.info("Ставка принялась!");
+
+        //new WebDriverWait(driver, 10).until(ExpectedConditions.numberOfElementsToBe(By.xpath(xpathBet),expectedCouponSize));
 
     }
 
@@ -439,7 +444,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         BigDecimal currentBalance, previousBalance, sumBet;
 
-        By balance = param.equals("бонусов") ? By.xpath("//div[contains(@class,'bonusmoney-sum')]") : By.id("topPanelWalletBalance");
+        By balance = param.equals("бонусов") ? By.xpath("//span[contains(@class,'subMenuBonus bonusmoney')]") : By.id("topPanelWalletBalance");
         String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         int count = 30;
         previousBalance = new BigDecimal(Stash.getValue(key).toString().replace("Б","").trim()).setScale(2, RoundingMode.HALF_UP);
