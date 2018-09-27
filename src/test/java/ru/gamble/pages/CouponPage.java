@@ -452,7 +452,8 @@ public class CouponPage extends AbstractPage {
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.HALF_UP);
         String currentNumber;
         while (count > 0){
-            currentNumber = driver.findElements(balance).stream().filter(WebElement::isDisplayed).findFirst().get().getText();
+            currentNumber = driver.findElements(balance).stream().filter(WebElement::isDisplayed).findFirst().get().getText()
+                    .replace("Б","").trim();
 
             currentBalance = new BigDecimal(currentNumber).setScale(2, RoundingMode.HALF_UP);
 
