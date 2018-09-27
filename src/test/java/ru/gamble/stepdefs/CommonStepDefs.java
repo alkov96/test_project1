@@ -1380,23 +1380,25 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \"([^\"]*)\"$")
     public void rememberActiveAndOffOption(String key,DataTable dataTable) {
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        StringBuilder activeOpt = new StringBuilder(workWithDBgetResult(sqlRequest, "value"));
-        Stash.put(key, activeOpt.toString());
+        String activeOpt = workWithDBgetResult(sqlRequest, "value");
+        Stash.put(key, activeOpt);
 
         Map<String,String> table = dataTable.asMap(String.class,String.class);
         for (Map.Entry<String, String> entry : table.entrySet()) {
             String option = entry.getKey();
-            if (entry.getValue().equals("true")) {
-                activeOpt.append(", ").append(entry.getKey());
+            if (entry.getValue().equals("true") && !activeOpt.contains(option)) {
+                activeOpt=activeOpt + ", " + option;
                 continue;
             }
-            activeOpt = new StringBuilder(activeOpt.toString().replace(", " + option, ""));
-            activeOpt = new StringBuilder(activeOpt.toString().replace("," + option, ""));
+            else if (activeOpt.contains(option) && entry.getValue().equals("true")) {continue;}
+
+            activeOpt = activeOpt.replaceAll("[', '|',']"  + option , "");
+            activeOpt =activeOpt.replaceAll(option + "[', '|',']"   , "");
             LOG.info("Удаление активной опций сайта " + option);
         }
 
-        activeOpt = new StringBuilder(activeOpt.toString().trim());
-        activeOpt = new StringBuilder(activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt.toString());
+        activeOpt = activeOpt.trim();
+        activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
         sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
         workWithDB(sqlRequest);
     }
