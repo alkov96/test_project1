@@ -49,14 +49,14 @@ public class MobileDatepickerPage extends AbstractPage {
 
     /**
      * Метод устанавливает дату в Датапикере и проверяет что ввелось верно
-     * @param keyBirthDate - строка даты в формате yyyy-MM-dd
+     * @param keyDate - строка даты в формате yyyy-MM-dd
      */
     @ActionTitle("выбирает дату из")
-    public void selectDate(String keyBirthDate){
+    public void selectDate(String keyDate){
         WebDriver driver = PageFactory.getWebDriver();
 
-        String settableDate = Stash.getValue(keyBirthDate);
-        LOG.info("Достали из памяти: key[" + keyBirthDate + "]==> value[" + settableDate + "]");
+        String settableDate = Stash.getValue(keyDate);
+        LOG.info("Достали из памяти: key[" + keyDate + "]==> value[" + settableDate + "]");
         List<String> datePieces = Arrays.asList(settableDate.split("-"));
 
         //Список датапикеров
@@ -66,22 +66,19 @@ public class MobileDatepickerPage extends AbstractPage {
         WebElement element;
          for(int i = 0; i < dataPikersFields.size(); i++){
              element = dataPikersFields.get(i).findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
-             while(Integer.parseInt(element.getText()) != Integer.parseInt(datePieces.get(i))){
-
-                 if (Integer.parseInt(element.getText()) > Integer.parseInt(datePieces.get(i))) {
+             while(Integer.parseInt(element.getAttribute("innerText")) != Integer.parseInt(datePieces.get(i))){
+                 if (Integer.parseInt(element.getAttribute("innerText")) > Integer.parseInt(datePieces.get(i))) {
                      swipeElementOnOneVerticalPosition(element, 40);
-                 } else if (Integer.parseInt(element.getText()) < Integer.parseInt(datePieces.get(i))) {
+                 } else if (Integer.parseInt(element.getAttribute("innerText")) < Integer.parseInt(datePieces.get(i))) {
                      swipeElementOnOneVerticalPosition(element, -40);
                  }
                  element = dataPikersFields.get(i).findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
              }
-
              try {
-                 Thread.sleep(1000);
+                 Thread.sleep(500);
              } catch (InterruptedException e) {
                  e.printStackTrace();
              }
-
          }
          
         // Проверяем введённую дату с той что пытались ввести
@@ -101,7 +98,6 @@ public class MobileDatepickerPage extends AbstractPage {
              expectedDate = dateFormat2.parse(settableDate).toInstant().atZone(defaultZoneId).toLocalDate();
                     } catch (ParseException e) {
             e.printStackTrace();
-
          }
         assertThat(actualDate.isEqual(expectedDate)).as("Ожидали[" + expectedDate.toString() + "],а получили[" + actualDate.toString() + "]").isTrue();
     }

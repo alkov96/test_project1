@@ -108,13 +108,13 @@ public class MobileSpecifyPassportDataPage extends AbstractPage {
             value = aData.get(VALUE);
             saveVariable = aData.get(SAVE_VALUE);
 
-            if (inputField.contains("Серия и номер")) {
+            if (inputField.contains(SERIAL)) {
                 serial = (value.equals(RANDOM)) ? Generators.randomNumber(4) : value;
                 fillField(serialAndNumberInput, serial);
                 Stash.put(saveVariable, String.valueOf(serial));
                 LOG.info(saveVariable + "<==[" + serial + "]");
             }
-            if (inputField.contains("Серия и номер")) {
+            if (inputField.contains(NUMBER)) {
                 number = (value.equals(RANDOM)) ? Generators.randomNumber(6) : value;
                 serialAndNumberInput.sendKeys(number);
                 Stash.put(saveVariable, String.valueOf(number));
