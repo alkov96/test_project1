@@ -140,7 +140,11 @@ public class DayEventsPage extends AbstractPage {
         driver.findElement(By.id("elected")).click();
     }
 
+
     public static void addEventsToCouponF () throws InterruptedException {
+        addEventsToCouponF(6);
+    }
+    public static void addEventsToCouponF (int countBet) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         int counter = 0;
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
@@ -153,7 +157,7 @@ public class DayEventsPage extends AbstractPage {
                 event.getText();
                 LOG.info("Событие добавилось в купон");
                 counter++;
-                if (counter >= 6) break;
+                if (counter >= countBet) break;
             }
         }else {
             throw new AutotestError("Ошибка! Лайв->События дня:: Ни одного события не найдено.");
@@ -163,6 +167,12 @@ public class DayEventsPage extends AbstractPage {
     @ActionTitle("добавляет несколько событий в купон")
     public void addEventsToCoupon() throws InterruptedException {
         addEventsToCouponF();
+    }
+
+
+    @ActionTitle("добавляет события в купон")
+    public void addEventsToCouponCount(String count) throws InterruptedException {
+        addEventsToCouponF(Integer.valueOf(count));
     }
 }
 

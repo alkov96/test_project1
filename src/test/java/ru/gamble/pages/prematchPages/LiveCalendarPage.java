@@ -1,5 +1,6 @@
 package ru.gamble.pages.prematchPages;
 
+import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -106,6 +107,10 @@ public class LiveCalendarPage extends AbstractPage {
             throw new AutotestError("Ошибка! Количество событий::" + coefficients.size());
         }
         do {
+            if (coefficients.size()<=number){
+                LOG.info("Всего добавлось ставок" + count);
+                break;
+            }
             LOG.info("coefficients = " + coefficients.size());
             num = random.nextInt(Math.abs(coefficients.size() - 1 - count));
             LOG.info("num = " + num);
