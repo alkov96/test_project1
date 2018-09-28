@@ -89,7 +89,7 @@ public class CouponPage extends AbstractPage {
 
     @ElementTitle("кнопка Заключить пари для Экспресса и Системы")
     //@FindBy(id="place-bet-button")
-    @FindBy(xpath = "//button[normalize-space(text())='Заключить пари']")
+    @FindBy(xpath = "//button[contains(@class,'btn_coupon') and normalize-space(text())='Заключить пари']")
     private WebElement buttonBet;
 
     @ElementTitle("переключатель ставки на бонусы")
@@ -613,6 +613,11 @@ public class CouponPage extends AbstractPage {
         assertTrue(
                 "Текущий тип купона неправильный! Ожидалось " + expectedType + ", а на самом деле " + currentType,
                 currentType.trim().equalsIgnoreCase(expectedType));
+    }
+
+    @ActionTitle("переходит на вкладку")
+    public void changeTabCoupon(String tab){
+        LOG.info("todo");
     }
 }
 
