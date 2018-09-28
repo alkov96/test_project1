@@ -1,7 +1,6 @@
 package ru.gamble.pages;
 
 import cucumber.api.Scenario;
-import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.openqa.selenium.*;
@@ -24,13 +23,10 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -391,60 +387,6 @@ public abstract class AbstractPage extends Page {
         }
     }
 
-//
-//    /**
-//     * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
-//     * @param sum
-//     */
-//    @ActionTitle("включает быструю ставку и вводит сумму")
-//    public void onQuickBet(String sum) {
-//        if (!quickBetFlag.getAttribute("class").contains("not-empty")){
-//            quickButton.click();
-//        }
-//        BigDecimal sumBet;
-//        BigDecimal one = new BigDecimal(1);
-//        sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
-//        //coupon_field.clear();
-//        LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
-//        WebElement quickBetInput = getWebDriver().findElement(By.xpath("//div[@class='coupon__quickbet-input-group']//input[@type='text']"));
-//        fillField(quickBetInput,sumBet.toString());
-//        LOG.info("Ввелось в поле::" + quickBetInput.getAttribute("value"));
-//        Stash.put("sumKey", sumBet.toString());
-//        LOG.info("Сохранили в память key [sumKey] <== value [" + sumBet.toString() + "]");
-//    }
-//
-//
-////    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
-////    public void checkError(String pattern) {
-////        WebDriver driver = PageFactory.getWebDriver();
-////        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-////        List<WebElement> listErrors = driver.findElements(By.xpath("//div[contains(@class,'bet-notification__warning_visible')]"));
-////        if (listErrors.isEmpty()) {
-////            Assertions.fail("Нет никаких предупреждений в купоне");
-////        }
-////        for (WebElement error : listErrors) {
-////            if (error.getText().contains(pattern)) {
-////                LOG.info("Искомое предупреждение в купоне найдено: " + pattern);
-////                break;
-////            }
-////            if (listErrors.indexOf(error) == (listErrors.size() - 1)) {
-////                Assertions.fail("Искомого предупреждения нет в купоне!");
-////            }
-////        }
-////    }
-//
-//    @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
-//    public void checkErrorsInCoupon(String expectedError){
-//        WebDriver driver = PageFactory.getWebDriver();
-//        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-//        List<WebElement> errorMessages = driver.findElements(By.xpath("//div[contains(@class,'coupon__message_error')]//span"));
-//        for (WebElement error: errorMessages){
-//            if (error.getText().contains(expectedError)) return;
-//        }
-//        Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
-//    }
-
-
     @ActionTitle("ждёт мс")
     public void whait(String ms) throws InterruptedException {
         int time = Integer.parseInt(ms);
@@ -578,8 +520,6 @@ public abstract class AbstractPage extends Page {
             throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
         }
 
-
-
         String currentHandle = driver.getWindowHandle();
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
@@ -649,7 +589,7 @@ public abstract class AbstractPage extends Page {
         do {
             field.clear();
             StringBuilder n = new StringBuilder();
-            n.append((char) ('А' + new Random().nextInt(64)));
+            n.append((char) ('А' + new Random().nextInt(32)));
             field.sendKeys(n);
             try {
                 Thread.sleep(500);
