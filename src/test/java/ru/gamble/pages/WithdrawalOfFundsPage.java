@@ -58,6 +58,14 @@ public class WithdrawalOfFundsPage extends AbstractPage{
 
         min = pattern.matcher(min).replaceAll("");
         fillField(summInput,min);
+        List <WebElement> bonuses = driver.findElements(By.xpath("//p[contains(@class,'money-in-out__bonus-money')]"));
+        if (bonuses.isEmpty()){
+            Stash.put("bonusPlus","0");
+        }
+        else{
+            String bonus = bonuses.get(0).getText().split("[^0-9.]")[1];
+            Stash.put("bonusPlus",bonus);
+        }
         String tmp = summInput.getAttribute("value");
         Stash.put(keyMinSumm, tmp);
         LOG.info("Ввели и сохранили в память минимальная сумма вывода: key=>[" + keyMinSumm + "] value=>[" + tmp + "]");

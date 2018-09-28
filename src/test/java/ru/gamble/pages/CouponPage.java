@@ -4,12 +4,9 @@ package ru.gamble.pages;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.livePages.DayEventsPage;
@@ -28,14 +25,11 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
-import static ru.sbtqa.tag.pagefactory.PageFactory.isDriverInitialized;
 
 /**
  * @author p.sivak.
@@ -76,8 +70,8 @@ public class CouponPage extends AbstractPage {
     static By currentExpressBonus = By.xpath("//div[@class='coupon__bottom-block']//span[contains(@class,'coupon__sum orange')]");
 
     @ElementTitle("параметры в купоне")
-    @FindBy(xpath = "//div[@class='list-bet-block-top']//div[@class='bs-type-switcher__wrapper']//i")
-    private WebElement button;
+    @FindBy(xpath = "//i[@class='icon icon-settings-old coupon-tabs__item-icon']")
+    private WebElement button_of_param_in_coupon;
 
     @ElementTitle("поле суммы ставки Ординар")
     @FindBy(xpath="//input[contains(@class,'input coupon__input') and not(@id='bet-input')]")
@@ -89,7 +83,7 @@ public class CouponPage extends AbstractPage {
 
     @ElementTitle("кнопка Заключить пари для Экспресса и Системы")
     //@FindBy(id="place-bet-button")
-    @FindBy(xpath = "//button[normalize-space(text())='Заключить пари']")
+    @FindBy(xpath = "//button[contains(@class,'btn_coupon') and normalize-space(text())='Заключить пари']")
     private WebElement buttonBet;
 
     @ElementTitle("переключатель ставки на бонусы")
@@ -227,10 +221,11 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("устанавливает условие для принятия коэфицентов как 'Никогда'")
     public void neverAccept(){
         WebDriver driver = PageFactory.getDriver();
-        button.click();
-        driver.findElement(xpath("//label[@class='betslip-settings__option']")).click();
+        button_of_param_in_coupon.click();
+        driver.findElement(xpath("//label[@for='betset_none']")).click();
         LOG.info("Установили условие 'Никогда'");
-        button.click();
+        driver.findElement(xpath("//ul[@class='coupon-tabs coupon-tabs_black']/li[1]")).click();//возращаемся обратно в купон
+        //button_of_param_in_coupon.click();
     }
 
     @ActionTitle("проверяет, что после изменения условий на 'Никогда' в купоне появляется кнопка 'Принять' и информационное сообщение")
@@ -281,9 +276,9 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет изменения коэфицентов в купоне при условии 'Повышенные коэфиценты', удаляет из купона все события, кроме событий, у которых повысился коэфицент")
     public void compareChangeCoef () throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        button.click();
+        button_of_param_in_coupon.click();
         driver.findElement(xpath("//div[@class='betslip-settings ng-scope active']//label[2]")).click();
-        button.click();
+        button_of_param_in_coupon.click();
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -421,7 +416,7 @@ public class CouponPage extends AbstractPage {
         LOG.info("Жмём 'Заключить пари'");
         //coupon_bet_button.click();
         buttonBet.click();
-        //driver.findElement(By.xpath("//button[normalize-space(text())='Заключить пари']")).click();
+        //driver.findElement(By.xpath("//button_of_param_in_coupon[normalize-space(text())='Заключить пари']")).click();
 
         waitingForPreloadertoDisappear(30);
 
@@ -549,7 +544,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
-        WebElement coeff = driver.findElement(cssSelector("div.coupon-bet__coeffs"));
+        WebElement coeff = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff')]"));
         previous = coeff.getText();
         preferences.click();
         List<WebElement> list_of_pref = driver.findElements(By.cssSelector("span.prefs__key"));
@@ -613,6 +608,11 @@ public class CouponPage extends AbstractPage {
         assertTrue(
                 "Текущий тип купона неправильный! Ожидалось " + expectedType + ", а на самом деле " + currentType,
                 currentType.trim().equalsIgnoreCase(expectedType));
+    }
+
+    @ActionTitle("переходит на вкладку")
+    public void changeTabCoupon(String tab){
+        LOG.info("todo");
     }
 }
 

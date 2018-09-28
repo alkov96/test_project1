@@ -171,7 +171,9 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^разлогиниваем пользователя$")
     public void logOut(){
         WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Переход на главную страницу");
         goToMainPage("site");
+        LOG.info("Очистка куков");
         cleanCookies();
         if(driver.getCurrentUrl().contains("mobile")){
             mobileSiteLogOut(driver);
@@ -1487,6 +1489,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверяем что с баланса \"([^\"]*)\" снялась сумма \"([^\"]*)\"$")
     public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
+        new WebDriverWait(PageFactory.getWebDriver(),10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[@class='userBalance']")));
         try {
             BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
             BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
