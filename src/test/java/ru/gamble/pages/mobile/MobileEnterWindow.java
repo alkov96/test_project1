@@ -78,10 +78,10 @@ public class MobileEnterWindow extends AbstractPage {
         }else { password = data.get(PASSWORD);}
 
         fillField(inputEmail,email);
-        LOG.info("В поле e-mail ввели::" + inputEmail.getAttribute("value"));
+        LOG.info("В поле e-mail ввели [" + inputEmail.getAttribute("value") + "]");
 
         new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOf(inputPassword));
         fillField(inputPassword,password);
-        LOG.info("В поле password ввели::" + inputPassword.getAttribute("value"));
+        LOG.info("В поле password ввели [" + inputPassword.getAttribute("value") + "]");
     }
 }
