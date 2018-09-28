@@ -609,10 +609,5 @@ public class CouponPage extends AbstractPage {
                 "Текущий тип купона неправильный! Ожидалось " + expectedType + ", а на самом деле " + currentType,
                 currentType.trim().equalsIgnoreCase(expectedType));
     }
-
-    @ActionTitle("переходит на вкладку")
-    public void changeTabCoupon(String tab){
-        LOG.info("todo");
-    }
 }
 

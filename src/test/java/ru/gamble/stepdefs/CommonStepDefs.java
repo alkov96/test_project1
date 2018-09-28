@@ -1029,6 +1029,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         FileWriter fw = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
         BufferedWriter bw = new BufferedWriter(fw);
+        LOG.info("перезаписываем файл " + "src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
         bw.write(sbt.toString());
         bw.flush();
         bw.close();
