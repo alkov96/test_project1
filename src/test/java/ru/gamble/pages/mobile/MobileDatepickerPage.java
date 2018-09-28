@@ -65,14 +65,14 @@ public class MobileDatepickerPage extends AbstractPage {
         Collections.reverse(dataPikersFields);
         WebElement element;
          for(int i = 0; i < dataPikersFields.size(); i++){
-             element = dataPikersFields.get(i).findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
+             element = dataPikersFields.get(i).findElements(By.xpath("div/div/ul/li")).get(5);
              while(Integer.parseInt(element.getAttribute("innerText")) != Integer.parseInt(datePieces.get(i))){
                  if (Integer.parseInt(element.getAttribute("innerText")) > Integer.parseInt(datePieces.get(i))) {
                      swipeElementOnOneVerticalPosition(element, 40);
                  } else if (Integer.parseInt(element.getAttribute("innerText")) < Integer.parseInt(datePieces.get(i))) {
                      swipeElementOnOneVerticalPosition(element, -40);
                  }
-                 element = dataPikersFields.get(i).findElements(By.xpath("div/div/ul/li[not(contains(@class,'disabled'))]")).get(5);
+                 element = dataPikersFields.get(i).findElements(By.xpath("div/div/ul/li")).get(5);
              }
              try {
                  Thread.sleep(500);

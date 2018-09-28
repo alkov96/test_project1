@@ -34,7 +34,6 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
-
 import javax.net.ssl.*;
 import java.io.*;
 import java.math.BigDecimal;
@@ -50,8 +49,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
@@ -164,7 +161,7 @@ public class CommonStepDefs extends GenericStepDefs {
         try {
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
             List<WebElement> preloaders = driver.findElements(by);
-            LOG.info("Найдено прелоадеров::" + preloaders.size());
+            LOG.info("Найдено прелоадеров [" + preloaders.size() + "]");
             driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
             LOG.info("Прелоадеры закрылись");
         }catch (Exception e){
@@ -172,34 +169,49 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^разлогиниваем пользователя$")
-    public static void logOut(){
+    public void logOut(){
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Переход на главную страницу");
         goToMainPage("site");
         LOG.info("Очистка куков");
         cleanCookies();
-        try {
-            LOG.info("Ищем кнопку с силуетом пользователя.");
-            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
-            List<WebElement> userIcon = PageFactory.getWebDriver().findElements(By.id("user-icon"))
-                    .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-            if(!userIcon.isEmpty()){
-                LOG.info("Нажимаем на кнопку с силуетом пользователя.");
-                userIcon.get(0).click();
-                Thread.sleep(1000);
-                LOG.info("Ищем кнопку выхода");
-                List<WebElement> logOutButton = PageFactory.getWebDriver().findElements(By.id("log-out-button"))
-                        .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-                if(!logOutButton.isEmpty()) {
-                    LOG.info("Нажимаем на кнопку выхода");
-                    logOutButton.get(0).click();
-                }
-            }
-        }catch (Exception e){
-        LOG.info("На сайте никто не авторизован");
+        if(driver.getCurrentUrl().contains("mobile")){
+            mobileSiteLogOut(driver);
+        }else{
+            descktopSiteLogOut(driver);
         }
-
     }
+
+    private void descktopSiteLogOut(WebDriver driver){
+        try {
+            LOG.info("Ищем наличие кнопки с силуетом пользователя.");
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
+            LOG.info("Нажимаем на кнопку с силуетом пользователя.");
+            driver.findElement(By.id("user-icon")).click();
+            Thread.sleep(1000);
+            LOG.info("Ищем кнопку 'Выход' и нажимаем");
+            driver.findElement(By.id("log-out-button")).click();
+        }catch (Exception e){
+            LOG.info("На сайте никто не авторизован");
+        }
+    }
+
+    private void mobileSiteLogOut(WebDriver driver){
+        try {
+            LOG.info("Ищем наличие ссылки депозита.");
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/private/balance/deposit']")));
+            WebElement menuSwitchButton = driver.findElement(By.xpath("//label[@class='header__button header__menu-switch']"));
+            LOG.info("Нажимаем на кнопку 'MenuSwitch'");
+            menuSwitchButton.click();
+            Thread.sleep(500);
+            LOG.info("Ищем кнопку 'Выход' нажимаем и обновляем страницу");
+            driver.findElement(By.xpath("//span[contains(.,'Выход')]")).click();
+            driver.navigate().refresh();
+        }catch (Exception e){
+            LOG.info("На сайте никто не авторизован");
+        }
+    }
+
 
     // Метод перехода на главную страницу
     @Когда("^переходит на главную страницу$")
@@ -224,7 +236,7 @@ public class CommonStepDefs extends GenericStepDefs {
         try {
         switch (siteUrl) {
             case "site":
-                currentUrl = JsonLoader.getData().get(STARTING_URL).get("MAIN_URL").getValue();
+                currentUrl = Stash.getValue("MAIN_URL");
                 break;
             case "admin":
                 currentUrl = JsonLoader.getData().get(STARTING_URL).get("ADMIN_URL").getValue();
@@ -1271,17 +1283,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^переходим на мобильную версию сайта$")
-    public void goToSiteAndTurnOnEmulationMode(){
-        WebDriver driver = PageFactory.getWebDriver();
-        try {
-            driver.get(JsonLoader.getData().get(STARTING_URL).get("MOBILE_URL").getValue());
-        } catch (DataException e) {
-            e.printStackTrace();
-            throw new AutotestError("Ошибка! Не смогли перейти на url мобильной версии сайта");
-        }
-    }
-
     @Когда("^закрываем браузер$")
     public static void closeBrowser() {
         PageFactory.dispose();
@@ -1389,13 +1390,14 @@ public class CommonStepDefs extends GenericStepDefs {
         for (Map.Entry<String, String> entry : table.entrySet()) {
             String option = entry.getKey();
             if (entry.getValue().equals("true") && !activeOpt.contains(option)) {
-                activeOpt=activeOpt + ", " + option;
+                activeOpt = activeOpt + ", " + option;
                 continue;
             }
             else if (activeOpt.contains(option) && entry.getValue().equals("true")) {continue;}
 
             activeOpt = activeOpt.replaceAll("[', '|',']"  + option , "");
-            activeOpt =activeOpt.replaceAll(option + "[', '|',']"   , "");
+            activeOpt = activeOpt.replaceAll(option + "[', '|',']"   , "");
+            activeOpt = activeOpt.replaceAll(",+"   , ",");
             LOG.info("Удаление активной опций сайта " + option);
         }
 
