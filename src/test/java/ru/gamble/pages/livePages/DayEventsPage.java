@@ -35,7 +35,7 @@ import static org.openqa.selenium.By.xpath;
 public class DayEventsPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(DayEventsPage.class);
 
-    @FindBy(xpath = "//div[@class='event-widget-game-info']")
+    @FindBy(xpath = "//table[@class='full_width bets-widget-table']")
     private WebElement widget;
 
 
