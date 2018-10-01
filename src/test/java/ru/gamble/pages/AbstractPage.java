@@ -42,6 +42,10 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 public abstract class AbstractPage extends Page {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
+    @ElementTitle("Вход")
+    @FindBy(id = "log-in")
+    private WebElement enterButton;
+
     @ElementTitle("На главную")
     @FindBy(id = "main-logo")
     protected WebElement onMainPageButton;

@@ -45,10 +45,6 @@ public class MainPage extends AbstractPage {
     @FindBy(id = "register")
     private WebElement registrationButton;
 
-    @ElementTitle("Вход")
-    @FindBy(xpath = "//button[contains(text(),'Вход')]")
-    private WebElement enterButton;
-
     @ElementTitle("Прематч")
     @FindBy(id = "prematch")
     private WebElement prematchButton;
