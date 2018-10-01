@@ -25,7 +25,7 @@ public class MobileManePage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        waitingForPreloadertoDisappear(30);
+        waitingForPreloaderToDisappear(30);
         tryingLoadPage(buttonProfile,5, 10);
     }
 
