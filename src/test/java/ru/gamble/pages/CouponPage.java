@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -231,19 +232,19 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, что после изменения условий на 'Никогда' в купоне появляется кнопка 'Принять' и информационное сообщение")
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-        List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+        Thread.sleep(30000);
+        List<WebElement> oldCoef = driver.findElements(xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout')]")).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
         if (oldCoef.size() == 0){
             Assertions.fail("Коэфицент не поменялся!");
         }
         Thread.sleep(500);
-        WebElement error_message = driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']"));
+        WebElement error_message =  driver.findElement(xpath("//span[@class='coupon__message-fragment']"));
         if (oldCoef.size() > 0 && !error_message.isDisplayed()) {
             Assertions.fail("Коэф изменился, однако сообщение не отображается.");
         }
         //LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
         Thread.sleep(5000);
-        WebElement btn_accept = driver.findElement(xpath("//div[@class='coupon-confirm__btn']"));
+        WebElement btn_accept = driver.findElement(xpath("//span[@class='btn btn_full-width' and @ng-click = 'acceptChanges()']"));
         if (!error_message.isDisplayed()
                 || !btn_accept.isDisplayed()) {
             Assertions.fail("При изменении условий ставки не появилось сообщение или кнопка о принятии изменений.");
@@ -280,8 +281,8 @@ public class CouponPage extends AbstractPage {
     public void compareChangeCoef () throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         button_of_param_in_coupon.click();
-        driver.findElement(xpath("//div[@class='betslip-settings ng-scope active']//label[2]")).click();
-        button_of_param_in_coupon.click();
+        driver.findElement(xpath("//ul[@class='coupon-settings__group']/li[3]")).click();
+        driver.findElement(By.xpath("//span[text()='Купон']")).click();
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
