@@ -159,8 +159,12 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         List <WebElement> listBets = driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
         if (!expect) {
-            assertTrue(driver.findElements(expressBonusLink).isEmpty());
-            assertTrue(driver.findElements(expressBonusText).isEmpty());
+            assertTrue(
+                    "Есть ссылка!!! " + driver.findElements(expressBonusLink).get(0).getAttribute("href"),
+                    driver.findElements(expressBonusLink).isEmpty());
+            assertTrue(
+                    "Есть эспресс-бонус!!! " + driver.findElements(expressBonusText).get(0).getText(),
+                    driver.findElements(expressBonusText).isEmpty());
         } else {
             assertTrue(
                     "Неправильная ссылка на описание экспресс-бонуса. Или ссылки вообще нет  ||| " + driver.findElement(expressBonusLink).getAttribute("href") + " |||",
