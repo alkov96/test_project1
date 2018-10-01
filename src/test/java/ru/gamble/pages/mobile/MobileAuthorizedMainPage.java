@@ -16,11 +16,16 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 @PageEntry(title = "Авторизованная мобильная главная страница")
 public class MobileAuthorizedMainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MobileAuthorizedMainPage.class);
 
-    @ElementTitle("Профиль")
+    @ElementTitle("Баланс")
     @FindBy(xpath = "//a[@href='/private/balance/deposit']")
     private WebElement deposit;
 
@@ -28,7 +33,7 @@ public class MobileAuthorizedMainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
-        waitingForPreloadertoDisappear(30);
+        waitingForPreloaderToDisappear(30);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(deposit));
     }
 
@@ -39,5 +44,18 @@ public class MobileAuthorizedMainPage extends AbstractPage {
         LOG.info("Сохранили в память key [" + balanceKey + "] <== value [" + value + "]");
     }
 
+    @ActionTitle("проверяет увеличение баланса")
+    public void checksIncreaseInBalanceOn(String keyOldBalance, String keySum){
+        String oldBalance = Stash.getValue(keyOldBalance.trim());
+        String sum = Stash.getValue(keySum.trim());
+        String newBalance = deposit.getAttribute("innerText").trim();
+        BigDecimal expectedAmount = new BigDecimal(oldBalance).setScale(2, RoundingMode.HALF_UP)
+                .add(new BigDecimal(sum).setScale(2, RoundingMode.HALF_UP));
+        BigDecimal actualAmount = new BigDecimal(newBalance).setScale(2, RoundingMode.HALF_UP);
+
+        assertThat(expectedAmount.compareTo(actualAmount) == 0)
+                .as("Ожидаемый баланс [" + expectedAmount.toString() + "] не соответсвует действительному [" + actualAmount.toString() + "]").isTrue();
+        LOG.info("Ожидаемый баланс [" + expectedAmount.toString() + "] соответсвует действительному [" + actualAmount.toString() + "]");
+    }
 
 }

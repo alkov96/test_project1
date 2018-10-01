@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.gamble.stepdefs.CommonStepDefs.waitEnabled;
+import static ru.gamble.utility.Constants.AMOUNT;
+import static ru.gamble.utility.Constants.PAYMENT_METHOD;
 
 
 @PageEntry(title = "Пополнение счёта")
@@ -121,8 +123,8 @@ public class RefillAccountsPage extends AbstractPage{
         WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String amount, depositMethod;
-        amount = data.get("СУММА");
-        depositMethod = data.get("Способ");
+        amount = data.get(AMOUNT);
+        depositMethod = data.get(PAYMENT_METHOD);
         LOG.info("Cохраняем в память сумму в переменной 'СУММА' и вводим в поле::" + amount);
         Stash.put("СУММА",amount);
         fillField(inputAmount,amount);

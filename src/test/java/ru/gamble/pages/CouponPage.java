@@ -26,7 +26,6 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.By.xpath;
@@ -358,15 +357,6 @@ public class CouponPage extends AbstractPage {
         LOG.info("Сохранили в память [sumKey] <== value [" + sum.toString() + "]");
     }
 
-//    public void checkErrorsInCoupon(String expectedError){
-//        List<WebElement> errorMessages = PageFactory.getDriver().findElements(By.xpath("//div[contains(@class,'coupon__message_error')]//span"));
-//        for (WebElement error: errorMessages){
-//            if (error.getText().contains(expectedError)) return;
-//        }
-//        Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
-//    }
-
-
     /**
      * включается быстрая ставка и в поле суммы вводится сумма, указанная в праметре. Если в параметр написано "больше баланса" то вводится (balance+1)
      * @param sum
@@ -426,7 +416,7 @@ public class CouponPage extends AbstractPage {
         buttonBet.click();
         //driver.findElement(By.xpath("//button_of_param_in_coupon[normalize-space(text())='Заключить пари']")).click();
 
-        waitingForPreloadertoDisappear(30);
+        waitingForPreloaderToDisappear(30);
 
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
         Thread.sleep(10000);

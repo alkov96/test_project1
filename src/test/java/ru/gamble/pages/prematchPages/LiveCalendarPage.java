@@ -1,6 +1,5 @@
 package ru.gamble.pages.prematchPages;
 
-import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -71,7 +70,7 @@ public class LiveCalendarPage extends AbstractPage {
             } else {
                 tryPage++;
                 allDaysPages.get(tryPage).click();
-                waitingForPreloadertoDisappear(10);
+                waitingForPreloaderToDisappear(10);
             }
         }
         allDaysPages.get(0).click();
@@ -129,7 +128,7 @@ public class LiveCalendarPage extends AbstractPage {
     public void inSportsSelectionMenuSelect(String sport){
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Нажимаем на выпадающее меню видов спорта");
-        waitingForPreloadertoDisappear(30);
+        waitingForPreloaderToDisappear(30);
         menuForSelectingSports.click();
         LOG.info("Выбираем вид спорта::" + sport);
         WebElement selectSport = menuForSelectingSports.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));

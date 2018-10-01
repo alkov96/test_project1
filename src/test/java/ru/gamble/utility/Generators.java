@@ -11,7 +11,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 
 public class Generators {
@@ -157,5 +159,67 @@ public class Generators {
             randomBirthDate = LocalDate.ofEpochDay(randomRange);
 
         return randomBirthDate.toString();
+    }
+
+    public static String generateCardNumber(){
+        List<String> numberTypeCard = Arrays.asList("4","5","6");
+        String startNumber = numberTypeCard.get(new Random().nextInt(numberTypeCard.size()));
+        String numberWithoutLastDigest = startNumber + randomNumber(14);
+        String cardNumber = "";
+        int[] digits = new int[16];
+        for(int i = 0; i < 10; i++){
+            cardNumber = numberWithoutLastDigest + i;
+            digits = cardNumber.chars().map(c -> c -= '0').toArray();
+            if(check(digits)){break; };
+        }
+       return cardNumber;
+    }
+
+    private static boolean check(int[] digits) {
+        int sum = 0;
+        int length = digits.length;
+
+        for (int i = 0; i < digits.length; i++) {
+
+            // get digits in reverse order
+            int digit = digits[length - i - 1];
+
+            // every 2nd number multiply by 2
+            if (i % 2 == 1) {
+                digit *= 2;
+            }
+            sum += digit > 9 ? digit - 9 : digit;
+        }
+        return sum % 10 == 0;
+    }
+
+    /**
+     * Метод возвращает случайную строку даты в вормате "MM/yy"
+     * от 1 до 97 лет вперёд
+     * для использования как даты действия карты
+     */
+    public static String generateDateForGard(){
+        DateFormat dateFormat = new SimpleDateFormat("MM/yy");
+        Calendar cal = Calendar.getInstance();
+        int randomRange = 366 + (int) (Math.random() * 35040);
+        cal.add(Calendar.DAY_OF_YEAR, + randomRange);
+        LOG.info(dateFormat.format(cal.getTime()));
+        return dateFormat.format(cal.getTime());
+    }
+
+    /**
+     * Случайная строка латинских больших букв
+     *
+     * @param len - максимальная длина строки. но может быть и меньше
+     * @return возвращает получившуюся строку
+     */
+    public static String randomBigLatinString(int len) {
+
+        StringBuilder result = new StringBuilder();
+        int count = (int) (1 + Math.random() * len);
+        for (int i = 0; i <= count; i++) {
+            result.append((char) ('A' + new Random().nextInt(26)));
+        }
+        return result.toString();
     }
 }

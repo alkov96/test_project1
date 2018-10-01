@@ -438,12 +438,12 @@ public abstract class AbstractPage extends Page {
         }
     }
 
-    protected void waitingForPreloadertoDisappear(int timeInSeconds){
+    protected void waitingForPreloaderToDisappear(int timeInSeconds){
         WebDriver driver = PageFactory.getWebDriver();
         try {
             new WebDriverWait(driver, timeInSeconds).until(ExpectedConditions.invisibilityOfElementLocated(xpath("//*[contains(@class,'preloader__container')]")));
         }catch (Exception e){
-            throw new AutotestError("Ошибка! Прелоадер не исчез в течение::"+ timeInSeconds + " сек.");
+            throw new AutotestError("Ошибка! Прелоадер не исчез в течение [" + timeInSeconds + "] сек.");
         }
     }
 
