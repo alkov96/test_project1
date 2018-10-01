@@ -1,6 +1,7 @@
 package ru.gamble.pages.userProfilePages;
 
 
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -217,16 +218,11 @@ public class FavouritePage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
-
-       // AbstractPage.openFavourite();
         LOG.info("Нажимаем на кнопку с шетсерёнкой");
         preferences.click();
-        List<WebElement> listCoeff = driver.findElements(By.cssSelector("span.prefs__key")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+        List<WebElement> listCoeff =driver.findElements(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__val')]")).stream().collect(Collectors.toList());
         if(!listCoeff.isEmpty()){
             Thread.sleep(500);
-            //WebElement coeff =  driver.findElements(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected-data__event-price ng-binding')]")).get(0);
-
-            // Thread.sleep(3000);
             previous = listCoeff.get(0).getText();
             AbstractPage.openFavourite();
             preferences.click();
@@ -237,7 +233,7 @@ public class FavouritePage extends AbstractPage {
             LOG.info("Предыдущий: " + previous + "Текущий: " + listCoeff.get(2).getText());
             if (previous.equals(listCoeff.get(2).getText())) {
                 LOG.error("Формат отображения коэффициентов не изменился");
-                org.assertj.core.api.Assertions.fail("Формат отображения коэффициентов не изменился");
+                Assertions.fail("Формат отображения коэффициентов не изменился");
             }
         }else {
             throw new AutotestError("Ошибка! Ни один коэффициент не найден.");

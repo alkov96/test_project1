@@ -4,6 +4,7 @@ package ru.gamble.pages;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -63,10 +64,10 @@ public class CouponPage extends AbstractPage {
 //    @FindBy(xpath = "//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]")
 //    private WebElement expressBonusText;
 
-    static By expressBonusText = By.xpath("//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]");
-    static By expressBonusLink = By.xpath("//div[contains(@class,'coupon-bet_offer')]//a[contains(@class,'coupon-bet__link')]");
+    static By expressBonusText = xpath("//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]");
+    static By expressBonusLink = xpath("//div[contains(@class,'coupon-bet_offer')]//a[contains(@class,'coupon-bet__link')]");
 
-    static By currentExpressBonus = By.xpath("//div[@class='coupon__bottom-block']//span[contains(@class,'coupon__sum orange')]");
+    static By currentExpressBonus = xpath("//div[@class='coupon__bottom-block']//span[contains(@class,'coupon__sum orange')]");
 
     @ElementTitle("параметры в купоне")
     @FindBy(xpath = "//i[@class='icon icon-settings-old coupon-tabs__item-icon']")
@@ -106,8 +107,8 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("убирает события из купона, пока их не станет")
     public void removeEventsFromCoupon(String param) {
         int count = Integer.parseInt(param);
-        while (PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']")).size() > count) {
-            PageFactory.getWebDriver().findElement(By.xpath("//span[@ng-click='removeBet(bet)']")).click();
+        while (PageFactory.getWebDriver().findElements(xpath("//ul[@class='coupon-bet-list ng-scope']")).size() > count) {
+            PageFactory.getWebDriver().findElement(xpath("//span[@ng-click='removeBet(bet)']")).click();
         }
     }
 
@@ -124,8 +125,8 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("заполняет сумму для ставки")
     public void fillSumm(String param1, String param2) {
         if (param1.equals("Экспресс")) {
-            PageFactory.getWebDriver().findElement(By.xpath("//input[@id='express-bet-input']")).clear();
-            PageFactory.getWebDriver().findElement(By.xpath("//input[@id='express-bet-input']")).sendKeys(param2);
+            PageFactory.getWebDriver().findElement(xpath("//input[@id='express-bet-input']")).clear();
+            PageFactory.getWebDriver().findElement(xpath("//input[@id='express-bet-input']")).sendKeys(param2);
         }
     }
 
@@ -142,7 +143,7 @@ public class CouponPage extends AbstractPage {
 
     public void checkBonus(boolean expect) {
         WebDriver driver = PageFactory.getDriver();
-        List <WebElement> listBets = driver.findElements(By.xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
+        List <WebElement> listBets = driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
         if (!expect) {
             assertTrue(driver.findElements(currentExpressBonus).isEmpty());
         } else {
@@ -155,7 +156,7 @@ public class CouponPage extends AbstractPage {
 
     public void checkExpressBonus(boolean expect) {
         WebDriver driver = PageFactory.getDriver();
-        List <WebElement> listBets = driver.findElements(By.xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
+        List <WebElement> listBets = driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
         if (!expect) {
             assertTrue(driver.findElements(expressBonusLink).isEmpty());
             assertTrue(driver.findElements(expressBonusText).isEmpty());
@@ -174,7 +175,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, добавилось ли событие в купон")
     public void checkListOfCoupon() {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> couponList= driver.findElements(By.xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']"));
+        List<WebElement> couponList= driver.findElements(xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']"));
         if (couponList.isEmpty()) {
             Assertions.fail("События не добавлиись в купон.");
         } else LOG.info("Событие " + couponList.size());
@@ -183,7 +184,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, совпадают ли события в купоне с ожидаемыми из")
     public void bannerAndTeams(String team1key, String team2key) {
         WebDriver driver = PageFactory.getDriver();
-        String couponGame = driver.findElement(By.xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']")).getText();//cuponGame - наше добавленные события в купоне.
+        String couponGame = driver.findElement(xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']")).getText();//cuponGame - наше добавленные события в купоне.
         String team1 = Stash.getValue(team1key);
         String team2 = Stash.getValue(team2key);
         if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(couponGame))) {
@@ -195,7 +196,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, совпадает ли исход в купоне с ожидаемым")
     public void checkIshod(String ishodKey) {
         WebDriver driver = PageFactory.getDriver();
-        String ishod = driver.findElement(By.xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getText().split("\n")[1];
+        String ishod = driver.findElement(xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getText().split("\n")[1];
         String ishodName = Stash.getValue(ishodKey);//ожидаемое название исхода
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
             LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + " <=> " + ishodName);
@@ -208,8 +209,8 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String coefString = Stash.getValue(keyOutcome).toString();
         float coef = Float.valueOf(coefString);
-        float coefCoupon = Float.valueOf(driver.findElement(By.xpath("//div[@class='coupon-bet__coeffs']/span[2]")).getText());//Кэфицент в купоне
-        WebElement oldWebElement = driver.findElement(By.xpath("//span[contains(@class,'coupon-bet__coeff-strikeout')]"));
+        float coefCoupon = Float.valueOf(driver.findElement(xpath("//div[@class='coupon-bet__coeffs']/span[2]")).getText());//Кэфицент в купоне
+        WebElement oldWebElement = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff-strikeout')]"));
         float oldCoef = oldWebElement.isDisplayed()? Float.valueOf(oldWebElement.getText().trim()) : coefCoupon;
         if (coef != coefCoupon && coef != oldCoef) {
             Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCoupon + coef);
@@ -230,8 +231,11 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, что после изменения условий на 'Никогда' в купоне появляется кнопка 'Принять' и информационное сообщение")
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
         List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+        if (oldCoef.size() == 0){
+            Assertions.fail("Коэфицент не поменялся!");
+        }
         Thread.sleep(500);
         WebElement error_message = driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']"));
         if (oldCoef.size() > 0 && !error_message.isDisplayed()) {
@@ -257,16 +261,16 @@ public class CouponPage extends AbstractPage {
      */
     public float compareCoef(int param) {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> allBets = driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
+        List<WebElement> allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         for (int i = 2; i > 0; i--) {
             List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
             if (!oldCoef.isEmpty()) break;
         }
-        float coefCoupon = Float.valueOf(allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice')]")).getText());
-        String oldString = allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice_old')]")).getAttribute("class");
+        float coefCoupon = Float.valueOf(allBets.get(param).findElement(xpath("span[contains(@class,'coupon-betprice')]")).getText());
+        String oldString = allBets.get(param).findElement(xpath("span[contains(@class,'coupon-betprice_old')]")).getAttribute("class");
         float coefOld;
-        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(By.xpath("span[contains(@class,'coupon-betprice_old')]")).getText());
+        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(xpath("span[contains(@class,'coupon-betprice_old')]")).getText());
         LOG.info("Старый коэф: " + coefOld);
         LOG.info("Текущий коэф: " + coefCoupon);
         return coefCoupon - coefOld;
@@ -283,13 +287,13 @@ public class CouponPage extends AbstractPage {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        List<WebElement> allBets = driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
+        List<WebElement> allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
         for (int i = allBets.size()-1; i >=0; i--) {
             float s = compareCoef(i);
             LOG.info("для " + i + " события результат = " + s);
                if (s<=0){
                    driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i+1) + "]//i[contains(@class,'icon-cross-close')]")).click();
-                    allBets = driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
+                    allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
                }
         }
 
@@ -299,7 +303,7 @@ public class CouponPage extends AbstractPage {
             compareChangeCoef();
             //  compareCoef(i);
         }
-        LOG.info("Количество событий в купоне: " + driver.findElements(By.xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]")).size());
+        LOG.info("Количество событий в купоне: " + driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]")).size());
         if (driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()
                 || driver.findElement(xpath("//div[@class='coupon-confirm__btn']")).isDisplayed()) {
             Assertions.fail("Отображается кнопка и сообщение, хотя не должны - в купоне одни лишь события с повышенным коэфицентом");
@@ -311,7 +315,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("выбирает тип ставки")
     public void selectTypeBet(String type) {
         WebDriver driver = PageFactory.getDriver();
-        WebElement selectType = driver.findElement(By.xpath("//span[contains(@class,'coupon-tabs__item-link coupon-text-h') " +
+        WebElement selectType = driver.findElement(xpath("//span[contains(@class,'coupon-tabs__item-link coupon-text-h') " +
                 "and normalize-space(translate(text(),'" + type.toLowerCase() +"','" + type.toUpperCase() + "'))='" + type.toUpperCase() + "']"));
         //этот длинный xpath потому что название типа может быть с большой буквы, или с маленькой, для разного типа по-разному. и в элементе getText() вместе с пробелами идет
         LOG.info("Переключаем тип ставки на '" + selectType.getText() + "'");
@@ -363,7 +367,7 @@ public class CouponPage extends AbstractPage {
         sumBet = sum.equals("больше баланса") ? new BigDecimal((String) Stash.getValue("balanceKey")).setScale(2, RoundingMode.HALF_UP).add(one): new BigDecimal(sum).setScale(2,RoundingMode.HALF_UP);
         //coupon_field.clear();
         LOG.info("Вбиваем сумму в поле купона::" + sumBet.toString());
-        WebElement quickBetInput = getWebDriver().findElement(By.xpath("//div[@class='coupon__quickbet-input-group']//input[@type='text']"));
+        WebElement quickBetInput = getWebDriver().findElement(xpath("//div[@class='coupon__quickbet-input-group']//input[@type='text']"));
         fillField(quickBetInput,sumBet.toString());
         LOG.info("Ввелось в поле::" + quickBetInput.getAttribute("value"));
         Stash.put("sumKey", sumBet.toString());
@@ -375,7 +379,7 @@ public class CouponPage extends AbstractPage {
     public void checkErrorsInCoupon(String expectedError){
         WebDriver driver = PageFactory.getWebDriver();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        List<WebElement> errorMessages = driver.findElements(By.xpath("//div[contains(@class,'coupon__message_error')]//span"));
+        List<WebElement> errorMessages = driver.findElements(xpath("//div[contains(@class,'coupon__message_error')]//span"));
         for (WebElement error: errorMessages){
             if (error.getText().contains(expectedError)) return;
         }
@@ -389,18 +393,18 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String xpathBet ="//input[contains(@class,'input coupon__input') and not(@id='bet-input')]";
 
-        int sizeCoupon = driver.findElements(By.xpath(xpathBet)).size();
+        int sizeCoupon = driver.findElements(xpath(xpathBet)).size();
         int i = 0;
         LOG.info("Ищем и нажимаем на шестерёнку в Купоне [" + i + "]");
-        WebElement gear = driver.findElement(By.xpath("//span[contains(@class,'coupon-tabs__item-link')]/i"));
+        WebElement gear = driver.findElement(xpath("//span[contains(@class,'coupon-tabs__item-link')]/i"));
         gear.click();
 
         LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
-        driver.findElement(By.xpath("//span[text()='Любые изменения']")).click();
+        driver.findElement(xpath("//span[text()='Любые изменения']")).click();
         LOG.info("Возвращаемся к списку событий в купоне");
-        driver.findElement(By.xpath("//span[text()='Купон']")).click();
+        driver.findElement(xpath("//span[text()='Купон']")).click();
 
-        String typeCoupon = driver.findElement(By.xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]/span")).getText();
+        String typeCoupon = driver.findElement(xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]/span")).getText();
         int expectedCouponSize = typeCoupon.contains("Ординар")? (sizeCoupon-1):0;
 
         LOG.info("Жмём 'Заключить пари'");
@@ -412,7 +416,7 @@ public class CouponPage extends AbstractPage {
 
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
         Thread.sleep(10000);
-        if (driver.findElements(By.xpath("//ul[@class='coupon-bet__content']")).size()>expectedCouponSize){
+        if (driver.findElements(xpath("//ul[@class='coupon-bet__content']")).size()>expectedCouponSize){
             Assertions.fail("Ставка не принялась!");
         } else LOG.info("Ставка принялась!");
 
@@ -429,7 +433,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         BigDecimal currentBalance, previousBalance, sumBet;
 
-        By balance = param.equals("бонусов") ? By.xpath("//span[contains(@class,'subMenuBonus bonusmoney')]") : By.id("topPanelWalletBalance");
+        By balance = param.equals("бонусов") ? xpath("//span[contains(@class,'subMenuBonus bonusmoney')]") : By.id("topPanelWalletBalance");
         String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         int count = 30;
         previousBalance = new BigDecimal(Stash.getValue(key).toString().replace("Б","").trim()).setScale(2, RoundingMode.HALF_UP);
@@ -466,9 +470,9 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет изменение количества экспрессов при переключении вида системы")
     public void checkCountExpress(){
         WebDriver driver = PageFactory.getDriver();
-        WebElement dropdownOpt = driver.findElement(By.xpath("//div[contains(@class,'coupon__system-select')]"));
-        List <WebElement> systemTypes = dropdownOpt.findElements(By.xpath("div//li[contains(@clas,'coupon__dropdown-item')]"));
-        WebElement openList = dropdownOpt.findElement(By.xpath("div/div[contains(@class,'custom-select__placeholder')]"));
+        WebElement dropdownOpt = driver.findElement(xpath("//div[contains(@class,'coupon__system-select')]"));
+        List <WebElement> systemTypes = dropdownOpt.findElements(xpath("div//li[contains(@clas,'coupon__dropdown-item')]"));
+        WebElement openList = dropdownOpt.findElement(xpath("div/div[contains(@class,'custom-select__placeholder')]"));
         int countExp = Integer.valueOf(current_type_of_system.getText().replaceAll("[^0-9?!]",""));
         int count;
         for (WebElement type:systemTypes){
@@ -515,12 +519,12 @@ public class CouponPage extends AbstractPage {
     public void dublicateBet(){
         BigDecimal sum;
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> listBets = driver.findElements(By.xpath("//input[contains(@class,'input coupon__input') and not(@id='bet-input')]"));
+        List<WebElement> listBets = driver.findElements(xpath("//input[contains(@class,'input coupon__input') and not(@id='bet-input')]"));
         String sumFirstBet = listBets.get(0).getAttribute("value");
         LOG.info("Сумма первой ставки = " + sumFirstBet);
         if (listBets.size()>1) {//если в купоне не одна ставка, то имеет смысл нажать кнопку "вниз" заполняющую сумму ставки для всех одинаковой
             LOG.info("Нажимаем на кнопку ВНИЗ чтобы скопировать размер ставки для второго события");
-            driver.findElements(By.xpath("//span[contains(@class,'coupon-btn_repeat-stake')]")).get(0).click();
+            driver.findElements(xpath("//span[contains(@class,'coupon-btn_repeat-stake')]")).get(0).click();
             LOG.info("Проверяем что размер ставки продублировался");
             String valueBet = listBets.get(1).getAttribute("value");
             if (!valueBet.equals(sumFirstBet)) {
@@ -584,25 +588,45 @@ public class CouponPage extends AbstractPage {
     public void autoSelectCoupon(String autoSelect ){
         WebDriver driver = PageFactory.getDriver();
         LOG.info("Переключаемся на вкладку настроек купона");
-        driver.findElement(By.xpath("//i[contains(@class,'coupon-tabs__item-icon')]")).click();
+        driver.findElement(xpath("//i[contains(@class,'coupon-tabs__item-icon')]")).click();
         LOG.info("Выбираем пункт " + autoSelect);
-         driver.findElement(By.xpath("//span[@class='coupon-settings__radio-label-text' and normalize-space(text())='" + autoSelect + "']")).click();
+         driver.findElement(xpath("//span[@class='coupon-settings__radio-label-text' and normalize-space(text())='" + autoSelect + "']")).click();
          LOG.info("Возвращаемся во вкладку Купон");
-        driver.findElement(By.xpath("//li[contains(@class,'coupon-tabs__item')]/span[normalize-space(text())='Купон']")).click();
+        driver.findElement(xpath("//li[contains(@class,'coupon-tabs__item')]/span[normalize-space(text())='Купон']")).click();
     }
 
     @ActionTitle("проверяет что текущий тип купона")
     public void checkCurrentTypeCoupon(String expectedType){
         String currentType = getWebDriver().findElement(
-                By.xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]/span")).getText();
+                xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]/span")).getText();
         assertTrue(
                 "Текущий тип купона неправильный! Ожидалось " + expectedType + ", а на самом деле " + currentType,
                 currentType.trim().equalsIgnoreCase(expectedType));
     }
 
-    @ActionTitle("переходит на вкладку")
-    public void changeTabCoupon(String tab){
-        LOG.info("todo");
+    @ActionTitle("пытается перейти на вкладку в купоне")
+    public void changeTabInCoupon(String tab, String active) {
+        LOG.info("Переключение на вкладку " + tab + " в купоне");
+        WebElement selectTab = PageFactory.getDriver().findElement(xpath("//ul[contains(@class,'coupon-tabs')]//span[normalize-space(text())='" + tab + "']"));
+        boolean expectedActive = active.equals("успешно") ? true : false;
+        boolean isActive = selectTab.findElement(By.xpath("ancestor::li")).getAttribute("disabled")==null;
+        // selectTab.findElement(By.xpath("ancestor::li")).getAttribute("class").contains("selected");
+        Assert.assertTrue(
+                "Ожидалось что активность вкладки в купоне " + tab + " будет " + expectedActive + ", но на самом деле " + isActive,
+                isActive == expectedActive);
+
+        if (expectedActive) {
+            try {
+                selectTab.click();
+                Assert.assertTrue(
+                        "Не удался переход на нужную вкладку. Сечас вместо нужной, активна кладка " +
+                                PageFactory.getDriver().findElement(xpath("//ul[contains(@class,'coupon-tabs')]/li[contains(@class,'selected')]/span")).getText(),
+                        selectTab.findElement(By.xpath("ancestor::li")).getAttribute("class").contains("selected"));
+            } catch (NoSuchElementException e) {
+                LOG.info("Невозможно переключиться на нужную вкладку купона. Элемент не найден");
+            }
+        }
     }
+
 }
 
