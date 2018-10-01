@@ -30,6 +30,22 @@ public class FirstTSUPISLK extends AbstractPage {
     @FindBy(xpath = "//div[@class='contract-details-content']")
     private WebElement pageTitle;
 
+    @ElementTitle("Номер карты")
+    @FindBy(name = "number")
+    private WebElement numberCardInput;
+
+    @ElementTitle("ММ")
+    @FindBy(name = "month")
+    private WebElement monthInput;
+
+    @ElementTitle("YY")
+    @FindBy(name = "year")
+    private WebElement yearInput;
+
+    @ElementTitle("Имя и фамилия латиницей")
+    @FindBy(name = "name")
+    private WebElement nameFamilyLatinInput;
+
     @ElementTitle("Продолжить")
     @FindBy(xpath = "//input[contains(@value,'Продолжить')]")
     private WebElement buttonContinue;
@@ -43,8 +59,9 @@ public class FirstTSUPISLK extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
-       // driver.getWindowHandle().
     }
+
+
 
     @ActionTitle("вводит случайное число в CVV")
     public void entersRandomNumberInCVV(){

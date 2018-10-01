@@ -42,6 +42,10 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 public abstract class AbstractPage extends Page {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
+    @ElementTitle("Вход")
+    @FindBy(id = "log-in")
+    private WebElement enterButton;
+
     @ElementTitle("На главную")
     @FindBy(id = "main-logo")
     protected WebElement onMainPageButton;
@@ -438,12 +442,12 @@ public abstract class AbstractPage extends Page {
         }
     }
 
-    protected void waitingForPreloadertoDisappear(int timeInSeconds){
+    protected void waitingForPreloaderToDisappear(int timeInSeconds){
         WebDriver driver = PageFactory.getWebDriver();
         try {
             new WebDriverWait(driver, timeInSeconds).until(ExpectedConditions.invisibilityOfElementLocated(xpath("//*[contains(@class,'preloader__container')]")));
         }catch (Exception e){
-            throw new AutotestError("Ошибка! Прелоадер не исчез в течение::"+ timeInSeconds + " сек.");
+            throw new AutotestError("Ошибка! Прелоадер не исчез в течение [" + timeInSeconds + "] сек.");
         }
     }
 

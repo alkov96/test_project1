@@ -53,6 +53,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.utility.Constants.*;
+import static ru.gamble.utility.Generators.generateDateForGard;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -69,7 +70,7 @@ public class CommonStepDefs extends GenericStepDefs {
             button.click();
             workWithPreloader();
         } catch (PageException e) {
-            LOG.error(e.getMessage());
+            throw new AutotestError("Ошибка! Не удалось нажать на копку [" + param + "]\n" + e.getMessage());
         }
 
     }
@@ -1622,6 +1623,27 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         Stash.put(keyIssueDate,issueDate);
         LOG.info("Сохранили в память key [" + keyIssueDate + "] <== value [" + issueDate + "]");
+    }
+
+    @Когда("^генерим номер карты и сохраняем в \"([^\"]*)\"$")
+    public void generateCardNumberAndSaveTo(String keyCardNumber) {
+        String numberCard = Generators.generateCardNumber();
+        Stash.put(keyCardNumber,numberCard);
+        LOG.info("Сохранили в память key [" + keyCardNumber + "] <== value [" + numberCard + "]");
+    }
+
+    @Когда("^генерим дату действия краты в \"([^\"]*)\"$")
+    public void generateDateOfGard(String keyGardDate) {
+        String gardDate = generateDateForGard();
+        Stash.put(keyGardDate,gardDate);
+        LOG.info("Сохранили в память key [" + keyGardDate + "] <== value [" + gardDate + "]");
+    }
+
+    @Когда("^транслируем имя и фамилию на латинском в \"([^\"]*)\"$")
+    public void translateNameAndFamilyToLatin(String kyeNameAndFamily) {
+        String nameAndFamily = Generators.randomBigLatinString(8) + " " + Generators.randomBigLatinString(8);
+        Stash.put(kyeNameAndFamily,nameAndFamily);
+        LOG.info("Сохранили в память key [" + kyeNameAndFamily + "] <== value [" + nameAndFamily + "]");
     }
 
 }
