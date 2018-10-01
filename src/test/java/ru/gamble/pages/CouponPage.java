@@ -231,8 +231,11 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, что после изменения условий на 'Никогда' в купоне появляется кнопка 'Принять' и информационное сообщение")
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
         List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+        if (oldCoef.size() == 0){
+            Assertions.fail("Коэфицент не поменялся!");
+        }
         Thread.sleep(500);
         WebElement error_message = driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']"));
         if (oldCoef.size() > 0 && !error_message.isDisplayed()) {
