@@ -268,7 +268,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        for (int i = 2; i > 0; i--) {
+        for (int i = 3; i > 0; i--) {
             List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
             if (!oldCoef.isEmpty()) break;
         }
@@ -297,7 +297,7 @@ public class CouponPage extends AbstractPage {
             float s = compareCoef(i);
             LOG.info("для " + i + " события результат = " + s);
                if (s<=0){
-                   driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i+1) + "]//i[contains(@class,'icon-cross-close')]")).click();
+                   driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i+1) + "]//i[contains(@class,'icon-cross-close')]")).click();//путь до крестика, чтобы удалить событие из купона
                     allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
                }
         }
@@ -389,6 +389,15 @@ public class CouponPage extends AbstractPage {
             if (error.getText().contains(expectedError)) return;
         }
         Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
+    }
+
+    @ActionTitle("проверяет наличие сообщения об ошибке в купоне для быстрой ставки")
+    public void checkErrorsInCouponForFastBet(){
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+       if (!driver.findElement(xpath("//div[@class='coupon__message coupon__message_suggestions']")).isDisplayed()){
+          Assertions.fail("в купоне не отображается сообщение о том, что нужно поплнить баланс");
+       }
     }
 
 
