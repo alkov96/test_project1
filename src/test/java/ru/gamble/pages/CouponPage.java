@@ -268,7 +268,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        for (int i = 2; i > 0; i--) {
+        for (int i = 3; i > 0; i--) {
             List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
             if (!oldCoef.isEmpty()) break;
         }
@@ -297,7 +297,7 @@ public class CouponPage extends AbstractPage {
             float s = compareCoef(i);
             LOG.info("для " + i + " события результат = " + s);
                if (s<=0){
-                   driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i+1) + "]//i[contains(@class,'icon-cross-close')]")).click();
+                   driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i+1) + "]//i[contains(@class,'icon-cross-close')]")).click();//путь до крестика, чтобы удалить событие из купона
                     allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
                }
         }
@@ -332,7 +332,7 @@ public class CouponPage extends AbstractPage {
      * @param less - показывает нужно ли вводить валидную сумму или нет. если less содержит слово меньше, то сумма должна быть меньше чем количество экспрессов - невалид
      */
     @ActionTitle("вводит сумму ставки система")
-    public void inputBet(String less){
+    public void inputBet(String less) throws InterruptedException {
         BigDecimal sum;
         int countExp = Integer.valueOf(current_type_of_system.getText().replaceAll("[^0-9?!]",""));
         String sumBet = less.contains("меньше")?String.valueOf(countExp-1):String.valueOf(countExp);
@@ -381,14 +381,23 @@ public class CouponPage extends AbstractPage {
 
 
     @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
-    public void checkErrorsInCoupon(String expectedError){
+    public void checkErrorsInCoupon(String expectedError) throws InterruptedException {
         WebDriver driver = PageFactory.getWebDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        Thread.sleep(10000);
         List<WebElement> errorMessages = driver.findElements(xpath("//div[contains(@class,'coupon__message_error')]//span"));
         for (WebElement error: errorMessages){
             if (error.getText().contains(expectedError)) return;
         }
         Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
+    }
+
+    @ActionTitle("проверяет наличие сообщения об ошибке в купоне для быстрой ставки")
+    public void checkErrorsInCouponForFastBet(){
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+       if (!driver.findElement(xpath("//div[@class='coupon__message coupon__message_suggestions']")).isDisplayed()){
+          Assertions.fail("в купоне не отображается сообщение о том, что нужно поплнить баланс");
+       }
     }
 
 
