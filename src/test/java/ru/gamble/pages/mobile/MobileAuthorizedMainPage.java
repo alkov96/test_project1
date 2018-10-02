@@ -46,10 +46,11 @@ public class MobileAuthorizedMainPage extends AbstractPage {
 
     @ActionTitle("проверяет увеличение баланса")
     public void checksIncreaseInBalanceOn(String keyOldBalance, String keySum){
-        String oldBalance = Stash.getValue(keyOldBalance.trim());
+        String oldBalance = Stash.getValue(keyOldBalance);
         String sum = Stash.getValue(keySum.trim());
-        String newBalance = deposit.getAttribute("innerText").trim();
-        BigDecimal expectedAmount = new BigDecimal(oldBalance).setScale(2, RoundingMode.HALF_UP)
+
+        String newBalance = deposit.getAttribute("innerText").replaceAll("\\s","").trim();
+        BigDecimal expectedAmount = new BigDecimal(oldBalance.replaceAll("\\s","").trim()).setScale(2, RoundingMode.HALF_UP)
                 .add(new BigDecimal(sum).setScale(2, RoundingMode.HALF_UP));
         BigDecimal actualAmount = new BigDecimal(newBalance).setScale(2, RoundingMode.HALF_UP);
 
