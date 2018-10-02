@@ -332,7 +332,7 @@ public class CouponPage extends AbstractPage {
      * @param less - показывает нужно ли вводить валидную сумму или нет. если less содержит слово меньше, то сумма должна быть меньше чем количество экспрессов - невалид
      */
     @ActionTitle("вводит сумму ставки система")
-    public void inputBet(String less){
+    public void inputBet(String less) throws InterruptedException {
         BigDecimal sum;
         int countExp = Integer.valueOf(current_type_of_system.getText().replaceAll("[^0-9?!]",""));
         String sumBet = less.contains("меньше")?String.valueOf(countExp-1):String.valueOf(countExp);
@@ -381,9 +381,9 @@ public class CouponPage extends AbstractPage {
 
 
     @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
-    public void checkErrorsInCoupon(String expectedError){
+    public void checkErrorsInCoupon(String expectedError) throws InterruptedException {
         WebDriver driver = PageFactory.getWebDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        Thread.sleep(10000);
         List<WebElement> errorMessages = driver.findElements(xpath("//div[contains(@class,'coupon__message_error')]//span"));
         for (WebElement error: errorMessages){
             if (error.getText().contains(expectedError)) return;
