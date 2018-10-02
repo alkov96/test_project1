@@ -15,18 +15,19 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-@PageEntry(title = "Способы пополнения")
-public class MobileWaysToDepositPage extends MobileAuthorizedMainPage{
-    private static final Logger LOG = LoggerFactory.getLogger(MobileWaysToDepositPage.class);
+@PageEntry(title = "Вывод")
+public class MobileWithdrawPage extends MobileAuthorizedMainPage {
+    private static final Logger LOG = LoggerFactory.getLogger(MobileWithdrawPage.class);
 
-    @FindBy(xpath = "//*[contains(.,'Способы пополнения')]")
+    @FindBy(xpath = "//*[contains(.,'Выберите способ вывода средств')]")
     private WebElement pageTitle;
 
-    @ElementTitle("Вывод")
-    @FindBy(xpath = "//a[@href='/private/balance/withdraw']")
-    private WebElement withdrawReference;
+    @ElementTitle("Сумма вывода")
+    @FindBy(xpath = "//input[@class='form-input']")
+    private WebElement withdrawInput;
 
-    public MobileWaysToDepositPage() {
+
+    public MobileWithdrawPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
@@ -34,10 +35,11 @@ public class MobileWaysToDepositPage extends MobileAuthorizedMainPage{
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    @ActionTitle("заполняет поле 'Сумма депозита'")
-    public void fillFielDepositAmount(String keySum){
+
+    @ActionTitle("заполняет поле 'Сумма вывода'")
+    public void fillFielWithdrawAmount(String keySum){
         String sum = Stash.getValue(keySum);
         fillField(amountInput,sum);
-        LOG.info("В поле [Сумма депозита] ввели сумму [" + amountInput.getAttribute("value") + "]");
+        LOG.info("В поле [Сумма вывода] ввели сумму [" + amountInput.getAttribute("value") + "]");
     }
 }

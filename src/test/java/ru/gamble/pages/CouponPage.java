@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -237,19 +238,19 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, что после изменения условий на 'Никогда' в купоне появляется кнопка 'Принять' и информационное сообщение")
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-        List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+        Thread.sleep(30000);
+        List<WebElement> oldCoef = driver.findElements(xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout')]")).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
         if (oldCoef.size() == 0){
             Assertions.fail("Коэфицент не поменялся!");
         }
         Thread.sleep(500);
-        WebElement error_message = driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']"));
+        WebElement error_message =  driver.findElement(xpath("//span[@class='coupon__message-fragment']"));
         if (oldCoef.size() > 0 && !error_message.isDisplayed()) {
             Assertions.fail("Коэф изменился, однако сообщение не отображается.");
         }
         //LOG.info("Изменился коэф и появилось сообщение о принятии коэфиценита");
         Thread.sleep(5000);
-        WebElement btn_accept = driver.findElement(xpath("//div[@class='coupon-confirm__btn']"));
+        WebElement btn_accept = driver.findElement(xpath("//span[@class='btn btn_full-width' and @ng-click = 'acceptChanges()']"));
         if (!error_message.isDisplayed()
                 || !btn_accept.isDisplayed()) {
             Assertions.fail("При изменении условий ставки не появилось сообщение или кнопка о принятии изменений.");
@@ -269,7 +270,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        for (int i = 2; i > 0; i--) {
+        for (int i = 3; i > 0; i--) {
             List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
             if (!oldCoef.isEmpty()) break;
         }
@@ -286,8 +287,8 @@ public class CouponPage extends AbstractPage {
     public void compareChangeCoef () throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         button_of_param_in_coupon.click();
-        driver.findElement(xpath("//div[@class='betslip-settings ng-scope active']//label[2]")).click();
-        button_of_param_in_coupon.click();
+        driver.findElement(xpath("//ul[@class='coupon-settings__group']/li[3]")).click();
+        driver.findElement(By.xpath("//span[text()='Купон']")).click();
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -298,7 +299,7 @@ public class CouponPage extends AbstractPage {
             float s = compareCoef(i);
             LOG.info("для " + i + " события результат = " + s);
                if (s<=0){
-                   driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i+1) + "]//i[contains(@class,'icon-cross-close')]")).click();
+                   driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i+1) + "]//i[contains(@class,'icon-cross-close')]")).click();//путь до крестика, чтобы удалить событие из купона
                     allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
                }
         }
@@ -333,7 +334,7 @@ public class CouponPage extends AbstractPage {
      * @param less - показывает нужно ли вводить валидную сумму или нет. если less содержит слово меньше, то сумма должна быть меньше чем количество экспрессов - невалид
      */
     @ActionTitle("вводит сумму ставки система")
-    public void inputBet(String less){
+    public void inputBet(String less) throws InterruptedException {
         BigDecimal sum;
         int countExp = Integer.valueOf(current_type_of_system.getText().replaceAll("[^0-9?!]",""));
         String sumBet = less.contains("меньше")?String.valueOf(countExp-1):String.valueOf(countExp);
@@ -382,14 +383,23 @@ public class CouponPage extends AbstractPage {
 
 
     @ActionTitle("проверяет наличие сообщения об ошибке в купоне")
-    public void checkErrorsInCoupon(String expectedError){
+    public void checkErrorsInCoupon(String expectedError) throws InterruptedException {
         WebDriver driver = PageFactory.getWebDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        Thread.sleep(10000);
         List<WebElement> errorMessages = driver.findElements(xpath("//div[contains(@class,'coupon__message_error')]//span"));
         for (WebElement error: errorMessages){
             if (error.getText().contains(expectedError)) return;
         }
         Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
+    }
+
+    @ActionTitle("проверяет наличие сообщения об ошибке в купоне для быстрой ставки")
+    public void checkErrorsInCouponForFastBet(){
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+       if (!driver.findElement(xpath("//div[@class='coupon__message coupon__message_suggestions']")).isDisplayed()){
+          Assertions.fail("в купоне не отображается сообщение о том, что нужно поплнить баланс");
+       }
     }
 
 

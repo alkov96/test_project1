@@ -108,9 +108,8 @@
       | fast_registration              | true  |
       | identification_with_video      | false |
       | identification_with_euroset    | false |
-      | identification_with_video      | false |
-      | identification_with_euroset    | false |
       | identification_with_skype_only | false |
+    * пользователь (перезагружает страницу)
 
     * (текст появляется на странице) "Шаг 3 из 3. Идентификация"
     * (текст появляется на странице) "«Столото»"

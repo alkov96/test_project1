@@ -256,13 +256,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
-    @Когда("^сохраняем в память таблицу$")
-    public static void saveKeyValueTable(DataTable dataTable) {
-        Map<String, String> date = dataTable.asMap(String.class, String.class);
-        int birthDay, birthMonth, birthYear;
-        String berthdayDate;
-    }
-
     /**
      * Генератор e-mail
      *
@@ -678,10 +671,13 @@ public class CommonStepDefs extends GenericStepDefs {
         ResultSet rs;
         String result;
         try {
+            con.setAutoCommit(false);// Отключаем автокоммит
             stmt = con.createStatement();
             rs = stmt.executeQuery(sqlRequest);
+            con.commit();
             rs.last();
             result = rs.getString(param);
+
             if(result.isEmpty()){
                 throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
             }
@@ -1050,7 +1046,7 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlRequest);
     }
 
-    @Когда("^обновляем поля в БД для юзера \"([^\"]*)\":$")
+    @Когда("^обновляем поля в БД для пользователя \"([^\"]*)\":$")
     public void NullToField(String keyEmail, DataTable dataTable) {
 
         Map<String, String> table = dataTable.asMap(String.class, String.class);
@@ -1407,6 +1403,10 @@ public class CommonStepDefs extends GenericStepDefs {
         activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
         sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
         workWithDB(sqlRequest);
+
+        sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
+        activeOpt = workWithDBgetResult(sqlRequest, "value");
+        LOG.info("СЕЙЧАС активные опции сайта [" + activeOpt + "]");
     }
 
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
@@ -1639,7 +1639,7 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Сохранили в память key [" + keyGardDate + "] <== value [" + gardDate + "]");
     }
 
-    @Когда("^транслируем имя и фамилию на латинском в \"([^\"]*)\"$")
+    @Когда("^генерим имя и фамилию на латинском в \"([^\"]*)\"$")
     public void translateNameAndFamilyToLatin(String kyeNameAndFamily) {
         String nameAndFamily = Generators.randomBigLatinString(8) + " " + Generators.randomBigLatinString(8);
         Stash.put(kyeNameAndFamily,nameAndFamily);
