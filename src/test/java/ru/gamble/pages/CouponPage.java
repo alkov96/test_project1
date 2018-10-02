@@ -56,13 +56,6 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//span[@class='btn btn_full-width']")
     protected WebElement clearCoupon;
 
-//    @ElementTitle("экспресс-бонус ссылка")
-//    @FindBy(xpath = "//div[contains(@class,'coupon-bet_offer')]//a[contains(@class,'coupon-bet__link')]")
-//    private WebElement expressBonusLink;
-//
-//    @ElementTitle("текст экспресс бонуса")
-//    @FindBy(xpath = "//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]")
-//    private WebElement expressBonusText;
 
     static By expressBonusText = xpath("//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]");
     static By expressBonusLink = xpath("//div[contains(@class,'coupon-bet_offer')]//a[contains(@class,'coupon-bet__link')]");
