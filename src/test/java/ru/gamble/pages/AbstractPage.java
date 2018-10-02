@@ -104,6 +104,7 @@ public abstract class AbstractPage extends Page {
     @FindBy (xpath = "//a[@href='/azbuka-bettinga']")
     private WebElement azbuka;
 
+
     // Метод три раза пытается обновить главную страницу
 
     @ActionTitle("открывает Избранное")
