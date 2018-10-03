@@ -20,9 +20,10 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import static ru.gamble.utility.Constants.*;
-
 import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static ru.gamble.utility.Constants.*;
 
 @PageEntry(title = "Первый ЦУПИС")
 public class TSUPISMainPage extends AbstractPage {
@@ -76,10 +77,13 @@ public class TSUPISMainPage extends AbstractPage {
         } catch (DataException e) {
             e.printStackTrace();
         }
-        LOG.info("Водим в поле::" + phone);
-        fillField(inputPhone, phone);
 
-        LOG.info("Водим в поле::" + password);
+        fillField(inputPhone, phone);
+        String actual = inputPhone.getAttribute("value").replaceAll("\\D","");
+        assertThat(actual).as("ОШИБКА! Вводимый номер [" + phone + "] не соответсвует [" + actual + "]").contains(phone);
+        LOG.info("В поле [Телефон] ввели [" + actual  +"]");
+
         fillField(inputPassword, password);
+        LOG.info("В поле [Пароль] ввели [" + password  +"]");
     }
 }
