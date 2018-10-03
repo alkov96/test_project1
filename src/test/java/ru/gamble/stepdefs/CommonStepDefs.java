@@ -1021,17 +1021,24 @@ public class CommonStepDefs extends GenericStepDefs {
         birthDate=formatgut.format(formatDate.parse(birthDate));
         Stash.put(keyPhone,phone);
         Stash.put(keyBD,birthDate);
+        Thread.sleep(500);
         while ((line = fr.readLine()) != null){
             sbt.append(line).append(System.lineSeparator());
         }
         FileWriter fw = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
         BufferedWriter bw = new BufferedWriter(fw);
         LOG.info("перезаписываем файл " + "src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
+        Thread.sleep(500);
         bw.write(sbt.toString());
         bw.flush();
         bw.close();
         fr.close();
         LOG.info(phone + " " +birthDate);
+
+
+        if ( new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r").readLine().trim().split(separator)[0].equals(phone)){
+            Assert.fail("Все плохо. файл опть не перезаписался!");
+        }
     }
 
     @Когда("^поиск пользователя проходившего ускоренную регистрацию \"([^\"]*)\"$")
