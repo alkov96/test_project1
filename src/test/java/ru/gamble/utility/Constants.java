@@ -48,7 +48,7 @@ public class Constants {
     public static final String NAME = "Имя";
     public static final String LASTNAME = "Фамилия";
     public static final String PATERNALNAME = "Отчество";
-    public static final String AMOUNT = "Сумма";
+    public static final String AMOUNT = "СУММА";
     public static final String PAYMENT_METHOD = "Способ";
 
     public static final List<String> cities = Arrays.asList("Москва","Санкт-Петербург","Новосибирск","Екатеринбург","Нижний Новгород","Казань","Челябинск","Омск","Самара","Ростов-на-Дону","Уфа","Красноярск","Пермь","Воронеж","Волгоград");

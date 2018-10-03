@@ -42,6 +42,8 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 public abstract class AbstractPage extends Page {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
+    public static By xpathListBets = xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul");
+
     @ElementTitle("Вход")
     @FindBy(id = "log-in")
     private WebElement enterButton;
@@ -334,7 +336,8 @@ public abstract class AbstractPage extends Page {
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
-                eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
+                eventsInCoupon = PageFactory.getWebDriver().findElements(xpathListBets);
+                        //PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
                 LOG.info("коэф: " + coefficient.getText());
                 if (eventsInCoupon.size() == count) {
                     break;
