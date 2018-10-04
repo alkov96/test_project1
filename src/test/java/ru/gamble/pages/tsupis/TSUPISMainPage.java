@@ -45,6 +45,7 @@ public class TSUPISMainPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
+        driver.navigate().to(driver.getCurrentUrl()); // костыль для Firefox
         LOG.info("Перешли на страницу [" + driver.getCurrentUrl() + "]");
         new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(inputPhone));
     }

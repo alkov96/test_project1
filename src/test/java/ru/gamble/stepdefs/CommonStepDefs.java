@@ -249,7 +249,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 break;
         }
             PageFactory.getDriver().get(currentUrl);
-            LOG.info("Перешли на страницу ==>[" + currentUrl + "]");
+            LOG.info("Перешли на страницу [" + currentUrl + "]");
         }catch (DataException e) {
             LOG.error(e.getMessage());
         }
