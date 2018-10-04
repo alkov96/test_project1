@@ -1512,8 +1512,8 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^записываем значение баланса бонусов в \"([^\"]*)\"$")
     public void writeValueOfBonusBalanceIn(String bonusKey) {
-        List<WebElement> bonusElement = PageFactory.getWebDriver().findElements(By.id("bonus-balance"));
-        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getText();
+        List<WebElement> bonusElement = PageFactory.getWebDriver().findElements(By.xpath("//span[contains(@class,'subMenuBonus bonusmoney-text')]"));
+        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getText().replaceAll("[^0-9.]","");
         Stash.put(bonusKey,bonus);
         LOG.info("Записали в key [" + bonusKey + "] <== value [" + bonus + "]");
     }

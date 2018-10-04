@@ -365,13 +365,17 @@ public abstract class AbstractPage extends Page {
             } while (Objects.requireNonNull(inCorrectMarkets).size() < count && tryPage < allDaysPages.size() - 1);
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
-                eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
+                eventsInCoupon = PageFactory.getWebDriver().findElements(xpathListBets);
                 LOG.info("коэф: " + coefficient.getText());
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
             }
         }
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
+        wait.withMessage("Попытались добавить " + count + " событий в купон. Но добавилось только " + getWebDriver().findElements(xpathListBets).size()
+                + "\nВероятно, просто нет подходящих событий");
+        wait.until(ExpectedConditions.numberOfElementsToBe(xpathListBets,count));
     }
 
     public void waitForElementPresent(final By by, int timeout) {
@@ -444,6 +448,9 @@ public abstract class AbstractPage extends Page {
         if (clearCoupon.isDisplayed()){
             clearCoupon.click();
         }
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
+        wait.withMessage("Очистить купон. Но остались события " + getWebDriver().findElements(xpathListBets).size());
+        wait.until(ExpectedConditions.numberOfElementsToBe(xpathListBets,0));
     }
 
     protected void waitingForPreloaderToDisappear(int timeInSeconds){
