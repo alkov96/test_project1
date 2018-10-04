@@ -1006,11 +1006,49 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^выбираем fullalt пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchFullAlt(String keyPhone, String keyBD) throws Exception {
-        RandomAccessFile fr = new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r");
+//        RandomAccessFile fr = new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r");
+//
+//        String line;
+//        StringBuilder sbt = new StringBuilder();
+//        String user = fr.readLine();
+//        String separator = user.contains("\t") ?"\t":"\\s";
+//        String phone = user.trim().split(separator)[0];
+//        String birthDate = user.trim().split(separator)[1];
+//        SimpleDateFormat formatDate = new SimpleDateFormat();
+//        SimpleDateFormat formatgut = new SimpleDateFormat();
+//        formatgut.applyPattern("dd.MM.yyyy");
+//        formatDate.applyPattern("yyyy-MM-dd");
+//        birthDate=formatgut.format(formatDate.parse(birthDate));
+//        Stash.put(keyPhone,phone);
+//        Stash.put(keyBD,birthDate);
+//        Thread.sleep(500);
+//        while ((line = fr.readLine()) != null){
+//            sbt.append(line).append(System.lineSeparator());
+//        }
+//        FileWriter fw = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
+//        BufferedWriter bw = new BufferedWriter(fw);
+//        LOG.info("перезаписываем файл " + "src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
+//        Thread.sleep(500);
+//        bw.write(sbt.toString());
+//        bw.flush();
+//        bw.close();
+//        fr.close();
+//        LOG.info(phone + " " +birthDate);
+//
+//
+//        if ( new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r").readLine().trim().split(separator)[0].equals(phone)){
+//            Assert.fail("Все плохо. файл опть не перезаписался!");
+//        }
 
-        String line;
-        StringBuilder sbt = new StringBuilder();
-        String user = fr.readLine();
+
+
+
+        StringBuilder lal = new StringBuilder();
+        FileReader file = new FileReader("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
+        Scanner scan = new Scanner(file);
+//lal.append(scan.next());
+
+        String user = scan.nextLine();
         String separator = user.contains("\t") ?"\t":"\\s";
         String phone = user.trim().split(separator)[0];
         String birthDate = user.trim().split(separator)[1];
@@ -1021,17 +1059,16 @@ public class CommonStepDefs extends GenericStepDefs {
         birthDate=formatgut.format(formatDate.parse(birthDate));
         Stash.put(keyPhone,phone);
         Stash.put(keyBD,birthDate);
-        while ((line = fr.readLine()) != null){
-            sbt.append(line).append(System.lineSeparator());
+
+        while (scan.hasNext()){
+            lal.append(scan.nextLine()).append(System.lineSeparator());
         }
-        FileWriter fw = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
-        BufferedWriter bw = new BufferedWriter(fw);
-        LOG.info("перезаписываем файл " + "src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
-        bw.write(sbt.toString());
-        bw.flush();
-        bw.close();
-        fr.close();
-        LOG.info(phone + " " +birthDate);
+
+        FileWriter nfile = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt",false);
+        nfile.write(lal.toString());
+        nfile.close();
+        file.close();
+
     }
 
     @Когда("^поиск пользователя проходившего ускоренную регистрацию \"([^\"]*)\"$")
