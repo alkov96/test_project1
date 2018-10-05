@@ -30,8 +30,7 @@ public class MainBannerPage extends AbstractPage{
 
     public MainBannerPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         tryingLoadPage(dotsOnBanner,5, 10);
     }
 

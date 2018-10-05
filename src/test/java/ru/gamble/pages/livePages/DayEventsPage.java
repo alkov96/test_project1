@@ -41,8 +41,7 @@ public class DayEventsPage extends AbstractPage {
 
     public DayEventsPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(widget));
     }
 

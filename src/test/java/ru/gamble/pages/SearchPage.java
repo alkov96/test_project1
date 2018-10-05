@@ -38,8 +38,7 @@ public class SearchPage extends AbstractPage{
 
     public SearchPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.elementToBeClickable(searchField));
 
     }

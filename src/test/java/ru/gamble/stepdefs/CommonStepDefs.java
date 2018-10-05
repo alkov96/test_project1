@@ -16,6 +16,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -34,6 +36,7 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
+
 import javax.net.ssl.*;
 import java.io.*;
 import java.math.BigDecimal;
@@ -49,6 +52,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
@@ -1374,6 +1378,20 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("TAGS: " + scenario.getSourceTagNames());
         LOG.info("ID: " + scenario.getId().replaceAll("\\D+","") );
         String mainUrl;
+
+        WebDriver driver = PageFactory.getWebDriver();
+
+        Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
+        String browserName = caps.getBrowserName();
+        LOG.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + caps.getBrowserName());
+
+        //Принуждение Firefox всегда открывать ссылку в новой вкладке, а не в новом окне!!!
+        if (browserName.contains("firefox")){
+            FirefoxProfile profile = new FirefoxProfile();
+            profile.setPreference("browser.link.open_newwindow.restriction", 0);
+            profile.setPreference("browser.link.open_newwindow", 1);
+        }
+
         try {
             if (scenario.getSourceTagNames().contains("@mobile")) {
                 mainUrl = JsonLoader.getData().get(STARTING_URL).get("MOBILE_URL").getValue();
