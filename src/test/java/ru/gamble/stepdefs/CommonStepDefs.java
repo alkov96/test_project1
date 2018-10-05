@@ -16,7 +16,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -1383,14 +1382,14 @@ public class CommonStepDefs extends GenericStepDefs {
 
         Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
         String browserName = caps.getBrowserName();
-        LOG.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + caps.getBrowserName());
-
-        //Принуждение Firefox всегда открывать ссылку в новой вкладке, а не в новом окне!!!
-        if (browserName.contains("firefox")){
-            FirefoxProfile profile = new FirefoxProfile();
-            profile.setPreference("browser.link.open_newwindow.restriction", 0);
-            profile.setPreference("browser.link.open_newwindow", 1);
-        }
+//        LOG.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + caps.getBrowserName());
+//
+//        //Принуждение Firefox всегда открывать ссылку в новой вкладке, а не в новом окне!!!
+//        if (browserName.contains("firefox")){
+//            FirefoxProfile profile = new FirefoxProfile();
+//            profile.setPreference("browser.link.open_newwindow.restriction", 0);
+//            profile.setPreference("browser.link.open_newwindow", 1);
+//        }
 
         try {
             if (scenario.getSourceTagNames().contains("@mobile")) {
