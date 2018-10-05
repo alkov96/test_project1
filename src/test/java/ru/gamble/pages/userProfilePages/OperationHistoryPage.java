@@ -80,7 +80,7 @@ public class OperationHistoryPage extends AbstractPage {
         page.click();
 
         newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getText());
-        LOG.info("Перешли на страницу " + newPage);
+        LOG.info("Перешли на страницу  [" + newPage + "]");
         if (newPage.equals(currentPage)) {
             Assert.fail("Страница не перелистнулась!! была активной страница" + currentPage + " стала активно страница " + newPage);
             result = false;

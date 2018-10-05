@@ -42,6 +42,8 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 public abstract class AbstractPage extends Page {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
+    public static By xpathListBets = xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul");
+
     @ElementTitle("Вход")
     @FindBy(id = "log-in")
     private WebElement enterButton;
@@ -103,6 +105,7 @@ public abstract class AbstractPage extends Page {
     @ElementTitle("Азбука беттинга")
     @FindBy (xpath = "//a[@href='/azbuka-bettinga']")
     private WebElement azbuka;
+
 
     // Метод три раза пытается обновить главную страницу
 
@@ -333,7 +336,8 @@ public abstract class AbstractPage extends Page {
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
-                eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
+                eventsInCoupon = PageFactory.getWebDriver().findElements(xpathListBets);
+                        //PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
                 LOG.info("коэф: " + coefficient.getText());
                 if (eventsInCoupon.size() == count) {
                     break;
@@ -361,13 +365,17 @@ public abstract class AbstractPage extends Page {
             } while (Objects.requireNonNull(inCorrectMarkets).size() < count && tryPage < allDaysPages.size() - 1);
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
-                eventsInCoupon = PageFactory.getWebDriver().findElements(By.xpath("//ul[@class='coupon-bet-list ng-scope']"));
+                eventsInCoupon = PageFactory.getWebDriver().findElements(xpathListBets);
                 LOG.info("коэф: " + coefficient.getText());
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
             }
         }
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
+        wait.withMessage("Попытались добавить " + count + " событий в купон. Но добавилось только " + getWebDriver().findElements(xpathListBets).size()
+                + "\nВероятно, просто нет подходящих событий");
+        wait.until(ExpectedConditions.numberOfElementsToBe(xpathListBets,count));
     }
 
     public void waitForElementPresent(final By by, int timeout) {
@@ -440,6 +448,9 @@ public abstract class AbstractPage extends Page {
         if (clearCoupon.isDisplayed()){
             clearCoupon.click();
         }
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
+        wait.withMessage("Очистить купон. Но остались события " + getWebDriver().findElements(xpathListBets).size());
+        wait.until(ExpectedConditions.numberOfElementsToBe(xpathListBets,0));
     }
 
     protected void waitingForPreloaderToDisappear(int timeInSeconds){

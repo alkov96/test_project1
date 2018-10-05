@@ -52,6 +52,10 @@ public class FirstTSUPISLK extends AbstractPage {
     @FindBy(xpath = "//input[contains(@value,'Продолжить')]")
     private WebElement buttonContinue;
 
+    @ElementTitle("Подтвердить")
+    @FindBy(xpath = "//input[contains(@value,'Подтвердить')]")
+    private WebElement buttonConfirm;
+
     @ElementTitle("Код из СМС")
     @FindBy (name = "validation")
     private WebElement inputSMSCode;

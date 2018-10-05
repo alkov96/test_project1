@@ -36,10 +36,10 @@ public class MobileWithdrawPage extends MobileAuthorizedMainPage {
     }
 
 
-//    @ActionTitle("заполняет поле 'Сумма вывода'")
-//    public void fillFielWithdrawAmount(String keySum){
-//        String sum = Stash.getValue(keySum);
-//        fillField(amountInput,sum);
-//        LOG.info("В поле [Сумма вывода] ввели сумму [" + amountInput.getAttribute("value") + "]");
-//    }
+    @ActionTitle("заполняет поле 'Сумма вывода'")
+    public void fillFielWithdrawAmount(String keySum){
+        String sum = Stash.getValue(keySum);
+        fillField(amountInput,sum);
+        LOG.info("В поле [Сумма вывода] ввели сумму [" + amountInput.getAttribute("value") + "]");
+    }
 }

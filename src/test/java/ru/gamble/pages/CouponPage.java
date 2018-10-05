@@ -61,13 +61,6 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//span[@class='btn btn_full-width']")
     protected WebElement clearCoupon;
 
-//    @ElementTitle("экспресс-бонус ссылка")
-//    @FindBy(xpath = "//div[contains(@class,'coupon-bet_offer')]//a[contains(@class,'coupon-bet__link')]")
-//    private WebElement expressBonusLink;
-//
-//    @ElementTitle("текст экспресс бонуса")
-//    @FindBy(xpath = "//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]")
-//    private WebElement expressBonusText;
 
     static By expressBonusText = xpath("//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]");
     static By expressBonusLink = xpath("//div[contains(@class,'coupon-bet_offer')]//a[contains(@class,'coupon-bet__link')]");
@@ -92,8 +85,12 @@ public class CouponPage extends AbstractPage {
     private WebElement buttonBet;
 
     @ElementTitle("переключатель ставки на бонусы")
-    @FindBy(xpath="//li[contains(@class, 'coupon-bet__row coupon-bet__row_inputs')]/div[@class='coupon__button-group']/label[2]")
+    @FindBy(xpath="//div[@class='coupon__button-group']//label[contains(@class,'coupon-btn_b')]")
     private WebElement bonusBet;
+
+
+    static By xpathFreeBet = xpath("//div[@class='coupon__button-group']//label[contains(@class,'coupon-btn_f')]");
+
 
     @FindBy(className="coupon__banners") //баннеры в купоне
     private WebElement bannersInCoupon;
@@ -112,8 +109,8 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("убирает события из купона, пока их не станет")
     public void removeEventsFromCoupon(String param) {
         int count = Integer.parseInt(param);
-        while (PageFactory.getWebDriver().findElements(xpath("//ul[@class='coupon-bet-list ng-scope']")).size() > count) {
-            PageFactory.getWebDriver().findElement(xpath("//span[@ng-click='removeBet(bet)']")).click();
+        while (PageFactory.getWebDriver().findElements(xpathListBets).size() > count) {
+            PageFactory.getWebDriver().findElement(xpath("//span[@class='coupon-bet__close-btn']")).click();
         }
     }
 
@@ -148,9 +145,12 @@ public class CouponPage extends AbstractPage {
 
     public void checkBonus(boolean expect) {
         WebDriver driver = PageFactory.getDriver();
-        List <WebElement> listBets = driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
+        List <WebElement> listBets = driver.findElements(xpathListBets);
+        //driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
         if (!expect) {
-            assertTrue(driver.findElements(currentExpressBonus).isEmpty());
+            assertTrue(
+                    "Есть эспресс-бонус!!! " + driver.findElements(currentExpressBonus).size(),
+                    driver.findElements(currentExpressBonus).isEmpty());
         } else {
              assertTrue(
                     "Неправильный размер экспресс-бонуса (или его вообще нет)   ||| " + driver.findElement(currentExpressBonus).getText() + " |||",
@@ -161,18 +161,20 @@ public class CouponPage extends AbstractPage {
 
     public void checkExpressBonus(boolean expect) {
         WebDriver driver = PageFactory.getDriver();
-        List <WebElement> listBets = driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
+        List <WebElement> listBets = driver.findElements(xpathListBets);
+
+        //driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
         if (!expect) {
+//            assertTrue(
+//                    "Есть ссылка!!! " + driver.findElements(expressBonusLink).get(0).getAttribute("href"),
+//                    driver.findElements(expressBonusLink).isEmpty());
             assertTrue(
-                    "Есть ссылка!!! " + driver.findElements(expressBonusLink).get(0).getAttribute("href"),
-                    driver.findElements(expressBonusLink).isEmpty());
-            assertTrue(
-                    "Есть эспресс-бонус!!! " + driver.findElements(expressBonusText).get(0).getText(),
+                    "Есть эспресс-бонус!!! " + driver.findElements(expressBonusText).size(),
                     driver.findElements(expressBonusText).isEmpty());
         } else {
-            assertTrue(
-                    "Неправильная ссылка на описание экспресс-бонуса. Или ссылки вообще нет  ||| " + driver.findElement(expressBonusLink).getAttribute("href") + " |||",
-                    driver.findElement(expressBonusLink).getAttribute("href").contains("'/rules/express-bonus'")); // проверка корректности ссылки
+//            assertTrue(
+//                    "Неправильная ссылка на описание экспресс-бонуса. Или ссылки вообще нет  ||| " + driver.findElement(expressBonusLink).getAttribute("href") + " |||",
+//                    driver.findElement(expressBonusLink).getAttribute("href").contains("'/rules/express-bonus'")); // проверка корректности ссылки
             assertTrue(
                     "Неправильная текст в описании экспресс-бонуса. Или его вообще нет   ||| " + driver.findElement(expressBonusText).getText() + " |||",
                     driver.findElement(expressBonusText).getText().contains("+" + (listBets.size()+1) + "% к выигрышу")); // проверка корректности текста
@@ -662,6 +664,20 @@ public class CouponPage extends AbstractPage {
             } catch (NoSuchElementException e) {
                 LOG.info("Невозможно переключиться на нужную вкладку купона. Элемент не найден");
             }
+        }
+    }
+
+    @ActionTitle("включает фрибет если есть и проверяет наличие экспресс-бонуса")
+    public void onFreebet(){
+        WebDriver driver = PageFactory.getDriver();
+        boolean hasFreeBet = !driver.findElements(xpathFreeBet).isEmpty();
+        if (hasFreeBet){
+            LOG.info("Фрибета нет у этого пользователя");
+        }
+        else {
+            driver.findElement(xpathFreeBet).click();
+            checkBonus(false);
+            checkExpressBonus(false);
         }
     }
 
