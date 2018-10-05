@@ -228,8 +228,8 @@ public class LandingAppPage extends AbstractPage {
         int x, y;
         WebElement inputPhone=driver.findElement(By.id("app_desctop_sms_block_input_phone"));
         WebElement sendPhone=driver.findElement(By.id("app_desctop_sms_block_btn_send"));
-        x=inputPhone.getLocation().getX()-100;
-        y=inputPhone.getLocation().getY()-100;
+        x = inputPhone.getLocation().getX() - 100;
+        y = inputPhone.getLocation().getY() - 100;
         CommonStepDefs.scrollPage(x,y);
 
         String hint;
@@ -238,7 +238,7 @@ public class LandingAppPage extends AbstractPage {
             inputPhone.clear();
             inputPhone.sendKeys(phone);
 
-            LOG.info("Отправили смс на номер +7"+phone);
+            LOG.info("Отправили смс на номер +7" + phone);
             sendPhone.click();
             Thread.sleep(1000);
             hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
