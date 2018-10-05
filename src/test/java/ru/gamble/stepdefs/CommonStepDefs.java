@@ -1383,6 +1383,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
         String browserName = caps.getBrowserName();
+        LOG.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + caps.getBrowserName());
 
         //Принуждение Firefox всегда открывать ссылку в новой вкладке, а не в новом окне!!!
         if (browserName.contains("firefox")){
