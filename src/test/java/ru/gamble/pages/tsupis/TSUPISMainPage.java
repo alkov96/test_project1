@@ -17,8 +17,6 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.util.Map;
 
@@ -43,17 +41,7 @@ public class TSUPISMainPage extends AbstractPage {
 
     public TSUPISMainPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
-
-        Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
-        String browserName = caps.getBrowserName();
-        if (browserName.contains("firefox")){
-            driver.switchTo().window(driver.getCurrentUrl());
-            //driver.navigate().to(driver.getCurrentUrl()); // костыль для Firefox
-        }
-
-
+        PageFactory.initElements(driver, this);
         LOG.info("Перешли на страницу [" + driver.getCurrentUrl() + "]");
         new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(inputPhone));
     }

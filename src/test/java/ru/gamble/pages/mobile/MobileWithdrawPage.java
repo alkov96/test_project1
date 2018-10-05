@@ -29,8 +29,7 @@ public class MobileWithdrawPage extends MobileAuthorizedMainPage {
 
     public MobileWithdrawPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         waitingForPreloaderToDisappear(30);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }

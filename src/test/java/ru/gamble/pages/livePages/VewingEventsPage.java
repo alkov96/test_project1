@@ -1,7 +1,6 @@
 package ru.gamble.pages.livePages;
 
 import cucumber.api.DataTable;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -18,17 +17,12 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
-
-import java.util.ArrayList;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.openqa.selenium.By.xpath;
-import static ru.gamble.stepdefs.CommonStepDefs.stringParse;
 
 @PageEntry(title = "Лайв просмотр событий")
 public class VewingEventsPage extends AbstractPage {
@@ -39,8 +33,7 @@ public class VewingEventsPage extends AbstractPage {
 
     public VewingEventsPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 

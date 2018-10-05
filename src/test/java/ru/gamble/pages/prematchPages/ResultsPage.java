@@ -26,8 +26,7 @@ public class ResultsPage extends AbstractPage {
 
     public ResultsPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(resultsToday));
     }
 
