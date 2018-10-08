@@ -1368,8 +1368,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
     }
 
-
-
     @Before()
     public void titleTest(Scenario scenario){
         LOG.info("<================START...TEST================>");
