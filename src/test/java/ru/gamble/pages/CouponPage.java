@@ -257,7 +257,9 @@ public class CouponPage extends AbstractPage {
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         By by = xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout') and not (contains (@class, 'ng-hide'))]");
-        new WebDriverWait(driver, 70).until(ExpectedConditions.presenceOfElementLocated(by));
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),20);
+        wait.withMessage("Не удалось найти события, где меняется коэфицент");
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 1));
         List<WebElement> oldCoef = driver.findElements(by).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
         if (oldCoef.size() == 0){
             Assertions.fail("Коэфицент не поменялся!");
@@ -574,7 +576,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
-        WebElement coeff = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff')]"));
+        WebElement coeff = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff') and not (contains (@class, 'strikeout'))]"));
         previous = coeff.getText();
         preferences.click();
         List<WebElement> list_of_pref = driver.findElements(By.cssSelector("span.prefs__key"));
