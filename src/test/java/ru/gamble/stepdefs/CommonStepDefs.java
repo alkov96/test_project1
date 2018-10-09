@@ -177,7 +177,6 @@ public class CommonStepDefs extends GenericStepDefs {
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Переход на главную страницу");
         goToMainPage("site");
-        LOG.info("Очистка куков");
         cleanCookies();
         if(driver.getCurrentUrl().contains("mobile")){
             mobileSiteLogOut(driver);
