@@ -12,7 +12,7 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 
-@PageEntry(title = "Купон")
+@PageEntry(title = "Мобильный Купон")
 public class MobileCouponPage extends MobileAuthorizedMainPage{
     private static final Logger LOG = LoggerFactory.getLogger(MobileCouponPage.class);
 

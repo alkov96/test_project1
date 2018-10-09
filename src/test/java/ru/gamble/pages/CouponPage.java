@@ -47,7 +47,7 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 public class CouponPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(CouponPage.class);
 
-    @FindBy(xpath = "//div[contains(@class,'list-bet-block')]")
+    @FindBy(xpath = "//div[contains(@class,'coupon__types')]")
     private WebElement coupon;
 
     @ElementTitle("Активация Быстрой ставки")
@@ -104,9 +104,9 @@ public class CouponPage extends AbstractPage {
 
     public CouponPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(coupon, 10, 5);
+//        PageFactory.initElements(new HtmlElementDecorator(
+//                new HtmlElementLocatorFactory(driver)), this);
+//        tryingLoadPage(coupon, 10, 5);
         PageFactory.initElements(driver, this);
         tryingLoadPage(coupon,10, 5);
     }
@@ -719,6 +719,7 @@ public class CouponPage extends AbstractPage {
         Assert.assertTrue(
                 "Не сработал фильтр для истории заключенных пари в купоне. вместо " + filter + ", включен " + currentFilter,
                 currentFilter.contains(filter));
+        CommonStepDefs.workWithPreloader();
     }
 
     @ActionTitle("запоминает первые события в заключенных пари")
