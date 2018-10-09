@@ -260,7 +260,7 @@ public class RefillAccountsPage extends AbstractPage{
         Thread.sleep(1000);
         message.setLength(0);//очищаем список ошибок чтобы заново его создать
         List<WebElement> depositWays = Stash.getValue("depositWaysKey");
-        String way = Stash.getValue("wayKey");
+        String way = Stash.getValue("wayKey").toString();
         for (WebElement sposob : depositWays) {
             sposob.click();
             Thread.sleep(5000);//да, это много. но прелоадер будет не всегда. если предыдущи способ не давал поополнить, и следующий не дает пополнить - то прелоадера не будет

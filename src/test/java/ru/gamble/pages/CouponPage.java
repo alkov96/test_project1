@@ -11,8 +11,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.livePages.DayEventsPage;
@@ -268,7 +266,7 @@ public class CouponPage extends AbstractPage {
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         By by = xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout') and not (contains (@class, 'ng-hide'))]");
-        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),20);
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),70);
         wait.withMessage("Не удалось найти события, где меняется коэфицент");
         wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 1));
         List<WebElement> oldCoef = driver.findElements(by).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
@@ -365,7 +363,6 @@ public class CouponPage extends AbstractPage {
 
     /**
      * Системы это по сути сразу несколько экспрессов, и сумма ставки должна быть не меньше чем их количество.
-     *
      * @param less - показывает нужно ли вводить валидную сумму или нет. если less содержит слово меньше, то сумма должна быть меньше чем количество экспрессов - невалид
      */
     @ActionTitle("вводит сумму ставки система")
@@ -386,7 +383,7 @@ public class CouponPage extends AbstractPage {
 
 
     @ActionTitle("вводит сумму ставки экспресс")
-    public void inputBetExpress(String sumBet) {
+    public void inputBetExpress(String sumBet){
         BigDecimal sum;
         LOG.info("Вводим сумму ставки : [" + sumBet + "]");
         fillField(couponInputSystem, sumBet);
@@ -437,6 +434,7 @@ public class CouponPage extends AbstractPage {
             Assertions.fail("в купоне не отображается сообщение о том, что нужно поплнить баланс");
         }
     }
+
 
 
     @ActionTitle("заключает пари")
@@ -549,6 +547,18 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         boolean disabled = status.equals("активна");
         if (buttonBet.isEnabled() != disabled) {
+            Assertions.fail("Кнопка 'Заключить пари' в неправильном состоянии: не " + status);
+        }
+        int i = 0;
+        LOG.info("Ищем и нажимаем на шестерёнку в Купоне [" + i + "]");
+        WebElement gear = driver.findElement(xpath("//span[contains(@class,'coupon-tabs__item-link')]/i"));
+        gear.click();
+
+        LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
+        driver.findElement(xpath("//span[text()='Любые изменения']")).click();
+        LOG.info("Возвращаемся к списку событий в купоне");
+        driver.findElement(xpath("//span[text()='Купон']")).click();
+        if (buttonBet.isEnabled()!=disabled){
             Assertions.fail("Кнопка 'Заключить пари' в неправильном состоянии: не " + status);
         }
         LOG.info("Кнопка 'Заключить пари' " + status);

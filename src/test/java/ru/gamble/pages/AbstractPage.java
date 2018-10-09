@@ -106,6 +106,9 @@ public abstract class AbstractPage extends Page {
     @FindBy (xpath = "//a[@href='/azbuka-bettinga']")
     private WebElement azbuka;
 
+    @ElementTitle("Подвал")
+    @FindBy (xpath = "//div[@class='footer__pin']")
+    private WebElement podval;
 
     // Метод три раза пытается обновить главную страницу
 
