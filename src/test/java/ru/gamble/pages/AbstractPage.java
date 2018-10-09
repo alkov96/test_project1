@@ -122,6 +122,10 @@ public abstract class AbstractPage extends Page {
         LOG.info("Нажали на [" + param + "]");
     }
 
+    @ActionTitle("открывает/закрывает Мои пари")
+    public void openMyBets(){
+        PageFactory.getDriver().findElement(By.xpath("//span[@class='icon-svg__my-bets_selected']")).click();
+    }
     @ActionTitle("stop")
     public static void stop() {
         LOG.info("STOP");
