@@ -9,15 +9,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.utility.Generators;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.utility.Generators;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,8 +92,7 @@ public class PassportDataPage extends AbstractPage {
 
     public PassportDataPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
     }
 

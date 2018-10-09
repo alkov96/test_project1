@@ -18,8 +18,6 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,10 +45,9 @@ public class EventViewerPage extends AbstractPage {
 
     public EventViewerPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
-            new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandCollapseMenusButton));
-            checkMenuIsOpen();
+        PageFactory.initElements(driver, this);
+        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandCollapseMenusButton));
+        checkMenuIsOpen();
     }
 
     private void checkMenuIsOpen(){
@@ -223,6 +220,11 @@ public class EventViewerPage extends AbstractPage {
             throw new AutotestError("Не надено время игры!!!");}
     }
 
+    /**
+     * Метод проверяет входит ли время события в необходимый диапазон
+     * @param diapason - диапазон, метка указывающая кол-во часов от текущей даты-веремени
+     * @param currentGameDateTime - время события
+     */
     private void checkDateTime(int diapason, String currentGameDateTime){
         Date currentDateTime = new Date(System.currentTimeMillis());
 

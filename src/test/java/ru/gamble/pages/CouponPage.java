@@ -8,6 +8,9 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -23,6 +26,7 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import javax.annotation.Nullable;
 import javax.naming.AuthenticationException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -105,6 +109,8 @@ public class CouponPage extends AbstractPage {
         PageFactory.initElements(new HtmlElementDecorator(
                 new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(coupon, 10, 5);
+        PageFactory.initElements(driver, this);
+        tryingLoadPage(coupon,10, 5);
     }
 
     @ActionTitle("убирает события из купона, пока их не станет")
@@ -241,12 +247,32 @@ public class CouponPage extends AbstractPage {
         //button_of_param_in_coupon.click();
     }
 
+
+        ExpectedCondition<Boolean> pageLoadCondition = new
+                ExpectedCondition<Boolean>() {
+                    @Nullable
+                    @Override
+                    public Boolean apply(@Nullable WebDriver webDriver) {
+                        return null;
+                    }
+
+                    public Boolean apply(WebDriver driver, By by) {
+                        return driver.findElement(by).isDisplayed();
+                    }
+                };
+
+
+
+
     @ActionTitle("проверяет, что после изменения условий на 'Никогда' в купоне появляется кнопка 'Принять' и информационное сообщение")
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
-        Thread.sleep(30000);
-        List<WebElement> oldCoef = driver.findElements(xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout')]")).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
-        if (oldCoef.size() == 0) {
+        By by = xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout') and not (contains (@class, 'ng-hide'))]");
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),20);
+        wait.withMessage("Не удалось найти события, где меняется коэфицент");
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 1));
+        List<WebElement> oldCoef = driver.findElements(by).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
+        if (oldCoef.size() == 0){
             Assertions.fail("Коэфицент не поменялся!");
         }
         Thread.sleep(500);
@@ -275,23 +301,24 @@ public class CouponPage extends AbstractPage {
      */
     public float compareCoef(int param) {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
+        List<WebElement> allBets = driver.findElements(xpath("//ul[@class='coupon-bet__content']"));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         for (int i = 3; i > 0; i--) {
-            List<WebElement> oldCoef = driver.findElements(xpath("//li[@class='coupon-bet-list__item_result']/div[@class='coupon-bet-list__item-column']/span[@class='coupon-betprice_old ng-binding']"));
+            List<WebElement> oldCoef = driver.findElements(xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout') and not (contains (@class, 'ng-hide'))]"))
+                    .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
             if (!oldCoef.isEmpty()) break;
         }
-        float coefCoupon = Float.valueOf(allBets.get(param).findElement(xpath("span[contains(@class,'coupon-betprice')]")).getText());
-        String oldString = allBets.get(param).findElement(xpath("span[contains(@class,'coupon-betprice_old')]")).getAttribute("class");
+        float coefCoupon = Float.valueOf(allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[2]")).getText());
+        String oldString = allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[1]")).getAttribute("class");
         float coefOld;
-        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(xpath("span[contains(@class,'coupon-betprice_old')]")).getText());
+        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[1]")).getText());
         LOG.info("Старый коэф: " + coefOld);
         LOG.info("Текущий коэф: " + coefCoupon);
         return coefCoupon - coefOld;
     }
 
     @ActionTitle("проверяет изменения коэфицентов в купоне при условии 'Повышенные коэфиценты', удаляет из купона все события, кроме событий, у которых повысился коэфицент")
-    public void compareChangeCoef() throws InterruptedException {
+    public void compareChangeCoef () throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         button_of_param_in_coupon.click();
         driver.findElement(xpath("//ul[@class='coupon-settings__group']/li[3]")).click();
@@ -301,29 +328,29 @@ public class CouponPage extends AbstractPage {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        List<WebElement> allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
-        for (int i = allBets.size() - 1; i >= 0; i--) {
+        List<WebElement> allBets = driver.findElements(xpath("//ul[@class='coupon-bet__content']"));
+        for (int i = allBets.size()-1; i >=0; i--) {
             float s = compareCoef(i);
             LOG.info("для " + i + " события результат = " + s);
-            if (s <= 0) {
-                driver.findElement(xpath("//ul[contains(@class,'coupon-bet-list') and position()=" + (i + 1) + "]//i[contains(@class,'icon-cross-close')]")).click();//путь до крестика, чтобы удалить событие из купона
-                allBets = driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]"));
-            }
+               if (s>=0.00){
+                   driver.findElements(xpath("//ul[contains(@class,'coupon-bet__content')]//i[contains(@class,'icon-cross-close')]")).get(i).click();//путь до крестика, чтобы удалить событие из купона
+                    allBets = driver.findElements(xpath("//ul[@class='coupon-bet__content']"));
+               }
         }
 
-        if (allBets.size() == 0) {
+        if (allBets.size() == 0){
             LOG.info("Подходящей ставки не нашлось, поэтому заново добавляем события в купон, сравниваем коэфиценты и удаляем ненужные события");
             DayEventsPage.addEventsToCouponF();
             compareChangeCoef();
             //  compareCoef(i);
         }
-        LOG.info("Количество событий в купоне: " + driver.findElements(xpath("//ul[contains(@class,'coupon-bet-list')]/li[2]/div[2]")).size());
-        if (driver.findElement(xpath("//div[@class='bet-notification__error-text bet-notification__suggestion-wrapper']")).isDisplayed()
-                || driver.findElement(xpath("//div[@class='coupon-confirm__btn']")).isDisplayed()) {
+        LOG.info("Количество событий в купоне: " + driver.findElements(xpath("//ul[@class='coupon-bet__content']")).size());
+        if (driver.findElement(xpath("//span[contains(@class,'coupon__message coupon__message_suggestions')]")).isDisplayed()
+                || driver.findElement(xpath("//span[@class='btn btn_full-width' and @ng-click = 'acceptChanges()']")).isDisplayed()) {
+            LOG.info("Отображается кнопка 'Принять', в купоне события с повышенным коэфицентом");
+        } else {
             Assertions.fail("Отображается кнопка и сообщение, хотя не должны - в купоне одни лишь события с повышенным коэфицентом");
         }
-        LOG.info("Не появилась кнопка 'Принять', в купоне события с повышенным коэфицентом");
-
     }
 
     @ActionTitle("выбирает тип ставки")
@@ -564,7 +591,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
-        WebElement coeff = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff')]"));
+        WebElement coeff = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff') and not (contains (@class, 'strikeout'))]"));
         previous = coeff.getText();
         preferences.click();
         List<WebElement> list_of_pref = driver.findElements(By.cssSelector("span.prefs__key"));
@@ -582,7 +609,7 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("выбирает ставку бонусами")
-    public void onBonus() {
+    public void onBonus(){
         WebDriver driver = PageFactory.getDriver();
         if (driver.findElement(xpath("//span[contains(@class,'bonusmoney-text')]")).isDisplayed()) {
             bonusBet.click();
@@ -591,36 +618,38 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("проверяет наличие банеров в купоне")
-    public void checkBannerInCoupon() {
-        if (bannersInCoupon.isDisplayed()) {
+    public void checkBannerInCoupon(){
+        if (bannersInCoupon.isDisplayed()){
             LOG.info("Баннер отображается, купон пустой");
-        } else {
+        }
+        else {
             Assertions.fail("Ошибка! Событий в купоне нет, но банеры при этом не отображаются.");
         }
     }
 
     @ActionTitle("проверяет отсутствие баннеров в купоне")
-    public void checkBannersOutOfCoupon() {
-        if (bannersInCoupon.isDisplayed()) {
+    public void checkBannersOutOfCoupon(){
+        if (bannersInCoupon.isDisplayed()){
             Assertions.fail("Ошибка! Баннер отображается, хотя в купоне есть событие");
-        } else {
+        }
+        else {
             LOG.info("Баннер не отображается, так как в купоне есть событие");
         }
     }
 
     @ActionTitle("выбирает авто-переключение купона на")
-    public void autoSelectCoupon(String autoSelect) {
+    public void autoSelectCoupon(String autoSelect ){
         WebDriver driver = PageFactory.getDriver();
         LOG.info("Переключаемся на вкладку настроек купона");
         driver.findElement(xpath("//i[contains(@class,'coupon-tabs__item-icon')]")).click();
         LOG.info("Выбираем пункт " + autoSelect);
-        driver.findElement(xpath("//span[@class='coupon-settings__radio-label-text' and normalize-space(text())='" + autoSelect + "']")).click();
-        LOG.info("Возвращаемся во вкладку Купон");
+         driver.findElement(xpath("//span[@class='coupon-settings__radio-label-text' and normalize-space(text())='" + autoSelect + "']")).click();
+         LOG.info("Возвращаемся во вкладку Купон");
         driver.findElement(xpath("//li[contains(@class,'coupon-tabs__item')]/span[normalize-space(text())='Купон']")).click();
     }
 
     @ActionTitle("проверяет что текущий тип купона")
-    public void checkCurrentTypeCoupon(String expectedType) {
+    public void checkCurrentTypeCoupon(String expectedType){
         String currentType = getWebDriver().findElement(
                 xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]/span")).getText();
         assertTrue(
@@ -633,7 +662,7 @@ public class CouponPage extends AbstractPage {
         LOG.info("Переключение на вкладку " + tab + " в купоне");
         WebElement selectTab = PageFactory.getDriver().findElement(xpath("//ul[contains(@class,'coupon-tabs')]//span[normalize-space(text())='" + tab + "']"));
         boolean expectedActive = active.equals("успешно") ? true : false;
-        boolean isActive = selectTab.findElement(By.xpath("ancestor::li")).getAttribute("disabled") == null;
+        boolean isActive = selectTab.findElement(By.xpath("ancestor::li")).getAttribute("disabled")==null;
         // selectTab.findElement(By.xpath("ancestor::li")).getAttribute("class").contains("selected");
         Assert.assertTrue(
                 "Ожидалось что активность вкладки в купоне " + tab + " будет " + expectedActive + ", но на самом деле " + isActive,

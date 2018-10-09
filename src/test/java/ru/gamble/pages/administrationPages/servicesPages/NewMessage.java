@@ -43,8 +43,7 @@ public class NewMessage extends AbstractPage{
 
     public NewMessage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         new WebDriverWait(driver, 20).until(ExpectedConditions.visibilityOf(message));
     }
 

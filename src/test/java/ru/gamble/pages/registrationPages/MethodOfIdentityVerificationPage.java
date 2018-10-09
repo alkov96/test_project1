@@ -41,8 +41,7 @@ public class MethodOfIdentityVerificationPage extends AbstractPage {
 
     public MethodOfIdentityVerificationPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(
-                new HtmlElementLocatorFactory(driver)), this);
+        PageFactory.initElements(driver, this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
