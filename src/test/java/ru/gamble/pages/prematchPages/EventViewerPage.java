@@ -220,6 +220,11 @@ public class EventViewerPage extends AbstractPage {
             throw new AutotestError("Не надено время игры!!!");}
     }
 
+    /**
+     * Метод проверяет входит ли время события в необходимый диапазон
+     * @param diapason - диапазон, метка указывающая кол-во часов от текущей даты-веремени
+     * @param currentGameDateTime - время события
+     */
     private void checkDateTime(int diapason, String currentGameDateTime){
         Date currentDateTime = new Date(System.currentTimeMillis());
 

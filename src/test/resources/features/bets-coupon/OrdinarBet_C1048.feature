@@ -1,4 +1,4 @@
-  # language: ru
+# language: ru
 Функционал: 3_Ставки
 
   @smoke
