@@ -257,7 +257,7 @@ public class CouponPage extends AbstractPage {
     public void buttonAndMessageIsDisplayed() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         By by = xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout') and not (contains (@class, 'ng-hide'))]");
-        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),20);
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),70);
         wait.withMessage("Не удалось найти события, где меняется коэфицент");
         wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 1));
         List<WebElement> oldCoef = driver.findElements(by).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
@@ -533,6 +533,15 @@ public class CouponPage extends AbstractPage {
     public void checkButtonBet(String status){
         WebDriver driver = PageFactory.getDriver();
         boolean disabled = status.equals("активна");
+        int i = 0;
+        LOG.info("Ищем и нажимаем на шестерёнку в Купоне [" + i + "]");
+        WebElement gear = driver.findElement(xpath("//span[contains(@class,'coupon-tabs__item-link')]/i"));
+        gear.click();
+
+        LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
+        driver.findElement(xpath("//span[text()='Любые изменения']")).click();
+        LOG.info("Возвращаемся к списку событий в купоне");
+        driver.findElement(xpath("//span[text()='Купон']")).click();
         if (buttonBet.isEnabled()!=disabled){
             Assertions.fail("Кнопка 'Заключить пари' в неправильном состоянии: не " + status);
         }
