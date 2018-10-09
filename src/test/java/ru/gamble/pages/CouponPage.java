@@ -574,7 +574,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
-        WebElement coeff = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff')]"));
+        WebElement coeff = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff') and not (contains (@class, 'strikeout'))]"));
         previous = coeff.getText();
         preferences.click();
         List<WebElement> list_of_pref = driver.findElements(By.cssSelector("span.prefs__key"));
