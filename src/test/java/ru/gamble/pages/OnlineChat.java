@@ -23,7 +23,7 @@ public class OnlineChat extends AbstractPage {
     private WebElement header;
 
     @ElementTitle("Свернуть")
-    @FindBy(xpath = "//div[@id='webim-chat-close']")
+    @FindBy(id = "webim-chat-close")
     private WebElement closeChat;
 
     public OnlineChat() {
