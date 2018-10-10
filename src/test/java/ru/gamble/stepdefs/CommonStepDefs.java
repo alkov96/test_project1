@@ -1697,5 +1697,16 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Сохранили в память key [" + kyeNameAndFamily + "] <== value [" + nameAndFamily + "]");
     }
 
+
+
+    public static String newFormatDate(SimpleDateFormat old, SimpleDateFormat newFormat, String oldDate){
+        String newDate = new String();
+        try {
+            newDate =  newFormat.format(old.parse(oldDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return newDate;
+    }
 }
 

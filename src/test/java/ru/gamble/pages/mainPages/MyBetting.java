@@ -10,6 +10,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.stepdefs.CommonStepDefs;
+import ru.gamble.utility.BetFull;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -17,10 +20,7 @@ import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -165,5 +165,103 @@ public class MyBetting extends AbstractPage {
                 filterByTypeOfBid.click();
             }
         }
+    }
+
+    @ActionTitle("ищет и запоминает ожидаемые события по фильтру")
+    public void remeberMyBets(String filter, String nameList) {
+        WebDriver driver = PageFactory.getWebDriver();
+        int  cou = 3;
+        LOG.info("Сначала включаем фильтр 'Ожидается'");
+        driver.findElement(By.xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(By.xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
+        CommonStepDefs.workWithPreloader();
+
+        LOG.info("Теперь включаем фильтр по типу ставки " + filter);
+        driver.findElement(By.xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(By.xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + filter + "']")).click();
+        CommonStepDefs.workWithPreloader();
+
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"),1));
+
+        List<WebElement> allBetsOnPage = driver.findElements(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"));
+
+        if (allBetsOnPage.size()<cou){
+            cou=allBetsOnPage.size();
+        }
+
+        List<BetFull> betsOnMyBets= new ArrayList<>();
+
+
+        for (int i = 0; i<cou; i++) {
+
+            betsOnMyBets.add(rememberBetOnMyBets(allBetsOnPage.get(i)));
+
+            LOG.info("Запомнили строчку из Моих пари");
+        }
+
+        LOG.info("Первые " + cou + " ставок(ки) в моих пари это: " +
+        betsOnMyBets.get(0).getType() + "\n" + betsOnMyBets.get(1).getType() + "\n" + betsOnMyBets.get(2).getType());
+        Stash.put(nameList,betsOnMyBets);
+
+    }
+
+    public BetFull rememberBetOnMyBets(WebElement element){
+        StringBuilder helpString = new StringBuilder();
+        int index;
+        StringBuilder timeBet = new StringBuilder();
+        List<String> coefs = new ArrayList<>();
+        List<String> dateGames = new ArrayList<>();
+        List<String> nameGames = new ArrayList<>();
+        StringBuilder sum = new StringBuilder();
+        BetFull bet = new BetFull();
+        SimpleDateFormat formatNo = new SimpleDateFormat("dd.MM.yy");
+        SimpleDateFormat formatYes = new SimpleDateFormat("dd.MM");
+
+        helpString.append(element.findElement(By.xpath(".//tr[contains(@class,'table')]/td[2]")).getText());
+        String typeBet = (!helpString.toString().toLowerCase().contains("система") && !helpString.toString().toLowerCase().contains("экспресс")) ?
+                "ординар" : helpString.toString().toLowerCase();
+        bet.setType(typeBet);
+
+        helpString.setLength(0);
+        helpString.append(element.findElement(By.xpath("td[2]/div")).getText());
+        index = helpString.indexOf(":");
+        try {
+            timeBet.append(helpString.substring(index - 2, index + 3));
+        }
+        catch (StringIndexOutOfBoundsException e){
+            LOG.info("Не получилось вытащить время из строчки "  + helpString);
+        }
+        bet.setTimeBet(timeBet.toString());
+
+
+        element.findElements(By.xpath(".//td[contains(@class,'table__head-cell_my-stakes-kef')]/div"))
+                .stream()
+                .forEach(el -> coefs.add(el.getText()));
+
+        element.findElements(By.xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=1]"))
+                .stream()
+                .map(WebElement::getText)
+                .map(el -> CommonStepDefs.newFormatDate(formatNo, formatYes, el))
+                .forEach(el -> dateGames.add(el));
+
+        element.findElements(By.xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=2]"))
+                .stream()
+                .forEach(el -> nameGames.add(el.getText()));
+
+        bet.setCoefs(coefs);
+        bet.setDates(dateGames);
+        bet.setNames(nameGames);
+
+
+        helpString.setLength(0);
+        helpString.append(element.findElement(By.xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[2]")).getAttribute("class"));
+
+        sum.append(helpString.toString().contains("hide") ? "Б" : "Р");
+        sum.insert(0, element.findElement(By.xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[1]")).getText() + " ");
+        bet.setSum(sum.toString());
+
+        return bet;
     }
 }
