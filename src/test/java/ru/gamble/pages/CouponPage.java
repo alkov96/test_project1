@@ -816,7 +816,17 @@ public class CouponPage extends AbstractPage {
     public void compareBets(String nameListOne, String nameListTwo){
         List<BetFull> listOne = Stash.getValue(nameListOne);
         List<BetFull> listTwo = Stash.getValue(nameListTwo);
-        LOG.info("ads");
+
+        Assert.assertTrue("Не один размер у списков",listOne.size()==listTwo.size());
+
+        for(int i=0; i<listOne.size(); i++){
+            listOne.get(i).normalizationBet();
+            listTwo.get(i).normalizationBet();
+            Assert.assertTrue("Запись под номером " + (i+1) + " не совпадает в 'Моих Пари' и в 'Истории пари' в купоне:",
+                    listOne.get(i).equals(listTwo.get(i)));
+            LOG.info("Проверили одну строчку");
+        }
+        LOG.info("Записи в 'Моих пари' и в купоне в 'заключенных пари' совпадают!");
     }
 }
 

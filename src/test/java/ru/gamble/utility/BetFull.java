@@ -1,5 +1,8 @@
 package ru.gamble.utility;
 
+import ru.gamble.stepdefs.CommonStepDefs;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class BetFull {
@@ -58,8 +61,43 @@ public class BetFull {
         return timeBet;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public void normalizationBet(){
+        List<String> newNames = new ArrayList<>();
+        names.forEach(el->newNames.add(CommonStepDefs.stringParse(el)));
+        setNames(newNames);
+
+        setSum(sum.replace(",",".").replace(".00",""));
+
+        setType(type.toLowerCase());
+    }
+
+
+    public boolean equals(BetFull betFull) {
+        if (!this.getNames().equals(betFull.getNames())){
+            System.out.println("Несовпадение: " + this.getNames() + " и " + betFull.getNames());
+            return false;
+        }
+        if (!this.getCoefs().equals(betFull.getCoefs())){
+            System.out.println("Несовпадение: " + this.getCoefs() + " и " + betFull.getCoefs());
+            return false;
+        }
+        if (!this.getDates().equals(betFull.getDates())){
+            System.out.println("Несовпадение: " + this.getDates() + " и " + betFull.getDates());
+            return false;
+        }
+        if (!this.getType().equals(betFull.getType())){
+            System.out.println("Несовпадение: " + this.getType() + " и " + betFull.getType());
+            return false;
+        }
+        if (!this.getTimeBet().equals(betFull.getTimeBet())){
+            System.out.println("Несовпадение: " + this.getTimeBet() + " и " + betFull.getTimeBet());
+            return false;
+        }
+        if (!this.getSum().equals(betFull.getSum())){
+            System.out.println("Несовпадение: " + this.getSum() + " и " + betFull.getSum());
+            return false;
+        }
+        return true;
+        //return super.equals(obj);
     }
 }
