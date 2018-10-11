@@ -597,7 +597,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param element
      * @throws Exception
      */
-    public static void waitEnabled(WebElement element) throws Exception {
+    public static void waitEnabled(WebElement element){
         int count = 20;
         try {
             while (count > 0) {
@@ -608,7 +608,7 @@ public class CommonStepDefs extends GenericStepDefs {
                     Assertions.fail("За 10 секунд элемент " + element + " так и не стал доступным");
                 }
             }
-        } catch (org.openqa.selenium.StaleElementReferenceException e) {
+        } catch (StaleElementReferenceException | InterruptedException e) {
             LOG.error("" + e);
         }
     }
@@ -1697,8 +1697,12 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Сохранили в память key [" + kyeNameAndFamily + "] <== value [" + nameAndFamily + "]");
     }
 
-
-
+    /**
+     * Метода переводит один формат даты в другой
+     * @old - исходный формат даты
+     * @newFormat - необходимый формат даты
+     * @oldDate - дата
+     */
     public static String newFormatDate(SimpleDateFormat old, SimpleDateFormat newFormat, String oldDate){
         String newDate = new String();
         try {
@@ -1707,6 +1711,12 @@ public class CommonStepDefs extends GenericStepDefs {
             e.printStackTrace();
         }
         return newDate;
+    }
+
+    public static void scrollToElement(WebElement element){
+//        Actions actions = new Actions(driver);
+//        actions.moveToElement(element);
+//        actions.perform();
     }
 }
 

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static ru.gamble.stepdefs.CommonStepDefs.waitEnabled;
 import static ru.gamble.utility.Constants.AMOUNT;
 import static ru.gamble.utility.Constants.PAYMENT_METHOD;
 
@@ -177,28 +176,32 @@ public class RefillAccountsPage extends AbstractPage{
     }
 
     @ActionTitle("проверяет, что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода")
-    public void checkLinkSumm() throws Exception {
+    public void checkLinkSumm() {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> summList = Stash.getValue("summListKey");
-        summList = driver.findElements(By.xpath("//div[@class='modal modal_money-in ng-scope active']//table[@class='moneyInOutTable']//div[contains(@class,'smallJsLink__wrapper')]/span"))
-                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-        LOG.info("Проверка что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода");
-        WebElement buttonOk;
-        int sumOnButton, sumField;
-        for (WebElement summ : summList) {
-            buttonOk =  driver.findElement(By.id("btn-submit-money-in"));
-            LOG.info("Вводим сумму с помощью кнопки " + summ.getText());
-            summ.click();
-            waitEnabled(buttonOk);
-            sumOnButton = Integer.valueOf(buttonOk.findElement(By.xpath("//span[contains(@ng-bind,'totalPrice | number')]")).getText().replace(" ", ""));
-            if (sumOnButton != Float.valueOf(summ.getText().replace(" ", ""))) {
-                Assertions.fail("При клике на кнопку с суммой на кнопке #Пополнить# указана непраивьная сумма");
+        BigDecimal actualAmount, expectedAmount;
+        LOG.info("Последовательно нажимаем на каждый способ попопления");
+        List<WebElement> partners = driver.findElements(By.xpath("//div[contains(@class,'payPartner')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+        for(WebElement partner: partners){
+            partner.click();
+            LOG.info("Нажали [" + partner.getAttribute("class") + "]");
+            List<WebElement> amounts = driver.findElements(By.xpath("//span[contains(@class,'jsLink smallJsLink')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+            LOG.info("Последовательно нажимаем на каждое изображение суммы");
+            for(WebElement amount: amounts){
+                String currentAmount = amount.getAttribute("innerText").replaceAll("\\s","");
+                LOG.info("Нажали [" + currentAmount + "]");
+                amount.click();
+                expectedAmount = new BigDecimal(currentAmount);
+                actualAmount = new BigDecimal(inputAmount.getAttribute("value"));
+                assertThat(actualAmount).as("ОШИБКА! Нажатая сумма [" + expectedAmount.toString() + "] не соответсвует отображенной в поле ввода [" + actualAmount.toString() + "]").isEqualTo(expectedAmount);
+                LOG.info("Нажатая сумма [" + expectedAmount.toString() + "] соответсвует отображенной в поле ввода [" + actualAmount.toString() + "]");
+
+                String textOnButton =  buttonRefill.getAttribute("innerText").trim();
+                LOG.info("На кнопке текст [" + buttonRefill.getAttribute("innerText") + "]");
+                if(textOnButton.contains("НА")){
+                    assertThat(textOnButton.replaceAll("\\s","")).as("ОШИБКА! Нажатая сумма [" + expectedAmount.toString() + "] не соответсвует отображенной на кнопке [" + textOnButton + "]").contains(expectedAmount.toString());
+                    LOG.info("Нажатая сумма [" + expectedAmount.toString() + "] соответсвует отображенной на кнопке [" + actualAmount.toString() + "]");
+                }
             }
-            sumField = Integer.valueOf(driver.findElement(By.id("money_in_amount1")).getAttribute("value"));
-            if (sumField != Float.valueOf(summ.getText().replace(" ", ""))) {
-                Assertions.fail("При клике на кнопку с суммой в поле суммы неправильное значение");
-            }
-            Stash.put("sumFieldKey", sumField);
         }
     }
 
