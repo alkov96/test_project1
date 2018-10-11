@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertTrue;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
 @PageEntry(title = "Мои пари")
@@ -48,17 +49,17 @@ public class MyBetting extends AbstractPage {
     }
 
     @ActionTitle("проверяет фильтры по типу ставки с")
-    public void checksFiltersByTypeOfBidWith(DataTable dataTable){
+    public void checksFiltersByTypeOfBidWith(DataTable dataTable) throws InterruptedException {
         String filterXpath = "//*[@class='input888wrpr']//custom-select";
         WebDriver driver = PageFactory.getWebDriver();
         List<String> data = dataTable.asList(String.class);
 
         LOG.info("Открываем фильтр по типу пари.");
         buttonFilterByTypeOfBid.click();
-        new WebDriverWait(driver,2);
+        Thread.sleep(2000);
         String actual =  buttonFilterByTypeOfBid.getText().replaceAll("\n", " ").toLowerCase();
         for(String existed: data){
-            assertThat(actual).as("Строка [" + actual + "] не соответсвует [" + existed + "]").contains(existed);
+            assertTrue("Строка [" + actual + "] не соответсвует [" + existed + "]",actual.contains(existed));
         }
         LOG.info("Закрываем фильтр по типу пари.");
         buttonFilterByTypeOfBid.click();
