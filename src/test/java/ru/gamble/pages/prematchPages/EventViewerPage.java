@@ -80,7 +80,8 @@ public class EventViewerPage extends AbstractPage {
         }
         int valueLimit = Integer.parseInt(Stash.getValue(limit));
 
-        String xpathMainCategoriesOfEvents = "//a[@class='left-menu__list-item-sport-link ng-binding']";
+        String xpathMainCategoriesOfEvents ="//li[not(contains(@id,'sport--'))]/a[@class='left-menu__list-item-sport-link ng-binding']";
+                //"//a[@class='left-menu__list-item-sport-link ng-binding']";
 
         String xpathCountries;
         WebElement isOpenMenu;
@@ -239,16 +240,22 @@ public class EventViewerPage extends AbstractPage {
 
         if(diapason == 0){
             assert gameDateTime != null;
-            assertThat(gameDateTime.after(currentDateTime))
-                    .as("Ошибка!!! Дата-время [" + gameDateTime.toString() + "] < [" + currentDateTime.toString() + "]");
+//            assertThat(gameDateTime.after(currentDateTime))
+//                    .as("Ошибка!!! Дата-время [" + gameDateTime.toString() + "] < [" + currentDateTime.toString() + "]");
+            Assert.assertTrue(
+                    "Ошибка!!! Дата-время [" + gameDateTime.toString() + "] < [" + currentDateTime.toString() + "]",
+                    gameDateTime.after(currentDateTime));
             LOG.info("Дата-время [" + gameDateTime.toString() + "] > [" + currentDateTime.toString() + "]");
 
         }else {
             Date dateTimePlusPeriod = new Date(System.currentTimeMillis() + diapason * 3600 * 1000);
 
             assert gameDateTime != null;
-            assertThat(gameDateTime.after(currentDateTime) && gameDateTime.before(dateTimePlusPeriod))
-                    .as("Ошибка!!! Дата-время [" + gameDateTime.toString() + "] вне диапазона [" + currentDateTime.toString() + " - " + dateTimePlusPeriod.toString() + "]");
+            Assert.assertTrue(
+                    "Ошибка!!! Дата-время [" + gameDateTime.toString() + "] вне диапазона [" + currentDateTime.toString() + " - " + dateTimePlusPeriod.toString() + "]",
+                    gameDateTime.after(currentDateTime) && gameDateTime.before(dateTimePlusPeriod));
+//            assertThat(gameDateTime.after(currentDateTime) && gameDateTime.before(dateTimePlusPeriod))
+//                    .as("Ошибка!!! Дата-время [" + gameDateTime.toString() + "] вне диапазона [" + currentDateTime.toString() + " - " + dateTimePlusPeriod.toString() + "]");
             LOG.info("Дата-время [" + gameDateTime.toString() + "] соответствует [" + currentDateTime.toString() + " - " + dateTimePlusPeriod.toString() + "]");
         }
     }
