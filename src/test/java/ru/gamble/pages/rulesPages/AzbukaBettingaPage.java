@@ -163,7 +163,7 @@ public class AzbukaBettingaPage extends AbstractPage {
     }
 
     @ActionTitle("проверяет скачивание приложения на android")
-    public void downloadAndroidForLanding() throws IOException {
+    public void downloadAndroidForLanding() throws IOException, InterruptedException {
         LandingAppPage.downloadAndroid();
     }
 

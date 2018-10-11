@@ -1,7 +1,6 @@
 #language: ru
 Функционал: 10_Разное
 
-  @bad
   @regress
   @MyBettingFilters
   Сценарий: Мои пари - проверка фильтров и поиска.

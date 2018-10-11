@@ -99,7 +99,6 @@ public class RefillAccountsPage extends AbstractPage{
             if(list.isEmpty()){
                 throw new AutotestError("Ошибка! Нет предложений номиналов сумм.");
             }
-
             LOG.info("Сравниваем два максимума [" + maxLimitInDB.toString() + "] и [" + maxLimitByWSS + "]");
             exeptedMaxLimit = (maxLimitInDB.compareTo(maxLimitByWSS) > 0) ? maxLimitByWSS.toString() : maxLimitInDB.toString();
             LOG.info("Ожидаемый максимум должен быть[" + exeptedMaxLimit + "]");
@@ -109,13 +108,11 @@ public class RefillAccountsPage extends AbstractPage{
                     .as("Ошибка! Фактический максимум на странице[" + maxValueOnPage.toString() + "] не равен ожидаемому максимуму [" + exeptedMaxLimit + "]")
                     .isEqualTo(exeptedMaxLimit);
         }
-
     }
 
     @ActionTitle("вводит сумму и выбирает способ пополнения c")
     public void enterAmountAndSelectDepositMethod(DataTable dataTable)  {
         checkForErrorLoadingPaymentSystems();
-
         WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String amount, depositMethod;
@@ -250,49 +247,32 @@ public class RefillAccountsPage extends AbstractPage{
 
     }
 
-//TODO Переделать этот метод, чтобы работал
-    @ActionTitle("проверяет, что для разных способов пополнения, но при одинаковой сумме кнопка будет то активна, то заблокирована")
-    public void checkDiffSumms() throws InterruptedException {
+    @ActionTitle("проверяет, что для разных способов пополнения, кнопка будет то активна, то заблокирована для суммы")
+    public void checkDiffSumms(String summ) {
         WebDriver driver = PageFactory.getDriver();
-        int summ = 500000;
-        StringBuilder message = Stash.getValue("messageKey");
-        LOG.info("Очищаем поле с суммой и затем вводим туда 500 000");
-        WebElement field = Stash.getValue("fieldKey");
-        field.clear();
-        field.sendKeys(String.valueOf(summ));
-        Thread.sleep(1000);
-        message.setLength(0);//очищаем список ошибок чтобы заново его создать
-        List<WebElement> depositWays = Stash.getValue("depositWaysKey");
-        String way = Stash.getValue("wayKey").toString();
-        for (WebElement sposob : depositWays) {
-            sposob.click();
-            Thread.sleep(5000);//да, это много. но прелоадер будет не всегда. если предыдущи способ не давал поополнить, и следующий не дает пополнить - то прелоадера не будет
-            message.setLength(0);//очищаем список ошибок чтобы заново его создать
-            driver.findElements(By.xpath("//div[contains(@class,'money-in-out__messages')]")).forEach(element -> message.append(element.getText()));
-            way = sposob.findElement(By.xpath("preceding-sibling::input")).getAttribute("value").trim();
-            LOG.info("Выбрали способ пополнения " + way + " и теперь смотрим правильно ли все на попапе");
-            Map maxForWay = Stash.getValue("maxForWayKey");
-            int currentMaxFlag = ((int) maxForWay.get(way)) <= summ ? 0 : 1;//switch не работает с булями, поэтому придется испольоватьвот такой флаг, который равен 0 = если допустимый максимум больше введенно суммы, и 1 - если допустимй максимум меньше введенной суммы
-            switch (currentMaxFlag) {
-                case 1:  //т.е. для выбранного способа пополнения введенная сумма разршена
-                    if (!driver.findElement(By.id("btn-submit-money-in")).isEnabled()) {
-                        Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " кнопка Пополнить недоступна, хотя максимально допустимая сумма " + maxForWay.get(way));
-                    }
-                    if (message.toString().contains("Сумма превышает максимальную допустимую") || message.toString().contains("Сумма меньше минимально допустимой")) {
-                        Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " есть сообщение об ошибке  " + message.toString());
-                    }
-                    break;
-                case 0: //т.е. для выбранного способа пополнения введенная сумма превышает максимум
-                    if (driver.findElement(By.id("btn-submit-money-in")).isEnabled()) {
-                        Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " кнопка Пополнить доступна, хотя максимально допустимая сумма " + maxForWay.get(way));
-                    }
-                    if (!message.toString().contains("Сумма превышает максимальную допустимую")) {
-                        Assertions.fail("При сумме " + summ + ", для выбранного способа пополнения " + way + " нет сообщения об ошибке  " + message.toString());
-                    }
-                    break;
+        fillField(inputAmount,summ);
+        BigDecimal amountEntered,maxAmount;
+
+        amountEntered = new BigDecimal(inputAmount.getAttribute("value").replaceAll("\\s",""));
+        LOG.info("Ввели в поле 'Сумма' [" + inputAmount.getAttribute("value") + "]");
+        List<WebElement> partners = driver.findElements(By.xpath("//div[contains(@class,'payPartner')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+        for(WebElement partner: partners) {
+            partner.click();
+            LOG.info("Нажали [" + partner.getAttribute("class") + "]");
+            WebElement lastAmount = driver.findElements(By.xpath("//span[contains(@class,'jsLink smallJsLink')]")).stream().filter(WebElement::isDisplayed).reduce((first, second) -> second).orElse(null);
+            maxAmount = new BigDecimal(lastAmount.getAttribute("innerText").replaceAll("\\s", ""));
+            LOG.info("Максимальная сумма [" + maxAmount + "]");
+
+            if(amountEntered.compareTo(maxAmount) < 1){
+                assertThat(buttonRefill.isEnabled())
+                        .as("Ошибка! При сумме [" + amountEntered + "], при пополнении через [" + partner.getAttribute("class") + "] кнопка 'ПОПОЛНИТЬ' оказалась недоступна.").isTrue();
+                LOG.info("При сумме [" + amountEntered + "], при пополнении через [" + partner.getAttribute("class") + "] кнопка 'ПОПОЛНИТЬ' доступна.");
+            }else{
+                assertThat(buttonRefill.isEnabled())
+                        .as("Ошибка! При сумме [" + amountEntered + "], при пополнении через [" + partner.getAttribute("class") + "] кнопка 'ПОПОЛНИТЬ' оказалась доступна.").isFalse();
+                LOG.info("При сумме [" + amountEntered + "], при пополнении через [" + partner.getAttribute("class") + "] кнопка 'ПОПОЛНИТЬ' недоступна.");
             }
         }
     }
-
 
 }

@@ -213,6 +213,16 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String ishod = driver.findElement(xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getText().split("\n")[1];
         String ishodName = Stash.getValue(ishodKey);//ожидаемое название исхода
+        switch (ishod) {
+            case "П1":
+                ishod = Stash.getValue("team1key").toString();
+                break;
+
+            case "П2":
+                ishod = Stash.getValue("team2key").toString();
+                break;
+        }
+
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
             LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + " <=> " + ishodName);
         } else Assertions.fail("Выбранный исход в купоне не совпадает с ожидаемым: " + ishod + " - " + ishodName);
