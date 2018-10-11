@@ -69,12 +69,13 @@ public class LandingAppPage extends AbstractPage {
     }
 
     @ActionTitle("проверяет скачивание приложения на android")
-    public void downloadAndroidForLanding() throws IOException {
+    public void downloadAndroidForLanding() throws IOException, InterruptedException {
         downloadAndroid();
     }
 
-    public static void downloadAndroid() throws IOException {
+    public static void downloadAndroid() throws IOException, InterruptedException {
         WebDriver driver = PageFactory.getDriver();
+        Thread.sleep(5000);
         if (!driver.findElement(xpath("//div[@class='modal__android-app-text']")).isDisplayed()) {
             Assert.fail("Не открылся попап на скачивание приложения для андроида");
         } else {
