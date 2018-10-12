@@ -67,7 +67,7 @@ public class VewingEventsPage extends AbstractPage {
         if (!menu.getAttribute("class").contains("collapsed")) menu.click();
 
         LOG.info("Сворачиваем все виды спорта");
-        driver.findElement(By.id("sports-toggler")).click();
+        closeSports();
 
         boolean gameIsAdding = false;
         String typeGame;
@@ -107,7 +107,7 @@ public class VewingEventsPage extends AbstractPage {
             //сворачиваем снова все виды спорта, чтобы все они помещались на экран. иначе, если не видно элемента (не помещается) на странице он не найдется
             LOG.info("Сворачиваем все виды спорта.");
             if (!menu.getAttribute("class").contains("collapsed")) menu.click();
-            driver.findElement(By.id("sports-toggler")).click();
+            closeSports();
             if (gameIsAdding) break;
 
         }
