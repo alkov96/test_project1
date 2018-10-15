@@ -1375,7 +1375,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("ID: " + scenario.getId().replaceAll("\\D+","") );
         String mainUrl;
 
-        System.setProperty("webdriver.chrome.driver", "webdrivers" + sep +"chromedriver");
         WebDriver driver = PageFactory.getWebDriver();
 
         Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
