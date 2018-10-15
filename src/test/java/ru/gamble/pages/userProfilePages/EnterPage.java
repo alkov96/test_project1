@@ -5,6 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -83,6 +85,8 @@ public class EnterPage extends AbstractPage {
                 String browserName = caps.getBrowserName();
                 if (browserName.contains("chrome")) {
                     login = JsonLoader.getData().get(STARTING_URL).get("USER_CHROME").getValue();
+                    ChromeOptions options = new ChromeOptions();
+                    options.addArguments("--no-sandbox");
                 } else {
                     login = JsonLoader.getData().get(STARTING_URL).get("USER_FIREFOX").getValue();
                 }

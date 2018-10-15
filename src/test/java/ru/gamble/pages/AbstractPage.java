@@ -44,6 +44,8 @@ public abstract class AbstractPage extends Page {
 
     public static By xpathListBets = xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul");
 
+    public static By preloaderOnPage = By.xpath("//div[contains(@class,'preloader__container')]");
+
     @ElementTitle("Вход")
     @FindBy(id = "log-in")
     private WebElement enterButton;
@@ -633,6 +635,18 @@ public abstract class AbstractPage extends Page {
         if (field.getAttribute("value").length() == 0) {
             LOG.info("ОШИБКА. Нажали на пункт в выпадающем списке для города,а знчение не выбралось!!");
             field.sendKeys(randomString(20));
+        }
+    }
+
+    /**
+     * сворачивание всех видов спорта
+     */
+    public void closeSports(){
+        WebDriver driver = PageFactory.getDriver();
+        if (driver.findElement(By.id("sports-toggler-opened")).isDisplayed()){
+            driver.findElement(By.id("sports-toggler-opened")).click();
+        }else if (driver.findElement(By.id("sports-toggler")).isDisplayed()){
+            driver.findElement(By.id("sports-toggler")).click();
         }
     }
 }
