@@ -38,6 +38,9 @@ public class MyBetting extends AbstractPage {
     @FindBy(xpath = "//*[@class='input888wrpr']//custom-select/div")
     private WebElement filterByTypeOfBid;
 
+    @ElementTitle("поисковая строка")
+    @FindBy(xpath = "//input[contains(@class, 'input-search')]")
+    private WebElement search_line;
 
     @FindBy(xpath = "//div[contains(@class,'input888wrpr')]")
     private WebElement buttonFilterByTypeOfBid;
@@ -48,22 +51,7 @@ public class MyBetting extends AbstractPage {
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    @ActionTitle("проверяет фильтры по типу ставки с")
-    public void checksFiltersByTypeOfBidWith(DataTable dataTable) throws InterruptedException {
-        String filterXpath = "//*[@class='input888wrpr']//custom-select";
-        WebDriver driver = PageFactory.getWebDriver();
-        List<String> data = dataTable.asList(String.class);
 
-        LOG.info("Открываем фильтр по типу пари.");
-        buttonFilterByTypeOfBid.click();
-        Thread.sleep(2000);
-        String actual =  buttonFilterByTypeOfBid.getText().replaceAll("\n", " ").toLowerCase();
-        for(String existed: data){
-            assertTrue("Строка [" + actual + "] не соответсвует [" + existed + "]",actual.contains(existed));
-        }
-        LOG.info("Закрываем фильтр по типу пари.");
-        buttonFilterByTypeOfBid.click();
-    }
 
     @ActionTitle("проверяет попадание ставок в диапазон дат")
     public void checksBidsOnDateRange() {
@@ -109,7 +97,55 @@ public class MyBetting extends AbstractPage {
 
     }
 
-    @ActionTitle("проверяет тип исхода с типом пари с")
+
+
+    public String rememberId() throws InterruptedException {
+        WebDriver driver = PageFactory.getWebDriver();
+        int value = new Random().nextInt(6);
+        List<WebElement> all_id = driver.findElements(By.xpath("//div[@ng-bind-html='bet.id | formatText:search']"));
+        Thread.sleep(5000);
+        String id = all_id.get(value).getText().trim().toLowerCase();
+        return id;
+    }
+
+    @ActionTitle("проверяет поиск, вводит в поисковую строку: ")
+    public void checkSearchById(String param) throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(), 15);
+        String pattern;
+        if (param.equals("id")){
+            pattern = rememberId();
+        }
+        else {
+            pattern = param;
+        }
+        search_line.clear();
+        search_line.sendKeys(pattern);
+        LOG.info("В строку поиска ввели: " + pattern);
+
+        By by = By.xpath("//div[@ng-bind-html='bet.id | formatText:search']");
+
+        if (param.equals("id")) {
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 0));
+            LOG.info("Ввели " + pattern + ". Результат: элемент найден" );
+        } else {
+            wait.until(ExpectedConditions.numberOfElementsToBeLessThan(by,1));
+            LOG.info("Ввели " + pattern + ". Результат: элемент не найден" );
+
+        }
+
+        }
+
+    @ActionTitle("переключается на другую дату")
+    public void chooseAnotherDate() throws InterruptedException {
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.findElements(By.xpath("//span[contains(@class,'datapicker__form')]")).get(0).click(); //нажимаем на первый календарь
+        driver.findElements(By.xpath("//div[@class='datepicker__btn']")).get(0).click(); //нажимаем на месяц назад
+        driver.findElements(By.xpath("//div[contains(@class,'datepicker__day')]/div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).get(3).click(); //выбираем дату
+        Thread.sleep(7000);
+    }
+
+
+    @ActionTitle("проверяет фильтр по типу ставки")
     public void checksTypeOfOutcomeWithBetTypeWith(DataTable dataTable){
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
