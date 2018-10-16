@@ -104,9 +104,6 @@ public class CouponPage extends AbstractPage {
 
     public CouponPage() {
         WebDriver driver = PageFactory.getDriver();
-//        PageFactory.initElements(new HtmlElementDecorator(
-//                new HtmlElementLocatorFactory(driver)), this);
-//        tryingLoadPage(coupon, 10, 5);
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(coupon,10, 5);
     }
