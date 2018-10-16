@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -27,6 +28,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.PERIOD;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
@@ -81,7 +83,7 @@ public class EventViewerPage extends AbstractPage {
         int valueLimit = Integer.parseInt(Stash.getValue(limit));
 
         String xpathMainCategoriesOfEvents ="//li[not(contains(@id,'sport--'))]/a[@class='left-menu__list-item-sport-link ng-binding']";
-                //"//a[@class='left-menu__list-item-sport-link ng-binding']";
+        //"//a[@class='left-menu__list-item-sport-link ng-binding']";
 
         String xpathCountries;
         WebElement isOpenMenu;
@@ -311,7 +313,7 @@ public class EventViewerPage extends AbstractPage {
         }
 
         LOG.info("Сворачиваем все виды спорта");
-        driver.findElement(By.id("sports-toggler")).click();
+        closeSports();
         int sportCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li")).size();
         for (int sportN = 4; sportN <= sportCount; sportN++) {
             //разворачиваем спорт(начнем с тенниса просто потому что не хочу футбол)
@@ -348,7 +350,7 @@ public class EventViewerPage extends AbstractPage {
                     if (!menu.getAttribute("class").contains("collapsed")) menu.click();
                     driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/ul[1]/li[" + region + "]/div[1]/div[" + tour + "]/h4[1]")).click();
                     CommonStepDefs.workWithPreloader();
-                   //все игры в этом соревновании
+                    //все игры в этом соревновании
                     List<WebElement> allGames = driver.findElements(By.xpath("//div[@class = 'prematch-competitions scroll-contain ng-scope']/div[1]/div[1]/div/div[1]/div[1]/div[1]/div[1]/div[1]"));
                     LOG.info("Смотрим все игры в спорте, в соответствующем соревновании. Ищем игру подходящую по фильтру времени " + hour + inPeriod);
                     for (int GameInTour = 0; GameInTour < allGames.size(); GameInTour++) {
@@ -498,4 +500,283 @@ public class EventViewerPage extends AbstractPage {
             myGamesCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
         }
     }
+
+
+    /**
+     * сворачивание или разворачивание левого меню
+     */
+    public void setExpandCollapseMenusButton(boolean collapsOrNot){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait =  new WebDriverWait(driver,10);
+        WebElement menu = driver.findElement(By.id("menu-toggler"));
+        if (menu.getAttribute("class").contains("collapsed")!=collapsOrNot){
+            menu.click();
+            CommonStepDefs.workWithPreloader();
+            if (!driver.findElements(preloaderOnPage).isEmpty()){
+                driver.navigate().refresh();
+                CommonStepDefs.workWithPreloader();
+            }
+        }
+
+        if (collapsOrNot) {
+            wait.withMessage("Не удалось развернуть левое меню");
+            wait.until(attributeContains(By.id("menu-toggler"), "class", "collapsed"));
+        }
+        else {
+            wait.withMessage("Не удалось свернуть левое меню");
+            wait.until(ExpectedConditions.not(attributeContains(By.id("menu-toggler"), "class", "collapsed")));
+        }
+    }
+
+    @ActionTitle("многовыборный режим")
+    public void multiGamesOnOff(String onOrOff){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait =  new WebDriverWait(driver,10);
+        boolean turnOn = onOrOff.equalsIgnoreCase("включает")?true:false;
+
+        WebElement multiviewButton = driver.findElement(By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]/i"));
+
+        if (!driver.findElements(preloaderOnPage).isEmpty()){
+            driver.navigate().refresh();
+            CommonStepDefs.workWithPreloader();
+        }
+
+        setExpandCollapseMenusButton(true);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        wait.withMessage("Нет кнопки многовыборного режима");
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]"),0));
+
+        LOG.info("Проверяем активность кнопки многовыборного режима");
+        boolean isOn = multiviewButton.findElement(By.xpath("..")).getAttribute("class").contains("active");
+        if (isOn!=turnOn){
+            multiviewButton.click();
+            isOn = multiviewButton.findElement(By.xpath("..")).getAttribute("class").contains("active");
+        }
+        Assert.assertTrue(
+                "Не изменилось состояние многовыборного режима. Ожидалось " + turnOn + ", а на самом деле " + isOn,
+                isOn==turnOn);
+
+        //сворачиваем ЛМ чтобы было видно контейнер многовыборного режима
+        setExpandCollapseMenusButton(false);
+
+        LOG.info("Проверям включен ли многовыборный режим. Для этого смотрим заголовок в центральной части страницы");
+        List<WebElement> innerHeader = driver.findElements(By.xpath("//div[contains(@class,'game-center-container__inner-header')]/div[contains(@class,'title-box')]/span[not(contains(@class,'js-hide'))]"));
+        boolean multiveiwOn = !innerHeader.isEmpty();
+        Assert.assertTrue(
+                "Многововыборный режим не в том состоянии что ожидалось. Ожидалось " + turnOn + ", а на самом деле " + multiveiwOn,
+                multiveiwOn==turnOn);
+    }
+
+    @ActionTitle("очищает список многовыборного режима")
+    public void clearMultiviewContainer(){
+        WebDriver driver = PageFactory.getDriver();
+
+        setExpandCollapseMenusButton(false);
+        List<WebElement> innerHeader = driver.findElements(By.xpath("//div[contains(@class,'game-center-container__inner-header')]/div[contains(@class,'title-box')]"));
+        LOG.info("Очищаем список в многовыборном режиме через кнопку #Очистить все#");
+        innerHeader.get(0).findElement(By.xpath("div[contains(@class,'clear-all btn')]")).click();
+        if (!driver.findElements(preloaderOnPage).isEmpty()){
+            driver.navigate().refresh();
+            CommonStepDefs.workWithPreloader();
+        }
+        LOG.info("Смотрим не осталось ли игр в контейнере");
+        List<WebElement> MultiViewContainer = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-games')]"));
+        Assert.assertTrue(
+                "Не очистился контейнер в многовыборном режиме",
+                MultiViewContainer.isEmpty());
+    }
+
+    @ActionTitle("добавляет в многовыборный режим целое соревнование из вида спорта номер")
+    public void addCompetitionInMultiviewList(String numberSportOnLM, String keyNameTour){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait =  new WebDriverWait(driver,10);
+
+        int index = Integer.valueOf(numberSportOnLM);
+
+        setExpandCollapseMenusButton(true);
+        LOG.info("Сворачиваем все виды спорта");
+        closeSports();//сворачиваем все виды спорта
+
+        List<WebElement> allSports = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li"));
+
+        LOG.info("Разворачиваем первый спорт");
+        allSports.get(index).click();//развернули спорт
+        wait.withMessage("Спорт номер " + index + " не развернулся за 10 секунд");
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + (index+1) + "]/ul[1]/li"),0));//проверяем что спорт развернулся
+
+        if (!allSports.get(index).findElement(By.xpath("ul[1]/li[1]")).getAttribute("class").contains("active"))//если первый регион спорта не выбран то откроем его
+        {
+            LOG.info("Регион в выбранном спорте свернут - разворачиваем его");
+            allSports.get(index).findElement(By.xpath("ul[1]/li[1]//div[contains(@class,'left-menu__list-item-arrow_region')]")).click();//развернули регион
+        }
+        LOG.info("Добавляем первый турнир в регионе в контейнер многовыборного режима");
+        allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]")).click();//выбрали турнир
+        LOG.info("Запоминаем название соревнования в ЛМ");
+        String nameTour = allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]/i")).getText();//название турнира в ЛМ
+        setExpandCollapseMenusButton(false);
+        Stash.put(keyNameTour,nameTour);
+    }
+
+
+    @ActionTitle("добавляет в многовыборный режим одну игру из спорта номер")
+    public void addOneGameToMultiview(String numberSport, String keyNameGame){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait =  new WebDriverWait(driver,10);
+        List<WebElement> allSports = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li"));
+        int index = Integer.valueOf(numberSport);
+
+        LOG.info("Добавляем одну игру из соревновани в контейнер");
+        setExpandCollapseMenusButton(true);
+        LOG.info("Сворачиваем все виды спорта");
+        closeSports();//свернули все виды спорта
+        LOG.info("Разворачиваем следующий спорт");
+        allSports.get(index).click();//развернули спорт
+        wait.withMessage("Спорт номер " + index + " не развернулся за 10 секунд");
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + (index+1) + "]/ul[1]/li"),0));//проверяем что спорт развернулся
+
+        if (!allSports.get(index).findElement(By.xpath("ul[1]/li[1]")).getAttribute("class").contains("active"))
+        {
+            LOG.info("регион в спорте свернут - разворачиваем его");
+            allSports.get(index).findElement(By.xpath("ul[1]/li[1]//div[contains(@class,'left-menu__list-item-arrow_region')]")).click();//развернули регион
+            wait.withMessage("Регион не развернулся за 10 секунд");
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                    By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + (index+1) + "]/ul[1]/li[1]//label[contains(@for,'checkbox-competition')]"),
+                    0));//проверяем что спорт развернулся
+        }
+        WebElement tour = allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]"));
+        Actions actions = new Actions(driver);
+        LOG.info("Наводим мышку на название соревнования, чтобы открлось всплывающее меню с переенм игр");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        actions.moveToElement(tour).build().perform();//наводим мышку на турнир
+        String nameGame = tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//label[contains(@for,'checkbox-game')]")).get(0).getText();
+        LOG.info("Выбираем игру из этого списка "+nameGame);
+        WebElement game = tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game')]")).get(0);
+        LOG.info("Добавляем игру в контейнер многовыборного режима");
+        game.findElement(By.xpath("../label")).click();
+        Stash.put(keyNameGame,nameGame);
+    }
+
+
+    @ActionTitle("првоеряет наличие игр в контейнере многовыборного режима")
+    public void checkListMultiview(String counterComp, String keyNameTour){
+        checkListMultiview(counterComp,keyNameTour,"");
+    }
+
+    public void checkListMultiview(String counterComp, String keyNameTour, String keyNameGame){
+        //т.к. добавляем из разных спортов, то точно долждно быть 2 разных турнира в контейнере. поэтому можно смотрить количетсво prematch-competition-nme
+        WebDriver driver = PageFactory.getDriver();
+        String nameGame = Stash.getValue(keyNameGame);
+        String nameTour = Stash.getValue(keyNameTour);
+        int countCompetition = Integer.valueOf(counterComp);
+
+        setExpandCollapseMenusButton(false);
+        LOG.info("Т.к. доабавллись игры из разн ивдов спорта, то они точно из разных соревнований. проверим содержитс ли в контейнере 2 разных соревновани");
+        Assert.assertFalse(
+                "Игра не добавилась в контейнер",
+                driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-name')]")).size()<countCompetition
+        );
+        boolean gameAdd=false;
+
+        //название турнира в контейнере
+        LOG.info("Запоминаем название соревнования, которое в контейнере многовыборного режима");
+        String nameTourInMulti = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-name')]//div[contains(@class,'prematch-competition-name__inner-competition ellipsis-text')]")).get(0).getText();
+
+        LOG.info("Сравниваем название соревновани в ЛМ и в контейнере");
+        Assert.assertTrue(
+                "В контейнере многовыбрного режима ожидались игры из соревнования " + nameTour + ", а вместо него " + nameTourInMulti,
+                nameTourInMulti.trim().equals(nameTour.trim()));
+
+        if (keyNameGame.isEmpty()) return;
+
+        LOG.info("Теперь смотрим какие игры(а не соревнования) в контейнере");
+        List<WebElement> MultiViewContainer = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-games ')]//div[contains(@class,'bets-block__header-teams')]"));
+        for (WebElement element:MultiViewContainer){
+            if (CommonStepDefs.stringParse(element.getAttribute("title")).equals(CommonStepDefs.stringParse(nameGame.split("\n")[0]))) {
+                LOG.info("Игра добавилась правильная");
+                gameAdd=true;
+                break;
+            }
+        }
+        Assert.assertTrue(
+                "Игра " + nameGame + " не добавилась в контейнер",
+                gameAdd
+        );
+    }
+
+    @ActionTitle("убирает одну игру из многовыборного режиме через Левое Меню")
+    public void deleteOneGameMultiview(String numberSport,String keyNameDelettingGame){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        LOG.info("Убираем одну игру из контейнера");
+        setExpandCollapseMenusButton(true);
+
+        int index = Integer.valueOf(numberSport);
+        List<WebElement> allSports = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li"));
+        if (!allSports.get(index).findElement(By.xpath("ul[1]/li[1]")).getAttribute("class").contains("active"))
+        {
+            LOG.info("регион в спорте свернут - разворачиваем его");
+            allSports.get(index).findElement(By.xpath("ul[1]/li[1]//div[contains(@class,'left-menu__list-item-arrow_region')]")).click();//развернули регион
+            wait.withMessage("Регион не развернулся за 10 секунд");
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                    By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + (index+1) + "]/ul[1]/li[1]//label[contains(@for,'checkbox-competition')]"),
+                    0));//проверяем что спорт развернулся
+        }
+        WebElement tour = allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]"));
+        Actions actions = new Actions(driver);
+        LOG.info("Наводим мышку на название соревноания в ЛМ, чтобы появился всплывающий список игр");
+        actions.moveToElement(tour).build().perform();//наводим мышку на турнир
+        LOG.info("Запоминаем название игры, которая в контейнере");
+        String nameGame = //tour.findElement(By.xpath("../div[1]/ul[1]/li[1]/div[1]/label")).getText();ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched
+                //tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//label[contains(@for,'checkbox-game')]")).get(0).getText();
+                tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game') and contains(@class,'ng-not-empty')]/../label")).get(0).getText();
+        LOG.info("Выбираем эту игру");
+        WebElement game = //tour.findElement(By.xpath("../div[1]/ul[1]/li[1]/div[1]/input[contains(@id,'checkbox-game')]"));//игра из списка турнира.
+                //  tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game')]")).get(0);
+                tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game') and contains(@class,'ng-not-empty')]")).get(0);
+        LOG.info("И убираем игру из контейнера");
+        game.findElement(By.xpath("../label")).click();
+        Stash.put(keyNameDelettingGame,nameGame);
+    }
+
+    @ActionTitle("проеряет что удаленная игра не осталась в списке многовыборного режима")
+    public void checkMultiviewHaveNotTheGame(String keyNameDeletingGame){
+        WebDriver driver = PageFactory.getDriver();
+        String nameGame = Stash.getValue(keyNameDeletingGame);
+        setExpandCollapseMenusButton(false);
+        LOG.info("Проверяем не осталась ли удаленая игра в контейнере.");
+        List<WebElement> MultiViewContainer = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-games ')]//div[contains(@class,'bets-block__header-teams')]"));
+        for (WebElement element : MultiViewContainer) {
+            //   log.info("вот контейнер " + element.getAttribute("title"));
+            if (CommonStepDefs.stringParse(element.getAttribute("title")).equals(CommonStepDefs.stringParse(nameGame.split("\n")[0]))) {
+                Assert.fail("Не получилось убрать игру из контейнера через левое меню. " + nameGame);
+            }
+        }
+    }
+
+    @ActionTitle("очищает контейнер через кнопку 'очистить все'")
+    public void cleanMultiview(){
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("Проверка очистки контейнера многовыборного режима");
+        setExpandCollapseMenusButton(false);
+        LOG.info("Нажимаем на кнопку #очистить все#");
+        List<WebElement> innerHeader = driver.findElements(By.xpath("//div[contains(@class,'game-center-container__inner-header')]/div[contains(@class,'title-box')]"));
+        innerHeader.get(0).findElement(By.xpath("div[contains(@class,'clear-all btn')]")).click();
+        CommonStepDefs.workWithPreloader();
+        LOG.info("Проверяем не осталось ли игр в контейнере");
+        List<WebElement> MultiViewContainer = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]/div[1]/div/div"));
+        new WebDriverWait(driver,10).
+                withMessage("Контейнер многовыборного режима не очистился по кнопке 'очистить'").
+                until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]/div[1]/div/div"),0));
+    }
 }
+

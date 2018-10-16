@@ -55,6 +55,7 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.pages.AbstractPage.preloaderOnPage;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
 
@@ -154,8 +155,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Метод ожидания появления и изчезновения прелоадера при методе click()
     public static void workWithPreloader() {
-        String xpathPreloader = "//*[contains(@class,'preloader__container')]";
-        waitShowElement(By.xpath(xpathPreloader));
+        waitShowElement(preloaderOnPage);
     }
 
     // Ожидание появления элемента на странице
