@@ -182,9 +182,9 @@ public class MyBetting extends AbstractPage {
         driver.findElement(By.xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + filter + "']")).click();
         CommonStepDefs.workWithPreloader();
 
-        WebDriverWait wait = new WebDriverWait(driver,10);
-        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"),1));
+//        WebDriverWait wait = new WebDriverWait(driver,10);
+//        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
+//        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"),0));
 
         List<WebElement> allBetsOnPage = driver.findElements(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"));
 
@@ -202,8 +202,10 @@ public class MyBetting extends AbstractPage {
             LOG.info("Запомнили строчку из Моих пари");
         }
 
-        LOG.info("Первые " + cou + " ставок(ки) в моих пари это: " +
-        betsOnMyBets.get(0).getType() + "\n" + betsOnMyBets.get(1).getType() + "\n" + betsOnMyBets.get(2).getType());
+        LOG.info("Первые " + cou + " ставок(ки) в моих пари это: ");
+        for (int i=0;i<cou;i++){
+            LOG.info(betsOnMyBets.get(i).getType() + "\n");
+        }
         Stash.put(nameList,betsOnMyBets);
 
     }

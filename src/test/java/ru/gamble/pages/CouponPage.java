@@ -166,6 +166,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> listBets = driver.findElements(xpathListBets);
 
+
         //driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
         if (!expect) {
 //            assertTrue(
@@ -731,25 +732,19 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("запоминает первые события в заключенных пари")
-    public void rememberHistoryInCoupon(String nameList) throws Exception{
+    public void rememberHistoryInCoupon(String nameList){
         WebDriver driver = PageFactory.getDriver();
         int  cou = 3;
         List<BetFull> betsOnMyBets= new ArrayList<>();
         By byListLines = By.xpath("//div[@class='coupon__outcome-betslip-wrapper']/div[contains(@class,'coupon__bet-block')]");
-        WebDriverWait wait = new WebDriverWait(driver,10);
-        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(byListLines,1));
         List<WebElement> linesOnHistory = driver.findElements(byListLines);
         if (linesOnHistory.size()<cou){
             cou=linesOnHistory.size();
         }
 
-        //for (WebElement element : linesOnHistory.subList(0,cou)) {
         for (int i=0; i<cou;i++){
-//            betsOnMyBets.add(remeberLineInHistoryCoupon(element));
             betsOnMyBets.add(remeberLineInHistoryCoupon(i));
             LOG.info("Запомнили строчку из истории пари в купоне");
-
         }
 
         LOG.info("Первые " + cou + " ставок(ки) в истории в купоне это: \n" +
@@ -789,7 +784,7 @@ public class CouponPage extends AbstractPage {
 
         //запоминаем размер ставки
         sumElement = element.findElement(By.xpath("div[contains(@class,'coupon-bet')]//*[normalize-space(text())='Ставка']/following-sibling::span"));
-        sumBet.append(element.findElement(By.xpath("div[contains(@class,'coupon-bet')]//*[normalize-space(text())='Ставка']/following-sibling::span")).getText().trim());
+        sumBet.append(element.findElement(By.xpath("div[contains(@class,'coupon-bet')]//*[normalize-space(text())='Ставка']/following-sibling::span")).getAttribute("title").trim());
 
         helpString.setLength(0);
        // helpString.append(sumElement.findElement(By.xpath("span")).getAttribute("class"));

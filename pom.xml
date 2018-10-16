@@ -154,7 +154,7 @@
                 <version>2.9</version>
                 <configuration>
                     <!--<resultsPattern>target/allure-results</resultsPattern>-->
-                    <reportVersion>2.9</reportVersion>
+                    <reportVersion>2.7.0</reportVersion>
                 </configuration>
             </plugin>
         </plugins>
