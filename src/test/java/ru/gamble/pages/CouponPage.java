@@ -165,23 +165,30 @@ public class CouponPage extends AbstractPage {
     public void checkExpressBonus(boolean expect) {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> listBets = driver.findElements(xpathListBets);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-
-        //driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
         if (!expect) {
-//            assertTrue(
-//                    "Есть ссылка!!! " + driver.findElements(expressBonusLink).get(0).getAttribute("href"),
-//                    driver.findElements(expressBonusLink).isEmpty());
             assertTrue(
-                    "Есть эспресс-бонус!!! " + driver.findElements(expressBonusText).size(),
+                    "Есть экспресс-бонус!!! " + driver.findElements(expressBonusText).size(),
                     driver.findElements(expressBonusText).isEmpty());
+            assertTrue(
+                    "Есть ссылка на описание экспресс-бонуса в правилах",
+                    driver.findElements(expressBonusLink).isEmpty());
         } else {
-//            assertTrue(
-//                    "Неправильная ссылка на описание экспресс-бонуса. Или ссылки вообще нет  ||| " + driver.findElement(expressBonusLink).getAttribute("href") + " |||",
-//                    driver.findElement(expressBonusLink).getAttribute("href").contains("'/rules/express-bonus'")); // проверка корректности ссылки
+            assertFalse(
+                    "Нет текста про экспресс-бонус!!! ",
+                    driver.findElements(expressBonusText).isEmpty());
             assertTrue(
                     "Неправильная текст в описании экспресс-бонуса. Или его вообще нет   ||| " + driver.findElement(expressBonusText).getText() + " |||",
                     driver.findElement(expressBonusText).getText().contains("+" + (listBets.size() + 1) + "% к выигрышу")); // проверка корректности текста
+            assertTrue(
+                    "Неправильная ссылка на описание экспресс-бонуса. Или ссылки вообще нет  ||| " + driver.findElement(expressBonusLink).getAttribute("href") + " |||",
+                    driver.findElement(expressBonusLink).getAttribute("href").contains("/rules/express-bonus")); // проверка корректности ссылки
+
         }
 
     }

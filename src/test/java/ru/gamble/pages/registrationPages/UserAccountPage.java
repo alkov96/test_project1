@@ -141,8 +141,8 @@ public class UserAccountPage extends AbstractPage{
                 String password = (value.equals(Constants.DEFAULT)) ? JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue() : value;
                 LOG.info("Вводим пароль::" + password);
                 fillField(passwordInput, password);
-                LOG.info("Подтверждаем::" + password);
-                fillField(confirmPasswordInput, password);
+//                LOG.info("Подтверждаем::" + password);
+//                fillField(confirmPasswordInput, password);
                 Stash.put(saveVariable, password);
             }
 

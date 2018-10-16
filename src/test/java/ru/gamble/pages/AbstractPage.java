@@ -158,6 +158,24 @@ public abstract class AbstractPage extends Page {
         myDynamicElement.click();
     }
 
+
+    public void tryingLoadPage(By by, int count, int waitSeconds) {
+        WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Ищем элемент [" + by + "] на странице::" + driver.getCurrentUrl());
+
+        for (int j = 0; j < count; j++) {
+            try {
+                new WebDriverWait(PageFactory.getDriver(), waitSeconds ).until(ExpectedConditions.visibilityOfElementLocated(by));
+                break;
+            } catch (Exception e) {
+                driver.navigate().refresh();
+            }
+            if (j >= count - 1) {
+                throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
+            }
+        }
+    }
+
     public void tryingLoadPage(WebElement element, int count, int waitSeconds) {
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Ищем элемент [" + element + "] на странице::" + driver.getCurrentUrl());
