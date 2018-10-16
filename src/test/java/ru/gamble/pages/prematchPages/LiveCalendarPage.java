@@ -39,7 +39,7 @@ public class LiveCalendarPage extends AbstractPage {
 
     public LiveCalendarPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(centralMarkets));
         tryingLoadPage(menuForSelectingSports,5, 10);
         workWithPreloader();

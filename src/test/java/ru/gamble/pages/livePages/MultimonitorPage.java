@@ -26,7 +26,7 @@ public class MultimonitorPage extends AbstractPage {
 
     public MultimonitorPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(multiviewWrapper));
     }
 }

@@ -28,7 +28,7 @@ public class MobileWaysToDepositPage extends MobileAuthorizedMainPage{
 
     public MobileWaysToDepositPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         waitingForPreloaderToDisappear(30);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
