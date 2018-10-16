@@ -76,10 +76,8 @@ public class MainPage extends AbstractPage {
 
     public MainPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
-        tryingLoadPage(By.xpath("//div[contains(@class,'main-slider__wrapper')]"),3, 5);
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(slider,3, 5);
+        tryingLoadPage(By.xpath("//div[contains(@class,'main-slider__wrapper')]"),3, 5);
         workWithPreloader();
     }
 
