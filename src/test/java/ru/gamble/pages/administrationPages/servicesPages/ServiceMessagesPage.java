@@ -49,7 +49,7 @@ public class ServiceMessagesPage extends AbstractPage {
 
     public ServiceMessagesPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(table));
     }
 

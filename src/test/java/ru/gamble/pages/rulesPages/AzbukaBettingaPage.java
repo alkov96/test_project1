@@ -43,7 +43,7 @@ public class AzbukaBettingaPage extends AbstractPage {
 
     public AzbukaBettingaPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 

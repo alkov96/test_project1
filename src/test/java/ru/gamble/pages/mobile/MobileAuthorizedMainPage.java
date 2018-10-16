@@ -15,6 +15,8 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -66,7 +68,7 @@ public class MobileAuthorizedMainPage extends AbstractPage {
 
     public MobileAuthorizedMainPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         waitingForPreloaderToDisappear(30);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(deposit));
     }

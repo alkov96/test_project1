@@ -57,7 +57,7 @@ public class TestingServicePage extends AbstractPage{
 
     public TestingServicePage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
         LOG.info("Сейчас мы на странице [" + driver.getCurrentUrl() + "]");
     }

@@ -28,7 +28,7 @@ public class MessagesPage extends AbstractPage {
 
     public MessagesPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(messagePage));
     }

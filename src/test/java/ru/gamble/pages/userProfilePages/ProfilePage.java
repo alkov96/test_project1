@@ -13,6 +13,8 @@ import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
@@ -30,7 +32,7 @@ public class ProfilePage extends AbstractPage {
 
     public ProfilePage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(tabWraper));
     }

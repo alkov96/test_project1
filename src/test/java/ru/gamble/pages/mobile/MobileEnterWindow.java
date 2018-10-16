@@ -46,7 +46,7 @@ public class MobileEnterWindow extends AbstractPage {
 
     public MobileEnterWindow() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         waitingForPreloaderToDisappear(30);
         tryingLoadPage(inputEmail,5, 10);
     }

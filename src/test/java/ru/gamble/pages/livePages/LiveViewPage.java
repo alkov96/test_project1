@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 /**
  * @author p.sivak.
@@ -22,7 +24,7 @@ public class LiveViewPage extends AbstractPage {
 
     public LiveViewPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(pageTitle,10, 5);
     }
 }
