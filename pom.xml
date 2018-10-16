@@ -14,18 +14,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>2.53.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>23.0</version>
-        </dependency>
-
-
-        <dependency>
             <groupId>ru.sbtqa.tag</groupId>
             <artifactId>page-factory</artifactId>
             <version>1.13.4</version>
@@ -166,7 +154,7 @@
                 <version>2.9</version>
                 <configuration>
                     <!--<resultsPattern>target/allure-results</resultsPattern>-->
-                    <reportVersion>2.7.0</reportVersion>
+                    <reportVersion>2.9</reportVersion>
                 </configuration>
             </plugin>
         </plugins>
