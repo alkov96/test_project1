@@ -3,9 +3,9 @@ package ru.gamble.utility;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.sbtqa.tag.datajack.TestDataObject;
-import ru.sbtqa.tag.datajack.adaptors.json.JsonDataObjectAdaptor;
+import ru.sbtqa.tag.datajack.TestDataProvider;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
+import ru.sbtqa.tag.datajack.providers.json.JsonDataProvider;
 
 import java.io.File;
 import java.sql.Timestamp;
@@ -14,13 +14,13 @@ import java.util.Map;
 
 
 public class JsonLoader {
-    private static TestDataObject data;
+    private static TestDataProvider data;
     private static final Logger LOG = LoggerFactory.getLogger(JsonLoader.class);
     private static final String sep = File.separator;
 
-    public static TestDataObject getData() {
+    public static TestDataProvider getData() {
             try {
-                data = new JsonDataObjectAdaptor("src" + sep + "test" + sep + "resources", "data");
+                data = new JsonDataProvider("src" + sep + "test" + sep + "resources", "data");
             } catch (DataException e) {
                 LOG.error(e.getMessage());
             }
