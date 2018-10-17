@@ -283,7 +283,7 @@ public class CouponPage extends AbstractPage {
         By by = xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout') and not (contains (@class, 'ng-hide'))]");
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),70);
         wait.withMessage("Не удалось найти события, где меняется коэфицент");
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 1));
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 0));
         List<WebElement> oldCoef = driver.findElements(by).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
         if (oldCoef.size() == 0){
             Assertions.fail("Коэфицент не поменялся!");
@@ -416,6 +416,7 @@ public class CouponPage extends AbstractPage {
     public void onQuickBet(String sum) {
         if (!quickBetFlag.getAttribute("class").contains("not-empty")) {
             quickButton.click();
+            new WebDriverWait(getWebDriver(),10).until(ExpectedConditions.attributeContains(quickBetFlag,"class","not-empty"));
         }
         BigDecimal sumBet;
         BigDecimal one = new BigDecimal(1);

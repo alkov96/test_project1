@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -243,10 +244,7 @@ public class VewingEventsPage extends AbstractPage {
         String xpathLeftMenu = "//div[contains(@class,'menu-toggler')]";
         String xpathTypeOfSports = "//a[contains(@class,'list-item-sport-link')]";
         WebElement leftMenu = driver.findElement(By.xpath(xpathLeftMenu));
-        if(leftMenu.getAttribute("title").contains("Свернуть всё")){
-            LOG.info("Сворачиваем левое меню.");
-            leftMenu.click();
-        }
+        setExpandCollapseMenusButton(false);
         List<WebElement> list = driver.findElements(By.xpath(xpathTypeOfSports)).stream().filter(e -> (e.isDisplayed() && (!e.getAttribute("title").isEmpty()))).collect(Collectors.toList());
         for (WebElement el: list) {
             LOG.info("Найден::" + el.getAttribute("title"));

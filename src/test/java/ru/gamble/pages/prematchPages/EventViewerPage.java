@@ -503,33 +503,6 @@ public class EventViewerPage extends AbstractPage {
         }
     }
 
-
-    /**
-     * сворачивание или разворачивание левого меню
-     */
-    public void setExpandCollapseMenusButton(boolean collapsOrNot){
-        WebDriver driver = PageFactory.getDriver();
-        WebDriverWait wait =  new WebDriverWait(driver,10);
-        WebElement menu = driver.findElement(By.id("menu-toggler"));
-        if (menu.getAttribute("class").contains("collapsed")!=collapsOrNot){
-            menu.click();
-            CommonStepDefs.workWithPreloader();
-            if (!driver.findElements(preloaderOnPage).isEmpty()){
-                driver.navigate().refresh();
-                CommonStepDefs.workWithPreloader();
-            }
-        }
-
-        if (collapsOrNot) {
-            wait.withMessage("Не удалось развернуть левое меню");
-            wait.until(attributeContains(By.id("menu-toggler"), "class", "collapsed"));
-        }
-        else {
-            wait.withMessage("Не удалось свернуть левое меню");
-            wait.until(ExpectedConditions.not(attributeContains(By.id("menu-toggler"), "class", "collapsed")));
-        }
-    }
-
     @ActionTitle("многовыборный режим")
     public void multiGamesOnOff(String onOrOff){
         WebDriver driver = PageFactory.getDriver();
