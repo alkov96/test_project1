@@ -1,6 +1,8 @@
 package ru.gamble.pages.mainPages;
 
 import cucumber.api.DataTable;
+import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -94,7 +96,6 @@ public class MyBetting extends AbstractPage {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -130,9 +131,7 @@ public class MyBetting extends AbstractPage {
         } else {
             wait.until(ExpectedConditions.numberOfElementsToBeLessThan(by,1));
             LOG.info("Ввели " + pattern + ". Результат: элемент не найден" );
-
-        }
-
+            }
         }
 
     @ActionTitle("переключается на другую дату")
@@ -142,6 +141,40 @@ public class MyBetting extends AbstractPage {
         driver.findElements(By.xpath("//div[@class='datepicker__btn']")).get(0).click(); //нажимаем на месяц назад
         driver.findElements(By.xpath("//div[contains(@class,'datepicker__day')]/div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).get(3).click(); //выбираем дату
         Thread.sleep(7000);
+    }
+
+
+    @ActionTitle("проверяет фильтр по типу исхода ставки")
+    public void checkFilterInMyBetting(DataTable dataTable) throws InterruptedException {
+        WebDriver driver = PageFactory.getWebDriver();
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String outcomeOfBet, selectedOutcomeOfBet, outcomeOfBetWeChoose;
+        for (Map<String, String> aTable : table) {
+            outcomeOfBet = aTable.get("Исход ставки");
+            selectedOutcomeOfBet = aTable.get("Выбранный исход ставки");
+            WebElement button_choose_outcome = driver.findElement(By.xpath("//th[@class='table__head-cell_my-stakes-result']//div[contains(@class,'custom-select__placeholder option')]"));
+            button_choose_outcome.click();
+            LOG.info("Выбираем тип " + outcomeOfBet);
+            button_choose_outcome.findElement(By.xpath("../div[contains(@class,'custom-select-der scroll-contain')]/div[contains(@class,'option')]/span[contains(., '" + outcomeOfBet + "')]"))
+                    .click();
+            Thread.sleep(5000);
+            List<WebElement> rows = PageFactory.getWebDriver().findElements(By.xpath("//tr[contains(@class,'showBetInfo ')]"))
+                    .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+            LOG.info("Всего пари::" + rows.size());
+            if (rows.size()==0){
+                LOG.info("нет ставок для " + outcomeOfBet);
+                continue;
+            }
+            LOG.info("Проверяем, что для выбранного типа исхода, отображаются только ставки с этим типом:: " + outcomeOfBet);
+            for (WebElement row : rows) {
+                outcomeOfBetWeChoose = row.findElement(By.xpath("//td[4]/table[@class='table-inner']//tr/td[@class='table__body-cell table__head-cell_my-stakes-result']"))
+                        .getText();
+                if (selectedOutcomeOfBet.equals("Все")){
+                    break;                }
+                Assert.assertTrue("Для ставки с типом " + outcomeOfBet + " отображается тип " + outcomeOfBetWeChoose, outcomeOfBetWeChoose
+                        .contains(selectedOutcomeOfBet));
+            }
+        }
     }
 
 
