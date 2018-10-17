@@ -19,6 +19,8 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,7 +51,7 @@ public class MyBetting extends AbstractPage {
 
     public MyBetting() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
@@ -251,9 +253,9 @@ public class MyBetting extends AbstractPage {
         driver.findElement(By.xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + filter + "']")).click();
         CommonStepDefs.workWithPreloader();
 
-        WebDriverWait wait = new WebDriverWait(driver,10);
-        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"),1));
+//        WebDriverWait wait = new WebDriverWait(driver,10);
+//        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
+//        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"),0));
 
         List<WebElement> allBetsOnPage = driver.findElements(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"));
 
@@ -271,8 +273,10 @@ public class MyBetting extends AbstractPage {
             LOG.info("Запомнили строчку из Моих пари");
         }
 
-        LOG.info("Первые " + cou + " ставок(ки) в моих пари это: " +
-        betsOnMyBets.get(0).getType() + "\n" + betsOnMyBets.get(1).getType() + "\n" + betsOnMyBets.get(2).getType());
+        LOG.info("Первые " + cou + " ставок(ки) в моих пари это: ");
+        for (int i=0;i<cou;i++){
+            LOG.info(betsOnMyBets.get(i).getType() + "\n");
+        }
         Stash.put(nameList,betsOnMyBets);
 
     }

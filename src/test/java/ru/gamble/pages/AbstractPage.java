@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.openqa.selenium.By.xpath;
+import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.RANDOM;
 import static ru.gamble.utility.Constants.STARTING_URL;
@@ -156,6 +157,24 @@ public abstract class AbstractPage extends Page {
         WebElement myDynamicElement = (new WebDriverWait(PageFactory.getWebDriver(), 10))
                 .until(ExpectedConditions.elementToBeClickable(element));
         myDynamicElement.click();
+    }
+
+
+    public void tryingLoadPage(By by, int count, int waitSeconds) {
+        WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Ищем элемент [" + by + "] на странице::" + driver.getCurrentUrl());
+
+        for (int j = 0; j < count; j++) {
+            try {
+                new WebDriverWait(PageFactory.getDriver(), waitSeconds ).until(ExpectedConditions.visibilityOfElementLocated(by));
+                break;
+            } catch (Exception e) {
+                driver.navigate().refresh();
+            }
+            if (j >= count - 1) {
+                throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
+            }
+        }
     }
 
     public void tryingLoadPage(WebElement element, int count, int waitSeconds) {
@@ -647,6 +666,34 @@ public abstract class AbstractPage extends Page {
             driver.findElement(By.id("sports-toggler-opened")).click();
         }else if (driver.findElement(By.id("sports-toggler")).isDisplayed()){
             driver.findElement(By.id("sports-toggler")).click();
+        }
+    }
+
+    /**
+     * сворачивание или разворачивание левого меню
+     * false - свернуть
+     * true - развернуть
+     */
+    public static void setExpandCollapseMenusButton(boolean collapsOrNot){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait =  new WebDriverWait(driver,10);
+        WebElement menu = driver.findElement(By.id("menu-toggler"));
+        if (menu.getAttribute("class").contains("collapsed")!=collapsOrNot){
+            menu.click();
+            CommonStepDefs.workWithPreloader();
+            if (!driver.findElements(preloaderOnPage).isEmpty()){
+                driver.navigate().refresh();
+                CommonStepDefs.workWithPreloader();
+            }
+        }
+
+        if (collapsOrNot) {
+            wait.withMessage("Не удалось развернуть левое меню");
+            wait.until(attributeContains(By.id("menu-toggler"), "class", "collapsed"));
+        }
+        else {
+            wait.withMessage("Не удалось свернуть левое меню");
+            wait.until(ExpectedConditions.not(attributeContains(By.id("menu-toggler"), "class", "collapsed")));
         }
     }
 }

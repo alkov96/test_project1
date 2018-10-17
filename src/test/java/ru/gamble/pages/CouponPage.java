@@ -21,6 +21,8 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import javax.annotation.Nullable;
 import javax.naming.AuthenticationException;
@@ -102,10 +104,7 @@ public class CouponPage extends AbstractPage {
 
     public CouponPage() {
         WebDriver driver = PageFactory.getDriver();
-//        PageFactory.initElements(new HtmlElementDecorator(
-//                new HtmlElementLocatorFactory(driver)), this);
-//        tryingLoadPage(coupon, 10, 5);
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(coupon,10, 5);
     }
 
@@ -165,22 +164,30 @@ public class CouponPage extends AbstractPage {
     public void checkExpressBonus(boolean expect) {
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> listBets = driver.findElements(xpathListBets);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        //driver.findElements(xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"));
         if (!expect) {
-//            assertTrue(
-//                    "Есть ссылка!!! " + driver.findElements(expressBonusLink).get(0).getAttribute("href"),
-//                    driver.findElements(expressBonusLink).isEmpty());
             assertTrue(
-                    "Есть эспресс-бонус!!! " + driver.findElements(expressBonusText).size(),
+                    "Есть экспресс-бонус!!! " + driver.findElements(expressBonusText).size(),
                     driver.findElements(expressBonusText).isEmpty());
+            assertTrue(
+                    "Есть ссылка на описание экспресс-бонуса в правилах",
+                    driver.findElements(expressBonusLink).isEmpty());
         } else {
-//            assertTrue(
-//                    "Неправильная ссылка на описание экспресс-бонуса. Или ссылки вообще нет  ||| " + driver.findElement(expressBonusLink).getAttribute("href") + " |||",
-//                    driver.findElement(expressBonusLink).getAttribute("href").contains("'/rules/express-bonus'")); // проверка корректности ссылки
+            assertFalse(
+                    "Нет текста про экспресс-бонус!!! ",
+                    driver.findElements(expressBonusText).isEmpty());
             assertTrue(
                     "Неправильная текст в описании экспресс-бонуса. Или его вообще нет   ||| " + driver.findElement(expressBonusText).getText() + " |||",
                     driver.findElement(expressBonusText).getText().contains("+" + (listBets.size() + 1) + "% к выигрышу")); // проверка корректности текста
+            assertTrue(
+                    "Неправильная ссылка на описание экспресс-бонуса. Или ссылки вообще нет  ||| " + driver.findElement(expressBonusLink).getAttribute("href") + " |||",
+                    driver.findElement(expressBonusLink).getAttribute("href").contains("/rules/express-bonus")); // проверка корректности ссылки
+
         }
 
     }
@@ -276,7 +283,7 @@ public class CouponPage extends AbstractPage {
         By by = xpath("//div[@class='coupon-bet__coeffs']/span[contains(@class,'coupon-bet__coeff-strikeout') and not (contains (@class, 'ng-hide'))]");
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),70);
         wait.withMessage("Не удалось найти события, где меняется коэфицент");
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 1));
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 0));
         List<WebElement> oldCoef = driver.findElements(by).stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
         if (oldCoef.size() == 0){
             Assertions.fail("Коэфицент не поменялся!");
@@ -409,6 +416,7 @@ public class CouponPage extends AbstractPage {
     public void onQuickBet(String sum) {
         if (!quickBetFlag.getAttribute("class").contains("not-empty")) {
             quickButton.click();
+            new WebDriverWait(getWebDriver(),10).until(ExpectedConditions.attributeContains(quickBetFlag,"class","not-empty"));
         }
         BigDecimal sumBet;
         BigDecimal one = new BigDecimal(1);
@@ -731,25 +739,19 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("запоминает первые события в заключенных пари")
-    public void rememberHistoryInCoupon(String nameList) throws Exception{
+    public void rememberHistoryInCoupon(String nameList){
         WebDriver driver = PageFactory.getDriver();
         int  cou = 3;
         List<BetFull> betsOnMyBets= new ArrayList<>();
         By byListLines = By.xpath("//div[@class='coupon__outcome-betslip-wrapper']/div[contains(@class,'coupon__bet-block')]");
-        WebDriverWait wait = new WebDriverWait(driver,10);
-        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(byListLines,1));
         List<WebElement> linesOnHistory = driver.findElements(byListLines);
         if (linesOnHistory.size()<cou){
             cou=linesOnHistory.size();
         }
 
-        //for (WebElement element : linesOnHistory.subList(0,cou)) {
         for (int i=0; i<cou;i++){
-//            betsOnMyBets.add(remeberLineInHistoryCoupon(element));
             betsOnMyBets.add(remeberLineInHistoryCoupon(i));
             LOG.info("Запомнили строчку из истории пари в купоне");
-
         }
 
         LOG.info("Первые " + cou + " ставок(ки) в истории в купоне это: \n" +
@@ -789,7 +791,7 @@ public class CouponPage extends AbstractPage {
 
         //запоминаем размер ставки
         sumElement = element.findElement(By.xpath("div[contains(@class,'coupon-bet')]//*[normalize-space(text())='Ставка']/following-sibling::span"));
-        sumBet.append(element.findElement(By.xpath("div[contains(@class,'coupon-bet')]//*[normalize-space(text())='Ставка']/following-sibling::span")).getText().trim());
+        sumBet.append(element.findElement(By.xpath("div[contains(@class,'coupon-bet')]//*[normalize-space(text())='Ставка']/following-sibling::span")).getAttribute("title").trim());
 
         helpString.setLength(0);
        // helpString.append(sumElement.findElement(By.xpath("span")).getAttribute("class"));

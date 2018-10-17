@@ -19,6 +19,8 @@ import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,7 +49,7 @@ public class EventViewerPage extends AbstractPage {
 
     public EventViewerPage() {
         WebDriver driver = PageFactory.getDriver();
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandCollapseMenusButton));
         checkMenuIsOpen();
     }
@@ -498,33 +500,6 @@ public class EventViewerPage extends AbstractPage {
             }
 
             myGamesCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
-        }
-    }
-
-
-    /**
-     * сворачивание или разворачивание левого меню
-     */
-    public void setExpandCollapseMenusButton(boolean collapsOrNot){
-        WebDriver driver = PageFactory.getDriver();
-        WebDriverWait wait =  new WebDriverWait(driver,10);
-        WebElement menu = driver.findElement(By.id("menu-toggler"));
-        if (menu.getAttribute("class").contains("collapsed")!=collapsOrNot){
-            menu.click();
-            CommonStepDefs.workWithPreloader();
-            if (!driver.findElements(preloaderOnPage).isEmpty()){
-                driver.navigate().refresh();
-                CommonStepDefs.workWithPreloader();
-            }
-        }
-
-        if (collapsOrNot) {
-            wait.withMessage("Не удалось развернуть левое меню");
-            wait.until(attributeContains(By.id("menu-toggler"), "class", "collapsed"));
-        }
-        else {
-            wait.withMessage("Не удалось свернуть левое меню");
-            wait.until(ExpectedConditions.not(attributeContains(By.id("menu-toggler"), "class", "collapsed")));
         }
     }
 

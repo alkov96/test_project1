@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" version="4">
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Spring" name="Spring">
       <configuration />
@@ -15,21 +15,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag:page-factory:1.12.3" level="project" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag:datajack:1.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:3.2.2" level="project" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-json-adaptor:1.2.0" level="project" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-properties-adaptor:1.1.0" level="project" />
-    <orderEntry type="library" name="Maven: pl.jalokim.propertiestojson:java-properties-to-json:3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.16.6" level="project" />
-    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.adaptors:datajack-excel-adaptor:1.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.15" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.15" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.15" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.6.0" level="project" />
-    <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
-    <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.04" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag:page-factory:1.13.4" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa.tag:allure-helper:1.4.1" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa.tag:video-recorder:1.0.6" level="project" />
     <orderEntry type="library" name="Maven: ru.sbtqa:monte-media:1.1.0-JAVA7" level="project" />
@@ -93,6 +79,21 @@
     <orderEntry type="library" name="Maven: org.apache.maven:maven-artifact:2.0.10" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-container-default:1.0-alpha-9-stable-1" level="project" />
     <orderEntry type="library" name="Maven: classworlds:classworlds:1.1-alpha-2" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack:datajack-api:4.0.4" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:3.2.2" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.providers:json-provider:4.0.4" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.providers:properties-provider:4.0.4" level="project" />
+    <orderEntry type="library" name="Maven: pl.jalokim.propertiestojson:java-properties-to-json:3.0" level="project" />
+    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.16.6" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.providers:excel-provider:4.0.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.17" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.17" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.17" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.04" level="project" />
+    <orderEntry type="library" name="Maven: ru.sbtqa.tag.datajack.providers:mongo-provider:4.0.4" level="project" />
     <orderEntry type="library" name="Maven: io.qameta.allure:allure-cucumber2-jvm:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: io.cucumber:cucumber-core:2.3.1" level="project" />
     <orderEntry type="library" name="Maven: info.cukes:cucumber-html:0.2.6" level="project" />
