@@ -61,6 +61,9 @@ public class SearchPage extends AbstractPage{
     public int checkTypeGameOnSearch(int numberRes) {
         WebDriver driver = PageFactory.getDriver();
         int typeGame;//1-live; 0-prematch
+        new WebDriverWait(driver,15)
+                .withMessage("Нет вообще никаких результатов поиска. Ни правильнх, ни неправильных")
+                .until(ExpectedConditions.numberOfElementsToBeMoreThan(xpath("//dl[contains(@class,'search-result-item')]/dd"),0));
         List <WebElement> searchResult = driver.findElements(xpath("//dl[contains(@class,'search-result-item')]/dd"));
         String whenGame = searchResult.get(numberRes).findElement(xpath("div/div[contains(@class,'result-search__competition-name')]")).getAttribute("title");
 
