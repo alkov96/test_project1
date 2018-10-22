@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.openqa.selenium.By.xpath;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 
 @PageEntry(title = "Мои пари")
@@ -59,7 +60,7 @@ public class MyBetting extends AbstractPage {
 
     @ActionTitle("проверяет попадание ставок в диапазон дат")
     public void checksBidsOnDateRange() {
-        List<WebElement> dates = PageFactory.getWebDriver().findElements(By.xpath("//span[contains(@class,'datapicker__form-text')]"));
+        List<WebElement> dates = PageFactory.getWebDriver().findElements(xpath("//span[contains(@class,'datapicker__form-text')]"));
         Date firstDate, lastDate, bidDate;
         SimpleDateFormat formatter1 = new SimpleDateFormat("dd.MM.yyyy");
         Calendar calendar = Calendar.getInstance();
@@ -67,7 +68,7 @@ public class MyBetting extends AbstractPage {
         LOG.info("Нашли датапикеров::" + dates.size());
 
         SimpleDateFormat formatter2 = new SimpleDateFormat("dd.MM.yy HH:mm");
-        List<WebElement> rows = PageFactory.getWebDriver().findElements(By.xpath("//tr[contains(@class,'showBetInfo ')]"));
+        List<WebElement> rows = PageFactory.getWebDriver().findElements(xpath("//tr[contains(@class,'showBetInfo ')]"));
         LOG.info("Всего ставок::" + rows.size());
         LOG.info("Проверяем, что даты ставок попадают в диапазон");
         try {
@@ -84,7 +85,7 @@ public class MyBetting extends AbstractPage {
             if(rows.size() > 0) {
                 for (WebElement row : rows) {
                     try {
-                        bidDate = formatter2.parse(row.findElement(By.xpath("./td[2]/div")).getText());
+                        bidDate = formatter2.parse(row.findElement(xpath("./td[2]/div")).getText());
                         assertThat(bidDate.after(firstDate) && bidDate.before(lastDate))
                                 .as("Дата не попадает в интервал::" + firstDate.toString() + "::" + bidDate + "::" + lastDate).isTrue();
                         LOG.info("Дата в интервале::" + firstDate.toString() + "::" + bidDate + "::" + lastDate);
@@ -105,7 +106,7 @@ public class MyBetting extends AbstractPage {
     public String rememberId() throws InterruptedException {
         WebDriver driver = PageFactory.getWebDriver();
         int value = new Random().nextInt(6);
-        List<WebElement> all_id = driver.findElements(By.xpath("//div[@ng-bind-html='bet.id | formatText:search']"));
+        List<WebElement> all_id = driver.findElements(xpath("//div[@ng-bind-html='bet.id | formatText:search']"));
         Thread.sleep(5000);
         String id = all_id.get(value).getText().trim().toLowerCase();
         return id;
@@ -125,7 +126,7 @@ public class MyBetting extends AbstractPage {
         search_line.sendKeys(pattern);
         LOG.info("В строку поиска ввели: " + pattern);
 
-        By by = By.xpath("//div[@ng-bind-html='bet.id | formatText:search']");
+        By by = xpath("//div[@ng-bind-html='bet.id | formatText:search']");
 
         if (param.equals("id")) {
             wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 0));
@@ -139,10 +140,35 @@ public class MyBetting extends AbstractPage {
     @ActionTitle("переключается на другую дату")
     public void chooseAnotherDate() throws InterruptedException {
         WebDriver driver = PageFactory.getWebDriver();
-        driver.findElements(By.xpath("//span[contains(@class,'datapicker__form')]")).get(0).click(); //нажимаем на первый календарь
-        driver.findElements(By.xpath("//div[@class='datepicker__btn']")).get(0).click(); //нажимаем на месяц назад
-        driver.findElements(By.xpath("//div[contains(@class,'datepicker__day')]/div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).get(3).click(); //выбираем дату
+        driver.findElements(xpath("//span[contains(@class,'datapicker__form')]")).get(0).click(); //нажимаем на первый календарь
+        driver.findElements(xpath("//div[@class='datepicker__btn']")).get(0).click(); //нажимаем на месяц назад
+        driver.findElements(xpath("//div[contains(@class,'datepicker__day')]/div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).get(3).click(); //выбираем дату
         Thread.sleep(7000);
+    }
+
+    @ActionTitle("проверяет сортировку по сумме")
+    public void sortSumm() throws InterruptedException {
+        WebDriver driver = PageFactory.getDriver();
+        boolean sort_list_summ;
+
+        By button = xpath("//tr[@class='table__row table__row_head']/th[3]");
+        By by = xpath("//tr[contains(@class,'showBetInfo table__row')]/td[@class='table__body-cell']/div[contains(@class,'showBetInfo__money-str')]");
+
+        driver.findElement(button).click();
+        Thread.sleep(5000);
+
+        List<Float> summList = driver.findElements(by).stream().filter(WebElement::isDisplayed).map(element -> Float.valueOf(element.getText())).collect(Collectors.toList());
+        sort_list_summ = summList.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList()).equals(summList);
+        assertTrue("Список не отсортировался по сумме!",sort_list_summ);
+
+        driver.findElement(button).click();
+        Thread.sleep(5000);
+
+        summList.clear();
+
+        sort_list_summ = summList.stream().sorted().collect(Collectors.toList()).equals(summList);
+        assertTrue("Список не отсортировался по сумме!",sort_list_summ);
+
     }
 
 
@@ -154,13 +180,13 @@ public class MyBetting extends AbstractPage {
         for (Map<String, String> aTable : table) {
             outcomeOfBet = aTable.get("Исход ставки");
             selectedOutcomeOfBet = aTable.get("Выбранный исход ставки");
-            WebElement button_choose_outcome = driver.findElement(By.xpath("//th[@class='table__head-cell_my-stakes-result']//div[contains(@class,'custom-select__placeholder option')]"));
+            WebElement button_choose_outcome = driver.findElement(xpath("//th[@class='table__head-cell_my-stakes-result']//div[contains(@class,'custom-select__placeholder option')]"));
             button_choose_outcome.click();
             LOG.info("Выбираем тип " + outcomeOfBet);
-            button_choose_outcome.findElement(By.xpath("../div[contains(@class,'custom-select-der scroll-contain')]/div[contains(@class,'option')]/span[contains(., '" + outcomeOfBet + "')]"))
+            button_choose_outcome.findElement(xpath("../div[contains(@class,'custom-select-der scroll-contain')]/div[contains(@class,'option')]/span[contains(., '" + outcomeOfBet + "')]"))
                     .click();
             Thread.sleep(5000);
-            List<WebElement> rows = PageFactory.getWebDriver().findElements(By.xpath("//tr[contains(@class,'showBetInfo ')]"))
+            List<WebElement> rows = PageFactory.getWebDriver().findElements(xpath("//tr[contains(@class,'showBetInfo ')]"))
                     .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
             LOG.info("Всего пари::" + rows.size());
             if (rows.size()==0){
@@ -169,7 +195,7 @@ public class MyBetting extends AbstractPage {
             }
             LOG.info("Проверяем, что для выбранного типа исхода, отображаются только ставки с этим типом:: " + outcomeOfBet);
             for (WebElement row : rows) {
-                outcomeOfBetWeChoose = row.findElement(By.xpath("//td[4]/table[@class='table-inner']//tr/td[@class='table__body-cell table__head-cell_my-stakes-result']"))
+                outcomeOfBetWeChoose = row.findElement(xpath("//td[4]/table[@class='table-inner']//tr/td[@class='table__body-cell table__head-cell_my-stakes-result']"))
                         .getText();
                 if (selectedOutcomeOfBet.equals("Все")){
                     break;                }
@@ -195,10 +221,10 @@ public class MyBetting extends AbstractPage {
             }
 
             LOG.info("Выбираем тип::" + typeOfOutcome);
-            filterByTypeOfBid.findElement(By.xpath("//custom-select//div/span[contains(.,'" + typeOfOutcome + "')]")).click();
+            filterByTypeOfBid.findElement(xpath("//custom-select//div/span[contains(.,'" + typeOfOutcome + "')]")).click();
             workWithPreloader();
 
-            List<WebElement> rows = PageFactory.getWebDriver().findElements(By.xpath("//tr[contains(@class,'showBetInfo ')]"))
+            List<WebElement> rows = PageFactory.getWebDriver().findElements(xpath("//tr[contains(@class,'showBetInfo ')]"))
                     .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
             LOG.info("Всего пари::" + rows.size());
             LOG.info("Проверяем, что даты ставок попадают в диапазон");
@@ -206,7 +232,7 @@ public class MyBetting extends AbstractPage {
             List<WebElement> subIvens;
             if (rows.size() > 0) {
                 for (WebElement row : rows) {
-                    selectedOutcome = row.findElement(By.xpath(".//tr[contains(@class,'table')]/td[2]")).getText();
+                    selectedOutcome = row.findElement(xpath(".//tr[contains(@class,'table')]/td[2]")).getText();
                     if (betType.contains("!")) {
                         assertThat(selectedOutcome).doesNotContain("Система");
                         assertThat(selectedOutcome).doesNotContain("Экспресс");
@@ -217,7 +243,7 @@ public class MyBetting extends AbstractPage {
                     LOG.info("Текст [" + selectedOutcome + "] соответсвует [" + betType + "]");
                     if (selectedOutcome.contains("Экспресс") || selectedOutcome.contains("Система")) {
                         LOG.info("Проверяем что в [" + selectedOutcome + "] больше одного события");
-                        subIvens = row.findElements(By.xpath(".//div//tr[contains(@class,'table-inner__row')]"));
+                        subIvens = row.findElements(xpath(".//div//tr[contains(@class,'table-inner__row')]"));
                         if (subIvens.size() > 1) {
                             subIvens.remove(0);
                         } //Здесь удаляем мусорную строку
@@ -244,20 +270,20 @@ public class MyBetting extends AbstractPage {
         WebDriver driver = PageFactory.getWebDriver();
         int  cou = 3;
         LOG.info("Сначала включаем фильтр 'Ожидается'");
-        driver.findElement(By.xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
-        driver.findElement(By.xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
+        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
         CommonStepDefs.workWithPreloader();
 
         LOG.info("Теперь включаем фильтр по типу ставки " + filter);
-        driver.findElement(By.xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
-        driver.findElement(By.xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + filter + "']")).click();
+        driver.findElement(xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + filter + "']")).click();
         CommonStepDefs.workWithPreloader();
 
 //        WebDriverWait wait = new WebDriverWait(driver,10);
 //        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
 //        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"),0));
 
-        List<WebElement> allBetsOnPage = driver.findElements(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"));
+        List<WebElement> allBetsOnPage = driver.findElements(xpath("//tr[contains(@class,'showBetInfo table__row')]"));
 
         if (allBetsOnPage.size()<cou){
             cou=allBetsOnPage.size();
@@ -293,13 +319,13 @@ public class MyBetting extends AbstractPage {
         SimpleDateFormat formatNo = new SimpleDateFormat("dd.MM.yy");
         SimpleDateFormat formatYes = new SimpleDateFormat("dd.MM");
 
-        helpString.append(element.findElement(By.xpath(".//tr[contains(@class,'table')]/td[2]")).getText());
+        helpString.append(element.findElement(xpath(".//tr[contains(@class,'table')]/td[2]")).getText());
         String typeBet = (!helpString.toString().toLowerCase().contains("система") && !helpString.toString().toLowerCase().contains("экспресс")) ?
                 "ординар" : helpString.toString().toLowerCase();
         bet.setType(typeBet);
 
         helpString.setLength(0);
-        helpString.append(element.findElement(By.xpath("td[2]/div")).getText());
+        helpString.append(element.findElement(xpath("td[2]/div")).getText());
         index = helpString.indexOf(":");
         try {
             timeBet.append(helpString.substring(index - 2, index + 3));
@@ -310,17 +336,17 @@ public class MyBetting extends AbstractPage {
         bet.setTimeBet(timeBet.toString());
 
 
-        element.findElements(By.xpath(".//td[contains(@class,'table__head-cell_my-stakes-kef')]/div"))
+        element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-kef')]/div"))
                 .stream()
                 .forEach(el -> coefs.add(el.getText()));
 
-        element.findElements(By.xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=1]"))
+        element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=1]"))
                 .stream()
                 .map(WebElement::getText)
                 .map(el -> CommonStepDefs.newFormatDate(formatNo, formatYes, el))
                 .forEach(el -> dateGames.add(el));
 
-        element.findElements(By.xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=2]"))
+        element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=2]"))
                 .stream()
                 .forEach(el -> nameGames.add(el.getText()));
 
@@ -330,10 +356,10 @@ public class MyBetting extends AbstractPage {
 
 
         helpString.setLength(0);
-        helpString.append(element.findElement(By.xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[2]")).getAttribute("class"));
+        helpString.append(element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[2]")).getAttribute("class"));
 
         sum.append(helpString.toString().contains("hide") ? "Б" : "Р");
-        sum.insert(0, element.findElement(By.xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[1]")).getText() + " ");
+        sum.insert(0, element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[1]")).getText() + " ");
         bet.setSum(sum.toString());
 
         return bet;
