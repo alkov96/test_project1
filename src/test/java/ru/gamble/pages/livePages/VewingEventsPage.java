@@ -11,7 +11,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -282,58 +281,96 @@ public class VewingEventsPage extends AbstractPage {
 
     @ActionTitle("проверяет, что при активном фильтре 'Группировка по регионам' появлятся родителький класс региона внутри которого есть игры")
     public void checkGroupingFilterByRegion(){
-        String xpathMainCategoriesOfEvents = "//li[contains (@id,'sport')]";
-        String xpathFlagsWithoutFilter = "//h4[contains(@class,'left-menu')]//span[contains(@class, 'flag')]";
-        String xpathRegionFilter = "//div[contains(@class,'left-menu-filters__item_regions')]";
-        String xpathRegions = "//a[contains(@class,'left-menu__list-item-region-link')]";
-        String xpathRegionInnerCompitition = "//div[contains(@class,'compitition')]";
-
-        LOG.info("Ищем категории вида спорта.");
-        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents));
-        if(list.size() > 0){
-            LOG.info("Найдено видов спорта::" + list.size());
-            for(int i = 0; i < (list.size() < 3 ? list.size() : 3); i++){
-                if(!list.get(i).getAttribute("class").contains("active")){
-                    LOG.info("Меню спорта было свёрнуто. Раскрываем.");
-                    list.get(i).click();
-                }
-                List<WebElement> listFlags = list.get(i).findElements(By.xpath(xpathFlagsWithoutFilter)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-                LOG.info("Найдено флагов без фильтра 'Группировка регионов'::" + listFlags.size() );
-
-                WebElement regionFilter = PageFactory.getWebDriver().findElement(By.xpath(xpathRegionFilter));
-                if(!regionFilter.getAttribute("class").contains("active")){
-                    LOG.info("Включаем фильтр");
-                    regionFilter.click();
-                }
-
-                LOG.info("Ищем появились ли регионы");
-                List<WebElement> listRegions = PageFactory.getWebDriver().findElements(By.xpath(xpathRegions))
-                        .stream().filter(e -> (e.isDisplayed() && !e.getText().isEmpty())).collect(Collectors.toList());
-                LOG.info("Найдено регионов после включения фильтра 'Группировка регионов'::" + list.size() );
-                if(listRegions.size()>0){
-                    for (WebElement el: listRegions) {
-                        LOG.info("Раскрываем регион::" + el.getText());
-                        el.click();
-                        List<WebElement> innerGames = el.findElements(By.xpath(xpathRegionInnerCompitition))
-                                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-                        if(innerGames.size() > 0){
-                            LOG.info("Нашли игр внутри региона::" + innerGames.size());
-                            for (WebElement game:innerGames) {
-                                LOG.info(game.getText().replaceAll("\n","]-["));
-                            }
-                        }else {
-                            throw new AutotestError("Ошибка! Фильтр не сработал");
-                        }
-                        LOG.info("Закрываем регион::" + el.getText());
-                        el.click();
-                    }
-                }
-                LOG.info("Выключаем фильтр");
-                regionFilter.click();
-            }
-        }else {
-            LOG.info("Нет ни одной строки с видом спорта!");
+//        String xpathMainCategoriesOfEvents = "//li[contains (@id,'sport')]";
+//        String xpathFlagsWithoutFilter = ".//h4[contains(@class,'left-menu')]//span[contains(@class, 'flag')]";
+//        String xpathRegionFilter = "//div[contains(@class,'left-menu-filters__item_regions')]";
+//        String xpathRegions = "//a[contains(@class,'left-menu__list-item-region-link')]";
+//        String xpathRegionInnerCompitition = ".//div[contains(@class,'compitition')]";
+//
+//        LOG.info("Ищем категории вида спорта.");
+//        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents));
+//        if(list.size() > 0){
+//            LOG.info("Найдено видов спорта::" + list.size());
+//            for(int i = 0; i < (list.size() < 3 ? list.size() : 3); i++){
+//                if(!list.get(i).getAttribute("class").contains("active")){
+//                    LOG.info("Меню спорта было свёрнуто. Раскрываем.");
+//                    list.get(i).click();
+//                }
+//                List<WebElement> listFlags = list.get(i).findElements(By.xpath(xpathFlagsWithoutFilter)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+//                LOG.info("Найдено флагов без фильтра 'Группировка регионов'::" + listFlags.size() );
+//
+//                WebElement regionFilter = PageFactory.getWebDriver().findElement(By.xpath(xpathRegionFilter));
+//                if(!regionFilter.getAttribute("class").contains("active")){
+//                    LOG.info("Включаем фильтр");
+//                    regionFilter.click();
+//                }
+//
+//                LOG.info("Ищем появились ли регионы");
+//                List<WebElement> listRegions = PageFactory.getWebDriver().findElements(By.xpath(xpathRegions))
+//                        .stream().filter(e -> (e.isDisplayed() && !e.getText().isEmpty())).collect(Collectors.toList());
+//                LOG.info("Найдено регионов после включения фильтра 'Группировка регионов'::" + list.size() );
+//                if(listRegions.size()>0){
+//                    for (WebElement el: listRegions) {
+//                        LOG.info("Раскрываем регион::" + el.getText());
+//                        el.click();
+//                        List<WebElement> innerGames = el.findElements(By.xpath(xpathRegionInnerCompitition))
+//                                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+//                        if(innerGames.size() > 0){
+//                            LOG.info("Нашли игр внутри региона::" + innerGames.size());
+//                            for (WebElement game:innerGames) {
+//                                LOG.info(game.getText().replaceAll("\n","]-["));
+//                            }
+//                        }else {
+//                            throw new AutotestError("Ошибка! Фильтр не сработал");
+//                        }
+//                        LOG.info("Закрываем регион::" + el.getText());
+//                        el.click();
+//                    }
+//                }
+//                LOG.info("Выключаем фильтр");
+//                regionFilter.click();
+//            }
+//        }else {
+//            LOG.info("Нет ни одной строки с видом спорта!");
+//        }
+        WebDriver driver =  PageFactory.getWebDriver();
+        LOG.info("Сначала убедимся что в Лайве вообще есть игры");
+        List<WebElement> games = driver.findElements(By.xpath("//div[@class='left-menu__list-item-games-row']"));
+        Assert.assertFalse("Нет игр в ЛАЙВЕ", games.isEmpty());
+        LOG.info("Включаем группировку по регионам(если не было вкючено)");
+        setExpandCollapseMenusButton(true);
+        WebElement regionFilter =driver.findElement(By.xpath("//div[contains(@class,'left-menu-filters__item_regions')]"));
+        if (!regionFilter.getAttribute("class").contains("active")){
+            regionFilter.click();
+            new WebDriverWait(driver,10)
+                    .withMessage("Триггер 'Группировка по регионам' не включился в Левом меню")
+                    .until(ExpectedConditions.attributeContains(regionFilter,"class","active"));
         }
+
+        LOG.info("Смотрим появились ли регионы в ЛМ");
+        List<WebElement> regions =
+                driver.findElements(By.xpath("//a[contains(@class,'left-menu__list-item-region-link') and not(contains(@class,'hide'))]"));
+        Assert.assertFalse(
+                "Нет регионов в ЛМ, значит группировка не сработала",
+                regions.isEmpty()
+        );
+
+        LOG.info("Выключаем группировку по регионам и смотрим что теперь их(регионов) нет в ЛМ");
+        regionFilter.click();
+
+        new WebDriverWait(driver,10)
+                .withMessage("Триггер 'Группировка по регионам' не включился в Левом меню")
+                .until(ExpectedConditions.not(ExpectedConditions.attributeContains(regionFilter,"class","active")));
+
+
+        regions.clear();
+        regions =
+                driver.findElements(By.xpath("//a[contains(@class,'left-menu__list-item-region-link') and not(contains(@class,'hide'))]"));
+        Assert.assertTrue(
+                "Есть регионов в ЛМ, значит группировка не отменилась",
+                regions.isEmpty()
+        );
+
     }
 
     @ActionTitle("проверяет что при активном фильтре 'С видео' у игр есть иконка в виде монитора со треугольником внутри")
