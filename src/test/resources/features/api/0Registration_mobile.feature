@@ -265,6 +265,7 @@
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
       |identification_with_euroset|false|
       |identification_with_video|false|
+      |identification_with_wave|true|
 
 
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
