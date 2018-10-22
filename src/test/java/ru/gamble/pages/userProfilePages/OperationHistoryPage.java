@@ -132,6 +132,7 @@ public class OperationHistoryPage extends AbstractPage {
         assertThat(sortList).as("История не отсортировалась по дате после нажатия на сортировку").isTrue();
     }
 
+
     @ActionTitle("проверяет сортировку по балансу")
     public void sortBal() throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
@@ -144,7 +145,7 @@ public class OperationHistoryPage extends AbstractPage {
         List<Float> operationsBalance = new ArrayList<>();
         elementsBalance.forEach(element -> operationsBalance.add(Float.valueOf(element.getText())));
         sortList = operationsBalance.stream().sorted().collect(Collectors.toList()).equals(operationsBalance);
-        assertThat(sortList).as("История не отсортировалась по сумме баланса").isFalse();
+        assertThat(sortList).as("История не отсортировалась по сумме баланса").isTrue();
 
         driver.findElement(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//th[contains(@class,'history__cell-balance table__head-cell_sort')]")).click(); //сортируем по балансу
         Thread.sleep(1000);
