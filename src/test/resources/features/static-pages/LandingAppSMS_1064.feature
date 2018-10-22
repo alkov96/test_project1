@@ -4,7 +4,6 @@
 * сохраняем в память
 | PHONE  | randomNumber 10 |
 
-  @bad
   @regress
   @LandingAppSMS_1064
   Сценарий: Проверка отправки смс на странице лендинга-app.
