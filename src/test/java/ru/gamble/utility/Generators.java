@@ -155,7 +155,7 @@ public class Generators {
             minDay = (int) dirthdayPlus14.toEpochDay();
         }
             int maxDay = (int) currentDate.toEpochDay();
-            int randomRange = minDay + random.nextInt(maxDay - minDay);
+            int randomRange = minDay + random.nextInt(maxDay - minDay) - (int) birthday.toEpochDay();
             randomBirthDate = LocalDate.ofEpochDay(randomRange);
 
         return randomBirthDate.toString();
