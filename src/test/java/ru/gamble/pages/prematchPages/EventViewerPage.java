@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.PERIOD;
@@ -509,13 +510,16 @@ public class EventViewerPage extends AbstractPage {
         WebDriverWait wait =  new WebDriverWait(driver,10);
         boolean turnOn = onOrOff.equalsIgnoreCase("включает")?true:false;
 
-        WebElement multiviewButton = driver.findElement(By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]/i"));
+        WebElement multiviewButton = driver.findElement(By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]"));
+
 
         if (!driver.findElements(preloaderOnPage).isEmpty()){
+            LOG.info("Страница не прогрузилась. Обновим её");
             driver.navigate().refresh();
             CommonStepDefs.workWithPreloader();
         }
 
+        LOG.info("\nОткроем левое меню");
         setExpandCollapseMenusButton(true);
         try {
             Thread.sleep(1000);
@@ -524,12 +528,13 @@ public class EventViewerPage extends AbstractPage {
         }
         wait.withMessage("Нет кнопки многовыборного режима");
         wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]"),0));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]")));
 
         LOG.info("Проверяем активность кнопки многовыборного режима");
-        boolean isOn = multiviewButton.findElement(By.xpath("..")).getAttribute("class").contains("active");
+        boolean isOn = multiviewButton.getAttribute("class").contains("active");
         if (isOn!=turnOn){
-            multiviewButton.click();
-            isOn = multiviewButton.findElement(By.xpath("..")).getAttribute("class").contains("active");
+            multiviewButton.findElement(By.xpath("./i")).click();
+            isOn = multiviewButton.getAttribute("class").contains("active");
         }
         Assert.assertTrue(
                 "Не изменилось состояние многовыборного режима. Ожидалось " + turnOn + ", а на самом деле " + isOn,
@@ -577,17 +582,21 @@ public class EventViewerPage extends AbstractPage {
         closeSports();//сворачиваем все виды спорта
 
         List<WebElement> allSports = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li"));
-
+        String xpathCurrentSport = "//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + (index+1) + "]";
         LOG.info("Разворачиваем первый спорт");
         allSports.get(index).click();//развернули спорт
         wait.withMessage("Спорт номер " + index + " не развернулся за 10 секунд");
         wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
-                By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + (index+1) + "]/ul[1]/li"),0));//проверяем что спорт развернулся
+                By.xpath(xpathCurrentSport+"/ul[1]/li"),0));//проверяем что спорт развернулся
 
         if (!allSports.get(index).findElement(By.xpath("ul[1]/li[1]")).getAttribute("class").contains("active"))//если первый регион спорта не выбран то откроем его
         {
             LOG.info("Регион в выбранном спорте свернут - разворачиваем его");
             allSports.get(index).findElement(By.xpath("ul[1]/li[1]//div[contains(@class,'left-menu__list-item-arrow_region')]")).click();//развернули регион
+            wait.withMessage("Регион " + allSports.get(index).findElement(By.xpath(".//div[@class='left-menu__item']/span[2]")).getText() +
+                    " в спорте номер " + index + " не развернулся!!")
+                    .until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                            By.xpath(xpathCurrentSport + "/ul[1]/li//div[contains(@class,'left-menu__list-item-region-compitition')]"),0));
         }
         LOG.info("Добавляем первый турнир в регионе в контейнер многовыборного режима");
         allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]")).click();//выбрали турнир
