@@ -666,6 +666,37 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
+
+    private static Map<String,String> workWithDBgetTwoRows(String sqlRequest) {
+        Connection con = DBUtils.getConnection();
+        Statement stmt;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        Map<String,String> result = new HashMap<>();
+        try {
+            con.setAutoCommit(false);// Отключаем автокоммит
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlRequest);
+            con.commit();
+           // rs.last();
+            while (rs.next()){
+                result.put(rs.getString(1),rs.getString(2));
+            }
+
+            if(result.isEmpty()){
+                throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
+            }
+            LOG.info("SQL-request [" + result + "]");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new AutotestError("Ошибка! Что-то не так в запросе, проверьте руками [" + sqlRequest + "]");
+        } finally {
+            DBUtils.closeAll(con, null, null);
+        }
+        return result;
+    }
+
+
     private static String workWithDBgetResult(String sqlRequest, String param) {
         Connection con = DBUtils.getConnection();
         Statement stmt;
@@ -1308,25 +1339,6 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyDelay,delay);
     }
 
-    @Когда("^включаем экспресс-регистрацию$")
-    public void onExpressReg() {
-        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-        if (!activeOpt.contains("fast_registration")){
-            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", fast_registration' WHERE NAME='ENABLED_FEATURES'";
-            workWithDB(sqlRequest);
-        }
-    }
-
-    @Когда("^включаем экспресс-бонус через SQL$")
-    public void onExpressBonus() {
-        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-        if (!activeOpt.contains("express_bonus")){
-            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", express_bonus' WHERE NAME='ENABLED_FEATURES'";
-            workWithDB(sqlRequest);
-        }
-    }
 
     @Когда("^закрываем браузер$")
     public static void closeBrowser() {
@@ -1356,23 +1368,20 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
-
-    @Когда("^добавляем активную опцию сайта \"([^\"]*)\"$")
-    public void addActive(String option) {
-        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-        if (!activeOpt.contains(option)){
-            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + ", " + option + "' WHERE NAME='ENABLED_FEATURES'";
-            workWithDB(sqlRequest);
-        }
+    /**
+     * это когда активные опции сайта в параметре. когда паараметр удалт - удалить этот before и иуспользовать только тот before что с rememberEnabledFeatures
+     */
+    @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
+    public void saveRegistrationValue(){
+        rememberActive("ACTIVE");
     }
 
-    @Before(value = "@NewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
-    public void saveRegistrationValue(){
-        String activeOptionKey = "ACTIVE";
-        String activeOpt = getActiveOptions();
-        Stash.put(activeOptionKey,activeOpt);
-        LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
+    /**
+     * это когда активне опции сайта в отдельной таблице
+     */
+    @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
+    public void saveRegistrationValue2(){
+        rememberEnabledFeatures("ENABLEDFEATURES");
     }
 
     @Before()
@@ -1396,34 +1405,38 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    /**
+     * когда активные опции сайта в отдельной таблице
+     */
+    @Когда("^запоминаем все активные опции сайта в \"([^\"]*)\"$")
+    public void rememberEnabledFeatures (String activeOptionKey){
+        Map<String,String> activeOpt =
+                workWithDBgetTwoRows("SELECT NAME,state FROM gamebet.`enabled_features`");
+        Stash.put(activeOptionKey,activeOpt);
+        LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
+    }
 
+    /**
+     * когда активные опции сайта в одном параметре
+     */
     @Когда("^запоминаем значение активных опций сайта в \"([^\"]*)\"$")
     public void rememberActive (String activeOptionKey){
-        LOG.info("В памяти лежит: key=>[" + activeOptionKey + "] ; value=>[" + Stash.getValue(activeOptionKey) + "]");
+        String activeOpt = getActiveOptions();
+        Stash.put(activeOptionKey,activeOpt);
+        LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
     }
 
     private String getActiveOptions(){
         return workWithDBgetResult("SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'", "value");
     }
 
-    @Когда("^переключаем регистрацию на \"([^\"]*)\"$")
-    public void switchesRegistrationOn(String typeRegistration) {
-        String sqlRequest;
-        String activeOpt = getActiveOptions();
+    ///////////////////////////////////
 
-        if(typeRegistration.equals("WAVE")) {
-            LOG.info("Удаление активных опций сайта identification_with_video и identification_with_euroset, и последнего символа, если это запятая");
-            activeOpt = activeOpt.replace(", identification_with_video", "");
-            activeOpt = activeOpt.replace(", identification_with_euroset", "");
-            activeOpt = activeOpt.replace(",identification_with_video", "");
-            activeOpt = activeOpt.replace(",identification_with_euroset", "");
-            activeOpt = activeOpt.trim();
-            activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
-            sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
-            workWithDB(sqlRequest);
-        }
-    }
 
+    /**
+     * когда активные опции сайта в одном параметре
+     * @param key - где хранятся старые активные опции
+     */
     @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \"([^\"]*)\"$")
     public void rememberActiveAndOffOption(String key,DataTable dataTable) {
         String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
@@ -1455,7 +1468,79 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("СЕЙЧАС активные опции сайта [" + activeOpt + "]");
     }
 
+
+    /**
+     * когда активные опции сайта в таблице. когда параметр удалят - использоватеь этот метод вместо старого (rememberActiveAndOffOption)
+     * но не забыть поменять Когда
+     */
+    @Когда("^редактируем некоторые активные опции сайта")
+    public void rememberActiveOption(DataTable dataTable) {
+
+//        Stash.put(key,activeOpt);
+//
+        StringBuilder optionTrue = new StringBuilder();
+        StringBuilder optionFalse = new StringBuilder();
+
+        Map<String,String> table = dataTable.asMap(String.class,String.class);
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+            if (entry.getValue().equals("true")) {
+                optionTrue.append(",'"+entry.getKey() + "'");
+                LOG.info("Добавление активной опций сайта " + entry.getKey());
+            }
+            else {
+                optionFalse.append(",'" + entry.getKey() + "'");
+                LOG.info("Удаление активной опций сайта " + entry.getKey());
+            }
+        }
+        optionTrue.delete(0,1);
+        optionFalse.delete(0,1);
+        String sqlRequest = "UPDATE gamebet.`enabled_features` SET state=1 WHERE NAME in (" + optionTrue + ")";
+        workWithDB(sqlRequest);
+        sqlRequest = "UPDATE gamebet.`enabled_features` SET state=0 WHERE NAME in (" + optionFalse + ")";
+        workWithDB(sqlRequest);
+
+        Map<String,String> activeOpt =
+                workWithDBgetTwoRows("SELECT NAME,state FROM gamebet.`enabled_features`");
+        LOG.info("СЕЙЧАС активные опции сайта [" + activeOpt + "]");
+    }
+
+    /**
+     * когда активные опции сайта в таблице
+     * @param key
+     */
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
+    public void revertEnabledFeatures(String key){
+        Map<String,String> oldEnabledFeatures = Stash.getValue(key);
+        StringBuilder optionFalse = new StringBuilder();
+        StringBuilder optionTrue = new StringBuilder();
+        for (Map.Entry<String, String> entry : oldEnabledFeatures.entrySet()) {
+            if (entry.getValue().equals("1")) {
+                optionTrue.append(",'"+entry.getKey() + "'");
+                LOG.info("Добавление активной опций сайта " + entry.getKey());
+            }
+            else {
+                optionFalse.append(",'" + entry.getKey() + "'");
+                LOG.info("Удаление активной опций сайта " + entry.getKey());
+            }
+        }
+        optionTrue.delete(0,1);
+        optionFalse.delete(0,1);
+        String sqlRequest = "UPDATE gamebet.`enabled_features` SET state=1 WHERE NAME in (" + optionTrue + ")";
+        workWithDB(sqlRequest);
+        sqlRequest = "UPDATE gamebet.`enabled_features` SET state=0 WHERE NAME in (" + optionFalse + ")";
+        workWithDB(sqlRequest);
+        Map<String,String> activeOpt =
+                workWithDBgetTwoRows("SELECT NAME,state FROM gamebet.`enabled_features`");
+        LOG.info("Вернули активные опции сайта [" + activeOpt + "]");
+        Assert.assertTrue("Не удалось вернуть опции сайта к старому значению. было: " + oldEnabledFeatures +
+        "\n!!!!!!!!!!!!!!!!!\nCтало:" + activeOpt, activeOpt.equals(oldEnabledFeatures));
+    }
+
+    /**
+     * когда активные опции сайта в одном параметре
+     * @param key - где хранятся старые активные опции
+     *            когда уберут этот параметр - вместо этого метода ВЕЗДЕ использовать revertEnabledFeatures
+     */
     public void changeActive(String key) {
         String activeOpt = Stash.getValue(key) == null ? "back_call, remove_limits_btn, identification_with_euroset, identification_with_courier, dentification_with_video, identification_with_wave" : Stash.getValue(key);
         Stash.put(key,activeOpt);
@@ -1464,6 +1549,10 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlRequest);
     }
 
+    /**
+     * сейчас активные опции сайта - это параметр. а когда будет только таблица - тут, в обоих after сделать использование revertEnabledFeatures вместо changeActive
+     * @param scenario
+     */
     @After(value = "@NewUserRegistration_C36189,@ExpressBonus_C39773")
     public void returnRegistrationValueWithScreenshot(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
@@ -1473,20 +1562,12 @@ public class CommonStepDefs extends GenericStepDefs {
         closeBrowser();
     }
 
-
-
     @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
         changeActive("ACTIVE");
     }
 
-
-    @Когда("^возвращаем регистрацию на предыдущий способ из \"([^\"]*)\"$")
-    public void returnRegistrationToPreviousMethod(String keyParams){
-        String sqlUpdate = "UPDATE gamebet.`params` SET value = '" + Stash.getValue(keyParams)  + "'";
-        workWithDBgetResult(sqlUpdate, "value");
-    }
 
     @Когда("^определяем дату завтрашнего дня \"([^\"]*)\"$")
     public void tomorrowDate(String keyParams){
