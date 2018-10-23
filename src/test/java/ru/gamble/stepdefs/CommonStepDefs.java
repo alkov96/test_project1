@@ -879,6 +879,14 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
 
+    @Когда("^определяем user_id пользователя \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
+    public static void findUserId(String keyEmail, String keyId) {
+        String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email = '" + Stash.getValue(keyEmail) + "'";
+        String id = workWithDBgetResult(sqlRequest, "id");
+        Stash.put(keyId, id);
+        LOG.info("Вычислили id::" + id);
+    }
+
 
     @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\"$")
     public void checkTimeLeft(String keyTimeLeft,String keyResponse) {

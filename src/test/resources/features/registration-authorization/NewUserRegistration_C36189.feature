@@ -146,7 +146,15 @@
     * пользователь (заполняет одно из двух полей) "SNILS" "INN"
     * пользователь (нажимает кнопку) "Продолжить"
 
-    * подтверждаем видеорегистрацию "EMAIL"
+    * определяем user_id пользователя "EMAIL" и сохраняем в "ID"
+
+    * запрос к API "api/stoloto/identification/approveVideoIdent" и сохраняем в "RESPONCE_API":
+      | type       | SKYPE |
+      | customer   | ID    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
     * подтверждаем от ЦУПИС "EMAIL"
 
     * обновляем страницу

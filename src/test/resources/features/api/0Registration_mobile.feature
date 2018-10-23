@@ -400,8 +400,8 @@
       | source                  | 16           |
       | identType               | 3            |
 
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":0 |
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted | "code":0 |
 
     * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
@@ -436,7 +436,16 @@
 
     * смотрим изменился ли "TIMELEFT" из "RESPONCE_API"
 
-    * подтверждаем видеорегистрацию "EMAIL"
+
+    * определяем user_id пользователя "EMAIL" и сохраняем в "ID"
+
+    * запрос к API "api/stoloto/identification/approveVideoIdent" и сохраняем в "RESPONCE_API":
+      | type       | skype |
+      | customer   | ID    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
     * подтверждаем от ЦУПИС "EMAIL"
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
