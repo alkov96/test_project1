@@ -168,12 +168,9 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через WAVE без выбора способа регистрации
 
-#    * запоминаем значение активных опций сайта в "ACTIVE"
-#    * переключаем регистрацию на "WAVE"
-
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
-      |identification_with_euroset|false|
-      |identification_with_video|false|
+      |identification_with_skype_only|false|
+      |identification_with_wave|true|
 
     * приводим дату к формату год-месяц-день "BIRTHDATE"
     * приводим дату к формату год-месяц-день "VALIDISSUEDATE"
@@ -250,21 +247,13 @@
 
     * ожидание "5" сек
 
-#    * выставляем обратно старое значение активных опций сайта "ACTIVE"
-
-
-
 
   @api
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через WAVE
 
-#    * запоминаем значение активных опций сайта в "ACTIVE"
-#    * переключаем регистрацию на "WAVE"
-
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
-      |identification_with_euroset|false|
-      |identification_with_video|false|
+      |identification_with_skype_only|false|
       |identification_with_wave|true|
 
 
@@ -372,17 +361,16 @@
 
     * ожидание "10" сек
 
-#    * выставляем обратно старое значение активных опций сайта "ACTIVE"
-
-
 
 
   @api
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через SKYPE
 
-#    * добавляем активную опцию сайта "identification_with_video"
-
+    * редактируем некоторые активные опции сайта
+      |identification_with_video|true|
+      |back_call|false|
+      |announcements|true|
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
       |identification_with_video|true|
 
@@ -464,6 +452,7 @@
       | exepted     | "status":8 or "status":7 |
 
     * ожидание "15" сек
+    * выставляем обратно старое значение активных опций сайта "ENABLEDFEATURES"
 
 
 
@@ -472,9 +461,9 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через Евросеть
 
-#    * добавляем активную опцию сайта "identification_with_euroset"
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
       |identification_with_euroset|true|
+      |identification_with_skype_only|false|
 
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
@@ -511,10 +500,9 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через DD
 
-  #    * добавляем активную опцию сайта "identification_with_video"
-
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
       | identification_with_courier |true|
+      |identification_with_skype_only|false|
 
 
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":

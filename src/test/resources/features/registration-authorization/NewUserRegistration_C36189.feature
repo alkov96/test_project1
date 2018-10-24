@@ -3,7 +3,6 @@
 
   Предыстория:
 
-    * запоминаем значение активных опций сайта в "ACTIVE"
     * сохраняем в память
       | INN | 775459885706 |
 
@@ -91,8 +90,7 @@
   Сценарий: Регистрация нового пользователя через Wave
 
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
-      |identification_with_euroset|false|
-      |identification_with_video|false|
+      |identification_with_skype_only|false|
       |identification_with_wave|true|
 #    * обновляем страницу
 
@@ -170,6 +168,7 @@
 
     * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
       |identification_with_euroset|true|
+      |identification_with_skype_only|false|
 
     * обновляем страницу
 
