@@ -1794,5 +1794,10 @@ public class CommonStepDefs extends GenericStepDefs {
 //        actions.moveToElement(element);
 //        actions.perform();
     }
+    public static String returnCode(String smsKa){
+
+        return workWithDBgetResult(smsKa, "code");
+
+    }
 }
 
