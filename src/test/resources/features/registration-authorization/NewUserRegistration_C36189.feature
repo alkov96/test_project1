@@ -147,7 +147,7 @@
     * определяем user_id пользователя "EMAIL" и сохраняем в "ID"
 
     * запрос к API "api/stoloto/identification/approveVideoIdent" и сохраняем в "RESPONCE_API":
-      | type       | SKYPE |
+      | type       | skype |
       | customer   | ID    |
 
     * проверка ответа API из "RESPONCE_API":
