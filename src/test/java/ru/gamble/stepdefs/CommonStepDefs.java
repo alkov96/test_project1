@@ -123,7 +123,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
 
         if (value.equals(RANDOME_EMAIL)) {
-            value = "testregistrator+" + Stash.getValue("PHONE") + "@yandex.ru";
+            value = "testregistrator+" + Stash.getValue("PHONE") + "@inbox.ru";
         }
         if (value.equals(RANDOM)) {
             value = Generators.randomString(25);
@@ -265,7 +265,7 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     @Когда("^генерим email в \"([^\"]*)\"$")
     public static void generateEmailAndSave(String key) {
-        String value = "testregistrator+" + System.currentTimeMillis() + "@yandex.ru";
+        String value = "testregistrator+" + System.currentTimeMillis() + "@inbox.ru";
         LOG.info("Сохраняем в память key[" + key + "] <== value[" + value + "]");
         Stash.put(key, value);
     }
@@ -1114,7 +1114,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск пользователя проходившего ускоренную регистрацию \"([^\"]*)\"$")
     public void searchUserNotPD(String keyEmail) {
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE tsupis_status IN (1,2) AND personal_data_state=1 AND email LIKE 'testregistrator+%@yandex.ru'";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE tsupis_status IN (1,2) AND personal_data_state=1 AND email LIKE 'testregistrator+%'";
         searchUser(keyEmail,sqlRequest);
     }
 
@@ -1793,6 +1793,11 @@ public class CommonStepDefs extends GenericStepDefs {
 //        Actions actions = new Actions(driver);
 //        actions.moveToElement(element);
 //        actions.perform();
+    }
+    public static String returnCode(String smsKa){
+
+        return workWithDBgetResult(smsKa, "code");
+
     }
 }
 

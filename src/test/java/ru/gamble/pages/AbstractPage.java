@@ -3,7 +3,10 @@ package ru.gamble.pages;
 import cucumber.api.Scenario;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -12,10 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.Generators;
-import ru.gamble.utility.JsonLoader;
 import ru.gamble.utility.YandexPostman;
 import ru.sbtqa.tag.datajack.Stash;
-import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -26,7 +27,6 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +35,6 @@ import static org.openqa.selenium.By.xpath;
 import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.RANDOM;
-import static ru.gamble.utility.Constants.STARTING_URL;
 import static ru.gamble.utility.Generators.randomString;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
@@ -562,53 +561,57 @@ public abstract class AbstractPage extends Page {
             e.getMessage();
             throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
         }
-
-        String currentHandle = driver.getWindowHandle();
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-
-        String registrationUrl = "";
-
-        try {
-            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
-        } catch (DataException e) {
-            LOG.error(e.getMessage());
-        }
-
-        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
-
-        Set<String> windows = driver.getWindowHandles();
-        windows.remove(currentHandle);
-        String newWindow = windows.toArray()[0].toString();
-
-        driver.switchTo().window(newWindow);
-
-        String xpath = "//li/a[contains(.,'" + phone + "')]";
-        WebElement numberSring = null;
-        int x = 0;
-
-        LOG.info("Пытаемся найти код подтверждения телефона");
-        for(int y = 0; y < 3; y++) {
-            try {
-                new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-                numberSring = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).findFirst().get();
-            } catch (Exception e) {
-                driver.navigate().refresh();
-            }
-            x++;
-            if (numberSring != null){break;}
-        }
-
-        if(numberSring != null && !numberSring.getText().isEmpty()) {
-            String code = numberSring.getText().split(" - ")[1];
-            driver.switchTo().window(currentHandle);
-            js.executeScript("registration_window.close()");
+//    //Начало кода для получения СМС
+//        String currentHandle = driver.getWindowHandle();
+//        JavascriptExecutor js = (JavascriptExecutor) driver;
+//
+//        String registrationUrl = "";
+//
+//        try {
+//            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
+//        } catch (DataException e) {
+//            LOG.error(e.getMessage());
+//        }
+//
+//        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+//
+//        Set<String> windows = driver.getWindowHandles();
+//        windows.remove(currentHandle);
+//        String newWindow = windows.toArray()[0].toString();
+//
+//        driver.switchTo().window(newWindow);
+//
+//        String xpath = "//li/a[contains(.,'" + phone + "')]";
+//        WebElement numberSring = null;
+//        int x = 0;
+//
+//        LOG.info("Пытаемся найти код подтверждения телефона");
+//        for(int y = 0; y < 3; y++) {
+//            try {
+//                new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+//                numberSring = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).findFirst().get();
+//            } catch (Exception e) {
+//                driver.navigate().refresh();
+//            }
+//            x++;
+//            if (numberSring != null){break;}
+//        }
+//
+//        if(numberSring != null && !numberSring.getText().isEmpty()) {
+//            String code = numberSring.getText().split(" - ")[1];
+//            driver.switchTo().window(currentHandle);
+//            js.executeScript("registration_window.close()");
+//	}else {
+//		throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
+//	}
+        String G;
+		G = "SELECT CODE FROM gamebet.`phoneconfirmationcode` WHERE  phone = '" + phone + "' ORDER BY creation_date DESC LIMIT 1";
+		String code = CommonStepDefs.returnCode(G);
 
             LOG.info("Вводим SMS-код::" + code);
             fillField(cellFoneConformationInput,code);
-        }else {
-            throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
-        }
-        Stash.put("PHONE_NUMBER",phone);
+
+        Stash.put("PHONE_NUMBER",phone ) ;
         LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
     }
 
