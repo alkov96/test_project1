@@ -1799,5 +1799,56 @@ public class CommonStepDefs extends GenericStepDefs {
         return workWithDBgetResult(smsKa, "code");
 
     }
+
+    @Когда("^выбираем ФИО \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\"$")
+    public void selectName(String keyName, String keySurName, String keyPatronymic) throws IOException {
+        StringBuilder lal = new StringBuilder();
+        FileReader file = new FileReader("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt");
+        Scanner scan = new Scanner(file);
+
+        String user = scan.nextLine();
+        String strLine;
+        List<String> allLines = new ArrayList<>();
+        while (scan.hasNext()){
+            allLines.add(scan.nextLine());
+        }
+        String separator = user.contains("\t") ?"\t":"\\s";
+        int randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        String name = allLines.get(randomNumber).split(separator)[1];
+        randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        String surname = allLines.get(randomNumber).split(separator)[0];
+        randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        String patronymic = allLines.get(randomNumber).split(separator)[2];
+
+        Stash.put(keyName,name);
+        Stash.put(keySurName,surname);
+        Stash.put(keyPatronymic,patronymic);
+        LOG.info("Выбранные ФИО: " + surname + " " + name + " " + patronymic);
+
+        file.close();
+    }
+
+    @Когда("^вычисляем телефон \"([^\"]*)\"$")
+    public void selectPhone(String keyPhone) throws IOException{
+
+        StringBuilder lal = new StringBuilder();
+        FileReader file = new FileReader("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt");
+        Scanner scan = new Scanner(file);
+
+        String line = scan.nextLine();
+        String phone = "700100"+String.valueOf(Integer.valueOf(line.substring(6)) + 1);
+
+        Stash.put(keyPhone,phone);
+
+        lal.append(phone + "\n");
+        while (scan.hasNext()){
+            lal.append(scan.nextLine()).append(System.lineSeparator());
+        }
+
+        FileWriter nfile = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt",false);
+        nfile.write(lal.toString());
+        nfile.close();
+        file.close();
+    }
 }
 
