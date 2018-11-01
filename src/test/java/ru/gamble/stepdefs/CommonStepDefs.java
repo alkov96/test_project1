@@ -541,13 +541,13 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^(пользователь |он) очищает cookies$")
     public static void cleanCookies() {
+        try {
         if(PageFactory.getWebDriver().manage().getCookies().size()>0) {
-            try {
-                LOG.info("Удаляем Cookies");
-                PageFactory.getWebDriver().manage().deleteAllCookies();
-            } catch (Exception e) {
-                LOG.error("Cookies не было!");
-            }
+            LOG.info("Удаляем Cookies");
+            PageFactory.getWebDriver().manage().deleteAllCookies();
+        }
+        } catch (Exception e) {
+            LOG.error("Cookies не было!");
         }
     }
 
