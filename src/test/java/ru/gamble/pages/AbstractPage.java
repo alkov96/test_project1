@@ -669,20 +669,27 @@ public abstract class AbstractPage extends Page {
 
         driver.switchTo().window(newWindow);
 
-        String xpath = "//li/a[contains(.,'" + phone + "')]";
+        String xpath = "//li/a[contains(text(),'" + phone + "')]";
         WebElement numberSring = null;
         int x = 0;
 
         LOG.info("Пытаемся найти код подтверждения телефона");
-        for(int y = 0; y < 3; y++) {
-            try {
-                new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-                numberSring = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).findFirst().get();
-            } catch (Exception e) {
+        for(int y = 0; y < 5; y++) {
+//            try {
+//                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
+//                numberSring = driver.findElements(By.xpath(xpath)).get(0);
+//            } catch (Exception e) {
+//                driver.navigate().refresh();
+//            }
+            if (driver.findElements(By.xpath(xpath)).isEmpty()){
                 driver.navigate().refresh();
             }
+            else {
+                numberSring = driver.findElements(By.xpath(xpath)).get(0);
+                break;
+            }
             x++;
-            if (numberSring != null){break;}
+//            if (numberSring != null){break;}
         }
 
         if(numberSring != null && !numberSring.getText().isEmpty()) {

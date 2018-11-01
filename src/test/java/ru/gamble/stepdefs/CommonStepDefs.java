@@ -2,6 +2,11 @@ package ru.gamble.stepdefs;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.neovisionaries.ws.client.*;
 import cucumber.api.DataTable;
 import cucumber.api.Scenario;
@@ -17,6 +22,7 @@ import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -31,12 +37,15 @@ import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
+import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.*;
+import java.awt.*;
+import java.awt.event.InputEvent;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -48,6 +57,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +65,7 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
+import static org.springframework.util.StreamUtils.BUFFER_SIZE;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
@@ -296,6 +307,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     private static void workWithDB(String sqlRequest) {
         Connection con = DBUtils.getConnection();
+
         PreparedStatement ps = null;
         int rs;
         try {
@@ -909,6 +921,176 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyPhone, phone);
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
+
+    @Когда("^берем \"([^\"]*)\"$")
+    public static void confirmEmail2(String keyPhone) throws Exception{
+        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7111002%' ORDER BY phone";
+        String phoneLast = ww(sqlRequest, "phone");
+        String phone = "7111002" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
+        Stash.put(keyPhone, phone);
+        LOG.info("Вычислили подходящий номер телефона::" + phone);
+    }
+
+    public static String ww (String sqlRequest, String param) throws Exception{
+        Connection con = null;
+
+        String url, user, password;
+        JSch jsch = new JSch();
+        Session session = jsch.getSession("tzavaliy", "test-int-bet-dbproca.tsed.orglot.office", 22);
+        java.util.Properties config = new java.util.Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.setPassword("2007-12g");
+
+        session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+        session.connect();
+        session.setPortForwardingL(1234, "jdbc:mysql://test-int-bet-dbproca.tsed.orglot.office", 3306);
+//
+//        Channel channel = session.openChannel("exec");
+//        ChannelExec channelExec = (ChannelExec) channel;
+//        channelExec.setCommand("ssh -L 1234:test-int-bet-dbproca.tsed.orglot.office:3306 mysql.server.remote");
+//        channelExec.setInputStream(null);
+//        channelExec.setErrStream(System.err);
+//        InputStream in =  channel.getInputStream();
+//        channel.connect();
+
+        url = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_URL").getValue();
+        user = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_USER").getValue();
+        password = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_PASSWORD").getValue();
+
+
+//        MysqlDataSource dataSource = new MysqlDataSource();
+//        dataSource.setServerName("jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office");
+//        dataSource.setPortNumber(1234);
+//        dataSource.setUser(user);
+//        dataSource.setAllowMultiQueries(true);
+//
+//        dataSource.setPassword(password);
+//        dataSource.setDatabaseName("mm");
+//
+//       con = dataSource.getConnection();
+
+
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+
+
+        Properties properties = new Properties();
+        properties.setProperty("user", user);
+        properties.setProperty("password", password);
+        properties.setProperty("useUnicode", "true");
+        properties.setProperty("characterEncoding", "UTF-8");
+           // con = DriverManager.getConnection(url, user, password);
+       // con=DriverManager.getConnection("jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office:1234/gamebet?noAccessToProcedureBodies=true", user, password);
+        con = DriverManager.getConnection(
+                "jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office:3306/gamebet?autoReconnect=true", properties);
+
+        Statement stmt;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        String result;
+
+
+            con.setAutoCommit(false);// Отключаем автокоммит
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlRequest);
+            con.commit();
+            rs.last();
+            result = rs.getString(param);
+
+            if(result.isEmpty()){
+                throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
+            }
+            LOG.info("SQL-request [" + result + "]");
+        return result;
+    }
+
+
+
+    @Когда("^подтверждаем скайп через админку \"([^\"]*)\"$")
+    public void skypeConfirm(String keyPhone) throws Exception{
+        WebDriver driver = PageFactory.getDriver();
+        String registrationUrl = "https://test-int-bet-dbproca.tsed.orglot.office/admin/";
+        String currentHandle = driver.getWindowHandle();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+
+        Set<String> windows = driver.getWindowHandles();
+        windows.remove(currentHandle);
+        String newWindow = windows.toArray()[0].toString();
+
+        driver.switchTo().window(newWindow);
+
+        Thread.sleep(1500);
+        WebElement authForm = driver.findElement(By.xpath("//div[@class='x-panel x-panel-default-framed x-box-item']"));
+
+        WebElement enterBottom = driver.findElement(By.xpath("//span[@id='button-1014-btnIconEl']"));
+
+        WebElement loginField = driver.findElement(By.xpath("//input[@id='textfield-1011-inputEl']"));
+
+        WebElement passField = driver.findElement(By.xpath("//input[@id='textfield-1012-inputEl']"));
+
+        loginField.clear();
+        loginField.sendKeys("promo_test_superadmin");
+        passField.clear();
+        passField.sendKeys("promo_test_superadmin");
+        enterBottom.click();
+
+        Thread.sleep(2500);
+        String phone = Stash.getValue(keyPhone);
+
+        PageFactory.getActions().doubleClick(driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../.."))).build().perform();
+        driver.findElement(By.id("editDataBtn-btnEl")).click();
+        int yy  =driver.findElement(By.id("confirmSkypeMenuBtn-btnWrap")).getLocation().getY() + 116;
+        int xx = driver.findElement(By.id("confirmSkypeMenuBtn-btnWrap")).getLocation().getX() + 156;
+        Robot robot = new Robot();
+        robot.mouseMove(xx,yy);
+        robot.delay(500);
+        robot.mousePress(InputEvent.BUTTON1_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        driver.findElement(By.id("confirmSkypeBtn")).click();
+        driver.findElement(By.id("saveUserBtn-btnIconEl")).click();
+    }
+
+
+
+    @Когда("^в админке смотрим id пользователя \"([^\"]*)\" \"([^\"]*)\"$")
+    public void getIDFromAdmin(String keyPhone,String keyId) throws Exception{
+        WebDriver driver = PageFactory.getDriver();
+        String registrationUrl = "https://test-int-bet-dbproca.tsed.orglot.office/admin/";
+        String currentHandle = driver.getWindowHandle();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+
+        Set<String> windows = driver.getWindowHandles();
+        windows.remove(currentHandle);
+        String newWindow = windows.toArray()[0].toString();
+
+        driver.switchTo().window(newWindow);
+
+Thread.sleep(1500);
+        WebElement authForm = driver.findElement(By.xpath("//div[@class='x-panel x-panel-default-framed x-box-item']"));
+
+        WebElement enterBottom = driver.findElement(By.xpath("//span[@id='button-1014-btnIconEl']"));
+
+        WebElement loginField = driver.findElement(By.xpath("//input[@id='textfield-1011-inputEl']"));
+
+        WebElement passField = driver.findElement(By.xpath("//input[@id='textfield-1012-inputEl']"));
+
+        loginField.clear();
+        loginField.sendKeys("promo_test_superadmin");
+        passField.clear();
+        passField.sendKeys("promo_test_superadmin");
+        enterBottom.click();
+
+        Thread.sleep(1500);
+        String phone = Stash.getValue(keyPhone);
+
+        String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getText();
+        Stash.put(keyId,id);
+
+
+    }
+
 
     @Когда("^определяем user_id пользователя \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public static void findUserId(String keyEmail, String keyId) {
