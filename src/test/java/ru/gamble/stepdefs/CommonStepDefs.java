@@ -262,7 +262,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 currentUrl = siteUrl;
                 break;
         }
-            PageFactory.getDriver().get(currentUrl);
+            PageFactory.getWebDriver().get(currentUrl);
             LOG.info("Перешли на страницу [" + currentUrl + "]");
         }catch (DataException e) {
             LOG.error(e.getMessage());
@@ -554,13 +554,13 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^(пользователь |он) очищает cookies$")
     public static void cleanCookies() {
+        try {
         if(PageFactory.getWebDriver().manage().getCookies().size()>0) {
-            try {
-                LOG.info("Удаляем Cookies");
-                PageFactory.getWebDriver().manage().deleteAllCookies();
-            } catch (Exception e) {
-                LOG.error("Cookies не было!");
-            }
+            LOG.info("Удаляем Cookies");
+            PageFactory.getWebDriver().manage().deleteAllCookies();
+        }
+        } catch (Exception e) {
+            LOG.error("Cookies не было!");
         }
     }
 
