@@ -23,10 +23,7 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -681,13 +678,25 @@ public abstract class AbstractPage extends Page {
 //            } catch (Exception e) {
 //                driver.navigate().refresh();
 //            }
-            if (driver.findElements(By.xpath(xpath)).isEmpty()){
-                driver.navigate().refresh();
+            try {
+                System.out.println("ASASDASDSADS");
+                System.out.println(new Date(System.currentTimeMillis()));
+                Thread.sleep(2000);
+                System.out.println(new Date(System.currentTimeMillis()));
+                System.out.println("ASASDASDSADS");
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
+                if (driver.findElements(By.xpath(xpath)).isEmpty()){
+                    driver.navigate().refresh();
+
+                }
+                else {
+                    numberSring = driver.findElements(By.xpath(xpath)).get(0);
+                    break;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            else {
-                numberSring = driver.findElements(By.xpath(xpath)).get(0);
-                break;
-            }
+
             x++;
 //            if (numberSring != null){break;}
         }

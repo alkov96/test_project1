@@ -21,6 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -210,6 +211,15 @@ public class PassportDataPage extends AbstractPage {
                 Stash.put(saveVariable, String.valueOf(flat));
                 LOG.info(saveVariable + "<==[" + flat + "]");
             }
+        }
+        try {
+            System.out.println("ASASDASDSADS");
+            System.out.println(new Date(System.currentTimeMillis()));
+            Thread.sleep(2000);
+            System.out.println(new Date(System.currentTimeMillis()));
+            System.out.println("ASASDASDSADS");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         LOG.info("Нажимаем кнопку 'Отправить'");
             sendButton.click();

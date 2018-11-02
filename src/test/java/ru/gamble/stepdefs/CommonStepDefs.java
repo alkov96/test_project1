@@ -66,6 +66,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
 import static org.springframework.util.StreamUtils.BUFFER_SIZE;
+import static org.springframework.util.StreamUtils.drain;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
@@ -936,42 +937,26 @@ public class CommonStepDefs extends GenericStepDefs {
 
         String url, user, password;
         JSch jsch = new JSch();
-        Session session = jsch.getSession("tzavaliy", "test-int-bet-dbproca.tsed.orglot.office", 22);
-        java.util.Properties config = new java.util.Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.setPassword("2007-12g");
+        String proxyHost = "test-int-bet-dbproca.tsed.orglot.office";
+        String proxyUser = "tzavaliy";
+        String proxyPassword = "2007-12g";
 
-        session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-        session.connect();
-        session.setPortForwardingL(1234, "jdbc:mysql://test-int-bet-dbproca.tsed.orglot.office", 3306);
-//
-//        Channel channel = session.openChannel("exec");
-//        ChannelExec channelExec = (ChannelExec) channel;
-//        channelExec.setCommand("ssh -L 1234:test-int-bet-dbproca.tsed.orglot.office:3306 mysql.server.remote");
-//        channelExec.setInputStream(null);
-//        channelExec.setErrStream(System.err);
-//        InputStream in =  channel.getInputStream();
-//        channel.connect();
-
-        url = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_URL").getValue();
+        String nameBD = "gamebet";
+        url = "test-int-bet-dbproc.tsed.orglot.office";
         user = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_USER").getValue();
         password = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_PASSWORD").getValue();
 
+        int localPort = 1234;
 
-//        MysqlDataSource dataSource = new MysqlDataSource();
-//        dataSource.setServerName("jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office");
-//        dataSource.setPortNumber(1234);
-//        dataSource.setUser(user);
-//        dataSource.setAllowMultiQueries(true);
-//
-//        dataSource.setPassword(password);
-//        dataSource.setDatabaseName("mm");
-//
-//       con = dataSource.getConnection();
+        Session session = jsch.getSession(proxyUser, proxyHost, 22);
+        java.util.Properties config = new java.util.Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.setPassword(proxyPassword);
 
-
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+        session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+        session.connect();
+        session.setPortForwardingL(0, url, 3306);
 
 
         Properties properties = new Properties();
@@ -979,10 +964,9 @@ public class CommonStepDefs extends GenericStepDefs {
         properties.setProperty("password", password);
         properties.setProperty("useUnicode", "true");
         properties.setProperty("characterEncoding", "UTF-8");
-           // con = DriverManager.getConnection(url, user, password);
-       // con=DriverManager.getConnection("jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office:1234/gamebet?noAccessToProcedureBodies=true", user, password);
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
         con = DriverManager.getConnection(
-                "jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office:3306/gamebet?autoReconnect=true", properties);
+                "jdbc:mysql://" + url + ":1234/" + nameBD + "?autoReconnect=true", properties);
 
         Statement stmt;
         PreparedStatement ps = null;
@@ -2019,7 +2003,7 @@ Thread.sleep(1500);
 
         String line = scan.nextLine();
         String phone = "700100"+String.valueOf(Integer.valueOf(line.substring(6)) + 1);
-
+        LOG.info("Номер телефона" + phone);
         Stash.put(keyPhone,phone);
 
         lal.append(phone + "\n");
@@ -2032,5 +2016,11 @@ Thread.sleep(1500);
         nfile.close();
         file.close();
     }
+
+    @Когда("^нажмем Продолжить регу на всякий$")
+    public void rega(){
+        PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
+        }
+
 }
 
