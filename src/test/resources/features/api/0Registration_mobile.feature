@@ -168,7 +168,7 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через WAVE без выбора способа регистрации
 
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       |identification_with_skype_only|false|
       |identification_with_wave|true|
 
@@ -252,7 +252,7 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через WAVE
 
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       |identification_with_skype_only|false|
       |identification_with_wave|true|
 
@@ -371,7 +371,7 @@
       |identification_with_video|true|
       |back_call|false|
       |announcements|true|
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       |identification_with_video|true|
 
     * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
@@ -461,7 +461,7 @@
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через Евросеть
 
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       |identification_with_euroset|true|
       |identification_with_skype_only|false|
 
@@ -493,14 +493,11 @@
 #      | exepted | "errorMsg":null |
 
 
-
-
-  @bad
   @api
   @Registration_mobile
   Сценарий: Мобильная регистрация полная через DD
 
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       | identification_with_courier |true|
       |identification_with_skype_only|false|
 

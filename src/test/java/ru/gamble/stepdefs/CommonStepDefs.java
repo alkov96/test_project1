@@ -1596,45 +1596,6 @@ Thread.sleep(1500);
         return workWithDBgetResult("SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'", "value");
     }
 
-    ///////////////////////////////////
-
-
-    /**
-     * когда активные опции сайта в одном параметре
-     * @param key - где хранятся старые активные опции
-     */
-    @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \"([^\"]*)\"$")
-    public void rememberActiveAndOffOption(String key,DataTable dataTable) {
-        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-        Stash.put(key, activeOpt);
-
-        Map<String,String> table = dataTable.asMap(String.class,String.class);
-        for (Map.Entry<String, String> entry : table.entrySet()) {
-            String option = entry.getKey();
-            if (entry.getValue().equals("true") && !activeOpt.contains(option)) {
-                activeOpt = activeOpt + ", " + option;
-                continue;
-            }
-            else if (activeOpt.contains(option) && entry.getValue().equals("true")) {continue;}
-
-            activeOpt = activeOpt.replaceAll("[', '|',']"  + option , "");
-            activeOpt = activeOpt.replaceAll(option + "[', '|',']"   , "");
-            activeOpt = activeOpt.replaceAll(",+"   , ",");
-            LOG.info("Удаление активной опций сайта " + option);
-        }
-
-        activeOpt = activeOpt.trim();
-        activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
-        sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
-        workWithDB(sqlRequest);
-
-        sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        activeOpt = workWithDBgetResult(sqlRequest, "value");
-        LOG.info("СЕЙЧАС активные опции сайта [" + activeOpt + "]");
-    }
-
-
     /**
      * когда активные опции сайта в таблице. когда параметр удалят - использоватеь этот метод вместо старого (rememberActiveAndOffOption)
      * но не забыть поменять Когда
@@ -1702,27 +1663,16 @@ Thread.sleep(1500);
         "\n!!!!!!!!!!!!!!!!!\nCтало:" + activeOpt, activeOpt.equals(oldEnabledFeatures));
     }
 
-    /**
-     * когда активные опции сайта в одном параметре
-     * @param key - где хранятся старые активные опции
-     *            когда уберут этот параметр - вместо этого метода ВЕЗДЕ использовать revertEnabledFeatures
-     */
-    public void changeActive(String key) {
-        String activeOpt = Stash.getValue(key) == null ? "back_call, remove_limits_btn, identification_with_euroset, identification_with_courier, dentification_with_video, identification_with_wave" : Stash.getValue(key);
-        Stash.put(key,activeOpt);
-        String sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
-        LOG.info("Возвращаем активные значения сайта =>[" + activeOpt + "]");
-        workWithDB(sqlRequest);
-    }
+
 
     /**
-     * сейчас активные опции сайта - это параметр. а когда будет только таблица - тут, в обоих after сделать использование revertEnabledFeatures вместо changeActive
+     * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
      */
     @After(value = "@NewUserRegistration_C36189,@ExpressBonus_C39773")
     public void returnRegistrationValueWithScreenshot(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-        changeActive("ACTIVE");
+        revertEnabledFeatures("ACTIVE");
         if(scenario.isFailed()) {
             final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
             scenario.embed(screenshot, "image/jpeg");
@@ -1730,10 +1680,15 @@ Thread.sleep(1500);
         closeBrowser();
     }
 
+
+    /**
+     * Возвращаем активные опции сайста в исходное положение до тестов
+     * @param scenario
+     */
     @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-        changeActive("ACTIVE");
+        revertEnabledFeatures("ACTIVE");
     }
 
 
@@ -1881,8 +1836,6 @@ Thread.sleep(1500);
                 .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
                 .connect();
     }
-
-
 
     @Когда("^вычленяем из названия игры одно слово \"([^\"]*)\" \"([^\"]*)\"$")
     public void oneWordSearch(String keySearch,String type){

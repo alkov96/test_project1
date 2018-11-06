@@ -177,7 +177,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       |video_identification_in_mobile_app|true|
       |identification_with_video|true|
 
@@ -228,7 +228,7 @@
 
     * поиск акаунта со статуом регистрации "=17" "EMAIL"
 
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       |video_identification_in_mobile_app|true|
       |identification_with_video|true|
 
@@ -257,7 +257,7 @@
 
     * поиск акаунта со статуом регистрации "=17" "EMAIL"
 
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       |video_identification_in_mobile_app|false|
       |identification_with_video|true|
 
@@ -285,7 +285,7 @@
 
     * поиск акаунта со статуом регистрации "=2" "EMAIL"
 
-    * редактируем активные опции сайта, а старое значение сохраняем в "ACTIVE"
+    * редактируем некоторые активные опции сайта
       |video_identification_in_mobile_app|true|
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
