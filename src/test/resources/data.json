@@ -1,5 +1,6 @@
 {
   "DEV_BK": {
+    "ESB_URL": "http://dev-bk-bet-esb.tsed.orglot.office:8081",
     "MAIN_URL": "https://dev-bk-bet-site.tsed.orglot.office/",
     "ADMIN_URL": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
     "MOBILE_URL": "https://dev-bk-bet-mobile-site.tsed.orglot.office",
@@ -18,6 +19,7 @@
     }
   },
   "DEMO": {
+    "ESB_URL": "http://demo.gamebet.ru:8663",
     "MAIN_URL": "https://demo.gamebet.ru",
     "ADMIN_URL": "http://demo.gamebet.ru/admin/",
     "MOBILE_URL": "https://demo.gamebet.ru",

@@ -48,6 +48,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -635,6 +636,47 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 
+
+    @Когда("^проверка что в ответе \"([^\"]*)\" верные даты  \"([^\"]*)\":$")
+    public void checkResponceAPIgoodDate(String keyStash, String keyParams) throws ParseException{
+        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
+        String params =  Stash.getValue(keyParams).toString();
+        SimpleDateFormat formatTS = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        SimpleDateFormat formatResponse = new SimpleDateFormat("dd.MM.yyy hh:mm");
+        String ts = params.split("ts=")[1].substring(0,16).replace("T"," ");
+        Date tsDate = formatTS.parse(ts);
+        Date tsEndDate = new Date();
+        String ts_end = null;
+        if (params.contains("ts_end")){
+            ts_end = params.split("ts_end=")[1].substring(0,16).replace("T"," ");
+            tsEndDate = formatTS.parse(ts_end);
+        }
+
+        String dateInResponceString = new String();
+
+        Date dateInResponce = new Date();
+        boolean a;
+        for (int i=1; i<actual.split("\"skypeSendDate"+"\":").length; i++){
+            dateInResponceString = actual.split("\"skypeSendDate"+"\":")[i].split("}")[0].replaceAll("\"","");
+            dateInResponce = formatResponse.parse(dateInResponceString);
+            Assert.assertTrue("В ответе есть результаты, выходящие за пределы ts-ts_end (" + ts + "   ---   " + ts_end + ")"
+                    +":\n" + dateInResponceString,
+                    dateInResponce.after(tsDate) && dateInResponce.before(tsEndDate));
+        }
+        LOG.info("Да, все результаты запроса вписываются по времени в значения ts и ts_end");
+    }
+
+    @Когда("^проверка что ответ \"([^\"]*)\" \"([^\"]*)\"$")
+    public void checkResponceFill(String keyStash,String isEmpty) throws ParseException{
+        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
+        actual = actual.replace("{\"code\":0,\"data\":","").replace("}","");
+        boolean expectedEmpty=isEmpty.equals("пустой");
+        Assert.assertTrue("Ожидалось что результат будет " + isEmpty + ", но это не так.\n" + actual,
+                actual.equals("[]")==expectedEmpty);
+        LOG.info("Да, RESPONCE действительно " + isEmpty);
+    }
+
+
     @Когда("^проверка вариантного ответа API из \"([^\"]*)\":$")
     public void checkresponceAPIor(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
@@ -932,7 +974,8 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
 
-    public static String ww (String sqlRequest, String param) throws Exception{
+    public static String ww (String sqlRequest, String param) throws Exception {
+
         Connection con = null;
 
         String url, user, password;
@@ -942,36 +985,45 @@ public class CommonStepDefs extends GenericStepDefs {
         String proxyPassword = "2007-12g";
 
         String nameBD = "gamebet";
-        url = "test-int-bet-dbproc.tsed.orglot.office";
+           url = "test-int-bet-dbproc.tsed.orglot.office";
+//        url = "localhost";
         user = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_USER").getValue();
         password = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_PASSWORD").getValue();
 
-        int localPort = 1234;
-
+        String result = null;
+        int localPort = 3366;
         Session session = jsch.getSession(proxyUser, proxyHost, 22);
-        java.util.Properties config = new java.util.Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.setPassword(proxyPassword);
+        try {
 
-        session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-        session.connect();
-        session.setPortForwardingL(0, url, 3306);
+            java.util.Properties config = new java.util.Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.setPassword(proxyPassword);
+
+            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+            session.connect();
+            session.setPortForwardingL(localPort, url, 3306);
 
 
-        Properties properties = new Properties();
-        properties.setProperty("user", user);
-        properties.setProperty("password", password);
-        properties.setProperty("useUnicode", "true");
-        properties.setProperty("characterEncoding", "UTF-8");
-        Class.forName("com.mysql.jdbc.Driver").newInstance();
-        con = DriverManager.getConnection(
-                "jdbc:mysql://" + url + ":1234/" + nameBD + "?autoReconnect=true", properties);
+            Properties properties = new Properties();
+            properties.setProperty("user", user);
+            properties.setProperty("password", password);
+            properties.setProperty("useUnicode", "true");
+            properties.setProperty("characterEncoding", "UTF-8");
+            properties.setProperty("autoReconnect", "true");
+            properties.setProperty("connectTimeout", "6000");
+            properties.setProperty("socketTimeout", "2000");
+            properties.setProperty("maxReconnects", "1");
+            properties.setProperty("retriesAllDown", "1");
+//            Class.forName("com.mysql.jdbc.Driver").newInstance();
+        Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
+            con = DriverManager.getConnection(
+                    "jdbc:mysql://" + url + ":" + localPort + "/" + nameBD , properties);
 
-        Statement stmt;
-        PreparedStatement ps = null;
-        ResultSet rs;
-        String result;
+            Statement stmt;
+            PreparedStatement ps = null;
+            ResultSet rs;
+
 
 
             con.setAutoCommit(false);// Отключаем автокоммит
@@ -981,10 +1033,16 @@ public class CommonStepDefs extends GenericStepDefs {
             rs.last();
             result = rs.getString(param);
 
-            if(result.isEmpty()){
+            if (result.isEmpty()) {
                 throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
             }
             LOG.info("SQL-request [" + result + "]");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.disconnect();
+        }
         return result;
     }
 
@@ -1370,6 +1428,57 @@ Thread.sleep(1500);
         requestByHTTPS(fullPath, keyStash,"GET",null);
     }
 
+
+    @Когда("^запрос типа COLLECT \"([^\"]*)\" c параметрами \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
+    public void requestCollect(String path, String keyParams, String keyStash) {
+        try {
+            StringBuilder fullPath = new StringBuilder();
+            fullPath.append(JsonLoader.getData().get(STARTING_URL).get("ESB_URL").getValue() +  "/" + path);
+            fullPath.append("?" + Stash.getValue(keyParams));
+            LOG.info("Строчка запроса: " + fullPath);
+            requestByHTTPGet(fullPath.toString(), keyStash);
+        } catch (DataException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Когда("^формирум параметры и сохраняем в \"([^\"]*)\"$")
+    public void collectParametrs(String keyParams, DataTable dataTable){
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        Map<String, Object> map;
+        String key, value;
+        ObjectMapper mapper;
+        StringBuilder params = new StringBuilder();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm:ss");
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+            key = entry.getKey();
+            Calendar dateNow = Calendar.getInstance();
+
+            switch (entry.getValue()){
+                case "прошлый месяц":
+                    dateNow.add(Calendar.DAY_OF_YEAR,-30);
+                    value = formatDate.format(dateNow.getTime()) + "T" + formatTime.format(Calendar.getInstance().getTime());
+                    break;
+                case "текущая дата-время":
+                    value = formatDate.format(dateNow.getTime()) + "T" + formatTime.format(Calendar.getInstance().getTime());
+                    break;
+                case "следующий месяц":
+                    dateNow.add(Calendar.DAY_OF_YEAR,30);
+                    value = formatDate.format(dateNow.getTime()) + "T" + formatTime.format(Calendar.getInstance().getTime());
+                    break;
+                default:
+                    value = entry.getValue();
+            }
+            params.append(key+"="+value+"&");
+        }
+        LOG.info("Параметры получились: " + params);
+        Stash.put(keyParams,params);
+
+    }
+
+
+
     private String collectQueryString(String path){
         String requestFull = "";
         LOG.info("Собираем строку запроса.");
@@ -1380,6 +1489,43 @@ Thread.sleep(1500);
         }
         LOG.info("requestFull [" + requestFull + "]");
         return requestFull;
+    }
+
+
+    protected void requestByHTTPGet(String requestFull, String keyStash){
+
+        HttpURLConnection connect = null;
+        try{
+            connect = (HttpURLConnection) new URL(requestFull).openConnection();
+            connect.setRequestMethod("GET");
+            connect.setUseCaches(false);
+            connect.setConnectTimeout(250);
+            connect.setReadTimeout(250);
+            connect.connect();
+
+            StringBuilder jsonString = new StringBuilder();
+            if (HttpURLConnection.HTTP_OK == connect.getResponseCode()){
+                BufferedReader in  = new BufferedReader(new InputStreamReader(connect.getInputStream()));
+                String line;
+                while ((line=in.readLine())!=null){
+                    jsonString.append(line);
+                    jsonString.append("\n");
+                }
+                LOG.info(jsonString.toString());
+                Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
+            }
+            else {
+                LOG.info("fail" + connect.getResponseCode() + ", " + connect.getResponseMessage());}
+            jsonString.toString();
+        }
+        catch (Throwable cause){
+            cause.printStackTrace();
+        }
+        finally {
+            if (connect!=null){
+                connect.disconnect();
+            }
+        }
     }
 
     protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
@@ -1472,7 +1618,8 @@ Thread.sleep(1500);
         Stash.put(keyTypeOS,type);
         String sqlDel = "DELETE FROM  gamebet.`appversion` WHERE (version=" + vers + " OR hard_update_version=" + hardVers + ") AND type_os=" + type + " AND active_version=0";
         workWithDB(sqlDel);
-        String sqlRequest = "UPDATE gamebet.`appversion` SET version=" + vers + ", hard_update_version=" + hardVers + " WHERE active_version=1 AND type_os=" + type;
+        String     sqlRequest = "UPDATE gamebet.`appversion` SET version=" + vers + ", hard_update_version=" + hardVers + " WHERE active_version=1 AND type_os=" + type;
+               // String sqlRequest = "INSERT INTO gamebet.`appversion` (VERSION,apk,hard_update_version,active_version,type_os) VALUES("+vers+", 'android.apk',"+hardVers+",'1',"+type+")";
         workWithDB(sqlRequest);
     }
 
