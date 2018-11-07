@@ -54,9 +54,9 @@ public class OperationHistoryPage extends AbstractPage {
         Thread.sleep(1000);
         List<WebElement> newList = driver.findElements(By.xpath("//span[@class='history__id']/span"));
         newList.forEach(element -> {
-            if (id.contains(element.getText())) {
+            if (id.contains(element.getAttribute("innerText"))) {
                 id.add("idbad");
-                Assert.fail("Такой id уже был, значит страница не обновилась + " + element.getText());
+                Assert.fail("Такой id уже был, значит страница не обновилась + " + element.getAttribute("innerText"));
             }
         });
         return id.contains("idbad");
@@ -74,11 +74,11 @@ public class OperationHistoryPage extends AbstractPage {
         id.clear();
 
         operationsId = driver.findElements(By.xpath("//span[@class='history__id']/span"));
-        operationsId.forEach(element -> id.add(element.getText()));
-        currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getText());
+        operationsId.forEach(element -> id.add(element.getAttribute("innerText")));
+        currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         page.click();
 
-        newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getText());
+        newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         LOG.info("Перешли на страницу  [" + newPage + "]");
         if (newPage.equals(currentPage)) {
             Assert.fail("Страница не перелистнулась!! была активной страница" + currentPage + " стала активно страница " + newPage);
@@ -113,7 +113,7 @@ public class OperationHistoryPage extends AbstractPage {
         List<WebElement> elementsDate = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell ng-binding']"));//поле с датой для каждой операции в истории
         List<Date> operationsDate = new ArrayList<>();//список именно дат
         for (WebElement element : elementsDate) {
-            operationsDate.add(format.parse(element.getText()));//берем каждое поле с датой и сохраняем дату в список
+            operationsDate.add(format.parse(element.getAttribute("innerText")));//берем каждое поле с датой и сохраняем дату в список
         }
 
         sortList = operationsDate.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList()).equals(operationsDate);//проверка отсортирован ли список по убыванию
@@ -126,7 +126,7 @@ public class OperationHistoryPage extends AbstractPage {
         operationsDate.clear();
         elementsDate = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell ng-binding']"));
         for (WebElement element : elementsDate) {
-            operationsDate.add(format.parse(element.getText()));
+            operationsDate.add(format.parse(element.getAttribute("innerText")));
         }
         sortList = operationsDate.stream().sorted().collect(Collectors.toList()).equals(operationsDate); //проверка отсортирован ли список теперь по возрастанию
         assertThat(sortList).as("История не отсортировалась по дате после нажатия на сортировку").isTrue();
@@ -143,7 +143,7 @@ public class OperationHistoryPage extends AbstractPage {
         Thread.sleep(4000);
         List<WebElement> elementsBalance = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());//поле с суммой баланса
         List<Float> operationsBalance = new ArrayList<>();
-        elementsBalance.forEach(element -> operationsBalance.add(Float.valueOf(element.getText())));
+        elementsBalance.forEach(element -> operationsBalance.add(Float.valueOf(element.getAttribute("innerText"))));
         sortList = operationsBalance.stream().sorted().collect(Collectors.toList()).equals(operationsBalance);
         assertThat(sortList).as("История не отсортировалась по сумме баланса").isTrue();
 
@@ -151,7 +151,7 @@ public class OperationHistoryPage extends AbstractPage {
         Thread.sleep(1000);
         elementsBalance = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell history__cell-balance ng-binding']"));
         operationsBalance.clear();
-        elementsBalance.forEach(element -> operationsBalance.add(Float.valueOf(element.getText())));
+        elementsBalance.forEach(element -> operationsBalance.add(Float.valueOf(element.getAttribute("innerText"))));
         sortList = operationsBalance.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList()).equals(operationsBalance);
         assertThat(sortList).as("История не отсортировалась по сумме баланса в обратную сторону").isTrue();
     }
@@ -188,9 +188,9 @@ public class OperationHistoryPage extends AbstractPage {
             count++;
         }
         for (WebElement element : operationsID) {
-            if (!element.getText().contains(randomID)) {// indexof<0 только если символы не нашлись в строке. т.е. есди в поиск по подстроке попала запись без этой подстроки
+            if (!element.getAttribute("innerText").contains(randomID)) {// indexof<0 только если символы не нашлись в строке. т.е. есди в поиск по подстроке попала запись без этой подстроки
                 flag = false;
-                Assert.fail("Поиск не сработал. Искали по подстроке " + randomID + ", но нашлась операция с номером " + element.getText());
+                Assert.fail("Поиск не сработал. Искали по подстроке " + randomID + ", но нашлась операция с номером " + element.getAttribute("innerText"));
             }
         }
     }

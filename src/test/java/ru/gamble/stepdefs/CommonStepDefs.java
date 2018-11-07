@@ -2,6 +2,11 @@ package ru.gamble.stepdefs;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.neovisionaries.ws.client.*;
 import cucumber.api.DataTable;
 import cucumber.api.Scenario;
@@ -11,12 +16,14 @@ import cucumber.api.java.ru.Когда;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -31,12 +38,15 @@ import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
+import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.*;
+import java.awt.*;
+import java.awt.event.InputEvent;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -48,6 +58,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +66,8 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
+import static org.springframework.util.StreamUtils.BUFFER_SIZE;
+import static org.springframework.util.StreamUtils.drain;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
@@ -250,7 +263,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 currentUrl = siteUrl;
                 break;
         }
-            PageFactory.getDriver().get(currentUrl);
+            PageFactory.getWebDriver().get(currentUrl);
             LOG.info("Перешли на страницу [" + currentUrl + "]");
         }catch (DataException e) {
             LOG.error(e.getMessage());
@@ -296,6 +309,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     private static void workWithDB(String sqlRequest) {
         Connection con = DBUtils.getConnection();
+
         PreparedStatement ps = null;
         int rs;
         try {
@@ -541,13 +555,13 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^(пользователь |он) очищает cookies$")
     public static void cleanCookies() {
+        try {
         if(PageFactory.getWebDriver().manage().getCookies().size()>0) {
-            try {
-                LOG.info("Удаляем Cookies");
-                PageFactory.getWebDriver().manage().deleteAllCookies();
-            } catch (Exception e) {
-                LOG.error("Cookies не было!");
-            }
+            LOG.info("Удаляем Cookies");
+            PageFactory.getWebDriver().manage().deleteAllCookies();
+        }
+        } catch (Exception e) {
+            LOG.error("Cookies не было!");
         }
     }
 
@@ -909,6 +923,159 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyPhone, phone);
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
+
+    @Когда("^берем \"([^\"]*)\"$")
+    public static void confirmEmail2(String keyPhone) throws Exception{
+        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7111002%' ORDER BY phone";
+        String phoneLast = ww(sqlRequest, "phone");
+        String phone = "7111002" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
+        Stash.put(keyPhone, phone);
+        LOG.info("Вычислили подходящий номер телефона::" + phone);
+    }
+
+    public static String ww (String sqlRequest, String param) throws Exception{
+        Connection con = null;
+
+        String url, user, password;
+        JSch jsch = new JSch();
+        String proxyHost = "test-int-bet-dbproca.tsed.orglot.office";
+        String proxyUser = "tzavaliy";
+        String proxyPassword = "2007-12g";
+
+        String nameBD = "gamebet";
+        url = "test-int-bet-dbproc.tsed.orglot.office";
+        user = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_USER").getValue();
+        password = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_PASSWORD").getValue();
+
+        int localPort = 1234;
+
+        Session session = jsch.getSession(proxyUser, proxyHost, 22);
+        java.util.Properties config = new java.util.Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.setPassword(proxyPassword);
+
+        session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+        session.connect();
+        session.setPortForwardingL(0, url, 3306);
+
+
+        Properties properties = new Properties();
+        properties.setProperty("user", user);
+        properties.setProperty("password", password);
+        properties.setProperty("useUnicode", "true");
+        properties.setProperty("characterEncoding", "UTF-8");
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        con = DriverManager.getConnection(
+                "jdbc:mysql://" + url + ":1234/" + nameBD + "?autoReconnect=true", properties);
+
+        Statement stmt;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        String result;
+
+
+            con.setAutoCommit(false);// Отключаем автокоммит
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlRequest);
+            con.commit();
+            rs.last();
+            result = rs.getString(param);
+
+            if(result.isEmpty()){
+                throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
+            }
+            LOG.info("SQL-request [" + result + "]");
+        return result;
+    }
+
+
+
+    @Когда("^подтверждаем скайп через админку \"([^\"]*)\"$")
+    public void skypeConfirm(String keyPhone) throws Exception{
+        WebDriver driver = PageFactory.getDriver();
+        String registrationUrl = "https://test-int-bet-dbproca.tsed.orglot.office/admin/";
+        String currentHandle = driver.getWindowHandle();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+
+        Set<String> windows = driver.getWindowHandles();
+        windows.remove(currentHandle);
+        String newWindow = windows.toArray()[0].toString();
+
+        driver.switchTo().window(newWindow);
+
+        Thread.sleep(1500);
+        WebElement authForm = driver.findElement(By.xpath("//div[@class='x-panel x-panel-default-framed x-box-item']"));
+
+        WebElement enterBottom = driver.findElement(By.xpath("//span[@id='button-1014-btnIconEl']"));
+
+        WebElement loginField = driver.findElement(By.xpath("//input[@id='textfield-1011-inputEl']"));
+
+        WebElement passField = driver.findElement(By.xpath("//input[@id='textfield-1012-inputEl']"));
+
+        loginField.clear();
+        loginField.sendKeys("promo_test_superadmin");
+        passField.clear();
+        passField.sendKeys("promo_test_superadmin");
+        enterBottom.click();
+
+        Thread.sleep(2500);
+        String phone = Stash.getValue(keyPhone);
+
+        PageFactory.getActions().doubleClick(driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../.."))).build().perform();
+        driver.findElement(By.id("editDataBtn-btnEl")).click();
+        int yy  =driver.findElement(By.id("confirmSkypeMenuBtn-btnWrap")).getLocation().getY() + 116;
+        int xx = driver.findElement(By.id("confirmSkypeMenuBtn-btnWrap")).getLocation().getX() + 156;
+        Robot robot = new Robot();
+        robot.mouseMove(xx,yy);
+        robot.delay(500);
+        robot.mousePress(InputEvent.BUTTON1_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        driver.findElement(By.id("confirmSkypeBtn")).click();
+        driver.findElement(By.id("saveUserBtn-btnIconEl")).click();
+    }
+
+
+
+    @Когда("^в админке смотрим id пользователя \"([^\"]*)\" \"([^\"]*)\"$")
+    public void getIDFromAdmin(String keyPhone,String keyId) throws Exception{
+        WebDriver driver = PageFactory.getDriver();
+        String registrationUrl = "https://test-int-bet-dbproca.tsed.orglot.office/admin/";
+        String currentHandle = driver.getWindowHandle();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+
+        Set<String> windows = driver.getWindowHandles();
+        windows.remove(currentHandle);
+        String newWindow = windows.toArray()[0].toString();
+
+        driver.switchTo().window(newWindow);
+
+Thread.sleep(1500);
+        WebElement authForm = driver.findElement(By.xpath("//div[@class='x-panel x-panel-default-framed x-box-item']"));
+
+        WebElement enterBottom = driver.findElement(By.xpath("//span[@id='button-1014-btnIconEl']"));
+
+        WebElement loginField = driver.findElement(By.xpath("//input[@id='textfield-1011-inputEl']"));
+
+        WebElement passField = driver.findElement(By.xpath("//input[@id='textfield-1012-inputEl']"));
+
+        loginField.clear();
+        loginField.sendKeys("promo_test_superadmin");
+        passField.clear();
+        passField.sendKeys("promo_test_superadmin");
+        enterBottom.click();
+
+        Thread.sleep(1500);
+        String phone = Stash.getValue(keyPhone);
+
+        String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getAttribute("innerText");
+        Stash.put(keyId,id);
+
+
+    }
+
 
     @Когда("^определяем user_id пользователя \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public static void findUserId(String keyEmail, String keyId) {
@@ -1368,20 +1535,13 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
-    /**
-     * это когда активные опции сайта в параметре. когда паараметр удалт - удалить этот before и иуспользовать только тот before что с rememberEnabledFeatures
-     */
-    @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
-    public void saveRegistrationValue(){
-        rememberActive("ACTIVE");
-    }
 
     /**
      * это когда активне опции сайта в отдельной таблице
      */
     @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
     public void saveRegistrationValue2(){
-        rememberEnabledFeatures("ENABLEDFEATURES");
+        rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
 
     @Before()
@@ -1417,67 +1577,11 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     /**
-     * когда активные опции сайта в одном параметре
-     */
-    @Когда("^запоминаем значение активных опций сайта в \"([^\"]*)\"$")
-    public void rememberActive (String activeOptionKey){
-        String activeOpt = getActiveOptions();
-        Stash.put(activeOptionKey,activeOpt);
-        LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
-    }
-
-    private String getActiveOptions(){
-        return workWithDBgetResult("SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'", "value");
-    }
-
-    ///////////////////////////////////
-
-
-    /**
-     * когда активные опции сайта в одном параметре
-     * @param key - где хранятся старые активные опции
-     */
-    @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \"([^\"]*)\"$")
-    public void rememberActiveAndOffOption(String key,DataTable dataTable) {
-        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-        Stash.put(key, activeOpt);
-
-        Map<String,String> table = dataTable.asMap(String.class,String.class);
-        for (Map.Entry<String, String> entry : table.entrySet()) {
-            String option = entry.getKey();
-            if (entry.getValue().equals("true") && !activeOpt.contains(option)) {
-                activeOpt = activeOpt + ", " + option;
-                continue;
-            }
-            else if (activeOpt.contains(option) && entry.getValue().equals("true")) {continue;}
-
-            activeOpt = activeOpt.replaceAll("[', '|',']"  + option , "");
-            activeOpt = activeOpt.replaceAll(option + "[', '|',']"   , "");
-            activeOpt = activeOpt.replaceAll(",+"   , ",");
-            LOG.info("Удаление активной опций сайта " + option);
-        }
-
-        activeOpt = activeOpt.trim();
-        activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
-        sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
-        workWithDB(sqlRequest);
-
-        sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        activeOpt = workWithDBgetResult(sqlRequest, "value");
-        LOG.info("СЕЙЧАС активные опции сайта [" + activeOpt + "]");
-    }
-
-
-    /**
      * когда активные опции сайта в таблице. когда параметр удалят - использоватеь этот метод вместо старого (rememberActiveAndOffOption)
      * но не забыть поменять Когда
      */
     @Когда("^редактируем некоторые активные опции сайта")
     public void rememberActiveOption(DataTable dataTable) {
-
-//        Stash.put(key,activeOpt);
-//
         StringBuilder optionTrue = new StringBuilder();
         StringBuilder optionFalse = new StringBuilder();
 
@@ -1510,12 +1614,12 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
     public void revertEnabledFeatures(String key){
-        Map<String,String> oldEnabledFeatures = Stash.getValue(key);
+        Map<String,String> oldEnabledFeatures = (HashMap)Stash.getValue(key);
         StringBuilder optionFalse = new StringBuilder();
         StringBuilder optionTrue = new StringBuilder();
         for (Map.Entry<String, String> entry : oldEnabledFeatures.entrySet()) {
             if (entry.getValue().equals("1")) {
-                optionTrue.append(",'"+entry.getKey() + "'");
+                optionTrue.append(",'" + entry.getKey() + "'");
                 LOG.info("Добавление активной опций сайта " + entry.getKey());
             }
             else {
@@ -1536,36 +1640,32 @@ public class CommonStepDefs extends GenericStepDefs {
         "\n!!!!!!!!!!!!!!!!!\nCтало:" + activeOpt, activeOpt.equals(oldEnabledFeatures));
     }
 
-    /**
-     * когда активные опции сайта в одном параметре
-     * @param key - где хранятся старые активные опции
-     *            когда уберут этот параметр - вместо этого метода ВЕЗДЕ использовать revertEnabledFeatures
-     */
-    public void changeActive(String key) {
-        String activeOpt = Stash.getValue(key) == null ? "back_call, remove_limits_btn, identification_with_euroset, identification_with_courier, dentification_with_video, identification_with_wave" : Stash.getValue(key);
-        Stash.put(key,activeOpt);
-        String sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
-        LOG.info("Возвращаем активные значения сайта =>[" + activeOpt + "]");
-        workWithDB(sqlRequest);
-    }
+
 
     /**
-     * сейчас активные опции сайта - это параметр. а когда будет только таблица - тут, в обоих after сделать использование revertEnabledFeatures вместо changeActive
+     * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
      */
     @After(value = "@NewUserRegistration_C36189,@ExpressBonus_C39773")
     public void returnRegistrationValueWithScreenshot(Scenario scenario){
-        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-        changeActive("ACTIVE");
-        final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
-        scenario.embed(screenshot, "image/png");
+        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
+        revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
+        if(scenario.isFailed()) {
+            final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
+            scenario.embed(screenshot, "image/jpeg");
+        }
         closeBrowser();
     }
 
+
+    /**
+     * Возвращаем активные опции сайста в исходное положение до тестов
+     * @param scenario
+     */
     @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
     public void returnRegistrationValue(Scenario scenario){
-        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-        changeActive("ACTIVE");
+        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
+        revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
 
 
@@ -1603,7 +1703,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^записываем значение баланса бонусов в \"([^\"]*)\"$")
     public void writeValueOfBonusBalanceIn(String bonusKey) {
         List<WebElement> bonusElement = PageFactory.getWebDriver().findElements(By.xpath("//span[contains(@class,'subMenuBonus bonusmoney-text')]"));
-        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getText().replaceAll("[^0-9.]","");
+        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getAttribute("innerText").replaceAll("[^0-9.]","");
         Stash.put(bonusKey,bonus);
         LOG.info("Записали в key [" + bonusKey + "] <== value [" + bonus + "]");
     }
@@ -1611,7 +1711,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^записываем значение баланса в \"([^\"]*)\"$")
     public void writeValueOfBalanceIn(String balanceKey) {
         List<WebElement> balanceElement = PageFactory.getWebDriver().findElements(By.id("topPanelWalletBalance"));
-        String balance = balanceElement.isEmpty() ? "0" : balanceElement.get(0).getText();
+        String balance = balanceElement.isEmpty() ? "0" : balanceElement.get(0).getAttribute("innerText");
         Stash.put(balanceKey,balance);
         LOG.info("Записали в key [" + balanceKey + "] <== value [" + balance + "]");
     }
@@ -1620,7 +1720,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
         new WebDriverWait(PageFactory.getWebDriver(),10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[@class='userBalance']")));
         try {
-            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"));
             BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
             BigDecimal withdrawnAmount = new BigDecimal(Stash.getValue(amountKey).toString());
             BigDecimal expectedBalance = previousBalance.subtract(withdrawnAmount);
@@ -1629,7 +1729,7 @@ public class CommonStepDefs extends GenericStepDefs {
            throw new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
         }
         BigDecimal actualBalance,previousBalance,withdrawnAmount,expectedBalance;
-        actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+        actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"));
         previousBalance = new BigDecimal((String) Stash.getValue(balanceKey));
         withdrawnAmount = new BigDecimal((String) Stash.getValue(amountKey));
         expectedBalance = previousBalance.subtract(withdrawnAmount);
@@ -1714,8 +1814,6 @@ public class CommonStepDefs extends GenericStepDefs {
                 .connect();
     }
 
-
-
     @Когда("^вычленяем из названия игры одно слово \"([^\"]*)\" \"([^\"]*)\"$")
     public void oneWordSearch(String keySearch,String type){
         LOG.info(Stash.getValue("nameGameKey") + " время начала ");
@@ -1799,5 +1897,62 @@ public class CommonStepDefs extends GenericStepDefs {
         return workWithDBgetResult(smsKa, "code");
 
     }
+
+    @Когда("^выбираем ФИО \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\"$")
+    public void selectName(String keyName, String keySurName, String keyPatronymic) throws IOException {
+        StringBuilder lal = new StringBuilder();
+        FileReader file = new FileReader("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt");
+        Scanner scan = new Scanner(file);
+
+        String user = scan.nextLine();
+        String strLine;
+        List<String> allLines = new ArrayList<>();
+        while (scan.hasNext()){
+            allLines.add(scan.nextLine());
+        }
+        String separator = user.contains("\t") ?"\t":"\\s";
+        int randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        String name = allLines.get(randomNumber).split(separator)[1];
+        randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        String surname = allLines.get(randomNumber).split(separator)[0];
+        randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        String patronymic = allLines.get(randomNumber).split(separator)[2];
+
+        Stash.put(keyName,name);
+        Stash.put(keySurName,surname);
+        Stash.put(keyPatronymic,patronymic);
+        LOG.info("Выбранные ФИО: " + surname + " " + name + " " + patronymic);
+
+        file.close();
+    }
+
+    @Когда("^вычисляем телефон \"([^\"]*)\"$")
+    public void selectPhone(String keyPhone) throws IOException{
+
+        StringBuilder lal = new StringBuilder();
+        FileReader file = new FileReader("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt");
+        Scanner scan = new Scanner(file);
+
+        String line = scan.nextLine();
+        String phone = "700100"+String.valueOf(Integer.valueOf(line.substring(6)) + 1);
+        LOG.info("Номер телефона" + phone);
+        Stash.put(keyPhone,phone);
+
+        lal.append(phone + "\n");
+        while (scan.hasNext()){
+            lal.append(scan.nextLine()).append(System.lineSeparator());
+        }
+
+        FileWriter nfile = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt",false);
+        nfile.write(lal.toString());
+        nfile.close();
+        file.close();
+    }
+
+    @Когда("^нажмем Продолжить регу на всякий$")
+    public void rega(){
+        PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
+        }
+
 }
 

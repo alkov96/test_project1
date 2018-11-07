@@ -34,5 +34,16 @@
       "DB_USER": "stoloto_main",
       "DB_PASSWORD": "lizByr4WO#"
     }
+  },
+  "TEST_INT": {
+    "MAIN_URL": "https://test-int-bet-site1.tsed.orglot.office",
+    "REGISTRATION_URL": "https://test-int-bet-site1.tsed.orglot.office/test_registration/",
+    "PASSWORD": "Acer0808",
+    "PASS": "Parol123",
+    "DB_REGISTRATION": {
+      "DB_URL": "jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office:3306",
+      "DB_USER": "gamebet_dml",
+      "DB_PASSWORD": "kahcheezao6fa=hfai3Ae"
+    }
   }
 }

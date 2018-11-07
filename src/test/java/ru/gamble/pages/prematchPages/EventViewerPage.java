@@ -95,12 +95,12 @@ public class EventViewerPage extends AbstractPage {
 
         // Ожидание появения хотя-бы одного события
         List<WebElement> listMainCategoriesOfEvents = getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents))
-                .stream().filter(e -> e.isDisplayed() && !(e.getText().isEmpty())).limit(valueLimit).collect(Collectors.toList());
+                .stream().filter(e -> e.isDisplayed() && !(e.getAttribute("innerText").isEmpty())).limit(valueLimit).collect(Collectors.toList());
         LOG.info("Найдено видов категорий событий::" + listMainCategoriesOfEvents.size());
 
         if(listMainCategoriesOfEvents.size()>0) {
             for (WebElement event : listMainCategoriesOfEvents) {
-                LOG.info(event.getText());
+                LOG.info(event.getAttribute("innerText"));
                 boolean populate = false;
                 boolean nullMarge = false;
 
@@ -111,7 +111,7 @@ public class EventViewerPage extends AbstractPage {
                     workWithPreloader();
                 }
 
-                String match = event.getText();
+                String match = event.getAttribute("innerText");
 
                 if (match.contains("ПОПУЛЯРНЫЕ СОРЕВНОВАНИЯ")) {
                     xpathCountries = "../ul/li/div";
@@ -170,7 +170,7 @@ public class EventViewerPage extends AbstractPage {
         String xpathGames = "..//div[@class='left-menu__list-item-region-compitition compitition-b ng-scope ng-isolate-scope']";
         String xpathDateTimeGames = "//div[@class='prematch-competition-games__item-date ng-binding']";
         for (WebElement country: listCompetitions) {
-            LOG.info(country.getText());
+            LOG.info(country.getAttribute("innerText"));
             // Если меню страны не открыта, то открываем
             if(!country.findElement(By.xpath("..")).getAttribute("class").contains("active")){
                 country.click();
@@ -181,7 +181,7 @@ public class EventViewerPage extends AbstractPage {
                     .stream().filter(WebElement::isDisplayed).limit(valueLimit).collect(Collectors.toList());
             if (listGames.size() > 0) {
                 for (WebElement gameItem : listGames) {
-                    LOG.info(gameItem.getText());
+                    LOG.info(gameItem.getAttribute("innerText"));
                     gameItem.click();
                     workWithPreloader();
                     checkGames(country, valuePeriod, valueLimit);
@@ -211,8 +211,8 @@ public class EventViewerPage extends AbstractPage {
 
         if (listDateTime.size() > 0) {
             for (WebElement game : listDateTime) {
-                LOG.info(game.findElement(By.xpath("../../../*")).getText().replaceAll("\n", " "));
-                rowDateTime = game.getText();
+                LOG.info(game.findElement(By.xpath("../../../*")).getAttribute("innerText").replaceAll("\n", " "));
+                rowDateTime = game.getAttribute("innerText");
                 int period;
                 if (valuePeriod.contains("Любое время")) {
                     period = 0;
@@ -357,7 +357,7 @@ public class EventViewerPage extends AbstractPage {
                     List<WebElement> allGames = driver.findElements(By.xpath("//div[@class = 'prematch-competitions scroll-contain ng-scope']/div[1]/div[1]/div/div[1]/div[1]/div[1]/div[1]/div[1]"));
                     LOG.info("Смотрим все игры в спорте, в соответствующем соревновании. Ищем игру подходящую по фильтру времени " + hour + inPeriod);
                     for (int GameInTour = 0; GameInTour < allGames.size(); GameInTour++) {
-                        dateGame = formatter.parse(allGames.get(GameInTour).getText());
+                        dateGame = formatter.parse(allGames.get(GameInTour).getAttribute("innerText"));
 
                         if (!gameIsAdding && (dateGame.getTime() <= Period.getTime()) == inPeriod) {
 
@@ -416,7 +416,7 @@ public class EventViewerPage extends AbstractPage {
 
         LOG.info("Проверка страницы прематч при включенном фильтре = " + expectedPeriod);
 
-        String selectPeriod = driver.findElement(By.xpath("//div[@class = 'left-menu__search left-menu-filters']/ng-include[1]/div[1]/div[2]/div[1]/div[1]")).getText();
+        String selectPeriod = driver.findElement(By.xpath("//div[@class = 'left-menu__search left-menu-filters']/ng-include[1]/div[1]/div[2]/div[1]/div[1]")).getAttribute("innerText");
         LOG.info("Теперь проверим что фильтр в нужном состоянии "+expectedPeriod);
         if (!selectPeriod.equals(expectedPeriod)) {
             flag=false;
@@ -593,7 +593,7 @@ public class EventViewerPage extends AbstractPage {
         {
             LOG.info("Регион в выбранном спорте свернут - разворачиваем его");
             allSports.get(index).findElement(By.xpath("ul[1]/li[1]//div[contains(@class,'left-menu__list-item-arrow_region')]")).click();//развернули регион
-            wait.withMessage("Регион " + allSports.get(index).findElement(By.xpath(".//div[@class='left-menu__item']/span[2]")).getText() +
+            wait.withMessage("Регион " + allSports.get(index).findElement(By.xpath(".//div[@class='left-menu__item']/span[2]")).getAttribute("innerText") +
                     " в спорте номер " + index + " не развернулся!!")
                     .until(ExpectedConditions.numberOfElementsToBeMoreThan(
                             By.xpath(xpathCurrentSport + "/ul[1]/li//div[contains(@class,'left-menu__list-item-region-compitition')]"),0));
@@ -601,7 +601,7 @@ public class EventViewerPage extends AbstractPage {
         LOG.info("Добавляем первый турнир в регионе в контейнер многовыборного режима");
         allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]")).click();//выбрали турнир
         LOG.info("Запоминаем название соревнования в ЛМ");
-        String nameTour = allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]/i")).getText();//название турнира в ЛМ
+        String nameTour = allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]/i")).getAttribute("innerText");//название турнира в ЛМ
         setExpandCollapseMenusButton(false);
         Stash.put(keyNameTour,nameTour);
     }
@@ -642,7 +642,7 @@ public class EventViewerPage extends AbstractPage {
             e.printStackTrace();
         }
         actions.moveToElement(tour).build().perform();//наводим мышку на турнир
-        String nameGame = tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//label[contains(@for,'checkbox-game')]")).get(0).getText();
+        String nameGame = tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//label[contains(@for,'checkbox-game')]")).get(0).getAttribute("innerText");
         LOG.info("Выбираем игру из этого списка "+nameGame);
         WebElement game = tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game')]")).get(0);
         LOG.info("Добавляем игру в контейнер многовыборного режима");
@@ -673,7 +673,7 @@ public class EventViewerPage extends AbstractPage {
 
         //название турнира в контейнере
         LOG.info("Запоминаем название соревнования, которое в контейнере многовыборного режима");
-        String nameTourInMulti = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-name')]//div[contains(@class,'prematch-competition-name__inner-competition ellipsis-text')]")).get(0).getText();
+        String nameTourInMulti = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-name')]//div[contains(@class,'prematch-competition-name__inner-competition ellipsis-text')]")).get(0).getAttribute("innerText");
 
         LOG.info("Сравниваем название соревновани в ЛМ и в контейнере");
         Assert.assertTrue(
@@ -720,12 +720,10 @@ public class EventViewerPage extends AbstractPage {
         LOG.info("Наводим мышку на название соревноания в ЛМ, чтобы появился всплывающий список игр");
         actions.moveToElement(tour).build().perform();//наводим мышку на турнир
         LOG.info("Запоминаем название игры, которая в контейнере");
-        String nameGame = //tour.findElement(By.xpath("../div[1]/ul[1]/li[1]/div[1]/label")).getText();ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched
-                //tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//label[contains(@for,'checkbox-game')]")).get(0).getText();
-                tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game') and contains(@class,'ng-not-empty')]/../label")).get(0).getText();
+        String nameGame =
+                tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game') and contains(@class,'ng-not-empty')]/../label")).get(0).getAttribute("innerText");
         LOG.info("Выбираем эту игру");
-        WebElement game = //tour.findElement(By.xpath("../div[1]/ul[1]/li[1]/div[1]/input[contains(@id,'checkbox-game')]"));//игра из списка турнира.
-                //  tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game')]")).get(0);
+        WebElement game =
                 tour.findElements(By.xpath("../..//div[contains(@class,'poup-sports_prematch scroll-contain')]//input[contains(@id,'checkbox-game') and contains(@class,'ng-not-empty')]")).get(0);
         LOG.info("И убираем игру из контейнера");
         game.findElement(By.xpath("../label")).click();

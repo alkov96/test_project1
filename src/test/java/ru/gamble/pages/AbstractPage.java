@@ -3,10 +3,7 @@ package ru.gamble.pages;
 import cucumber.api.Scenario;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,8 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.Generators;
+import ru.gamble.utility.JsonLoader;
 import ru.gamble.utility.YandexPostman;
 import ru.sbtqa.tag.datajack.Stash;
+import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -24,9 +23,7 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +32,7 @@ import static org.openqa.selenium.By.xpath;
 import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.RANDOM;
+import static ru.gamble.utility.Constants.STARTING_URL;
 import static ru.gamble.utility.Generators.randomString;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
@@ -614,6 +612,120 @@ public abstract class AbstractPage extends Page {
         Stash.put("PHONE_NUMBER",phone ) ;
         LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
     }
+
+
+
+
+
+
+
+    protected void enterSellphoneForOrtax(String value, WebElement cellFoneInput, WebElement cellFoneConformationInput){
+        WebDriver driver = PageFactory.getWebDriver();
+        String phone;
+        int count = 1;
+        do {
+            if(value.contains(RANDOM)) {
+                phone = "0" + Generators.randomNumber(9);
+                LOG.info("Вводим случайный номер телефона::+7[" + phone + "]");
+                fillField(cellFoneInput,phone);
+            } else {
+                phone = (value.matches("^[A-Z_]+$")) ? Stash.getValue(value) : value;
+                LOG.info("Вводим номер телефона без первой 7-ки [" + phone.substring(1,11) + "]");
+                fillField(cellFoneInput,phone.substring(1,11));
+            }
+
+            LOG.info("Попыток ввести номер::" + count);
+            if (count > 5) {
+                throw new AutotestError("Использовано 5 попыток ввода номера телефона");
+            }
+            ++count;
+
+        } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
+
+
+        LOG.info("Копируем смс-код для подтверждения телефона");
+
+
+        //Начало кода для получения СМС
+        String currentHandle = driver.getWindowHandle();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        String registrationUrl = "";
+
+        try {
+            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
+        } catch (DataException e) {
+            LOG.error(e.getMessage());
+        }
+
+        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+
+        Set<String> windows = driver.getWindowHandles();
+        windows.remove(currentHandle);
+        String newWindow = windows.toArray()[0].toString();
+
+        driver.switchTo().window(newWindow);
+
+        String xpath = "//li/a[contains(text(),'" + phone + "')]";
+        WebElement numberSring = null;
+        int x = 0;
+
+        LOG.info("Пытаемся найти код подтверждения телефона");
+        for(int y = 0; y < 5; y++) {
+//            try {
+//                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
+//                numberSring = driver.findElements(By.xpath(xpath)).get(0);
+//            } catch (Exception e) {
+//                driver.navigate().refresh();
+//            }
+            try {
+                System.out.println("ASASDASDSADS");
+                System.out.println(new Date(System.currentTimeMillis()));
+                Thread.sleep(2000);
+                System.out.println(new Date(System.currentTimeMillis()));
+                System.out.println("ASASDASDSADS");
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
+                if (driver.findElements(By.xpath(xpath)).isEmpty()){
+                    driver.navigate().refresh();
+
+                }
+                else {
+                    numberSring = driver.findElements(By.xpath(xpath)).get(0);
+                    break;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            x++;
+//            if (numberSring != null){break;}
+        }
+
+        if(numberSring != null && !numberSring.getText().isEmpty()) {
+            String code = numberSring.getText().split(" - ")[1];
+            driver.switchTo().window(currentHandle);
+            js.executeScript("registration_window.close()");
+
+
+            try {
+                new WebDriverWait(driver, 70).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
+            }catch (Exception e){
+                e.getMessage();
+                throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
+            }
+
+
+            LOG.info("Вводим SMS-код::" + code);
+            fillField(cellFoneConformationInput,code);
+
+            Stash.put("PHONE_NUMBER",phone ) ;
+            LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
+        }else {
+            throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
+        }
+
+    }
+
 
     @ActionTitle("нажимает в поле ввода")
     public void clickInputField(String inputFieldName) {

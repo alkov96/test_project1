@@ -161,7 +161,7 @@ public class FavouritePage extends AbstractPage {
     public void rememberCoef(String coefKey){
         WebDriver driver = PageFactory.getDriver();
         WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
-        float coefFavour = Float.valueOf(game.findElement(xpath("div//div[contains(@class,'elected-data__event-price')]")).getText());
+        float coefFavour = Float.valueOf(game.findElement(xpath("div//div[contains(@class,'elected-data__event-price')]")).getAttribute("innerText"));
         LOG.info("Значение коэффициента выбранного исхода = " + coefKey);
         Stash.put(coefKey,coefFavour);
     }
@@ -222,15 +222,15 @@ public class FavouritePage extends AbstractPage {
         List<WebElement> listCoeff =driver.findElements(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__val')]")).stream().collect(Collectors.toList());
         if(!listCoeff.isEmpty()){
             Thread.sleep(500);
-            previous = listCoeff.get(0).getText();
+            previous = listCoeff.get(0).getAttribute("innerText");
             AbstractPage.openFavourite();
             preferences.click();
             listCoeff.get(2).click();
-            LOG.info("Переключаемся на '" + listCoeff.get(2).getText() + "' формат отображения");
+            LOG.info("Переключаемся на '" + listCoeff.get(2).getAttribute("innerText") + "' формат отображения");
             AbstractPage.openFavourite();
             Thread.sleep(500);
-            LOG.info("Предыдущий: " + previous + "Текущий: " + listCoeff.get(2).getText());
-            if (previous.equals(listCoeff.get(2).getText())) {
+            LOG.info("Предыдущий: " + previous + "Текущий: " + listCoeff.get(2).getAttribute("innerText"));
+            if (previous.equals(listCoeff.get(2).getAttribute("innerText"))) {
                 LOG.error("Формат отображения коэффициентов не изменился");
                 Assertions.fail("Формат отображения коэффициентов не изменился");
             }

@@ -55,11 +55,11 @@ public class DayEventsPage extends AbstractPage {
         List <WebElement> events = driver.findElements(By.xpath(xpathEvent))
                 .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         if(events.size() > 0) {
-            LOG.info("Нажали на событие  " + events.get(0).getText());
+            LOG.info("Нажали на событие  " + events.get(0).getAttribute("innerText"));
             events.get(0).click();//добавляем событие со страницы Событие дня с баннера(вторая команда)
             String team1 = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[1]/span[1]")).getAttribute("title");//Сохраняем название команды1 на банере
             String team2 = driver.findElement(By.xpath("//div[@class='event-widget-coef']/div[3]/span[1]")).getAttribute("title");//Сохраняем название команды2 на банере
-            String coef = driver.findElement(By.xpath("//div[@class='event-widget-coef__item' and contains(@ng-click,'W2')]/span[2]")).getText();
+            String coef = driver.findElement(By.xpath("//div[@class='event-widget-coef__item' and contains(@ng-click,'W2')]/span[2]")).getAttribute("innerText");
             driver.findElements(By.xpath("//span[contains (@class,'event-widget-coef')]"));
             Stash.put(keyTeam1, team1);
             Stash.put(keyTeam2, team2);
@@ -74,8 +74,8 @@ public class DayEventsPage extends AbstractPage {
     @ActionTitle("проверяет, совпадают ли названия событий на кнопках на баннере и сверху c")
     public void teamsOnBanner(String keyTeam1, String keyTeam2){
         WebDriver driver = PageFactory.getDriver();
-        String teamname1 = driver.findElement(By.xpath("//div[@class='event-widget-full-info']//div[contains(@ng-bind,'team1_name')]")).getText(); //Имя команды на банере в окошке
-        String teamname2 = driver.findElement(By.xpath("//div[@class='event-widget-full-info']//div[contains(@ng-bind,'team2_name')]")).getText(); //Имя команды на банере в окошке
+        String teamname1 = driver.findElement(By.xpath("//div[@class='event-widget-full-info']//div[contains(@ng-bind,'team1_name')]")).getAttribute("innerText"); //Имя команды на банере в окошке
+        String teamname2 = driver.findElement(By.xpath("//div[@class='event-widget-full-info']//div[contains(@ng-bind,'team2_name')]")).getAttribute("innerText"); //Имя команды на банере в окошке
         String team1 = Stash.getValue(keyTeam1);
         String team2 = Stash.getValue(keyTeam2);
         if (CommonStepDefs.stringParse(teamname1+teamname2).equals(CommonStepDefs.stringParse(team1 + team2))) {
@@ -153,7 +153,7 @@ public class DayEventsPage extends AbstractPage {
             for (WebElement event : allEvents) {
                 Thread.sleep(1000);
                 event.click();
-                event.getText();
+                event.getAttribute("innerText");
                 LOG.info("Событие добавилось в купон");
                 counter++;
                 if (counter >= countBet) break;

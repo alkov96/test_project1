@@ -53,7 +53,7 @@ public class AuthenticationMainPage extends AbstractPage {
         String key = param.equals("бонусов") ? "balanceBonusKey" : "balanceKey";
         List<WebElement> balanceElement = getWebDriver().findElements(top_balance);
 
-        String balance = (balanceElement.isEmpty()) ? "0" : balanceElement.get(0).getText();
+        String balance = (balanceElement.isEmpty()) ? "0" : balanceElement.get(0).getAttribute("innerText");
         Stash.put(key, balance);
         LOG.info("Сохранили в память key [" + key + "] <== value [" + balance + "]");
     }
@@ -77,7 +77,7 @@ public class AuthenticationMainPage extends AbstractPage {
             LOG.info("Нашли кнопку ["
                     + PageFactory.getWebDriver().findElements(By.xpath(xpathGoTSUPIS))
                     .stream().filter(WebElement::isDisplayed).findFirst().get()
-                    .getText().replaceAll("\n", "").trim()
+                    .getAttribute("innerText").replaceAll("\n", "").trim()
                     + "] и нажимаем на крест");
             PageFactory.getWebDriver().findElements(By.xpath(xpathCross)).stream().filter(WebElement::isDisplayed).findFirst().get().click();
         }catch (Exception e){

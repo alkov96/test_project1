@@ -87,7 +87,7 @@ public class MobileDatepickerPage extends AbstractPage {
             e.printStackTrace();
         }
         ZoneId defaultZoneId = ZoneId.systemDefault();
-         String actualString = driver.findElement(By.xpath("//div[@class='datepicker-header']")).getText();
+         String actualString = driver.findElement(By.xpath("//div[@class='datepicker-header']")).getAttribute("innerText");
          LOG.info("На экране [" + actualString + "]");
          DateFormat dateFormat1 = new SimpleDateFormat("dd.MM.yyyy");
          DateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
