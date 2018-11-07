@@ -64,6 +64,9 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//span[@class='btn btn_full-width']")
     protected WebElement clearCoupon;
 
+    @ElementTitle("Тип купона")
+    @FindBy(xpath = "//div[contains(@class,'coupon__types')]//li[contains(@class,'selected')]")
+    private WebElement couponType;
 
     static By expressBonusText = xpath("//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]");
     static By expressBonusLink = xpath("//div[contains(@class,'coupon-bet_offer')]//a[contains(@class,'coupon-bet__link')]");
@@ -469,7 +472,7 @@ public class CouponPage extends AbstractPage {
         LOG.info("Возвращаемся к списку событий в купоне");
         driver.findElement(xpath("//span[text()='Купон']")).click();
 
-        String typeCoupon = driver.findElement(xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]")).getAttribute("innerText");
+        String typeCoupon = couponType.getAttribute("innerText");
         int expectedCouponSize = typeCoupon.contains("Ординар") ? (sizeCoupon - 1) : 0;
 
         LOG.info("Жмём 'Заключить пари'");
@@ -676,8 +679,7 @@ public class CouponPage extends AbstractPage {
 
     @ActionTitle("проверяет что текущий тип купона")
     public void checkCurrentTypeCoupon(String expectedType){
-        String currentType = getWebDriver().findElement(
-                xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'selected')]")).getAttribute("innerText");
+        String currentType = couponType.getAttribute("innerText");
         assertTrue(
                 "Текущий тип купона неправильный! Ожидалось " + expectedType + ", а на самом деле " + currentType,
                 currentType.trim().equalsIgnoreCase(expectedType));
