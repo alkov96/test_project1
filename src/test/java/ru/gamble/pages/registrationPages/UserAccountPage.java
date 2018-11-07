@@ -98,6 +98,10 @@ public class UserAccountPage extends AbstractPage{
             value = aTable.get(VALUE);
             saveVariable = aTable.get(SAVE_VALUE);
 
+            if (value.matches("[A-Z]*")){
+                value=Stash.getValue(value);
+            }
+
             if (inputField.contains(DATEOFBIRTH)) {
                 try {
                     date = outputFormat.format(inputFormat.parse(enterDate(value)));
