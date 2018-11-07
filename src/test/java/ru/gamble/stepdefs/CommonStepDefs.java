@@ -1070,7 +1070,7 @@ Thread.sleep(1500);
         Thread.sleep(1500);
         String phone = Stash.getValue(keyPhone);
 
-        String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getText();
+        String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getAttribute("innerText");
         Stash.put(keyId,id);
 
 
@@ -1703,7 +1703,7 @@ Thread.sleep(1500);
     @Когда("^записываем значение баланса бонусов в \"([^\"]*)\"$")
     public void writeValueOfBonusBalanceIn(String bonusKey) {
         List<WebElement> bonusElement = PageFactory.getWebDriver().findElements(By.xpath("//span[contains(@class,'subMenuBonus bonusmoney-text')]"));
-        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getText().replaceAll("[^0-9.]","");
+        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getAttribute("innerText").replaceAll("[^0-9.]","");
         Stash.put(bonusKey,bonus);
         LOG.info("Записали в key [" + bonusKey + "] <== value [" + bonus + "]");
     }
@@ -1711,7 +1711,7 @@ Thread.sleep(1500);
     @Когда("^записываем значение баланса в \"([^\"]*)\"$")
     public void writeValueOfBalanceIn(String balanceKey) {
         List<WebElement> balanceElement = PageFactory.getWebDriver().findElements(By.id("topPanelWalletBalance"));
-        String balance = balanceElement.isEmpty() ? "0" : balanceElement.get(0).getText();
+        String balance = balanceElement.isEmpty() ? "0" : balanceElement.get(0).getAttribute("innerText");
         Stash.put(balanceKey,balance);
         LOG.info("Записали в key [" + balanceKey + "] <== value [" + balance + "]");
     }
@@ -1720,7 +1720,7 @@ Thread.sleep(1500);
     public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
         new WebDriverWait(PageFactory.getWebDriver(),10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[@class='userBalance']")));
         try {
-            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"));
             BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
             BigDecimal withdrawnAmount = new BigDecimal(Stash.getValue(amountKey).toString());
             BigDecimal expectedBalance = previousBalance.subtract(withdrawnAmount);
@@ -1729,7 +1729,7 @@ Thread.sleep(1500);
            throw new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
         }
         BigDecimal actualBalance,previousBalance,withdrawnAmount,expectedBalance;
-        actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+        actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"));
         previousBalance = new BigDecimal((String) Stash.getValue(balanceKey));
         withdrawnAmount = new BigDecimal((String) Stash.getValue(amountKey));
         expectedBalance = previousBalance.subtract(withdrawnAmount);

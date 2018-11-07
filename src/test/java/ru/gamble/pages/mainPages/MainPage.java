@@ -145,7 +145,7 @@ public class MainPage extends AbstractPage {
             if (!games.isEmpty()) {
                 break;
             }
-            if(allSport.get(0).getText().contains("Подходящих игр не найдено")){throw new AutotestError("Ошибка! Подходящих игр не найденою");}
+            if(allSport.get(0).getAttribute("innerText").contains("Подходящих игр не найдено")){throw new AutotestError("Ошибка! Подходящих игр не найденою");}
             allSport.get(number).click();
 
             CommonStepDefs.workWithPreloader();
@@ -212,7 +212,7 @@ public class MainPage extends AbstractPage {
             if (!games.isEmpty()) {
                 break;
             }
-            if(allSport.get(0).getText().contains("Подходящих игр не найдено")) {
+            if(allSport.get(0).getAttribute("innerText").contains("Подходящих игр не найдено")) {
              throw new AutotestError("Ошибка! Подходящих игр не найдено");
             }
 
@@ -227,7 +227,7 @@ public class MainPage extends AbstractPage {
         WebElement selectGame = games.get(0).findElement(By.xpath("ancestor::tr"));
         String bannerTeam1 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).getAttribute("title").trim();
         String bannerTeam2 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div[1]")).getAttribute("title").trim();
-        float p1 = Float.valueOf(selectGame.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div[1]/span")).getText());
+        float p1 = Float.valueOf(selectGame.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div[1]/span")).getAttribute("innerText"));
         LOG.info("Игра, на которой будем проверять добавление в купон из виджета БТ: " + bannerTeam1 + " - " + bannerTeam2);
         LOG.info("Коэффициент победы первой команды = " + p1);
         selectGame.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div[1]/span")).click();
@@ -264,21 +264,21 @@ public class MainPage extends AbstractPage {
 
             for(int i = 0; i < table.size(); i++) {
                 section = table.get(i);
-                if (main.get(i).getText().isEmpty() || main.get(i).getText() == null){main.get(i).click();}
-                String tmp = main.get(i).getText().toUpperCase();
+                if (main.get(i).getAttribute("innerText").isEmpty() || main.get(i).getAttribute("innerText") == null){main.get(i).click();}
+                String tmp = main.get(i).getAttribute("innerText").toUpperCase();
                 assertThat(tmp).as("Строка [" + tmp + "] не соответсвует [" + section + "]").contains(section);
-                LOG.info("Найден раздел новостей::" + main.get(i).getText());
+                LOG.info("Найден раздел новостей::" + main.get(i).getAttribute("innerText"));
             }
     }
 
     @ActionTitle("проверяет что дайджест новостей не пустой")
     public void verifiesThatNewsDigestsNotEmpty() {
         List<WebElement> digestList = PageFactory.getWebDriver().findElements(By.xpath("//a[@class='news-widget__item-inner']"))
-                .stream().filter(element -> !element.getText().isEmpty()).collect(Collectors.toList());
+                .stream().filter(element -> !element.getAttribute("innerText").isEmpty()).collect(Collectors.toList());
         assertThat(!digestList.isEmpty()).as("Ошибка! Не найден ни один дайджест в блоке новостей").isTrue();
 
         for(WebElement element: digestList){
-          LOG.info("Найдена новость::" + element.getText().replaceAll("\n", " ").replaceAll("\\?","\""));
+          LOG.info("Найдена новость::" + element.getAttribute("innerText").replaceAll("\n", " ").replaceAll("\\?","\""));
         }
     }
 
@@ -310,14 +310,14 @@ public class MainPage extends AbstractPage {
         List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
         WebElement coeff = Stash.getValue("coeffKey");
         for (int i = 1; i < 6; i++) {
-            previous = coeff.getText();
-            LOG.info("Переключаемся на '" + list.get((i*3)%7-1).getText() + "' формат отображения"); // рандомно берёт 1 тип из 6
+            previous = coeff.getAttribute("innerText");
+            LOG.info("Переключаемся на '" + list.get((i*3)%7-1).getAttribute("innerText") + "' формат отображения"); // рандомно берёт 1 тип из 6
             list.get((i*3)%7-1).click();
-            LOG.info("Текущее значение коэффициента : " + coeff.getText());
+            LOG.info("Текущее значение коэффициента : " + coeff.getAttribute("innerText"));
             Thread.sleep(350);
-            if (previous.equals(coeff.getText())){
+            if (previous.equals(coeff.getAttribute("innerText"))){
                 LOG.error("Формат отображения коэффициентов не изменился");
-                Assertions.fail("Формат отображения коэффициентов не изменился: " + previous +" " + coeff.getText());
+                Assertions.fail("Формат отображения коэффициентов не изменился: " + previous +" " + coeff.getAttribute("innerText"));
             }
         }
         list.get(0).click();
@@ -393,7 +393,7 @@ public class MainPage extends AbstractPage {
 
         List<String> sportsLanding = new ArrayList<>();
         driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).forEach(element->
-        sportsLanding.add(element.getText().replace("На ","")));
+        sportsLanding.add(element.getAttribute("innerText").replace("На ","")));
 
         //смотрим список всех спортов. ищем там нужный нам
         List<WebElement> allSport = driver.findElements(By.xpath("//div[@class='bets-widget lastMinutesBets']//li[contains(@class,'sport-tabs__item') and not(contains(@class,'no-link'))]"));
@@ -424,7 +424,7 @@ public class MainPage extends AbstractPage {
         if (Stash.asMap().containsKey("indexLandingSportKey")){
             index= Stash.getValue("indexLandingSportKey");
         }
-        LOG.info(driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).getText());
+        LOG.info(driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).getAttribute("innerText"));
         String sport = driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).getAttribute("href").substring(1);
         driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).get(index).click();
         wait.until(ExpectedConditions.urlContains(sport));
@@ -464,7 +464,7 @@ public class MainPage extends AbstractPage {
         WebElement hotBet = driver.findElements(By.xpath("//div[@class='bets-widget-table hot-bets']//tr[contains(@class,'bets-widget-table__bets')]")).get(0);
         String team1 = hotBet.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div")).getAttribute("title");
         String team2 = hotBet.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div")).getAttribute("title");
-        float p1 = Float.valueOf(hotBet.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div/span")).getText());
+        float p1 = Float.valueOf(hotBet.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div/span")).getAttribute("innerText"));
 
         LOG.info("Нажимаем на коэффициент к1 - победа первой коаманды в Гоячих Ставках");
         hotBet.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div/span")).click();

@@ -677,7 +677,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет что текущий тип купона")
     public void checkCurrentTypeCoupon(String expectedType){
         String currentType = getWebDriver().findElement(
-                xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]/span")).getText();
+                xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'selected')]")).getAttribute("innerText");
         assertTrue(
                 "Текущий тип купона неправильный! Ожидалось " + expectedType + ", а на самом деле " + currentType,
                 currentType.trim().equalsIgnoreCase(expectedType));

@@ -183,7 +183,7 @@ public class FooterPage extends AbstractPage {
                 requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
                 LOG.info("Текущая страница::" + driver.getCurrentUrl());
                 if(!requiredElements.isEmpty()){
-                    LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getText().replaceAll("\n", " "));
+                    LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getAttribute("innerText").replaceAll("\n", " "));
                     break;
                 }
                 driver.navigate().refresh();

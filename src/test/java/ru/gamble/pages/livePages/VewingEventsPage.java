@@ -97,7 +97,7 @@ public class VewingEventsPage extends AbstractPage {
             int gameNumber = hasVideo(sportCategory, gamesInSportCount, withVideo);
             //если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
             if (gameNumber != -1 && !gameIsAdding) {
-                String nameGamefull = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul/li/div/div/ul/li/div[1]/div[1]/div[1]")).get(gameNumber).findElement(By.xpath("../p")).getText();
+                String nameGamefull = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul/li/div/div/ul/li/div[1]/div[1]/div[1]")).get(gameNumber).findElement(By.xpath("../p")).getAttribute("innerText");
                 CommonStepDefs.addStash("nameGameKey",nameGamefull);
                 CommonStepDefs.addStash("typeGameKey",typeGame);
                 if (adding) {
@@ -179,7 +179,7 @@ public class VewingEventsPage extends AbstractPage {
         else {
             String nameOnLeftMenu =
                     driver.findElement(xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]" +
-                            "//p[contains(@class,'left-menu__list-item-games-teams')]")).getText();
+                            "//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");
             Assert.assertTrue(
                     "В левом меню выделена желтым неправильная игра. Вместо " + team1Name + " выделена " +nameOnLeftMenu,
                     CommonStepDefs.stringParse(nameOnLeftMenu).equals(team1Name));
@@ -223,7 +223,7 @@ public class VewingEventsPage extends AbstractPage {
             }
         }
         LOG.info("Смотрим что нужная игра выделена желтым в левом меню в общем списке игр");
-        String nameActiveGame = driver.findElement(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).getText();////название активной игр
+        String nameActiveGame = driver.findElement(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");////название активной игр
         if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameActiveGame))){
             flag=false;
             LOG.error("В ЛАЙВе игра на которую перешли не выделена активной в левом меню. Название активной игры:" + CommonStepDefs.stringParse(nameActiveGame) + ", а ожидалось" + CommonStepDefs.stringParse(team1Name));
@@ -400,7 +400,7 @@ public class VewingEventsPage extends AbstractPage {
                 if (gameList.size() > 0) {
                     for (WebElement game : gameList) {
                         game.findElement(By.xpath("//div[contains(@class, 'icon icon-video-tv')]"));
-                        LOG.info(game.getText().replaceAll("\n","]-["));
+                        LOG.info(game.getAttribute("innerText").replaceAll("\n","]-["));
                     }
                 }
 

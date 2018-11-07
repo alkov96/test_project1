@@ -72,8 +72,8 @@ public class MyBetting extends AbstractPage {
         LOG.info("Всего ставок::" + rows.size());
         LOG.info("Проверяем, что даты ставок попадают в диапазон");
         try {
-            firstDate = formatter1.parse(dates.get(0).getText());
-            lastDate = formatter1.parse(dates.get(1).getText());
+            firstDate = formatter1.parse(dates.get(0).getAttribute("innerText"));
+            lastDate = formatter1.parse(dates.get(1).getAttribute("innerText"));
             //***Преоборазуем дату из dd.MM.yy 00:00 в dd.MM.yy 23:59
             calendar.setTime(lastDate);
             calendar.add(Calendar.SECOND, 86399);
@@ -85,7 +85,7 @@ public class MyBetting extends AbstractPage {
             if(rows.size() > 0) {
                 for (WebElement row : rows) {
                     try {
-                        bidDate = formatter2.parse(row.findElement(xpath("./td[2]/div")).getText());
+                        bidDate = formatter2.parse(row.findElement(xpath("./td[2]/div")).getAttribute("innerText"));
                         assertThat(bidDate.after(firstDate) && bidDate.before(lastDate))
                                 .as("Дата не попадает в интервал::" + firstDate.toString() + "::" + bidDate + "::" + lastDate).isTrue();
                         LOG.info("Дата в интервале::" + firstDate.toString() + "::" + bidDate + "::" + lastDate);
@@ -108,7 +108,7 @@ public class MyBetting extends AbstractPage {
         int value = new Random().nextInt(6);
         List<WebElement> all_id = driver.findElements(xpath("//div[@ng-bind-html='bet.id | formatText:search']"));
         Thread.sleep(5000);
-        String id = all_id.get(value).getText().trim().toLowerCase();
+        String id = all_id.get(value).getAttribute("innerText").trim().toLowerCase();
         return id;
     }
 
@@ -157,7 +157,7 @@ public class MyBetting extends AbstractPage {
         driver.findElement(button).click();
         Thread.sleep(5000);
 
-        List<Float> summList = driver.findElements(by).stream().filter(WebElement::isDisplayed).map(element -> Float.valueOf(element.getText())).collect(Collectors.toList());
+        List<Float> summList = driver.findElements(by).stream().filter(WebElement::isDisplayed).map(element -> Float.valueOf(element.getAttribute("innerText"))).collect(Collectors.toList());
         sort_list_summ = summList.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList()).equals(summList);
         assertTrue("Список не отсортировался по сумме!",sort_list_summ);
 
@@ -196,7 +196,7 @@ public class MyBetting extends AbstractPage {
             LOG.info("Проверяем, что для выбранного типа исхода, отображаются только ставки с этим типом:: " + outcomeOfBet);
             for (WebElement row : rows) {
                 outcomeOfBetWeChoose = row.findElement(xpath("//td[4]/table[@class='table-inner']//tr/td[@class='table__body-cell table__head-cell_my-stakes-result']"))
-                        .getText();
+                        .getAttribute("innerText");
                 if (selectedOutcomeOfBet.equals("Все")){
                     break;                }
                 Assert.assertTrue("Для ставки с типом " + outcomeOfBet + " отображается тип " + outcomeOfBetWeChoose, outcomeOfBetWeChoose
@@ -232,7 +232,7 @@ public class MyBetting extends AbstractPage {
             List<WebElement> subIvens;
             if (rows.size() > 0) {
                 for (WebElement row : rows) {
-                    selectedOutcome = row.findElement(xpath(".//tr[contains(@class,'table')]/td[2]")).getText();
+                    selectedOutcome = row.findElement(xpath(".//tr[contains(@class,'table')]/td[2]")).getAttribute("innerText");
                     if (betType.contains("!")) {
                         assertThat(selectedOutcome).doesNotContain("Система");
                         assertThat(selectedOutcome).doesNotContain("Экспресс");
@@ -250,7 +250,7 @@ public class MyBetting extends AbstractPage {
                         assertThat(subIvens.size())
                                 .as("Ошибка! В типе пари [" + typeOfOutcome + "] меньше чем " + subIvens.size() + " пари").isGreaterThan(1);
                         for (WebElement subIvent : subIvens) {
-                            LOG.info(subIvent.getText().replaceAll("\n", " "));
+                            LOG.info(subIvent.getAttribute("innerText").replaceAll("\n", " "));
                         }
                     }
                 }
@@ -319,13 +319,13 @@ public class MyBetting extends AbstractPage {
         SimpleDateFormat formatNo = new SimpleDateFormat("dd.MM.yy");
         SimpleDateFormat formatYes = new SimpleDateFormat("dd.MM");
 
-        helpString.append(element.findElement(xpath(".//tr[contains(@class,'table')]/td[2]")).getText());
+        helpString.append(element.findElement(xpath(".//tr[contains(@class,'table')]/td[2]")).getAttribute("innerText"));
         String typeBet = (!helpString.toString().toLowerCase().contains("система") && !helpString.toString().toLowerCase().contains("экспресс")) ?
                 "ординар" : helpString.toString().toLowerCase();
         bet.setType(typeBet);
 
         helpString.setLength(0);
-        helpString.append(element.findElement(xpath("td[2]/div")).getText());
+        helpString.append(element.findElement(xpath("td[2]/div")).getAttribute("innerText"));
         index = helpString.indexOf(":");
         try {
             timeBet.append(helpString.substring(index - 2, index + 3));
@@ -338,7 +338,7 @@ public class MyBetting extends AbstractPage {
 
         element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-kef')]/div"))
                 .stream()
-                .forEach(el -> coefs.add(el.getText()));
+                .forEach(el -> coefs.add(el.getAttribute("innerText")));
 
         element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=1]"))
                 .stream()
@@ -348,7 +348,7 @@ public class MyBetting extends AbstractPage {
 
         element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=2]"))
                 .stream()
-                .forEach(el -> nameGames.add(el.getText()));
+                .forEach(el -> nameGames.add(el.getAttribute("innerText")));
 
         bet.setCoefs(coefs);
         bet.setDates(dateGames);
@@ -359,7 +359,7 @@ public class MyBetting extends AbstractPage {
         helpString.append(element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[2]")).getAttribute("class"));
 
         sum.append(helpString.toString().contains("hide") ? "Б" : "Р");
-        sum.insert(0, element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[1]")).getText() + " ");
+        sum.insert(0, element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[1]")).getAttribute("innerText") + " ");
         bet.setSum(sum.toString());
 
         return bet;
