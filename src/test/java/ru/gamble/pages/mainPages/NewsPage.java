@@ -43,8 +43,8 @@ public class NewsPage extends AbstractPage {
                 .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         assertThat(tabsNews.size()).as("Ошибка! Верхняя линейка вкладок не найдена").isGreaterThan(0);
         for(WebElement tab: tabsNews){
-            if(!tab.getText().equals("")){
-                LOG.info("Найдено::" + tab.getText());
+            if(!tab.getAttribute("innerText").equals("")){
+                LOG.info("Найдено::" + tab.getAttribute("innerText"));
             }
         }
     }
@@ -64,7 +64,7 @@ public class NewsPage extends AbstractPage {
                 LOG.info("Нажимаем кнопку [Ещё]");
                 driver.findElement(By.xpath(xpathButtonMore)).click();
             }
-            LOG.info("Собираем список всех дайджестов на вкладке::" + tabsNews.get(i).getText());
+            LOG.info("Собираем список всех дайджестов на вкладке::" + tabsNews.get(i).getAttribute("innerText"));
             tabsNews.get(i).click();
             //Для ожидание прогрузки
             workWithPreloader();
@@ -73,8 +73,8 @@ public class NewsPage extends AbstractPage {
             assertThat(dagestsNews.size()).as("Ошибка! Дайджесты не найдены").isGreaterThan(0);
 
             for(WebElement dagest: dagestsNews){
-                if(!dagest.getText().equals("")){
-                    actualText = dagest.getText();
+                if(!dagest.getAttribute("innerText").equals("")){
+                    actualText = dagest.getAttribute("innerText");
                     LOG.info("Найдено::" + actualText);
                 }
             }

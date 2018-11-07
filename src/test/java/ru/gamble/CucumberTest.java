@@ -32,7 +32,8 @@ public class CucumberTest {
             screenshot();
         }
 
-        @Attachment(value = "Page screenshot", type = "image/png")
+//        @Attachment(value = "Page screenshot", type = "image/png")
+        @Attachment(value = "Page screenshot", type = "image/jpeg")
         public byte[] saveScreenshot(byte[] screenShot) {
             return screenShot;
         }

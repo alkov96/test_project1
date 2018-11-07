@@ -16,6 +16,7 @@ import cucumber.api.java.ru.Когда;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -1127,7 +1128,7 @@ Thread.sleep(1500);
         Thread.sleep(1500);
         String phone = Stash.getValue(keyPhone);
 
-        String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getText();
+        String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getAttribute("innerText");
         Stash.put(keyId,id);
 
 
@@ -1681,20 +1682,13 @@ Thread.sleep(1500);
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
-    /**
-     * это когда активные опции сайта в параметре. когда паараметр удалт - удалить этот before и иуспользовать только тот before что с rememberEnabledFeatures
-     */
-    @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
-    public void saveRegistrationValue(){
-        rememberActive("ACTIVE");
-    }
 
     /**
      * это когда активне опции сайта в отдельной таблице
      */
     @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
     public void saveRegistrationValue2(){
-        rememberEnabledFeatures("ENABLEDFEATURES");
+        rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
 
     @Before()
@@ -1730,67 +1724,11 @@ Thread.sleep(1500);
     }
 
     /**
-     * когда активные опции сайта в одном параметре
-     */
-    @Когда("^запоминаем значение активных опций сайта в \"([^\"]*)\"$")
-    public void rememberActive (String activeOptionKey){
-        String activeOpt = getActiveOptions();
-        Stash.put(activeOptionKey,activeOpt);
-        LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
-    }
-
-    private String getActiveOptions(){
-        return workWithDBgetResult("SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'", "value");
-    }
-
-    ///////////////////////////////////
-
-
-    /**
-     * когда активные опции сайта в одном параметре
-     * @param key - где хранятся старые активные опции
-     */
-    @Когда("^редактируем активные опции сайта, а старое значение сохраняем в \"([^\"]*)\"$")
-    public void rememberActiveAndOffOption(String key,DataTable dataTable) {
-        String sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        String activeOpt = workWithDBgetResult(sqlRequest, "value");
-        Stash.put(key, activeOpt);
-
-        Map<String,String> table = dataTable.asMap(String.class,String.class);
-        for (Map.Entry<String, String> entry : table.entrySet()) {
-            String option = entry.getKey();
-            if (entry.getValue().equals("true") && !activeOpt.contains(option)) {
-                activeOpt = activeOpt + ", " + option;
-                continue;
-            }
-            else if (activeOpt.contains(option) && entry.getValue().equals("true")) {continue;}
-
-            activeOpt = activeOpt.replaceAll("[', '|',']"  + option , "");
-            activeOpt = activeOpt.replaceAll(option + "[', '|',']"   , "");
-            activeOpt = activeOpt.replaceAll(",+"   , ",");
-            LOG.info("Удаление активной опций сайта " + option);
-        }
-
-        activeOpt = activeOpt.trim();
-        activeOpt = activeOpt.substring(activeOpt.length() - 1).equals(",") ? activeOpt.substring(0, activeOpt.length() - 1) : activeOpt;
-        sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
-        workWithDB(sqlRequest);
-
-        sqlRequest = "SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'";
-        activeOpt = workWithDBgetResult(sqlRequest, "value");
-        LOG.info("СЕЙЧАС активные опции сайта [" + activeOpt + "]");
-    }
-
-
-    /**
      * когда активные опции сайта в таблице. когда параметр удалят - использоватеь этот метод вместо старого (rememberActiveAndOffOption)
      * но не забыть поменять Когда
      */
     @Когда("^редактируем некоторые активные опции сайта")
     public void rememberActiveOption(DataTable dataTable) {
-
-//        Stash.put(key,activeOpt);
-//
         StringBuilder optionTrue = new StringBuilder();
         StringBuilder optionFalse = new StringBuilder();
 
@@ -1823,12 +1761,12 @@ Thread.sleep(1500);
      */
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
     public void revertEnabledFeatures(String key){
-        Map<String,String> oldEnabledFeatures = Stash.getValue(key);
+        Map<String,String> oldEnabledFeatures = (HashMap)Stash.getValue(key);
         StringBuilder optionFalse = new StringBuilder();
         StringBuilder optionTrue = new StringBuilder();
         for (Map.Entry<String, String> entry : oldEnabledFeatures.entrySet()) {
             if (entry.getValue().equals("1")) {
-                optionTrue.append(",'"+entry.getKey() + "'");
+                optionTrue.append(",'" + entry.getKey() + "'");
                 LOG.info("Добавление активной опций сайта " + entry.getKey());
             }
             else {
@@ -1849,36 +1787,32 @@ Thread.sleep(1500);
         "\n!!!!!!!!!!!!!!!!!\nCтало:" + activeOpt, activeOpt.equals(oldEnabledFeatures));
     }
 
-    /**
-     * когда активные опции сайта в одном параметре
-     * @param key - где хранятся старые активные опции
-     *            когда уберут этот параметр - вместо этого метода ВЕЗДЕ использовать revertEnabledFeatures
-     */
-    public void changeActive(String key) {
-        String activeOpt = Stash.getValue(key) == null ? "back_call, remove_limits_btn, identification_with_euroset, identification_with_courier, dentification_with_video, identification_with_wave" : Stash.getValue(key);
-        Stash.put(key,activeOpt);
-        String sqlRequest = "UPDATE gamebet.`params` SET value='" + activeOpt + "' WHERE NAME='ENABLED_FEATURES'";
-        LOG.info("Возвращаем активные значения сайта =>[" + activeOpt + "]");
-        workWithDB(sqlRequest);
-    }
+
 
     /**
-     * сейчас активные опции сайта - это параметр. а когда будет только таблица - тут, в обоих after сделать использование revertEnabledFeatures вместо changeActive
+     * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
      */
     @After(value = "@NewUserRegistration_C36189,@ExpressBonus_C39773")
     public void returnRegistrationValueWithScreenshot(Scenario scenario){
-        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-        changeActive("ACTIVE");
-        final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
-        scenario.embed(screenshot, "image/png");
+        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
+        revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
+        if(scenario.isFailed()) {
+            final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
+            scenario.embed(screenshot, "image/jpeg");
+        }
         closeBrowser();
     }
 
+
+    /**
+     * Возвращаем активные опции сайста в исходное положение до тестов
+     * @param scenario
+     */
     @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
     public void returnRegistrationValue(Scenario scenario){
-        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-        changeActive("ACTIVE");
+        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
+        revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
 
 
@@ -1916,7 +1850,7 @@ Thread.sleep(1500);
     @Когда("^записываем значение баланса бонусов в \"([^\"]*)\"$")
     public void writeValueOfBonusBalanceIn(String bonusKey) {
         List<WebElement> bonusElement = PageFactory.getWebDriver().findElements(By.xpath("//span[contains(@class,'subMenuBonus bonusmoney-text')]"));
-        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getText().replaceAll("[^0-9.]","");
+        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getAttribute("innerText").replaceAll("[^0-9.]","");
         Stash.put(bonusKey,bonus);
         LOG.info("Записали в key [" + bonusKey + "] <== value [" + bonus + "]");
     }
@@ -1924,7 +1858,7 @@ Thread.sleep(1500);
     @Когда("^записываем значение баланса в \"([^\"]*)\"$")
     public void writeValueOfBalanceIn(String balanceKey) {
         List<WebElement> balanceElement = PageFactory.getWebDriver().findElements(By.id("topPanelWalletBalance"));
-        String balance = balanceElement.isEmpty() ? "0" : balanceElement.get(0).getText();
+        String balance = balanceElement.isEmpty() ? "0" : balanceElement.get(0).getAttribute("innerText");
         Stash.put(balanceKey,balance);
         LOG.info("Записали в key [" + balanceKey + "] <== value [" + balance + "]");
     }
@@ -1933,7 +1867,7 @@ Thread.sleep(1500);
     public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
         new WebDriverWait(PageFactory.getWebDriver(),10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[@class='userBalance']")));
         try {
-            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+            BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"));
             BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
             BigDecimal withdrawnAmount = new BigDecimal(Stash.getValue(amountKey).toString());
             BigDecimal expectedBalance = previousBalance.subtract(withdrawnAmount);
@@ -1942,7 +1876,7 @@ Thread.sleep(1500);
            throw new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
         }
         BigDecimal actualBalance,previousBalance,withdrawnAmount,expectedBalance;
-        actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getText());
+        actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"));
         previousBalance = new BigDecimal((String) Stash.getValue(balanceKey));
         withdrawnAmount = new BigDecimal((String) Stash.getValue(amountKey));
         expectedBalance = previousBalance.subtract(withdrawnAmount);
@@ -2026,8 +1960,6 @@ Thread.sleep(1500);
                 .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
                 .connect();
     }
-
-
 
     @Когда("^вычленяем из названия игры одно слово \"([^\"]*)\" \"([^\"]*)\"$")
     public void oneWordSearch(String keySearch,String type){

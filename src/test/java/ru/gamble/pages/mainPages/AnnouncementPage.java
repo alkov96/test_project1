@@ -44,8 +44,8 @@ public class AnnouncementPage extends AbstractPage {
         assertThat(announcementsList.size()).as("Ошибка! Анонсы не найдены").isGreaterThan(0);
 
         for(WebElement announcement: announcementsList){
-            if(!announcement.getText().equals("")){
-                actualText = announcement.getText();
+            if(!announcement.getAttribute("innerText").equals("")){
+                actualText = announcement.getAttribute("innerText");
                 LOG.info("Найдено::" + actualText);
             }
         }

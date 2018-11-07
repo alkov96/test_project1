@@ -62,7 +62,7 @@ public class ServiceMessagesPage extends AbstractPage {
         }
         int pageCount = 0;
         Pattern pat = Pattern.compile("[-]?[0-9]+(.[0-9]+)?");
-        Matcher matcher = pat.matcher(maxPagesText.getText());
+        Matcher matcher = pat.matcher(maxPagesText.getAttribute("innerText"));
         while (matcher.find()) {
             pageCount = Integer.parseInt(matcher.group());
         }

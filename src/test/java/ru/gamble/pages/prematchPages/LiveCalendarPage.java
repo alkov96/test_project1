@@ -55,7 +55,7 @@ public class LiveCalendarPage extends AbstractPage {
             try {
                 waitForElementPresent(By.xpath("//div[contains(@class,'livecal-table__coefficient')]"), 3);
             }catch (Exception e){
-                LOG.info("На странице [" + allDaysPages.get(tryPage).getText() + "] нет событий");
+                LOG.info("На странице [" + allDaysPages.get(tryPage).getAttribute("innerText") + "] нет событий");
             }
             List<WebElement> correctCoeffs = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='table livecal-table ng-scope']/div[contains(text(), '" + coeff + "')]"));
             if (correctCoeffs.size()>0) {
@@ -116,7 +116,7 @@ public class LiveCalendarPage extends AbstractPage {
                 coefficients.get(num).click();
                 LOG.info("Ожидаем прогрузки коеффициента.");
                 new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathCoefficient)));
-                LOG.info(coefficients.get(num).findElement(By.xpath(xpathCoefficient)).getText());
+                LOG.info(coefficients.get(num).findElement(By.xpath(xpathCoefficient)).getAttribute("innerText"));
                 coefficients.remove(num);
                 count++;
             }
@@ -160,7 +160,7 @@ public class LiveCalendarPage extends AbstractPage {
                 return;
             }
             el.click();
-            LOG.info("Нажали на::[" + el.getText() + "]");
+            LOG.info("Нажали на::[" + el.getAttribute("innerText") + "]");
         }
         throw new AutotestError("Ошибка! Недостаточно событий. Ожидали[" + numberOfIvents + "], а фактически[" + actualIvents + "]");
     }

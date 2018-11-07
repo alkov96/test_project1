@@ -120,14 +120,14 @@ public class PopUPLCPage extends AbstractPage {
                 "//label[contains(@for,'withdraw-method')]/following-sibling::div/span[1]"));
         List<String> minSumStrings = new ArrayList<>();
         Pattern pattern = Pattern.compile("(?u)[^0-9]");
-        minSumElements.forEach(element -> minSumStrings.add(pattern.matcher(element.getText()).replaceAll("")));
+        minSumElements.forEach(element -> minSumStrings.add(pattern.matcher(element.getAttribute("innerText")).replaceAll("")));
         String errorMessage;
         String errorMessageSum;
         LOG.info("Кликаем на каждый доступный способ вывода и проверяем, что появляет ошибка лимитов.");
         for (int i = 0; i < minSumElements.size(); i++) {
             minSumElements.get(i).findElement(By.xpath("../../label/div")).click();//кликаем на способ вывода
             workWithPreloader();
-            errorMessage = driver.findElement(By.xpath("//div[@class='money-in-out__messages']/div[contains(@class, 'money-in-out__message money-in-out__message-error')]")).getText();
+            errorMessage = driver.findElement(By.xpath("//div[@class='money-in-out__messages']/div[contains(@class, 'money-in-out__message money-in-out__message-error')]")).getAttribute("innerText");
             errorMessageSum = pattern.matcher(errorMessage).replaceAll("");
             Assert.assertEquals(minSumStrings.get(i), errorMessageSum);
         }
@@ -155,14 +155,14 @@ public class PopUPLCPage extends AbstractPage {
             waitToPreloader();
             workWithPreloader();
             try {
-                ndfl = driver.findElement(By.xpath("//div[contains(@class,'money-in-out__line')]/p/span")).getText();
+                ndfl = driver.findElement(By.xpath("//div[contains(@class,'money-in-out__line')]/p/span")).getAttribute("innerText");
                 LOG.info("НДФЛ [" + ndfl + "]");
             } catch (Exception e) {
                 throw new AutotestError("Ошибка! Не найден НДФЛ");
             }
-            sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getText().replace(" ", "").replace(",", ".");
+            sumOnButton = driver.findElement(By.xpath("//button[@type = 'submit']/span[1]/span[1]")).getAttribute("innerText").replace(" ", "").replace(",", ".");
             LOG.info("Cумма на кнопке [" + sumOnButton + "]");//сумма на кнопке
-            linkBalance = driver.findElement(By.xpath("//div[@class='smallJsLink__wrapper']/span[1]")).getText().replace(" ", "");//сумма баланса на ссылке;
+            linkBalance = driver.findElement(By.xpath("//div[@class='smallJsLink__wrapper']/span[1]")).getAttribute("innerText").replace(" ", "");//сумма баланса на ссылке;
             ndflFloat = Float.parseFloat(ndfl);
             linkBalanceFloat = Float.parseFloat(linkBalance);
             sumOnButtonFloat = Float.parseFloat(sumOnButton);
