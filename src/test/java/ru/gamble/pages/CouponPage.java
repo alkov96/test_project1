@@ -155,8 +155,8 @@ public class CouponPage extends AbstractPage {
                     driver.findElements(currentExpressBonus).isEmpty());
         } else {
             assertTrue(
-                    "Неправильный размер экспресс-бонуса (или его вообще нет)   ||| " + driver.findElement(currentExpressBonus).getText() + " |||",
-                    driver.findElement(currentExpressBonus).getText().contains(listBets.size() + "%")); // проверка корректности текста
+                    "Неправильный размер экспресс-бонуса (или его вообще нет)   ||| " + driver.findElement(currentExpressBonus).getAttribute("innerText") + " |||",
+                    driver.findElement(currentExpressBonus).getAttribute("innerText").contains(listBets.size() + "%")); // проверка корректности текста
         }
 
     }
@@ -182,8 +182,8 @@ public class CouponPage extends AbstractPage {
                     "Нет текста про экспресс-бонус!!! ",
                     driver.findElements(expressBonusText).isEmpty());
             assertTrue(
-                    "Неправильная текст в описании экспресс-бонуса. Или его вообще нет   ||| " + driver.findElement(expressBonusText).getText() + " |||",
-                    driver.findElement(expressBonusText).getText().contains("+" + (listBets.size() + 1) + "% к выигрышу")); // проверка корректности текста
+                    "Неправильная текст в описании экспресс-бонуса. Или его вообще нет   ||| " + driver.findElement(expressBonusText).getAttribute("innerText") + " |||",
+                    driver.findElement(expressBonusText).getAttribute("innerText").contains("+" + (listBets.size() + 1) + "% к выигрышу")); // проверка корректности текста
             assertTrue(
                     "Неправильная ссылка на описание экспресс-бонуса. Или ссылки вообще нет  ||| " + driver.findElement(expressBonusLink).getAttribute("href") + " |||",
                     driver.findElement(expressBonusLink).getAttribute("href").contains("/rules/express-bonus")); // проверка корректности ссылки
@@ -205,7 +205,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, совпадают ли события в купоне с ожидаемыми из")
     public void bannerAndTeams(String team1key, String team2key) {
         WebDriver driver = PageFactory.getDriver();
-        String couponGame = driver.findElement(xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']")).getText();//cuponGame - наше добавленные события в купоне.
+        String couponGame = driver.findElement(xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']")).getAttribute("innerText");//cuponGame - наше добавленные события в купоне.
         String team1 = Stash.getValue(team1key);
         String team2 = Stash.getValue(team2key);
         if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(couponGame))) {
@@ -218,7 +218,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, совпадает ли исход в купоне с ожидаемым")
     public void checkIshod(String ishodKey) {
         WebDriver driver = PageFactory.getDriver();
-        String ishod = driver.findElement(xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getText().split("\n")[1];
+        String ishod = driver.findElement(xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getAttribute("innerText").split("\n")[1];
         String ishodName = Stash.getValue(ishodKey);//ожидаемое название исхода
         switch (ishod) {
             case "П1":
@@ -241,9 +241,9 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String coefString = Stash.getValue(keyOutcome).toString();
         float coef = Float.valueOf(coefString);
-        float coefCoupon = Float.valueOf(driver.findElement(xpath("//div[@class='coupon-bet__coeffs']/span[2]")).getText());//Кэфицент в купоне
+        float coefCoupon = Float.valueOf(driver.findElement(xpath("//div[@class='coupon-bet__coeffs']/span[2]")).getAttribute("innerText"));//Кэфицент в купоне
         WebElement oldWebElement = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff-strikeout')]"));
-        float oldCoef = oldWebElement.isDisplayed() ? Float.valueOf(oldWebElement.getText().trim()) : coefCoupon;
+        float oldCoef = oldWebElement.isDisplayed() ? Float.valueOf(oldWebElement.getAttribute("innerText").trim()) : coefCoupon;
         if (coef != coefCoupon && coef != oldCoef) {
             Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCoupon + coef);
         } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon + " <=> " + coef);
@@ -321,10 +321,10 @@ public class CouponPage extends AbstractPage {
                     .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
             if (!oldCoef.isEmpty()) break;
         }
-        float coefCoupon = Float.valueOf(allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[2]")).getText());
+        float coefCoupon = Float.valueOf(allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[2]")).getAttribute("innerText"));
         String oldString = allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[1]")).getAttribute("class");
         float coefOld;
-        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[1]")).getText());
+        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[1]")).getAttribute("innerText"));
         LOG.info("Старый коэф: " + coefOld);
         LOG.info("Текущий коэф: " + coefCoupon);
         return coefCoupon - coefOld;
@@ -372,7 +372,7 @@ public class CouponPage extends AbstractPage {
         WebElement selectType = driver.findElement(xpath("//span[contains(@class,'coupon-tabs__item-link coupon-text-h') " +
                 "and normalize-space(translate(text(),'" + type.toLowerCase() + "','" + type.toUpperCase() + "'))='" + type.toUpperCase() + "']"));
         //этот длинный xpath потому что название типа может быть с большой буквы, или с маленькой, для разного типа по-разному. и в элементе getText() вместе с пробелами идет
-        LOG.info("Переключаем тип ставки на '" + selectType.getText() + "'");
+        LOG.info("Переключаем тип ставки на '" + selectType.getAttribute("innerText") + "'");
         selectType.click();
     }
 
@@ -383,7 +383,7 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("вводит сумму ставки система")
     public void inputBet(String less) throws InterruptedException {
         BigDecimal sum;
-        int countExp = Integer.valueOf(current_type_of_system.getText().replaceAll("[^0-9?!]", ""));
+        int countExp = Integer.valueOf(current_type_of_system.getAttribute("innerText").replaceAll("[^0-9?!]", ""));
         String sumBet = less.contains("меньше") ? String.valueOf(countExp - 1) : String.valueOf(countExp);
         LOG.info("Вводим сумму ставки : [" + sumBet + "]");
         fillField(couponInputSystem, sumBet);
@@ -437,7 +437,7 @@ public class CouponPage extends AbstractPage {
         Thread.sleep(10000);
         List<WebElement> errorMessages = driver.findElements(xpath("//div[contains(@class,'coupon__message_error')]//span"));
         for (WebElement error : errorMessages) {
-            if (error.getText().contains(expectedError)) return;
+            if (error.getAttribute("innerText").contains(expectedError)) return;
         }
         Assert.fail("В купоне нет ожидаемого сообщения об ошибке [" + expectedError + "]");
     }
@@ -469,7 +469,7 @@ public class CouponPage extends AbstractPage {
         LOG.info("Возвращаемся к списку событий в купоне");
         driver.findElement(xpath("//span[text()='Купон']")).click();
 
-        String typeCoupon = driver.findElement(xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]/span")).getText();
+        String typeCoupon = driver.findElement(xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]")).getAttribute("innerText");
         int expectedCouponSize = typeCoupon.contains("Ординар") ? (sizeCoupon - 1) : 0;
 
         LOG.info("Жмём 'Заключить пари'");
@@ -507,7 +507,7 @@ public class CouponPage extends AbstractPage {
         sumBet = new BigDecimal((String) Stash.getValue("sumKey")).setScale(2, RoundingMode.HALF_UP);
         String currentNumber;
         while (count > 0) {
-            currentNumber = driver.findElements(balance).stream().filter(WebElement::isDisplayed).findFirst().get().getText()
+            currentNumber = driver.findElements(balance).stream().filter(WebElement::isDisplayed).findFirst().get().getAttribute("innerText")
                     .replace("Б", "").trim();
 
             currentBalance = new BigDecimal(currentNumber).setScale(2, RoundingMode.HALF_UP);
@@ -539,12 +539,12 @@ public class CouponPage extends AbstractPage {
         WebElement dropdownOpt = driver.findElement(xpath("//div[contains(@class,'coupon__system-select')]"));
         List<WebElement> systemTypes = dropdownOpt.findElements(xpath("div//li[contains(@clas,'coupon__dropdown-item')]"));
         WebElement openList = dropdownOpt.findElement(xpath("div/div[contains(@class,'custom-select__placeholder')]"));
-        int countExp = Integer.valueOf(current_type_of_system.getText().replaceAll("[^0-9?!]", ""));
+        int countExp = Integer.valueOf(current_type_of_system.getAttribute("innerText").replaceAll("[^0-9?!]", ""));
         int count;
         for (WebElement type : systemTypes) {
             openList.click();
             type.click();
-            count = Integer.valueOf(current_type_of_system.getText().replaceAll("[^0-9?!]", ""));
+            count = Integer.valueOf(current_type_of_system.getAttribute("innerText").replaceAll("[^0-9?!]", ""));
             assertFalse(
                     "При переключении разбиения системы не меняется общее количество экспрессов. Было " + countExp + ", стало " + count,
                     count == countExp);
@@ -582,7 +582,7 @@ public class CouponPage extends AbstractPage {
         List<WebElement> notifications = driver.findElements(xpath("//div[contains(@class,'bet-notification__suggestion_visible') and @trans]"));
         notifications.addAll(driver.findElements(xpath("//div[contains(@class,'bet-notification__warning_visible')]/span")));
         for (WebElement element : notifications) {
-            LOG.info(element.getText());
+            LOG.info(element.getAttribute("innerText"));
         }
     }
 
@@ -618,15 +618,15 @@ public class CouponPage extends AbstractPage {
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
         WebElement coeff = driver.findElement(xpath("//span[contains(@class,'coupon-bet__coeff') and not (contains (@class, 'strikeout'))]"));
-        previous = coeff.getText();
+        previous = coeff.getAttribute("innerText");
         preferences.click();
         List<WebElement> list_of_pref = driver.findElements(By.cssSelector("span.prefs__key"));
 
-        LOG.info("Переключаемся на '" + list_of_pref.get(2).getText() + "' формат отображения");
+        LOG.info("Переключаемся на '" + list_of_pref.get(2).getAttribute("innerText") + "' формат отображения");
         list_of_pref.get(2).click();
-        LOG.info("Текущее значение коэффициента : " + coeff.getText());
+        LOG.info("Текущее значение коэффициента : " + coeff.getAttribute("innerText"));
         Thread.sleep(350);
-        if (previous.equals(coeff.getText())) {
+        if (previous.equals(coeff.getAttribute("innerText"))) {
             LOG.error("Формат отображения коэффициентов не изменился");
             Assertions.fail("Формат отображения коэффициентов не изменился");
         }
@@ -699,7 +699,7 @@ public class CouponPage extends AbstractPage {
                 selectTab.click();
                 Assert.assertTrue(
                         "Не удался переход на нужную вкладку. Сейчас вместо нужной, активна кладка " +
-                                PageFactory.getDriver().findElement(xpath("//ul[contains(@class,'coupon-tabs')]/li[contains(@class,'selected')]/span")).getText(),
+                                PageFactory.getDriver().findElement(xpath("//ul[contains(@class,'coupon-tabs')]/li[contains(@class,'selected')]/span")).getAttribute("innerText"),
                         selectTab.findElement(By.xpath("ancestor::li")).getAttribute("class").contains("selected"));
                 CommonStepDefs.workWithPreloader();
             } catch (NoSuchElementException e) {
@@ -731,7 +731,7 @@ public class CouponPage extends AbstractPage {
         tryToClick(driver.findElement(filtrHeadXpath).
                 findElement(By.xpath("following-sibling::div[contains(@class,'scroll-contain')]//span[normalize-space(text())='" + filter + "']")));
 
-        String currentFilter = driver.findElement(filtrHeadXpath).findElement(By.xpath("span")).getText();
+        String currentFilter = driver.findElement(filtrHeadXpath).findElement(By.xpath("span")).getAttribute("innerText");
         Assert.assertTrue(
                 "Не сработал фильтр для истории заключенных пари в купоне. вместо " + filter + ", включен " + currentFilter,
                 currentFilter.contains(filter));
@@ -780,11 +780,11 @@ public class CouponPage extends AbstractPage {
         BetFull bet = new BetFull();
         LOG.info("путь: " + element);
         //запоминаем тип ставки
-        typeBet.append(element.findElements(xpathTypeBet).isEmpty() ? "ординар" : element.findElements(xpathTypeBet).get(0).getText().trim().split(" ")[0]);
+        typeBet.append(element.findElements(xpathTypeBet).isEmpty() ? "ординар" : element.findElements(xpathTypeBet).get(0).getAttribute("innerText").trim().split(" ")[0]);
         bet.setType(typeBet.toString());
 
         //запоминаем время ставки
-        helpString.append(element.findElement(By.xpath(".//div[@class='coupon-bet__row']/div")).getText());
+        helpString.append(element.findElement(By.xpath(".//div[@class='coupon-bet__row']/div")).getAttribute("innerText"));
         int index = helpString.indexOf(":");
         timeBet.append(helpString.substring(index - 2, index + 3));
         bet.setTimeBet(timeBet.toString());
@@ -802,7 +802,7 @@ public class CouponPage extends AbstractPage {
 
         //запоминаем названия ставок (или одно название, если ординар)
         element.findElements(By.xpath("div[contains(@class,'coupon-bet')]/ul//div[contains(@class,'coupon-bet__title')]"))
-                .forEach(el -> names.add(el.getText().trim()));
+                .forEach(el -> names.add(el.getAttribute("innerText").trim()));
         bet.setNames(names);
 
         //запоминаем коэффициенты ставок (или один кэф, если ординар)

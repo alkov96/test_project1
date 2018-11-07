@@ -105,7 +105,7 @@ public class RefillAccountsPage extends AbstractPage{
             exeptedMaxLimit = (maxLimitInDB.compareTo(maxLimitByWSS) > 0) ? maxLimitByWSS.toString() : maxLimitInDB.toString();
             LOG.info("Ожидаемый максимум должен быть[" + exeptedMaxLimit + "]");
 
-            maxValueOnPage = new BigDecimal(list.get(list.size()-1).getText().replaceAll(" +",""));
+            maxValueOnPage = new BigDecimal(list.get(list.size()-1).getAttribute("innerText").replaceAll(" +",""));
             assertThat(maxValueOnPage)
                     .as("Ошибка! Фактический максимум на странице[" + maxValueOnPage.toString() + "] не равен ожидаемому максимуму [" + exeptedMaxLimit + "]")
                     .isEqualTo(exeptedMaxLimit);
@@ -216,7 +216,7 @@ public class RefillAccountsPage extends AbstractPage{
         StringBuilder message = new StringBuilder();
         Stash.put("messageKey", message);
         LOG.info("Запоминаем все сообщения с ошибками и предупредлениями, которые появились на попапе пополнения");
-        driver.findElements(By.xpath("//div[contains(@class,'money-in-out__messages')]")).forEach(element -> message.append(element.getText())); //строка, содержащая все сообщения на попапе пополнения
+        driver.findElements(By.xpath("//div[contains(@class,'money-in-out__messages')]")).forEach(element -> message.append(element.getAttribute("innerText"))); //строка, содержащая все сообщения на попапе пополнения
         LOG.info("Смотрим что есть соответсвующее проедупреждение о минимально допустимой сумме, и что кнопка #Пополнить# заблокировалась");
         if (message.toString().isEmpty() || !message.toString().contains("Сумма меньше минимально допустимой")) {
             Assertions.fail("При сумме пополнения = 1 нет сообщения об ошибке. Сообщение: " + message.toString());
@@ -238,7 +238,7 @@ public class RefillAccountsPage extends AbstractPage{
         StringBuilder message = Stash.getValue("messageKey");
         message.setLength(0);//очищаем список ошибок чтобы заново его создать
         LOG.info("Запоминаем все сообщения с ошибками и предупреждениями, которые появились на попапе пополнения");
-        driver.findElements(By.xpath("//div[contains(@class,'money-in-out__messages')]")).forEach(element -> message.append(element.getText())); //строка, содержащая все сообщения на попапе пополнения
+        driver.findElements(By.xpath("//div[contains(@class,'money-in-out__messages')]")).forEach(element -> message.append(element.getAttribute("innerText"))); //строка, содержащая все сообщения на попапе пополнения
         LOG.info("Смотрим что есть соответсвующее проедупреждение о минимально допустимой сумме, и что кнопка #Пополнить# заблокировалась");
         if (message.toString().isEmpty() || !message.toString().contains("Сумма превышает максимальную допустимую")) {
             Assertions.fail("При сумме пополнения = 600.000 нет сообщения об ошибке. Сообщение: " + message.toString());

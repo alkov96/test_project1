@@ -48,7 +48,7 @@ public class WithdrawalOfFundsPage extends AbstractPage{
         WebDriver driver = PageFactory.getWebDriver();
         Pattern pattern = Pattern.compile("(?u)[^0-9]");
         List<WebElement> allWayWithdraw = driver.findElements(By.xpath("//table[@class='moneyInOutTable']//tr[3]/td[2]/div[not(contains(@class,'not-available'))]/span/label[contains(@for, 'withdraw-method')]"));
-        String min = allWayWithdraw.get(0).findElement(By.xpath("//div/span[@ng-if='method.limit.min']")).getText();
+        String min = allWayWithdraw.get(0).findElement(By.xpath("//div/span[@ng-if='method.limit.min']")).getAttribute("innerText");
 
         String xpathCard = "//label[@for='withdraw-method-cupis_card']";
 
@@ -62,7 +62,7 @@ public class WithdrawalOfFundsPage extends AbstractPage{
             Stash.put("bonusPlus","0");
         }
         else{
-            String bonus = bonuses.get(0).getText().split("[^0-9.]")[1];
+            String bonus = bonuses.get(0).getAttribute("innerText").split("[^0-9.]")[1];
             Stash.put("bonusPlus",bonus);
         }
         String tmp = summInput.getAttribute("value");

@@ -88,9 +88,7 @@ public class UserAccountPage extends AbstractPage{
     @ActionTitle("заполняет форму с")
     public void fillsForm(DataTable dataTable) throws DataException {
         List<Map<String,String>> table = dataTable.asMaps(String.class,String.class);
-        String inputField, value, saveVariable, date = "";
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MMMM-dd");
-        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String inputField, date = "", value, saveVariable;
 
         for (Map<String, String> aTable : table) {
 
@@ -103,11 +101,9 @@ public class UserAccountPage extends AbstractPage{
             }
 
             if (inputField.contains(DATEOFBIRTH)) {
-                try {
-                    date = outputFormat.format(inputFormat.parse(enterDate(value)));
-                } catch (ParseException e) {
-                    e.getMessage();
-                }
+                date = Stash.getValue(value);
+                    enterDate(date);
+
                 Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
             }

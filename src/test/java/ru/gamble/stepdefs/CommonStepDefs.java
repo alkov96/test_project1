@@ -1976,7 +1976,7 @@ Thread.sleep(1500);
         }
     }
 
-    @Когда("^генерируем дату рождения от 18 до 100 лет и сохраняем в \"([^\"]*)\"$")
+    @Когда("^генерируем дату рождения от 18 до 50 лет и сохраняем в \"([^\"]*)\"$")
     public void generationRandomBerthDate(String keyBirthDate){
         String birthDate = Generators.generateDateInRequiredRange();
         Stash.put(keyBirthDate, birthDate);
@@ -2100,6 +2100,7 @@ Thread.sleep(1500);
     public void rega(){
         PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
         }
+
 
 }
 

@@ -143,8 +143,8 @@ public class SearchPage extends AbstractPage{
         LOG.info("В результатх поиска будем выбирать игру " + gameName);
         int number=-1;
         for (int i=step; i<searchResult.size();i++){
-            LOG.info("В поиске есть результат: " + searchResult.get(i).findElement(By.xpath("div/span")).getText());
-            if (stringParse(searchResult.get(i).findElement(By.xpath("div/span")).getText()).equals(gameName)){//если в результатах поиска название игры совпадает с искомым
+            LOG.info("В поиске есть результат: " + searchResult.get(i).findElement(By.xpath("div")).getAttribute("innerText"));
+            if (stringParse(searchResult.get(i).findElement(By.xpath("div")).getAttribute("innerText")).equals(gameName)){//если в результатах поиска название игры совпадает с искомым
                 //number=searchResult.indexOf(searchResult.get(i));//то запоминаем номер в списке результатов
                 number = i;
                 break;

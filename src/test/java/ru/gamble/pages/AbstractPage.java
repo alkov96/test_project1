@@ -236,17 +236,13 @@ public abstract class AbstractPage extends Page {
     /**
      * Открывает выпадающий список и выбирает оттуда пункт случайным образом
      *
-     * @param element - поле где ждем выпадающий список
-     * @param max     - максимальный пункт, который можно выбрать (включая этот max). Второго параметра может и не быть. тогда максимум - это длина всего списка
+     * @param element - поле где ждем выпадающий список.
+     * @param select - выбираемый пункт меню.
      */
-    protected void selectMenu(WebElement element, int max) {
-        int menuSize = element.findElements(By.xpath("custom-select/div[2]/div")).size();
-        menuSize -= (max + 1);
-        int select = 1 + (int) (Math.random() * menuSize);
+    protected void selectMenu(WebElement element, int select) {
         element.findElement(By.xpath("custom-select")).click();
-        element.findElement(By.xpath("custom-select/div[2]/div[" + select + "]")).click();
+        element.findElement(By.xpath("custom-select/div[2]/div[contains(.,'" + select + "')]")).click();
     }
-
     protected void selectMenu(WebElement element) {
         selectMenu(element, 0);
     }
@@ -254,29 +250,20 @@ public abstract class AbstractPage extends Page {
     protected String enterDate(String value) {
         StringBuilder date = new StringBuilder();
         String day, month, year;
-        if (value.equals(RANDOM)) {
-
-            do {
-                selectMenu(fieldYear);
-                selectMenu(fieldMonth);
-                selectMenu(fieldDay);
-                LOG.info("Вводим случайную дату::");
-            } while (PageFactory.getWebDriver().findElement(By.className("inpErrText")).isDisplayed());
-        } else {
-            String[] tmp = value.split(".");
+            String[] tmp = value.split("-");
             LOG.info("Вводим дату");
+            selectMenu(fieldYear, Integer.parseInt(tmp[0]));
             selectMenu(fieldMonth, Integer.parseInt(tmp[1]));
-            selectMenu(fieldDay, Integer.parseInt(tmp[0]));
-            selectMenu(fieldYear, Integer.parseInt(tmp[2]));
-        }
+            selectMenu(fieldDay, Integer.parseInt(tmp[2]));
+
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        day = fieldDay.getText();
-        month = fieldMonth.getText();
-        year = fieldYear.getText();
+        day = fieldDay.getAttribute("innerText");
+        month = fieldMonth.getAttribute("innerText");
+        year = fieldYear.getAttribute("innerText");
         return date.append(year).append("-").append(month).append("-").append(day).toString();
     }
 
@@ -357,13 +344,13 @@ public abstract class AbstractPage extends Page {
             Thread.sleep(3000);
             waitForElementPresent(findCoeffs, 10);
             correctMarkets = getWebDriver().findElements(findCoeffs)
-                    .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.260)
+                    .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) >= 1.260)
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(xpathListBets);
                         //PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
-                LOG.info("коэф: " + coefficient.getText());
+                LOG.info("коэф: " + coefficient.getAttribute("innerText"));
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
@@ -379,7 +366,7 @@ public abstract class AbstractPage extends Page {
             do {
                 try {
                     inCorrectMarkets = getWebDriver().findElements(findCoeffs)
-                            .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) < 1.25)
+                            .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) < 1.25)
                             .limit(count + 3).collect(Collectors.toList());
                 } catch (StaleElementReferenceException e) {
                     tryPage++;
@@ -391,7 +378,7 @@ public abstract class AbstractPage extends Page {
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(xpathListBets);
-                LOG.info("коэф: " + coefficient.getText());
+                LOG.info("коэф: " + coefficient.getAttribute("innerText"));
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
@@ -444,7 +431,7 @@ public abstract class AbstractPage extends Page {
         int count = 0;
         while (count < 40) {
             if (serviceMessage.isDisplayed()) {
-                MatcherAssert.assertThat(true, equalTo(serviceMessage.getText().equals(text)));
+                MatcherAssert.assertThat(true, equalTo(serviceMessage.getAttribute("innerText").equals(text)));
                 return true;
             } else {
                 count++;
@@ -494,7 +481,7 @@ public abstract class AbstractPage extends Page {
         try{
             LOG.info("Ждём появление всплывающего окна.");
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoToTSUPIS)));
-            LOG.info("Появилось окно c кнопкой [" + driver.findElement(By.xpath(xpathGoToTSUPIS)).getText() + "]");
+            LOG.info("Появилось окно c кнопкой [" + driver.findElement(By.xpath(xpathGoToTSUPIS)).getAttribute("innerText") + "]");
             driver.findElements(By.xpath("//div/a[@class='modal__closeBtn closeBtn']")).stream().filter(WebElement::isDisplayed).findFirst().get().click();
             LOG.info("Закрыли всплывающего окно");
         }catch (Exception e){
@@ -701,8 +688,8 @@ public abstract class AbstractPage extends Page {
 //            if (numberSring != null){break;}
         }
 
-        if(numberSring != null && !numberSring.getText().isEmpty()) {
-            String code = numberSring.getText().split(" - ")[1];
+        if(numberSring != null && !numberSring.getAttribute("innerText").isEmpty()) {
+            String code = numberSring.getAttribute("innerText").split(" - ")[1];
             driver.switchTo().window(currentHandle);
             js.executeScript("registration_window.close()");
 
