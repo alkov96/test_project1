@@ -20,14 +20,14 @@
     * открывается страница "Учетная запись"
 
     * пользователь (заполняет форму с) данными
-      | Поле ввода     | Значение | Переменная сохранения |
-      | Дата рождения  | random   | BIRTHDATE             |
-      | Фамилия        | Волков   | LASTNAME              |
-      | Имя            | Иван     | FIRSTNAME             |
-      | Отчество       | Иванович | PATERNALNAME          |
-      | E-mail         | EMAIL    | EMAIL                 |
-      | Пароль         | Default  | PASSWORD              |
-      | Номер телефона | PHONE    | PHONE                 |
+      | Поле ввода     | Значение      | Переменная сохранения |
+      | Дата рождения  | random        | BIRTHDATE             |
+      | Фамилия        | LASTNAME      | LASTNAME              |
+      | Имя            | FIRSTNAME     | FIRSTNAME             |
+      | Отчество       | PATERNALNAME  | PATERNALNAME          |
+      | E-mail         | EMAIL         | EMAIL                 |
+      | Пароль         | Default       | PASSWORD              |
+      | Номер телефона | PHONE         | PHONE                 |
 
     * пользователь (отмечает признак) "Чекбокс оферты"
 
