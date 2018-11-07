@@ -236,17 +236,13 @@ public abstract class AbstractPage extends Page {
     /**
      * Открывает выпадающий список и выбирает оттуда пункт случайным образом
      *
-     * @param element - поле где ждем выпадающий список
-     * @param max     - максимальный пункт, который можно выбрать (включая этот max). Второго параметра может и не быть. тогда максимум - это длина всего списка
+     * @param element - поле где ждем выпадающий список.
+     * @param select - выбираемый пункт меню.
      */
-    protected void selectMenu(WebElement element, int max) {
-        int menuSize = element.findElements(By.xpath("custom-select/div[2]/div")).size();
-        menuSize -= (max + 1);
-        int select = 1 + (int) (Math.random() * menuSize);
+    protected void selectMenu(WebElement element, int select) {
         element.findElement(By.xpath("custom-select")).click();
-        element.findElement(By.xpath("custom-select/div[2]/div[" + select + "]")).click();
+        element.findElement(By.xpath("custom-select/div[2]/div[contains(.,'" + select + "')]")).click();
     }
-
     protected void selectMenu(WebElement element) {
         selectMenu(element, 0);
     }
@@ -254,29 +250,20 @@ public abstract class AbstractPage extends Page {
     protected String enterDate(String value) {
         StringBuilder date = new StringBuilder();
         String day, month, year;
-        if (value.equals(RANDOM)) {
-
-            do {
-                selectMenu(fieldYear);
-                selectMenu(fieldMonth);
-                selectMenu(fieldDay);
-                LOG.info("Вводим случайную дату::");
-            } while (PageFactory.getWebDriver().findElement(By.className("inpErrText")).isDisplayed());
-        } else {
-            String[] tmp = value.split(".");
+            String[] tmp = value.split("-");
             LOG.info("Вводим дату");
+            selectMenu(fieldYear, Integer.parseInt(tmp[0]));
             selectMenu(fieldMonth, Integer.parseInt(tmp[1]));
-            selectMenu(fieldDay, Integer.parseInt(tmp[0]));
-            selectMenu(fieldYear, Integer.parseInt(tmp[2]));
-        }
+            selectMenu(fieldDay, Integer.parseInt(tmp[2]));
+
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        day = fieldDay.getText();
-        month = fieldMonth.getText();
-        year = fieldYear.getText();
+        day = fieldDay.getAttribute("innerText");
+        month = fieldMonth.getAttribute("innerText");
+        year = fieldYear.getAttribute("innerText");
         return date.append(year).append("-").append(month).append("-").append(day).toString();
     }
 

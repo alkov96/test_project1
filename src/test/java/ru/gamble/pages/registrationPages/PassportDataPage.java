@@ -105,21 +105,15 @@ public class PassportDataPage extends AbstractPage {
         List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
         String inputField, value, saveVariable, date = "", serial, number, whoIssued, unitCode, sex, placeOfBirth, house, building, block, flat;
         String wrongAddressXpath = "//div[@class='message-error']/div[contains(.,'Неправильный адрес')]";
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MMMM-dd");
-        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
-
 
         for (Map<String, String> aData : data) {
             inputField = aData.get(INPUT_FIELD);
             value = aData.get(VALUE);
             saveVariable = aData.get(SAVE_VALUE);
 
-            if (inputField.contains(DATEOFBIRTH)) {
-                try {
-                    date = outputFormat.format(inputFormat.parse(enterDate(value)));
-                } catch (ParseException e) {
-                    e.getMessage();
-                }
+            if (inputField.contains(DATEISSUE)) {
+                date = Stash.getValue(value);
+                enterDate(date);
                 Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
             }
@@ -134,21 +128,6 @@ public class PassportDataPage extends AbstractPage {
                 fillField(passpNumberInput, number);
                 Stash.put(saveVariable, String.valueOf(number));
                 LOG.info(saveVariable + "<==[" + number + "]");
-            }
-            if (inputField.contains(DATEISSUE)) {
-                // делаем столько попыток ввести дату, пока не пропадёт ошибка
-                // "Дата выдачи не соответсвует дате обязательной  замены паспорта"
-                String errXpath = "//div[@class='inpErrText__inner ng-binding ng-scope']";
-                do {
-                    try {
-                        date = outputFormat.format(inputFormat.parse(enterDate(value)));
-                    } catch (ParseException e) {
-                        e.getMessage();
-                    }
-                } while (!PageFactory.getWebDriver().findElements(By.xpath(errXpath))
-                        .stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).isEmpty());
-                Stash.put(saveVariable, date);
-                LOG.info(saveVariable + "<==[" + date + "]");
             }
 
             if (inputField.contains(ISSUEDBY)) {
@@ -213,11 +192,8 @@ public class PassportDataPage extends AbstractPage {
             }
         }
         try {
-            System.out.println("ASASDASDSADS");
-            System.out.println(new Date(System.currentTimeMillis()));
+            LOG.info("Ждём 2 сек. из-за TEST_INT");
             Thread.sleep(2000);
-            System.out.println(new Date(System.currentTimeMillis()));
-            System.out.println("ASASDASDSADS");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
