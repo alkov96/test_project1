@@ -1656,8 +1656,11 @@ Thread.sleep(1500);
 
     @Когда("^закрываем браузер$")
     public static void closeBrowser() {
-        PageFactory.dispose();
-        LOG.info("Браузер закрыт");
+        try {
+            PageFactory.dispose();
+        }catch (Exception e) {
+            LOG.info("Браузер закрыт");
+        }
     }
 
     @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
@@ -1731,6 +1734,7 @@ Thread.sleep(1500);
     public void rememberActiveOption(DataTable dataTable) {
         StringBuilder optionTrue = new StringBuilder();
         StringBuilder optionFalse = new StringBuilder();
+        String sqlRequest;
 
         Map<String,String> table = dataTable.asMap(String.class,String.class);
         for (Map.Entry<String, String> entry : table.entrySet()) {
@@ -1745,14 +1749,16 @@ Thread.sleep(1500);
         }
         optionTrue.delete(0,1);
         optionFalse.delete(0,1);
-        String sqlRequest = "UPDATE gamebet.`enabled_features` SET state=1 WHERE NAME in (" + optionTrue + ")";
-        workWithDB(sqlRequest);
-        sqlRequest = "UPDATE gamebet.`enabled_features` SET state=0 WHERE NAME in (" + optionFalse + ")";
-        workWithDB(sqlRequest);
-
-        Map<String,String> activeOpt =
-                workWithDBgetTwoRows("SELECT NAME,state FROM gamebet.`enabled_features`");
-        LOG.info("СЕЙЧАС активные опции сайта [" + activeOpt + "]");
+        if(!optionTrue.toString().isEmpty()) {
+            sqlRequest = "UPDATE gamebet.`enabled_features` SET state=1 WHERE NAME in (" + optionTrue + ")";
+            workWithDB(sqlRequest);
+            LOG.info("Включили опиции [" + optionTrue.toString() + "]");
+        }
+        if(!optionFalse.toString().isEmpty()) {
+            sqlRequest = "UPDATE gamebet.`enabled_features` SET state=0 WHERE NAME in (" + optionFalse + ")";
+            workWithDB(sqlRequest);
+            LOG.info("Выключили опиции [" + optionFalse.toString() + "]");
+        }
     }
 
     /**
