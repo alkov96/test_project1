@@ -454,8 +454,6 @@ public class CouponPage extends AbstractPage {
         }
     }
 
-
-
     @ActionTitle("заключает пари")
     public void doBet() throws AuthenticationException, InterruptedException {
         WebDriver driver = PageFactory.getDriver();
@@ -476,19 +474,14 @@ public class CouponPage extends AbstractPage {
         int expectedCouponSize = typeCoupon.contains("Ординар") ? (sizeCoupon - 1) : 0;
 
         LOG.info("Жмём 'Заключить пари'");
-        //coupon_bet_button.click();
         buttonBet.click();
-        //driver.findElement(By.xpath("//button_of_param_in_coupon[normalize-space(text())='Заключить пари']")).click();
-
         waitingForPreloaderToDisappear(30);
 
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
         Thread.sleep(10000);
         if (driver.findElements(xpath("//ul[@class='coupon-bet__content']")).size() > expectedCouponSize) {
-            Assertions.fail("Ставка не принялась!");
+            Assertions.fail("Ошибка! Ставка не принялась((");
         } else LOG.info("Ставка принялась!");
-
-        //new WebDriverWait(driver, 10).until(ExpectedConditions.numberOfElementsToBe(By.xpath(xpathBet),expectedCouponSize));
 
     }
 
@@ -557,7 +550,7 @@ public class CouponPage extends AbstractPage {
 
 
     /**
-     * првоерка кнопка Заключить Пари в купоне активна или заблокирована. и Печать ошибок и предупреждений в купоне, если есть
+     * Метод проверяет кнопку 'Заключить Пари' в купоне активна или заблокирована и печать ошибок и предупреждений в купоне, если есть.
      *
      * @param status - ожидаемое состояние кнопки(активна, заблокирована)
      */
