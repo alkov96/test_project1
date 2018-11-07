@@ -241,7 +241,7 @@ public class LandingAppPage extends AbstractPage {
             LOG.info("Отправили смс на номер +7" + phone);
             sendPhone.click();
             Thread.sleep(1000);
-            hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getText();
+            hint = driver.findElement(xpath("//div[contains(@class,'sms-form-hint')]")).getAttribute("innerText");
             if (!hint.contains(expectedHint)) {
                 Assert.fail("После отпраки смс текст подскази не соответсвует ожидаемому. Вместо @" + expectedHint + "@ написано " + hint);
             }

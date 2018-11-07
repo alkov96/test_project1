@@ -344,13 +344,13 @@ public abstract class AbstractPage extends Page {
             Thread.sleep(3000);
             waitForElementPresent(findCoeffs, 10);
             correctMarkets = getWebDriver().findElements(findCoeffs)
-                    .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) >= 1.260)
+                    .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) >= 1.260)
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(xpathListBets);
                         //PageFactory.getWebDriver().findElements(By.xpath("//li[@class='coupon-bet-list__item']"));
-                LOG.info("коэф: " + coefficient.getText());
+                LOG.info("коэф: " + coefficient.getAttribute("innerText"));
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
@@ -366,7 +366,7 @@ public abstract class AbstractPage extends Page {
             do {
                 try {
                     inCorrectMarkets = getWebDriver().findElements(findCoeffs)
-                            .stream().filter(e -> e.isDisplayed() && !e.getText().contains("-") && Double.parseDouble(e.getText()) < 1.25)
+                            .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) < 1.25)
                             .limit(count + 3).collect(Collectors.toList());
                 } catch (StaleElementReferenceException e) {
                     tryPage++;
@@ -378,7 +378,7 @@ public abstract class AbstractPage extends Page {
             for (WebElement coefficient : inCorrectMarkets) {
                 clickElement(coefficient);
                 eventsInCoupon = PageFactory.getWebDriver().findElements(xpathListBets);
-                LOG.info("коэф: " + coefficient.getText());
+                LOG.info("коэф: " + coefficient.getAttribute("innerText"));
                 if (eventsInCoupon.size() == count) {
                     break;
                 }
@@ -431,7 +431,7 @@ public abstract class AbstractPage extends Page {
         int count = 0;
         while (count < 40) {
             if (serviceMessage.isDisplayed()) {
-                MatcherAssert.assertThat(true, equalTo(serviceMessage.getText().equals(text)));
+                MatcherAssert.assertThat(true, equalTo(serviceMessage.getAttribute("innerText").equals(text)));
                 return true;
             } else {
                 count++;
@@ -481,7 +481,7 @@ public abstract class AbstractPage extends Page {
         try{
             LOG.info("Ждём появление всплывающего окна.");
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathGoToTSUPIS)));
-            LOG.info("Появилось окно c кнопкой [" + driver.findElement(By.xpath(xpathGoToTSUPIS)).getText() + "]");
+            LOG.info("Появилось окно c кнопкой [" + driver.findElement(By.xpath(xpathGoToTSUPIS)).getAttribute("innerText") + "]");
             driver.findElements(By.xpath("//div/a[@class='modal__closeBtn closeBtn']")).stream().filter(WebElement::isDisplayed).findFirst().get().click();
             LOG.info("Закрыли всплывающего окно");
         }catch (Exception e){
@@ -688,8 +688,8 @@ public abstract class AbstractPage extends Page {
 //            if (numberSring != null){break;}
         }
 
-        if(numberSring != null && !numberSring.getText().isEmpty()) {
-            String code = numberSring.getText().split(" - ")[1];
+        if(numberSring != null && !numberSring.getAttribute("innerText").isEmpty()) {
+            String code = numberSring.getAttribute("innerText").split(" - ")[1];
             driver.switchTo().window(currentHandle);
             js.executeScript("registration_window.close()");
 

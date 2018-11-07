@@ -77,7 +77,7 @@ public class TestingServicePage extends AbstractPage{
         String xpath = "//p[contains(.,'Последние отправленные смс:')]/following-sibling::ul/li[contains(.,'" + number + "')]";
         StringBuilder tmp = new StringBuilder();
 
-            sms = PageFactory.getDriver().findElement(By.xpath(xpath)).getText();
+            sms = PageFactory.getDriver().findElement(By.xpath(xpath)).getAttribute("innerText");
 
             Pattern pat = Pattern.compile("(?<= код\\s)[\\d]{4}");
             Matcher matcher = pat.matcher(sms);
