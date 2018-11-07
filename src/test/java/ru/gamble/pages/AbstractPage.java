@@ -1,9 +1,12 @@
 package ru.gamble.pages;
 
 import cucumber.api.Scenario;
+import cucumber.api.java.ru.Когда;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.openqa.selenium.*;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -546,65 +549,14 @@ public abstract class AbstractPage extends Page {
             e.getMessage();
             throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
         }
-//    //Начало кода для получения СМС
-//        String currentHandle = driver.getWindowHandle();
-//        JavascriptExecutor js = (JavascriptExecutor) driver;
-//
-//        String registrationUrl = "";
-//
-//        try {
-//            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
-//        } catch (DataException e) {
-//            LOG.error(e.getMessage());
-//        }
-//
-//        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
-//
-//        Set<String> windows = driver.getWindowHandles();
-//        windows.remove(currentHandle);
-//        String newWindow = windows.toArray()[0].toString();
-//
-//        driver.switchTo().window(newWindow);
-//
-//        String xpath = "//li/a[contains(.,'" + phone + "')]";
-//        WebElement numberSring = null;
-//        int x = 0;
-//
-//        LOG.info("Пытаемся найти код подтверждения телефона");
-//        for(int y = 0; y < 3; y++) {
-//            try {
-//                new WebDriverWait(driver, 3).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-//                numberSring = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).findFirst().get();
-//            } catch (Exception e) {
-//                driver.navigate().refresh();
-//            }
-//            x++;
-//            if (numberSring != null){break;}
-//        }
-//
-//        if(numberSring != null && !numberSring.getText().isEmpty()) {
-//            String code = numberSring.getText().split(" - ")[1];
-//            driver.switchTo().window(currentHandle);
-//            js.executeScript("registration_window.close()");
-//	}else {
-//		throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
-//	}
-        String G;
-		G = "SELECT CODE FROM gamebet.`phoneconfirmationcode` WHERE  phone = '" + phone + "' ORDER BY creation_date DESC LIMIT 1";
-		String code = CommonStepDefs.returnCode(G);
 
-            LOG.info("Вводим SMS-код::" + code);
-            fillField(cellFoneConformationInput,code);
-
-        Stash.put("PHONE_NUMBER",phone ) ;
+        String sQLRequest = "SELECT CODE FROM gamebet.`phoneconfirmationcode` WHERE  phone = '" + phone + "' ORDER BY creation_date DESC LIMIT 1";
+		String code = CommonStepDefs.returnCode(sQLRequest);
+		LOG.info("Вводим SMS-код [" + code + "]");
+		fillField(cellFoneConformationInput,code);
+        Stash.put("PHONE_NUMBER", phone) ;
         LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
     }
-
-
-
-
-
-
 
     protected void enterSellphoneForOrtax(String value, WebElement cellFoneInput, WebElement cellFoneConformationInput){
         WebDriver driver = PageFactory.getWebDriver();
@@ -629,9 +581,7 @@ public abstract class AbstractPage extends Page {
 
         } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
 
-
         LOG.info("Копируем смс-код для подтверждения телефона");
-
 
         //Начало кода для получения СМС
         String currentHandle = driver.getWindowHandle();
@@ -659,22 +609,13 @@ public abstract class AbstractPage extends Page {
 
         LOG.info("Пытаемся найти код подтверждения телефона");
         for(int y = 0; y < 5; y++) {
-//            try {
-//                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
-//                numberSring = driver.findElements(By.xpath(xpath)).get(0);
-//            } catch (Exception e) {
-//                driver.navigate().refresh();
-//            }
+
             try {
-                System.out.println("ASASDASDSADS");
-                System.out.println(new Date(System.currentTimeMillis()));
+                LOG.info("Ожидаем 2 сек. для сервера TEST_INT");
                 Thread.sleep(2000);
-                System.out.println(new Date(System.currentTimeMillis()));
-                System.out.println("ASASDASDSADS");
                 new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
                 if (driver.findElements(By.xpath(xpath)).isEmpty()){
                     driver.navigate().refresh();
-
                 }
                 else {
                     numberSring = driver.findElements(By.xpath(xpath)).get(0);
@@ -683,9 +624,7 @@ public abstract class AbstractPage extends Page {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
             x++;
-//            if (numberSring != null){break;}
         }
 
         if(numberSring != null && !numberSring.getAttribute("innerText").isEmpty()) {
@@ -693,14 +632,12 @@ public abstract class AbstractPage extends Page {
             driver.switchTo().window(currentHandle);
             js.executeScript("registration_window.close()");
 
-
             try {
                 new WebDriverWait(driver, 70).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
             }catch (Exception e){
                 e.getMessage();
                 throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
             }
-
 
             LOG.info("Вводим SMS-код::" + code);
             fillField(cellFoneConformationInput,code);
@@ -742,8 +679,7 @@ public abstract class AbstractPage extends Page {
                 e.printStackTrace();
             }
                 list = field.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-
-            count--;
+                count--;
             if(count<=0){ break;}
         } while (list.isEmpty() && authFill);
 
@@ -798,5 +734,76 @@ public abstract class AbstractPage extends Page {
             wait.until(ExpectedConditions.not(attributeContains(By.id("menu-toggler"), "class", "collapsed")));
         }
     }
+
+    @ActionTitle("при необходимости логинимся в 'Первый ЦУПИС'")
+    public void loginInTSUPIS(){
+        WebDriver driver = PageFactory.getDriver();
+        goToThisPage("23bet-pay");
+
+        String phone = "", password = "";
+        try {
+            Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
+            String browserName = caps.getBrowserName();
+            phone = browserName.contains("chrome") ?
+                    JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue() :
+                    JsonLoader.getData().get(STARTING_URL).get("PHONE_FIREFOX").getValue();
+            password = JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue();
+
+            LOG.info("Пытаемся найти поле для ввода номера телефона по id[form_login_phone]");
+            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("form_login_phone")));
+
+        }catch (Exception e){
+         return;
+        }
+        LOG.info("Перешли на страницу [" + driver.getCurrentUrl() + "]");
+
+        WebElement inputPhone = driver.findElement(By.id("form_login_phone"));
+        WebElement inputPassword = driver.findElement(By.id("form_login_password"));
+
+        slowFillField(inputPhone, phone, 250);
+        String actual = inputPhone.getAttribute("value").replaceAll("\\D","");
+        AssertionsForClassTypes.assertThat(actual).as("ОШИБКА! Вводимый номер [" + phone + "] не соответсвует [" + actual + "]").contains(phone);
+        LOG.info("В поле [Телефон] ввели [" + actual  +"]");
+
+        slowFillField(inputPassword, password, 250);
+        LOG.info("В поле [Пароль] ввели [" + password  +"]");
+
+        WebElement buttonEnter = driver.findElement(By.id("btn_authorization_enter"));
+        LOG.info("Нажимаем кнопку [Войти]");
+        buttonEnter.click();
+
+
+    }
+
+    protected void goToThisPage(String peaceURL){
+        WebDriver driver = PageFactory.getWebDriver();
+        Set<String> windows = driver.getWindowHandles();
+        for(String windowHandle: windows) {
+            driver.switchTo().window(windowHandle);
+            if (driver.getCurrentUrl().contains(peaceURL)) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Метод ввода по символу с задержкой чтобы JS-маски успевали обрабатывать
+     * @inputField поле ввода
+     * @text текст, который нужно ввести
+     * @delay задержка между вводом каждого символа в миллисекундах
+     */
+    protected void slowFillField(WebElement inputField, String text, int delay){
+        inputField.clear();
+        char[] tmp = text.toCharArray();
+        for(int i = 0; i < tmp.length; i++) {
+            inputField.sendKeys(String.valueOf(tmp[i]));
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
 

@@ -43,6 +43,8 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import javax.net.ssl.*;
 import java.awt.*;
@@ -2040,15 +2042,12 @@ Thread.sleep(1500);
         return newDate;
     }
 
-    public static void scrollToElement(WebElement element){
-//        Actions actions = new Actions(driver);
-//        actions.moveToElement(element);
-//        actions.perform();
-    }
-    public static String returnCode(String smsKa){
-
-        return workWithDBgetResult(smsKa, "code");
-
+    /**
+     * Метода запрашивает у базы код SMS
+     * @requestToDB - строка SQL-запроса
+     */
+    public static String returnCode(String requestToDB){
+        return workWithDBgetResult(requestToDB, "code");
     }
 
     @Когда("^выбираем ФИО \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\"$")
@@ -2105,7 +2104,7 @@ Thread.sleep(1500);
     @Когда("^нажмем Продолжить регу на всякий$")
     public void rega(){
         PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
-        }
+    }
 
 
 }
