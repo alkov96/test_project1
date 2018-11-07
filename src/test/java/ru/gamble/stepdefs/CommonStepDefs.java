@@ -1712,16 +1712,6 @@ Thread.sleep(1500);
         Stash.put(keyDelay,delay);
     }
 
-
-    @Когда("^закрываем браузер$")
-    public static void closeBrowser() {
-        try {
-            PageFactory.dispose();
-        }catch (Exception e) {
-            LOG.info("Браузер закрыт");
-        }
-    }
-
     @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
     public void userOpenNewUrl(String url){
         PageFactory.getDriver().get(url);
@@ -1866,7 +1856,6 @@ Thread.sleep(1500);
             final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
             scenario.embed(screenshot, "image/jpeg");
         }
-        closeBrowser();
     }
 
 
