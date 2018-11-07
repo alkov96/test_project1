@@ -16,6 +16,7 @@ import cucumber.api.java.ru.Когда;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -1534,20 +1535,13 @@ Thread.sleep(1500);
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
-    /**
-     * это когда активные опции сайта в параметре. когда паараметр удалт - удалить этот before и иуспользовать только тот before что с rememberEnabledFeatures
-     */
-    @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
-    public void saveRegistrationValue(){
-        rememberActive("ACTIVE");
-    }
 
     /**
      * это когда активне опции сайта в отдельной таблице
      */
     @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
     public void saveRegistrationValue2(){
-        rememberEnabledFeatures("ENABLEDFEATURES");
+        rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
 
     @Before()
@@ -1583,28 +1577,11 @@ Thread.sleep(1500);
     }
 
     /**
-     * когда активные опции сайта в одном параметре
-     */
-    @Когда("^запоминаем значение активных опций сайта в \"([^\"]*)\"$")
-    public void rememberActive (String activeOptionKey){
-        String activeOpt = getActiveOptions();
-        Stash.put(activeOptionKey,activeOpt);
-        LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
-    }
-
-    private String getActiveOptions(){
-        return workWithDBgetResult("SELECT * FROM gamebet.`params` WHERE NAME='ENABLED_FEATURES'", "value");
-    }
-
-    /**
      * когда активные опции сайта в таблице. когда параметр удалят - использоватеь этот метод вместо старого (rememberActiveAndOffOption)
      * но не забыть поменять Когда
      */
     @Когда("^редактируем некоторые активные опции сайта")
     public void rememberActiveOption(DataTable dataTable) {
-
-//        Stash.put(key,activeOpt);
-//
         StringBuilder optionTrue = new StringBuilder();
         StringBuilder optionFalse = new StringBuilder();
 
@@ -1637,12 +1614,12 @@ Thread.sleep(1500);
      */
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
     public void revertEnabledFeatures(String key){
-        Map<String,String> oldEnabledFeatures = Stash.getValue(key);
+        Map<String,String> oldEnabledFeatures = (HashMap)Stash.getValue(key);
         StringBuilder optionFalse = new StringBuilder();
         StringBuilder optionTrue = new StringBuilder();
         for (Map.Entry<String, String> entry : oldEnabledFeatures.entrySet()) {
             if (entry.getValue().equals("1")) {
-                optionTrue.append(",'"+entry.getKey() + "'");
+                optionTrue.append(",'" + entry.getKey() + "'");
                 LOG.info("Добавление активной опций сайта " + entry.getKey());
             }
             else {
@@ -1671,8 +1648,8 @@ Thread.sleep(1500);
      */
     @After(value = "@NewUserRegistration_C36189,@ExpressBonus_C39773")
     public void returnRegistrationValueWithScreenshot(Scenario scenario){
-        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-        revertEnabledFeatures("ACTIVE");
+        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
+        revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
         if(scenario.isFailed()) {
             final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
             scenario.embed(screenshot, "image/jpeg");
@@ -1687,8 +1664,8 @@ Thread.sleep(1500);
      */
     @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
     public void returnRegistrationValue(Scenario scenario){
-        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE'");
-        revertEnabledFeatures("ACTIVE");
+        LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
+        revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
 
 
