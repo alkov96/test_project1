@@ -1656,8 +1656,11 @@ Thread.sleep(1500);
 
     @Когда("^закрываем браузер$")
     public static void closeBrowser() {
-        PageFactory.dispose();
-        LOG.info("Браузер закрыт");
+        try {
+            PageFactory.dispose();
+        }catch (Exception e) {
+            LOG.info("Браузер закрыт");
+        }
     }
 
     @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
