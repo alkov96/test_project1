@@ -2080,10 +2080,15 @@ Thread.sleep(1500);
      */
     public static String newFormatDate(SimpleDateFormat old, SimpleDateFormat newFormat, String oldDate){
         String newDate = new String();
-        try {
-            newDate =  newFormat.format(old.parse(oldDate));
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if(oldDate.isEmpty() || oldDate == null){
+            LOG.info("Дату [" + oldDate + "] не удалось перевести");
+            return null;
+        } else {
+            try {
+                newDate = newFormat.format(old.parse(oldDate));
+            } catch (ParseException e) {
+               throw new AutotestError("Ошибка! Не удалось перевести дату [" + oldDate + "] в нужный формат [" + newFormat.toString() + "]");
+            }
         }
         return newDate;
     }
