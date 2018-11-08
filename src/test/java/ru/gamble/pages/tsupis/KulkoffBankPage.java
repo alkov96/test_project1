@@ -31,7 +31,7 @@ public class KulkoffBankPage extends AbstractPage {
         public KulkoffBankPage() {
             WebDriver driver = PageFactory.getDriver();
             PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
+            new WebDriverWait(driver, 20).until(ExpectedConditions.visibilityOf(pageTitle));
         }
 
     }

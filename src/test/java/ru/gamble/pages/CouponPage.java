@@ -64,6 +64,9 @@ public class CouponPage extends AbstractPage {
     @FindBy(xpath = "//span[@class='btn btn_full-width']")
     protected WebElement clearCoupon;
 
+    @ElementTitle("Тип купона")
+    @FindBy(xpath = "//div[contains(@class,'coupon__types')]//li[contains(@class,'selected')]")
+    private WebElement couponType;
 
     static By expressBonusText = xpath("//div[contains(@class,'coupon-bet_offer')]//span[contains(@class,'coupon-bet__text')]");
     static By expressBonusLink = xpath("//div[contains(@class,'coupon-bet_offer')]//a[contains(@class,'coupon-bet__link')]");
@@ -451,8 +454,6 @@ public class CouponPage extends AbstractPage {
         }
     }
 
-
-
     @ActionTitle("заключает пари")
     public void doBet() throws AuthenticationException, InterruptedException {
         WebDriver driver = PageFactory.getDriver();
@@ -469,23 +470,18 @@ public class CouponPage extends AbstractPage {
         LOG.info("Возвращаемся к списку событий в купоне");
         driver.findElement(xpath("//span[text()='Купон']")).click();
 
-        String typeCoupon = driver.findElement(xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'coupon-tabs__item_selected')]")).getAttribute("innerText");
+        String typeCoupon = couponType.getAttribute("innerText");
         int expectedCouponSize = typeCoupon.contains("Ординар") ? (sizeCoupon - 1) : 0;
 
         LOG.info("Жмём 'Заключить пари'");
-        //coupon_bet_button.click();
         buttonBet.click();
-        //driver.findElement(By.xpath("//button_of_param_in_coupon[normalize-space(text())='Заключить пари']")).click();
-
         waitingForPreloaderToDisappear(30);
 
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
         Thread.sleep(10000);
         if (driver.findElements(xpath("//ul[@class='coupon-bet__content']")).size() > expectedCouponSize) {
-            Assertions.fail("Ставка не принялась!");
+            Assertions.fail("Ошибка! Ставка не принялась((");
         } else LOG.info("Ставка принялась!");
-
-        //new WebDriverWait(driver, 10).until(ExpectedConditions.numberOfElementsToBe(By.xpath(xpathBet),expectedCouponSize));
 
     }
 
@@ -554,7 +550,7 @@ public class CouponPage extends AbstractPage {
 
 
     /**
-     * првоерка кнопка Заключить Пари в купоне активна или заблокирована. и Печать ошибок и предупреждений в купоне, если есть
+     * Метод проверяет кнопку 'Заключить Пари' в купоне активна или заблокирована и печать ошибок и предупреждений в купоне, если есть.
      *
      * @param status - ожидаемое состояние кнопки(активна, заблокирована)
      */
@@ -676,8 +672,7 @@ public class CouponPage extends AbstractPage {
 
     @ActionTitle("проверяет что текущий тип купона")
     public void checkCurrentTypeCoupon(String expectedType){
-        String currentType = getWebDriver().findElement(
-                xpath("//div[contains(@class,'coupon__types')]//li[contains(@class,'selected')]")).getAttribute("innerText");
+        String currentType = couponType.getAttribute("innerText");
         assertTrue(
                 "Текущий тип купона неправильный! Ожидалось " + expectedType + ", а на самом деле " + currentType,
                 currentType.trim().equalsIgnoreCase(expectedType));
@@ -730,11 +725,10 @@ public class CouponPage extends AbstractPage {
         driver.findElement(filtrHeadXpath).click();
         tryToClick(driver.findElement(filtrHeadXpath).
                 findElement(By.xpath("following-sibling::div[contains(@class,'scroll-contain')]//span[normalize-space(text())='" + filter + "']")));
-
-        String currentFilter = driver.findElement(filtrHeadXpath).findElement(By.xpath("span")).getAttribute("innerText");
+        String currentFilter = driver.findElement(filtrHeadXpath).getAttribute("innerText");
         Assert.assertTrue(
                 "Не сработал фильтр для истории заключенных пари в купоне. вместо " + filter + ", включен " + currentFilter,
-                currentFilter.contains(filter));
+                currentFilter.equalsIgnoreCase(filter));
         CommonStepDefs.workWithPreloader();
     }
 

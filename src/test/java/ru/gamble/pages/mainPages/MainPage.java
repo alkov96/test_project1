@@ -251,26 +251,6 @@ public class MainPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("проверяет наличие обязательных разделов новостей с")
-    public void checksForNewsBlock(DataTable dataTable){
-        String xpathAvailability;
-        WebElement current;
-        String xpath = "//div[contains(@class,'news-widget-head') and contains(@class,'active')]";
-        WebDriver driver = PageFactory.getWebDriver();
-        List<String> table = dataTable.asList(String.class);
-        String section;
-        List<WebElement> main = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'news-widget-head__')]"))
-                .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-
-            for(int i = 0; i < table.size(); i++) {
-                section = table.get(i);
-                if (main.get(i).getAttribute("innerText").isEmpty() || main.get(i).getAttribute("innerText") == null){main.get(i).click();}
-                String tmp = main.get(i).getAttribute("innerText").toUpperCase();
-                assertThat(tmp).as("Строка [" + tmp + "] не соответсвует [" + section + "]").contains(section);
-                LOG.info("Найден раздел новостей::" + main.get(i).getAttribute("innerText"));
-            }
-    }
-
     @ActionTitle("проверяет что дайджест новостей не пустой")
     public void verifiesThatNewsDigestsNotEmpty() {
         List<WebElement> digestList = PageFactory.getWebDriver().findElements(By.xpath("//a[@class='news-widget__item-inner']"))
@@ -281,8 +261,6 @@ public class MainPage extends AbstractPage {
           LOG.info("Найдена новость::" + element.getAttribute("innerText").replaceAll("\n", " ").replaceAll("\\?","\""));
         }
     }
-
-
 
     @ActionTitle("ищет доступные коэффиценты на Главной")
     public void findAvailableCoef() {

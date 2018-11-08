@@ -43,6 +43,8 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
+import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import javax.net.ssl.*;
 import java.awt.*;
@@ -637,6 +639,56 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 
+
+
+    @Когда("^выбираем одну дату из \"([^\"]*)\" и сохраняем в \"([^\"]*)\" а id_user в \"([^\"]*)\"$")
+    public void selectOneDateInResponce(String keyResponce, String keyDate, String keyId) throws ParseException {
+        SimpleDateFormat oldFormat = new SimpleDateFormat("dd.MM.yyyy kk:mm");
+        SimpleDateFormat newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        String actual = JSONValue.toJSONString(Stash.getValue(keyResponce));
+        actual = actual.replace("{\"code\":0,\"data\":","").replace("}","");
+        String[] linesResponce = actual.split("swarmUserId");
+        int i = new Random().nextInt(linesResponce.length);
+        String idUser = linesResponce[i].split(",")[0].replace("\":","");
+        String dateForUser = null;
+        if (actual.contains("videoIdentDate")){
+            int a = linesResponce[i].replaceAll("\"","").indexOf("videoIdentDate");
+            dateForUser = linesResponce[i].replaceAll("\"","").substring(a+15,a+34);
+            oldFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm:ss");
+            newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        }
+        if (actual.contains("skypeSendDate")){
+            int a = linesResponce[i].replaceAll("\"","").indexOf("skypeSendDate");
+            dateForUser = linesResponce[i].replaceAll("\"","").substring(a+14,a+30);
+            oldFormat = new SimpleDateFormat("dd.MM.yyyy kk:mm");
+            newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        }
+
+        LOG.info("Выбранная дата: " + dateForUser + ", для юзера с id = " + idUser);
+
+        LOG.info("Отнимем от даты одну минуту");
+        Calendar newDateTime = new GregorianCalendar();
+
+        newDateTime.setTime(oldFormat.parse(dateForUser));
+        newDateTime.add(Calendar.MINUTE,-1);
+        LOG.info("Теперь переведем дату в нужны формат");
+        dateForUser = newFormat.format(newDateTime.getTime()).replace(" ","T")+":00";
+
+        Stash.put(keyDate,dateForUser);
+        Stash.put(keyId,idUser);
+
+        LOG.info("Новая дата: " + dateForUser);
+    }
+
+
+    @Когда("^проверка что в ответе \"([^\"]*)\" нет юзера с \"([^\"]*)\"$")
+    public void checkResponceNotConains(String keyResponce, String keyId){
+        String actual = JSONValue.toJSONString(Stash.getValue(keyResponce));
+        String userId = Stash.getValue(keyId);
+        Assert.assertFalse("В ответе есть пользователь "  + userId + ", хотя он не вписывается в заданные ts и ts_end:" + Stash.getValue("PARAMS"),
+                actual.contains("\"swarmUserId\":" + userId));
+        LOG.info("В ответе действительно теперь нет записи о пользователе с id=" + userId);
+    }
 
     @Когда("^проверка что в ответе \"([^\"]*)\" верные даты  \"([^\"]*)\":$")
     public void checkResponceAPIgoodDate(String keyStash, String keyParams) throws ParseException{
@@ -1451,12 +1503,17 @@ Thread.sleep(1500);
         ObjectMapper mapper;
         StringBuilder params = new StringBuilder();
         SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat formatTime = new SimpleDateFormat("kk:mm:ss");
         for (Map.Entry<String, String> entry : table.entrySet()) {
             key = entry.getKey();
             Calendar dateNow = Calendar.getInstance();
 
-            switch (entry.getValue()){
+            value = entry.getValue();
+            if (value.matches("[A-Z]*")){
+                value="fromStash";
+            }
+
+            switch (value){
                 case "прошлый месяц":
                     dateNow.add(Calendar.DAY_OF_YEAR,-30);
                     value = formatDate.format(dateNow.getTime()) + "T" + formatTime.format(Calendar.getInstance().getTime());
@@ -1468,8 +1525,9 @@ Thread.sleep(1500);
                     dateNow.add(Calendar.DAY_OF_YEAR,30);
                     value = formatDate.format(dateNow.getTime()) + "T" + formatTime.format(Calendar.getInstance().getTime());
                     break;
-                default:
-                    value = entry.getValue();
+                case "fromStash":
+                    value = Stash.getValue(entry.getValue());
+                    break;
             }
             params.append(key+"="+value+"&");
         }
@@ -1516,7 +1574,8 @@ Thread.sleep(1500);
                 Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
             }
             else {
-                LOG.info("fail" + connect.getResponseCode() + ", " + connect.getResponseMessage());}
+                LOG.info("fail" + connect.getResponseCode() + ", " + connect.getResponseMessage());
+                Stash.put(keyStash, JSONValue.parse(connect.getResponseMessage()));}
             jsonString.toString();
         }
         catch (Throwable cause){
@@ -1651,16 +1710,6 @@ Thread.sleep(1500);
         String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='index_main_default'";
         String delay = workWithDBgetResult(sqlRequest, "delay");
         Stash.put(keyDelay,delay);
-    }
-
-
-    @Когда("^закрываем браузер$")
-    public static void closeBrowser() {
-        try {
-            PageFactory.dispose();
-        }catch (Exception e) {
-            LOG.info("Браузер закрыт");
-        }
     }
 
     @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
@@ -1807,7 +1856,6 @@ Thread.sleep(1500);
             final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
             scenario.embed(screenshot, "image/jpeg");
         }
-        closeBrowser();
     }
 
 
@@ -2032,23 +2080,25 @@ Thread.sleep(1500);
      */
     public static String newFormatDate(SimpleDateFormat old, SimpleDateFormat newFormat, String oldDate){
         String newDate = new String();
-        try {
-            newDate =  newFormat.format(old.parse(oldDate));
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if(oldDate.isEmpty() || oldDate == null){
+            LOG.info("Дату [" + oldDate + "] не удалось перевести");
+            return null;
+        } else {
+            try {
+                newDate = newFormat.format(old.parse(oldDate));
+            } catch (ParseException e) {
+               throw new AutotestError("Ошибка! Не удалось перевести дату [" + oldDate + "] в нужный формат [" + newFormat.toString() + "]");
+            }
         }
         return newDate;
     }
 
-    public static void scrollToElement(WebElement element){
-//        Actions actions = new Actions(driver);
-//        actions.moveToElement(element);
-//        actions.perform();
-    }
-    public static String returnCode(String smsKa){
-
-        return workWithDBgetResult(smsKa, "code");
-
+    /**
+     * Метода запрашивает у базы код SMS
+     * @requestToDB - строка SQL-запроса
+     */
+    public static String returnCode(String requestToDB){
+        return workWithDBgetResult(requestToDB, "code");
     }
 
     @Когда("^выбираем ФИО \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\"$")
@@ -2105,7 +2155,7 @@ Thread.sleep(1500);
     @Когда("^нажмем Продолжить регу на всякий$")
     public void rega(){
         PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
-        }
+    }
 
 
 }
