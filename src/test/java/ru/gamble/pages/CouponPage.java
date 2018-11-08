@@ -725,8 +725,6 @@ public class CouponPage extends AbstractPage {
         driver.findElement(filtrHeadXpath).click();
         tryToClick(driver.findElement(filtrHeadXpath).
                 findElement(By.xpath("following-sibling::div[contains(@class,'scroll-contain')]//span[normalize-space(text())='" + filter + "']")));
-
-//        String currentFilter = driver.findElement(filtrHeadXpath).findElement(By.xpath("span")).getAttribute("innerText");
         String currentFilter = driver.findElement(filtrHeadXpath).getAttribute("innerText");
         Assert.assertTrue(
                 "Не сработал фильтр для истории заключенных пари в купоне. вместо " + filter + ", включен " + currentFilter,
