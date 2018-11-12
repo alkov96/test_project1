@@ -270,11 +270,13 @@ public class MyBetting extends AbstractPage {
         WebDriver driver = PageFactory.getWebDriver();
         int  cou = 3;
         LOG.info("Сначала включаем фильтр 'Ожидается'");
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
         driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
         driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
         CommonStepDefs.workWithPreloader();
 
         LOG.info("Теперь включаем фильтр по типу ставки " + filter);
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
         driver.findElement(xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
         driver.findElement(xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + filter + "']")).click();
         CommonStepDefs.workWithPreloader();
