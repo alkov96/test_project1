@@ -77,7 +77,7 @@ public abstract class AbstractPage extends Page {
 
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
-    protected WebElement preferences;
+    public static WebElement preferences;
 
     @ElementTitle("Активация Быстрой ставки")
     @FindBy(xpath = "//div[@class='coupon__toggler']/label")

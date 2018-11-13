@@ -29,6 +29,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -65,12 +66,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
 import static org.springframework.util.StreamUtils.BUFFER_SIZE;
 import static org.springframework.util.StreamUtils.drain;
+import static ru.gamble.pages.AbstractPage.preferences;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
@@ -1858,6 +1861,22 @@ Thread.sleep(1500);
         }
     }
 
+    /**
+     * Возвращаем десятичный тип отображения коэффициентов
+     */
+    @After(value = "@ChangeTypeOfCoefficientOnMain_C1066,@ChangeTypeOfCoefficientCoupon_C1066,@ChangeTypeOfCoefficientFav_C1066")
+    public void returnDecTypeCoef(){
+        WebDriver driver = PageFactory.getDriver();
+        LOG.info("переходит в настройки и меняет коэффицент");
+        String previous;
+        LOG.info("Нажимаем на кнопку с шетсерёнкой");
+        if (!preferences.getAttribute("class").contains("active")) {
+            preferences.click();
+        }
+        driver.findElement(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__key') and normalize-space(text())='Десятичный']")).click();
+    }
+
+
 
     /**
      * Возвращаем активные опции сайста в исходное положение до тестов
@@ -2156,7 +2175,6 @@ Thread.sleep(1500);
     public void rega(){
         PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
     }
-
 
 }
 
