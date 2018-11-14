@@ -94,6 +94,7 @@ public class FavouritePage extends AbstractPage {
     public void goFromFavourite(){
         WebDriver driver = PageFactory.getDriver();
         boolean flag=true;
+        String period = Stash.getValue("keyPeriod");
         List<WebElement> allMyGames = driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']"));
         List<String> names = Stash.getValue("nameGameKey");
         List<String> teams = new ArrayList<>();
@@ -121,7 +122,7 @@ public class FavouritePage extends AbstractPage {
                     Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "PrematchInPeriod":
-                    flag=EventViewerPage.pagePrematch(teams.get(index),  "2 часа",true);
+                    flag=EventViewerPage.pagePrematch(teams.get(index),  period,true);
                     Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "LiveWithVideo":
