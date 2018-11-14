@@ -2,6 +2,7 @@ package ru.gamble.pages.userProfilePages;
 
 
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -93,6 +94,7 @@ public class FavouritePage extends AbstractPage {
     public void goFromFavourite(){
         WebDriver driver = PageFactory.getDriver();
         boolean flag=true;
+        String period = Stash.getValue("keyPeriod");
         List<WebElement> allMyGames = driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']"));
         List<String> names = Stash.getValue("nameGameKey");
         List<String> teams = new ArrayList<>();
@@ -102,14 +104,12 @@ public class FavouritePage extends AbstractPage {
         for (int MyGameN = 0; MyGameN < allMyGames.size(); MyGameN++) {
             String nameMyGame = allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title");
             int index;
+            index = teams.indexOf(CommonStepDefs.stringParse(nameMyGame));
+            Assert.assertFalse(
+                    "Игра в Избранное не добавлялась. Игра " + CommonStepDefs.stringParse(nameMyGame) + "а в Избранном "+ teams,
+                    index<0
+            );
 
-            try {
-                index = teams.indexOf(CommonStepDefs.stringParse(nameMyGame));
-            } catch (Exception e) {
-                LOG.info("Игра в Избранное не добавлялась. Игра " + CommonStepDefs.stringParse(nameMyGame) + "а в Избранном "+ teams);
-                LOG.error("Exception " + e);
-                return;
-            }
             LOG.info("gameis" + allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title"));
 //переходим на игру из Избранного и ждем загрузки страницы
             //driver.findElement(By.xpath("//*[@id='private_panel']/li[3]/div[1]/div[1]/div[2]/div[" + (MyGameN + 1) + "]")).click();
@@ -118,20 +118,23 @@ public class FavouritePage extends AbstractPage {
             //   switch(typeGame){
             switch (types.get(index)) {
                 case "PrematchVnePeriod":
-                    flag&=EventViewerPage.pagePrematch(teams.get(index), "Любое время",true);
+                    flag=EventViewerPage.pagePrematch(teams.get(index), "Любое время",true);
+                    Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "PrematchInPeriod":
-                    flag&=EventViewerPage.pagePrematch(teams.get(index),  "2 часа",true);
+                    flag=EventViewerPage.pagePrematch(teams.get(index),  period,true);
+                    Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "LiveWithVideo":
-                    flag&=VewingEventsPage.pageLive(teams.get(index),true,true);
+                    flag=VewingEventsPage.pageLive(teams.get(index),true,true);
+                    Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "LiveWithoutVideo":
-                    flag&=VewingEventsPage.pageLive(teams.get(index),  true,true);
+                    flag=VewingEventsPage.pageLive(teams.get(index),  true,true);
+                    Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 default:
-                    flag=false;
-                    LOG.error("В избранном игра, для которой не сохранился тип");
+                    fail("В избранном игра, для которой не сохранился тип");
                     break;
             }
 
@@ -200,7 +203,7 @@ public class FavouritePage extends AbstractPage {
         LOG.info("Проверка что в Избранном игр не больше, чем добавлялось");
         if (teams.size() < allMyGames.size())
         {
-            fail("В избранном лишние игры");
+            fail("В избранном лишние игры:" + allMyGames.size() + " вместо " + teams.size());
         }
         LOG.info("Проверка названий игр, которе оказались в Избранном по названию");
         for (WebElement gameN : allMyGames){

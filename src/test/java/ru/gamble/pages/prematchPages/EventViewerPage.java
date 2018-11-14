@@ -399,6 +399,7 @@ public class EventViewerPage extends AbstractPage {
         driver.findElement(By.xpath("//div[@class='periods']//div[contains(@class,'periods__input')]")).click();
         driver.findElement(By.xpath("//div[@class='periods']//ul[@class='periods__list']/li[contains(text(),'"+period+"')]")).click();
         CommonStepDefs.workWithPreloader();
+        Stash.put("keyPeriod",period);
     }
 
     /**
