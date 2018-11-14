@@ -29,7 +29,6 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
@@ -67,20 +66,7 @@ public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
     private static final String sep = File.separator;
 
-    @ActionTitle("нажимает на кнопку")
-    public static void pressButton(String param) {
-        Page page;
-        WebElement button;
-        try {
-            page = PageFactory.getInstance().getCurrentPage();
-            button = page.getElementByTitle(param);
-            button.click();
-            workWithPreloader();
-        } catch (PageException e) {
-            throw new AutotestError("Ошибка! Не удалось нажать на копку [" + param + "]\n" + e.getMessage());
-        }
 
-    }
 
     @Когда("^запрашиваем дату-время и сохраняем в память$")
     public static void requestAndSaveToMamory(DataTable dataTable){
@@ -1516,7 +1502,6 @@ public class CommonStepDefs extends GenericStepDefs {
         };
 
         try {
-//            SSLContext sc = SSLContext.getInstance("SSL");
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
@@ -2059,5 +2044,18 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
+    public static void pressButton(String param) {
+        Page page;
+        WebElement button;
+        try {
+            page = PageFactory.getInstance().getCurrentPage();
+            button = page.getElementByTitle(param);
+            button.click();
+            workWithPreloader();
+        } catch (PageException e) {
+            throw new AutotestError("Ошибка! Не удалось нажать на копку [" + param + "]\n" + e.getMessage());
+        }
+
+    }
 }
 

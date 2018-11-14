@@ -42,7 +42,7 @@ import static ru.gamble.utility.Generators.randomString;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 
-public abstract class AbstractPage extends Page {
+public abstract class AbstractPage extends Page{
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
     public static By xpathListBets = xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul");
@@ -115,7 +115,6 @@ public abstract class AbstractPage extends Page {
     @FindBy (xpath = "//div[@class='footer__pin']")
     private WebElement podval;
 
-    // Метод три раза пытается обновить главную страницу
 
     @ActionTitle("открывает Избранное")
     public static void openFavourite() {
