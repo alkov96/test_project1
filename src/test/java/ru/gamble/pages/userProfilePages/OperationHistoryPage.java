@@ -75,12 +75,10 @@ public class OperationHistoryPage extends AbstractPage {
 
         operationsId = driver.findElements(By.xpath("//span[@class='history__id']/span"));
         operationsId.forEach(element -> id.add(element.getAttribute("innerText")));
-        currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page') and contains(@class,'active')]")).getAttribute("innerText"));
+        currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         page.click();
 
-        Thread.sleep(500);
-
-        newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page') and contains(@class,'active')]")).getAttribute("innerText"));
+        newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         LOG.info("Перешли на страницу  [" + newPage + "]");
         if (newPage.equals(currentPage)) {
             Assert.fail("Страница не перелистнулась!! была активной страница" + currentPage + " стала активно страница " + newPage);
@@ -94,7 +92,7 @@ public class OperationHistoryPage extends AbstractPage {
     public void pagesCheck() throws Exception {
         WebDriver driver = PageFactory.getDriver();
 
-        List<WebElement> pages = driver.findElements(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page') and not(contains(@class,'active'))]"));//неактивные стрницы(без стрелок)
+        List<WebElement> pages = driver.findElements(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and not(contains(@class,'active'))]"));//неактивные стрницы(без стрелок)
         LOG.info("Листаем на последнюю из видимых страниц");
         assertTrue(changePage(pages.get(pages.size() - 1)));
         LOG.info("Листаем влево");

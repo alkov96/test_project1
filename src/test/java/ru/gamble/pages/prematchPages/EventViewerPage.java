@@ -558,16 +558,16 @@ public class EventViewerPage extends AbstractPage {
         setExpandCollapseMenusButton(false);
         List<WebElement> innerHeader = driver.findElements(By.xpath("//div[contains(@class,'game-center-container__inner-header')]/div[contains(@class,'title-box')]"));
         LOG.info("Очищаем список в многовыборном режиме через кнопку #Очистить все#");
-        innerHeader.get(0).findElement(By.xpath("./div[contains(@class,'clear-all btn')]")).click();
+        innerHeader.get(0).findElement(By.xpath("div[contains(@class,'clear-all btn')]")).click();
         if (!driver.findElements(preloaderOnPage).isEmpty()){
             driver.navigate().refresh();
             CommonStepDefs.workWithPreloader();
         }
         LOG.info("Смотрим не осталось ли игр в контейнере");
-        By xpathContainer = By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-games')]");
-        new WebDriverWait(driver,10)
-                .withMessage("Список игр в многовыборном режиме не очистился за 10 секунд. Там сейчас элементов " + driver.findElements(xpathContainer).size())
-                .until(ExpectedConditions.numberOfElementsToBeLessThan(xpathContainer,1));
+        List<WebElement> MultiViewContainer = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-games')]"));
+        Assert.assertTrue(
+                "Не очистился контейнер в многовыборном режиме",
+                MultiViewContainer.isEmpty());
     }
 
     @ActionTitle("добавляет в многовыборный режим целое соревнование из вида спорта номер")
