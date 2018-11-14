@@ -1,7 +1,6 @@
 package ru.gamble.pages;
 
 import cucumber.api.Scenario;
-import cucumber.api.java.ru.Когда;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
@@ -26,7 +25,10 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -229,7 +231,7 @@ public abstract class AbstractPage extends Page {
             LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
             Thread.sleep(5000);
             if (!driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).isDisplayed()) {
-                Assert.fail("Ошибка! Не пояивлось диалоговое окно с надписью 'Спасибо!'");
+                Assert.fail("Ошибка! Не появилось диалоговое окно с надписью 'Спасибо!'");
             }
             LOG.info("Закрываем уведомление об успешном подтверждении почты");
             driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();

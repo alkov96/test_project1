@@ -2,8 +2,6 @@ package ru.gamble.stepdefs;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
 import com.neovisionaries.ws.client.*;
 import cucumber.api.DataTable;
 import cucumber.api.Scenario;
@@ -36,6 +34,7 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
+
 import javax.net.ssl.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -105,6 +104,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String key, value;
         key = data.get(0);
         value = data.get(1);
+
 
         if (value.equals("skypeLoginGenerate")) {
             value = "skype" + Stash.getValue("PHONE");
@@ -1006,89 +1006,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
 
-    @Когда("^берем \"([^\"]*)\"$")
-    public static void confirmEmail2(String keyPhone) throws Exception{
-        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7111002%' ORDER BY phone";
-        String phoneLast = ww(sqlRequest, "phone");
-        String phone = "7111002" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
-        Stash.put(keyPhone, phone);
-        LOG.info("Вычислили подходящий номер телефона::" + phone);
-    }
-
-    public static String ww (String sqlRequest, String param) throws Exception {
-
-        Connection con = null;
-
-        String url, user, password;
-        JSch jsch = new JSch();
-        String proxyHost = "test-int-bet-dbproca.tsed.orglot.office";
-        String proxyUser = "tzavaliy";
-        String proxyPassword = "2007-12g";
-
-        String nameBD = "gamebet";
-           url = "test-int-bet-dbproc.tsed.orglot.office";
-//        url = "localhost";
-        user = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_USER").getValue();
-        password = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_PASSWORD").getValue();
-
-        String result = null;
-        int localPort = 3366;
-        Session session = jsch.getSession(proxyUser, proxyHost, 22);
-        try {
-
-            java.util.Properties config = new java.util.Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            session.setPassword(proxyPassword);
-
-            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-            session.connect();
-            session.setPortForwardingL(localPort, url, 3306);
-
-
-            Properties properties = new Properties();
-            properties.setProperty("user", user);
-            properties.setProperty("password", password);
-            properties.setProperty("useUnicode", "true");
-            properties.setProperty("characterEncoding", "UTF-8");
-            properties.setProperty("autoReconnect", "true");
-            properties.setProperty("connectTimeout", "6000");
-            properties.setProperty("socketTimeout", "2000");
-            properties.setProperty("maxReconnects", "1");
-            properties.setProperty("retriesAllDown", "1");
-//            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
-            con = DriverManager.getConnection(
-                    "jdbc:mysql://" + url + ":" + localPort + "/" + nameBD , properties);
-
-            Statement stmt;
-            PreparedStatement ps = null;
-            ResultSet rs;
-
-
-
-            con.setAutoCommit(false);// Отключаем автокоммит
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(sqlRequest);
-            con.commit();
-            rs.last();
-            result = rs.getString(param);
-
-            if (result.isEmpty()) {
-                throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
-            }
-            LOG.info("SQL-request [" + result + "]");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            session.disconnect();
-        }
-        return result;
-    }
-
-
-
     @Когда("^подтверждаем скайп через админку \"([^\"]*)\"$")
     public void skypeConfirm(String keyPhone) throws Exception{
         WebDriver driver = PageFactory.getDriver();
@@ -1134,8 +1051,6 @@ public class CommonStepDefs extends GenericStepDefs {
         driver.findElement(By.id("saveUserBtn-btnIconEl")).click();
     }
 
-
-
     @Когда("^в админке смотрим id пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public void getIDFromAdmin(String keyPhone,String keyId) throws Exception{
         WebDriver driver = PageFactory.getDriver();
@@ -1150,7 +1065,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         driver.switchTo().window(newWindow);
 
-Thread.sleep(1500);
+        Thread.sleep(1500);
         WebElement authForm = driver.findElement(By.xpath("//div[@class='x-panel x-panel-default-framed x-box-item']"));
 
         WebElement enterBottom = driver.findElement(By.xpath("//span[@id='button-1014-btnIconEl']"));
@@ -1170,8 +1085,6 @@ Thread.sleep(1500);
 
         String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getAttribute("innerText");
         Stash.put(keyId,id);
-
-
     }
 
 
