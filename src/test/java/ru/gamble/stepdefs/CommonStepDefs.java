@@ -1672,12 +1672,12 @@ public class CommonStepDefs extends GenericStepDefs {
         Map<String,String> table = dataTable.asMap(String.class,String.class);
         for (Map.Entry<String, String> entry : table.entrySet()) {
             if (entry.getValue().equals("true")) {
-                optionTrue.append(",'"+entry.getKey() + "'");
-                LOG.info("Добавление активной опций сайта " + entry.getKey());
+                optionTrue.append(",'" + entry.getKey() + "'");
+                LOG.info("[" + entry.getKey() + "] = true");
             }
             else {
                 optionFalse.append(",'" + entry.getKey() + "'");
-                LOG.info("Удаление активной опций сайта " + entry.getKey());
+                LOG.info("[" + entry.getKey() + "] = false");
             }
         }
         optionTrue.delete(0,1);
@@ -1706,11 +1706,11 @@ public class CommonStepDefs extends GenericStepDefs {
         for (Map.Entry<String, String> entry : oldEnabledFeatures.entrySet()) {
             if (entry.getValue().equals("1")) {
                 optionTrue.append(",'" + entry.getKey() + "'");
-                LOG.info("Добавление активной опций сайта " + entry.getKey());
+                LOG.info("[" + entry.getKey() + "] = true");
             }
             else {
                 optionFalse.append(",'" + entry.getKey() + "'");
-                LOG.info("Удаление активной опций сайта " + entry.getKey());
+                LOG.info("[" + entry.getKey() + "] = false");
             }
         }
         optionTrue.delete(0,1);
