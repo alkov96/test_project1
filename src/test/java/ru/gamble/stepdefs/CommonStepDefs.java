@@ -75,6 +75,7 @@ import static org.springframework.util.StreamUtils.BUFFER_SIZE;
 import static org.springframework.util.StreamUtils.drain;
 import static ru.gamble.pages.AbstractPage.preferences;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
+import static ru.gamble.pages.mainPages.FooterPage.opensNewTabAndChecksPresenceOFElement;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
 
@@ -530,9 +531,8 @@ public class CommonStepDefs extends GenericStepDefs {
      * @return true - если все ок.
      */
 
-    public static boolean goLink(WebElement element, String pattern) {
+    public static void goLink(WebElement element, String pattern) {
         WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         LOG.info("Проверяем что откроется правильная ссылка " + pattern);
         pattern = stringParse(pattern);
         int CountWind = driver.getWindowHandles().size();
@@ -543,20 +543,18 @@ public class CommonStepDefs extends GenericStepDefs {
         } else element.click();
         CommonStepDefs.workWithPreloader();
         driver.switchTo().window(driver.getWindowHandles().toArray()[driver.getWindowHandles().size() - 1].toString());
-        if ((CountWind + 1) != driver.getWindowHandles().size()) {
-            LOG.error("Не открылась ссылка");
-            return false;
-        }
+
+        Assert.assertTrue("Не открылась ссылка " + pattern + "\nБыло вкладок " + CountWind + ", стало " + driver.getWindowHandles().size(),
+                (CountWind + 1) == driver.getWindowHandles().size());
+
         LOG.info("Ссылка открылась");
         driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind].toString());
         String siteUrl = stringParse(driver.getCurrentUrl());
-        if (!siteUrl.contains(pattern)) {
-            flag = false;
-            LOG.error("Ссылка открылась, но не то, что надо. Вместо " + pattern + " открылось " + siteUrl);
-        }
+
+        Assert.assertTrue("Ссылка открылась, но не то, что надо. Вместо " + pattern + " открылось " + siteUrl,
+                siteUrl.contains(pattern));
         driver.close();
         driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind - 1].toString()); //мы знаем что поле открытия ссылки на скачивание количесвто ссылок будет на  больше, незачем переопрелеть CountWind.
-        return flag;
     }
 
     @Когда("^(пользователь |он) очищает cookies$")
@@ -2176,5 +2174,21 @@ Thread.sleep(1500);
         PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
     }
 
+    @Когда("^проверяем ТЕКСТ при переходе по ссылке с$")
+    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable){
+        WebDriver driver = PageFactory.getWebDriver();
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String linkTitle, expectedText;
+        String link = "";
+        String currentHandle = driver.getWindowHandle();
+
+        for (Map<String, String> aTable : table) {
+            linkTitle = aTable.get(LINK);
+            expectedText = aTable.get(TEXT);
+            String xpath = "//*[contains(text(),'" + expectedText + "')]";
+            LOG.info("Переходим по клику на элемент " + linkTitle);
+            opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+        }
+    }
 }
 

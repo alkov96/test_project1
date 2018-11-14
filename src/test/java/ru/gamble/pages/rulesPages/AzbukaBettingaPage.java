@@ -16,7 +16,6 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
-import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
@@ -24,10 +23,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.pages.mainPages.FooterPage.opensNewTabAndChecksPresenceOFElement;
 import static ru.gamble.utility.Constants.LINK;
 import static ru.gamble.utility.Constants.TEXT;
+
 
 /**
  * @author a.kovtun
@@ -88,15 +88,19 @@ public class AzbukaBettingaPage extends AbstractPage {
     @FindBy(xpath = "//i[@class='icon icon-android']")
     private WebElement forAndroidLink;
 
-    @ElementTitle("Facebook")
+    @ElementTitle("для айфонов")
+    @FindBy(xpath = "//a[@id='app_desctop_top_block_btn_iphone']")
+    private WebElement forIOSLink;
+
+    @ElementTitle("social Facebook")
     @FindBy(xpath = "//div[contains(@class,'abc-betting-socials')]/a[1]")
     private WebElement facebookLink;
 
-    @ElementTitle("ВКонтакте")
+    @ElementTitle("social ВКонтакте")
     @FindBy(xpath = "//div[contains(@class,'abc-betting-socials')]/a[2]")
     private WebElement vkontakteLink;
 
-    @ElementTitle("Youtube")
+    @ElementTitle("social Youtube")
     @FindBy(xpath = "//div[contains(@class,'abc-betting-socials')]/a[3]")
     private WebElement youtubeLink;
 
@@ -140,22 +144,6 @@ public class AzbukaBettingaPage extends AbstractPage {
         CommonStepDefs.scrollPage(x, y);
     }
 
-    @ActionTitle("проверяем переход на страницы с")
-    public void checkPagesOnPlatforms(DataTable dataTable) throws PageException {
-        WebDriver driver = PageFactory.getWebDriver();
-        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-        String linkElement, titleOnLink;
-        String currentHandle = driver.getWindowHandle();
-        String link = "";
-
-        for (int i = 0; i < table.size(); i++) {
-            linkElement = table.get(i).get(LINK);
-            titleOnLink = table.get(i).get(TEXT);
-            CommonStepDefs.goLink(getElementByTitle(linkElement), titleOnLink);
-
-        }
-    }
-
     @ActionTitle("нажимает на кнопку для загрузки приложения на android")
     public void clickDownloadAndroid() {
         WebDriver driver = PageFactory.getDriver();
@@ -166,6 +154,5 @@ public class AzbukaBettingaPage extends AbstractPage {
     public void downloadAndroidForLanding() throws IOException, InterruptedException {
         LandingAppPage.downloadAndroid();
     }
-
 
 }

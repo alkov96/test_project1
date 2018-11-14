@@ -15,6 +15,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
+import ru.sbtqa.tag.pagefactory.exceptions.ElementNotFoundException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
@@ -59,6 +60,10 @@ public class FooterPage extends AbstractPage {
     @ElementTitle("Для iOS")
     @FindBy(xpath = "//a[contains(.,'Для iOS')]")
     private WebElement foriOSLink;
+
+//    @ElementTitle("для айфонов")
+//    @FindBy(xpath = "//a[@id='app_desctop_top_block_btn_iphone']")
+//    private WebElement forIPhoneLink;
 
     @ElementTitle("Для Android")
     @FindBy(xpath = "//a[contains(.,'Для Android')]")
@@ -111,37 +116,6 @@ public class FooterPage extends AbstractPage {
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
-    @ActionTitle("проверяем ТЕКСТ при переходе по ссылке с")
-    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable){
-        WebDriver driver = PageFactory.getWebDriver();
-        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-        String linkTitle, expectedText;
-        String link = "";
-        String currentHandle = driver.getWindowHandle();
-
-        for (Map<String, String> aTable : table) {
-            linkTitle = aTable.get(LINK);
-            expectedText = aTable.get(TEXT);
-            String xpath = "//*[contains(text(),'" + expectedText + "')]";
-            opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
-        }
-    }
-
-    @ActionTitle("проверяем ЭЛЕМЕНТ при переходе по ссылке с")
-    public void checkElementWhenClickingOnLinkWith(DataTable dataTable){
-        WebDriver driver = PageFactory.getWebDriver();
-        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-        String linkTitle, elementTitle;
-        String link = "";
-        String currentHandle = driver.getWindowHandle();
-
-        for (Map<String, String> aTable : table) {
-            linkTitle = aTable.get(LINK);
-            elementTitle = aTable.get(ELEMENT);
-            String xpath = "//a[contains(@class,'no-reload-js active')]//*[contains(.,'" + elementTitle + "')]";
-            opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
-        }
-    }
 
     /**
      * Метод открывает новую вкладку в браузере, переходит на неё,
@@ -188,7 +162,7 @@ public class FooterPage extends AbstractPage {
                 }
                 driver.navigate().refresh();
                 if(j >= 9){
-                    throw new AutotestError("Ошибка! Не нашли элемент после " + j + " попыток перезагрузки страницы");
+                    throw new AutotestError("Ошибка! Не нашли элемент " + xpath + " после " + j + " попыток перезагрузки страницы");
                 }
             }
         driver.switchTo().window(currentHandle);

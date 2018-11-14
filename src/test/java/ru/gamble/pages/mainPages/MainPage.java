@@ -3,6 +3,7 @@ package ru.gamble.pages.mainPages;
 
 import cucumber.api.DataTable;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -243,10 +244,9 @@ public class MainPage extends AbstractPage {
     public void widgetsOnMain(){
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> attr = driver.findElements(By.xpath("//div[@class='benef__item']/a"));
-        boolean flag = true; //flag, который говорит что все ок. в конце программы смотрим, если он false - значит были ошибки и их выводим
         for (WebElement element : attr) {
             String link = element.getAttribute("href");
-            flag &= CommonStepDefs.goLink(element, link);
+            CommonStepDefs.goLink(element, link);
             LOG.info("Ссылка " + link + " открылась");
         }
     }
