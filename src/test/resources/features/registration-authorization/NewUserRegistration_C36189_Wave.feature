@@ -86,6 +86,8 @@
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
+  @before
+  @after
   @smoke
   @NewUserRegistration_C36189_Wave
   Сценарий: Регистрация нового пользователя через Wave
