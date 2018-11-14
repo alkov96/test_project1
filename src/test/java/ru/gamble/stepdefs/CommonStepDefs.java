@@ -29,7 +29,6 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
@@ -67,21 +66,6 @@ import static ru.gamble.utility.Generators.generateDateForGard;
 public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
     private static final String sep = File.separator;
-
-    @ActionTitle("нажимает на кнопку")
-    public static void pressButton(String param) {
-        Page page;
-        WebElement button;
-        try {
-            page = PageFactory.getInstance().getCurrentPage();
-            button = page.getElementByTitle(param);
-            button.click();
-            workWithPreloader();
-        } catch (PageException e) {
-            throw new AutotestError("Ошибка! Не удалось нажать на копку [" + param + "]\n" + e.getMessage());
-        }
-
-    }
 
     @Когда("^запрашиваем дату-время и сохраняем в память$")
     public static void requestAndSaveToMamory(DataTable dataTable){
@@ -515,8 +499,9 @@ public class CommonStepDefs extends GenericStepDefs {
      * @return true - если все ок.
      */
 
-    public static void goLink(WebElement element, String pattern) {
+    public static boolean goLink(WebElement element, String pattern) {
         WebDriver driver = PageFactory.getDriver();
+        boolean flag = true;
         LOG.info("Проверяем что откроется правильная ссылка " + pattern);
         pattern = stringParse(pattern);
         int CountWind = driver.getWindowHandles().size();
@@ -527,18 +512,20 @@ public class CommonStepDefs extends GenericStepDefs {
         } else element.click();
         CommonStepDefs.workWithPreloader();
         driver.switchTo().window(driver.getWindowHandles().toArray()[driver.getWindowHandles().size() - 1].toString());
-
-        Assert.assertTrue("Не открылась ссылка " + pattern + "\nБыло вкладок " + CountWind + ", стало " + driver.getWindowHandles().size(),
-                (CountWind + 1) == driver.getWindowHandles().size());
-
+        if ((CountWind + 1) != driver.getWindowHandles().size()) {
+            LOG.error("Не открылась ссылка");
+            return false;
+        }
         LOG.info("Ссылка открылась");
         driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind].toString());
         String siteUrl = stringParse(driver.getCurrentUrl());
-
-        Assert.assertTrue("Ссылка открылась, но не то, что надо. Вместо " + pattern + " открылось " + siteUrl,
-                siteUrl.contains(pattern));
+        if (!siteUrl.contains(pattern)) {
+            flag = false;
+            LOG.error("Ссылка открылась, но не то, что надо. Вместо " + pattern + " открылось " + siteUrl);
+        }
         driver.close();
         driver.switchTo().window(driver.getWindowHandles().toArray()[CountWind - 1].toString()); //мы знаем что поле открытия ссылки на скачивание количесвто ссылок будет на  больше, незачем переопрелеть CountWind.
+        return flag;
     }
 
     @Когда("^(пользователь |он) очищает cookies$")
@@ -1513,7 +1500,6 @@ public class CommonStepDefs extends GenericStepDefs {
         };
 
         try {
-//            SSLContext sc = SSLContext.getInstance("SSL");
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
@@ -1636,7 +1622,7 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * это когда активне опции сайта в отдельной таблице
      */
-    @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
+    @Before(value = "@before or @api")
     public void saveRegistrationValue2(){
         rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
@@ -1746,7 +1732,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
      */
-    @After(value = "@NewUserRegistration_C36189,@ExpressBonus_C39773")
+    @After(value = "@after")
     public void returnRegistrationValueWithScreenshot(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
@@ -1759,7 +1745,7 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * Возвращаем десятичный тип отображения коэффициентов
      */
-    @After(value = "@ChangeTypeOfCoefficientOnMain_C1066,@ChangeTypeOfCoefficientCoupon_C1066,@ChangeTypeOfCoefficientFav_C1066")
+    @After(value = "@ChangeTypeOfCoefficientOnMain_C1066 or @ChangeTypeOfCoefficientCoupon_C1066 or @ChangeTypeOfCoefficientFav_C1066")
     public void returnDecTypeCoef(){
         WebDriver driver = PageFactory.getDriver();
         WebElement preferences = driver.findElement(By.id("preferences"));
@@ -1778,7 +1764,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
      */
-    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
+    @After(value = "@0Registration_mobile or @requestVideoChatConfirmation or @1Registration_fullalt_mobile or @requestPhoneCall or @requestVideoChatConfirmation")
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
@@ -2087,6 +2073,21 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info("Переходим по клику на элемент " + linkTitle);
             opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
         }
+    }
+    public static void pressButton(String param) {
+        Page page;
+        WebElement button;
+        try {
+            page = PageFactory.getInstance().getCurrentPage();
+            button = page.getElementByTitle(param);
+            button.click();
+            workWithPreloader();
+        } catch (PageInitializationException e) {
+            e.printStackTrace();
+        } catch (PageException e) {
+            throw new AutotestError("Ошибка! Не удалось нажать на копку [" + param + "]\n" + e.getMessage());
+        }
+
     }
 }
 
