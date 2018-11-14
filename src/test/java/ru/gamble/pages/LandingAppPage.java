@@ -58,7 +58,7 @@ public class LandingAppPage extends AbstractPage {
         x = driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-mac')]")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
         WebElement iosLink = driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-mac')]"));
-        assertThat(CommonStepDefs.goLink(iosLink, "itunes.apple.com")).isTrue();
+        CommonStepDefs.goLink(iosLink, "itunes.apple.com");
         LOG.info("Ссылка " + "itunes.apple.com" + " открылась");
     }
 
@@ -84,7 +84,7 @@ public class LandingAppPage extends AbstractPage {
             } else {
                 String pattern = "play.google.com/intl/ru_ALL/about/restricted-content/gambling";
                 WebElement rules = driver.findElement(By.id("app_desctop_popup_link_more"));
-                assertTrue(CommonStepDefs.goLink(rules, pattern));
+                CommonStepDefs.goLink(rules, pattern);
             }
             if (!driver.findElement(By.id("app_desctop_popup_btn_download")).isDisplayed()) {
                 Assert.fail("На попапе нет кнопки на скачивание");
@@ -187,7 +187,7 @@ public class LandingAppPage extends AbstractPage {
         x = driver.findElement(By.id("app_desctop_freebet_block_btn")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
         String linkFreeBet = driver.findElement(By.id("app_desctop_freebet_block_btn")).getAttribute("href");
-        assertTrue(CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_freebet_block_btn")), linkFreeBet));
+        CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_freebet_block_btn")), linkFreeBet);
         LOG.info("Ссылка на фрибет работает");
     }
 
@@ -200,7 +200,7 @@ public class LandingAppPage extends AbstractPage {
         x = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
         String linkWithdraw = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getAttribute("href");
-        assertTrue(CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_warranty")), linkWithdraw));
+        CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_warranty")), linkWithdraw);
     }
 
     @ActionTitle("смотрит ссылку на правила про НДФЛ")
@@ -211,7 +211,7 @@ public class LandingAppPage extends AbstractPage {
         x = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getLocation().getX() - 100;
         CommonStepDefs.scrollPage(x, y);
         String linkNDFL = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getAttribute("href");
-        assertTrue(CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")), linkNDFL));
+       CommonStepDefs.goLink(driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")), linkNDFL);
     }
 
 
