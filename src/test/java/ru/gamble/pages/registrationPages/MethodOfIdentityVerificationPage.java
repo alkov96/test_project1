@@ -43,6 +43,7 @@ public class MethodOfIdentityVerificationPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        LOG.info("Перешли на страницу  [" + PageFactory.getInstance().getCurrentPageTitle() + "]");
     }
 
     @ActionTitle("нажимает на 'ИНН или СНИЛС'")

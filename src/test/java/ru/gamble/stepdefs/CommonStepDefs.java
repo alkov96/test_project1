@@ -2,11 +2,6 @@ package ru.gamble.stepdefs;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.neovisionaries.ws.client.*;
 import cucumber.api.DataTable;
 import cucumber.api.Scenario;
@@ -16,14 +11,11 @@ import cucumber.api.java.ru.Когда;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -37,14 +29,10 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
-import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import javax.net.ssl.*;
 import java.awt.*;
@@ -69,9 +57,9 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
-import static org.springframework.util.StreamUtils.BUFFER_SIZE;
-import static org.springframework.util.StreamUtils.drain;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
+import static ru.gamble.pages.mainPages.FooterPage.opensNewTabAndChecksPresenceOFElement;
+import static ru.gamble.pages.userProfilePages.FavouritePage.clearFavouriteGames;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
 
@@ -79,21 +67,6 @@ import static ru.gamble.utility.Generators.generateDateForGard;
 public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
     private static final String sep = File.separator;
-
-    @ActionTitle("нажимает на кнопку")
-    public static void pressButton(String param) {
-        Page page;
-        WebElement button;
-        try {
-            page = PageFactory.getInstance().getCurrentPage();
-            button = page.getElementByTitle(param);
-            button.click();
-            workWithPreloader();
-        } catch (PageException e) {
-            throw new AutotestError("Ошибка! Не удалось нажать на копку [" + param + "]\n" + e.getMessage());
-        }
-
-    }
 
     @Когда("^запрашиваем дату-время и сохраняем в память$")
     public static void requestAndSaveToMamory(DataTable dataTable){
@@ -1018,89 +991,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
 
-    @Когда("^берем \"([^\"]*)\"$")
-    public static void confirmEmail2(String keyPhone) throws Exception{
-        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7111002%' ORDER BY phone";
-        String phoneLast = ww(sqlRequest, "phone");
-        String phone = "7111002" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
-        Stash.put(keyPhone, phone);
-        LOG.info("Вычислили подходящий номер телефона::" + phone);
-    }
-
-    public static String ww (String sqlRequest, String param) throws Exception {
-
-        Connection con = null;
-
-        String url, user, password;
-        JSch jsch = new JSch();
-        String proxyHost = "test-int-bet-dbproca.tsed.orglot.office";
-        String proxyUser = "tzavaliy";
-        String proxyPassword = "2007-12g";
-
-        String nameBD = "gamebet";
-           url = "test-int-bet-dbproc.tsed.orglot.office";
-//        url = "localhost";
-        user = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_USER").getValue();
-        password = JsonLoader.getData().get(STARTING_URL).get("DB_REGISTRATION").get("DB_PASSWORD").getValue();
-
-        String result = null;
-        int localPort = 3366;
-        Session session = jsch.getSession(proxyUser, proxyHost, 22);
-        try {
-
-            java.util.Properties config = new java.util.Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            session.setPassword(proxyPassword);
-
-            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-            session.connect();
-            session.setPortForwardingL(localPort, url, 3306);
-
-
-            Properties properties = new Properties();
-            properties.setProperty("user", user);
-            properties.setProperty("password", password);
-            properties.setProperty("useUnicode", "true");
-            properties.setProperty("characterEncoding", "UTF-8");
-            properties.setProperty("autoReconnect", "true");
-            properties.setProperty("connectTimeout", "6000");
-            properties.setProperty("socketTimeout", "2000");
-            properties.setProperty("maxReconnects", "1");
-            properties.setProperty("retriesAllDown", "1");
-//            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
-            con = DriverManager.getConnection(
-                    "jdbc:mysql://" + url + ":" + localPort + "/" + nameBD , properties);
-
-            Statement stmt;
-            PreparedStatement ps = null;
-            ResultSet rs;
-
-
-
-            con.setAutoCommit(false);// Отключаем автокоммит
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(sqlRequest);
-            con.commit();
-            rs.last();
-            result = rs.getString(param);
-
-            if (result.isEmpty()) {
-                throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
-            }
-            LOG.info("SQL-request [" + result + "]");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            session.disconnect();
-        }
-        return result;
-    }
-
-
-
     @Когда("^подтверждаем скайп через админку \"([^\"]*)\"$")
     public void skypeConfirm(String keyPhone) throws Exception{
         WebDriver driver = PageFactory.getDriver();
@@ -1146,8 +1036,6 @@ public class CommonStepDefs extends GenericStepDefs {
         driver.findElement(By.id("saveUserBtn-btnIconEl")).click();
     }
 
-
-
     @Когда("^в админке смотрим id пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public void getIDFromAdmin(String keyPhone,String keyId) throws Exception{
         WebDriver driver = PageFactory.getDriver();
@@ -1162,7 +1050,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         driver.switchTo().window(newWindow);
 
-Thread.sleep(1500);
+        Thread.sleep(1500);
         WebElement authForm = driver.findElement(By.xpath("//div[@class='x-panel x-panel-default-framed x-box-item']"));
 
         WebElement enterBottom = driver.findElement(By.xpath("//span[@id='button-1014-btnIconEl']"));
@@ -1182,8 +1070,6 @@ Thread.sleep(1500);
 
         String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getAttribute("innerText");
         Stash.put(keyId,id);
-
-
     }
 
 
@@ -1615,7 +1501,6 @@ Thread.sleep(1500);
         };
 
         try {
-//            SSLContext sc = SSLContext.getInstance("SSL");
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
@@ -1738,7 +1623,7 @@ Thread.sleep(1500);
     /**
      * это когда активне опции сайта в отдельной таблице
      */
-    @Before(value = "@NewUserRegistration_C36189,@MobileNewUserRegistration_C36189,@api,@mobile,@ExpressBonus_C39773")
+    @Before(value = "@before or @api")
     public void saveRegistrationValue2(){
         rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
@@ -1788,12 +1673,12 @@ Thread.sleep(1500);
         Map<String,String> table = dataTable.asMap(String.class,String.class);
         for (Map.Entry<String, String> entry : table.entrySet()) {
             if (entry.getValue().equals("true")) {
-                optionTrue.append(",'"+entry.getKey() + "'");
-                LOG.info("Добавление активной опций сайта " + entry.getKey());
+                optionTrue.append(",'" + entry.getKey() + "'");
+                LOG.info("[" + entry.getKey() + "] = true");
             }
             else {
                 optionFalse.append(",'" + entry.getKey() + "'");
-                LOG.info("Удаление активной опций сайта " + entry.getKey());
+                LOG.info("[" + entry.getKey() + "] = false");
             }
         }
         optionTrue.delete(0,1);
@@ -1822,11 +1707,11 @@ Thread.sleep(1500);
         for (Map.Entry<String, String> entry : oldEnabledFeatures.entrySet()) {
             if (entry.getValue().equals("1")) {
                 optionTrue.append(",'" + entry.getKey() + "'");
-                LOG.info("Добавление активной опций сайта " + entry.getKey());
+                LOG.info("[" + entry.getKey() + "] = true");
             }
             else {
                 optionFalse.append(",'" + entry.getKey() + "'");
-                LOG.info("Удаление активной опций сайта " + entry.getKey());
+                LOG.info("[" + entry.getKey() + "] = false");
             }
         }
         optionTrue.delete(0,1);
@@ -1848,7 +1733,7 @@ Thread.sleep(1500);
      * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
      */
-    @After(value = "@NewUserRegistration_C36189,@ExpressBonus_C39773")
+    @After(value = "@after")
     public void returnRegistrationValueWithScreenshot(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
@@ -1858,12 +1743,29 @@ Thread.sleep(1500);
         }
     }
 
+    /**
+     * Возвращаем десятичный тип отображения коэффициентов
+     */
+    @After(value = "@ChangeTypeOfCoefficientOnMain_C1066 or @ChangeTypeOfCoefficientCoupon_C1066 or @ChangeTypeOfCoefficientFav_C1066")
+    public void returnDecTypeCoef(){
+        WebDriver driver = PageFactory.getDriver();
+        WebElement preferences = driver.findElement(By.id("preferences"));
+        LOG.info("переходит в настройки и меняет коэффицент");
+        String previous;
+        LOG.info("Нажимаем на кнопку с шетсерёнкой");
+        if (!preferences.getAttribute("class").contains("active")) {
+            preferences.click();
+        }
+        driver.findElement(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__key') and normalize-space(text())='Десятичный']")).click();
+    }
+
+
 
     /**
      * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
      */
-    @After(value = "@0Registration_mobile,@requestVideoChatConfirmation,@1Registration_fullalt_mobile,@requestPhoneCall, @requestVideoChatConfirmation,@mobile")
+    @After(value = "@0Registration_mobile or @requestVideoChatConfirmation or @1Registration_fullalt_mobile or @requestPhoneCall or @requestVideoChatConfirmation")
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
@@ -2157,6 +2059,41 @@ Thread.sleep(1500);
         PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
     }
 
+    @Когда("^проверяем ТЕКСТ при переходе по ссылке с$")
+    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable){
+        WebDriver driver = PageFactory.getWebDriver();
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String linkTitle, expectedText;
+        String link = "";
+        String currentHandle = driver.getWindowHandle();
 
+        for (Map<String, String> aTable : table) {
+            linkTitle = aTable.get(LINK);
+            expectedText = aTable.get(TEXT);
+            String xpath = "//*[contains(text(),'" + expectedText + "')]";
+            LOG.info("Переходим по клику на элемент " + linkTitle);
+            opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+        }
+    }
+    public static void pressButton(String param) {
+        Page page;
+        WebElement button;
+        try {
+            page = PageFactory.getInstance().getCurrentPage();
+            button = page.getElementByTitle(param);
+            button.click();
+            workWithPreloader();
+        } catch (PageInitializationException e) {
+            e.printStackTrace();
+        } catch (PageException e) {
+            throw new AutotestError("Ошибка! Не удалось нажать на копку [" + param + "]\n" + e.getMessage());
+        }
+
+    }
+
+    @Когда("^очищаем избранное$")
+    public void clearFavourite() throws Exception{
+        clearFavouriteGames();
+    }
 }
 

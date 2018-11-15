@@ -1,9 +1,14 @@
 # language: ru
 Функционал: 3_Ставки
 
+
   Предыстория:
     * редактируем некоторые активные опции сайта
     |express_bonus|true|
+
+
+  @before
+  @after
   @smoke
   @ExpressBonus_C39773
 

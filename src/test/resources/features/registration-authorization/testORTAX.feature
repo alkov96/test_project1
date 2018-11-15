@@ -53,21 +53,21 @@
 
     * открывается страница "Паспортные данные"
     * пользователь (заполняет паспорт с) данными
-      | Поле ввода        | Значение | Переменная сохранения |
-      | Серия             | random   | SERIES                |
-      | Номер             | random   | NUMBER                |
+      | Поле ввода        | Значение     | Переменная сохранения |
+      | Серия             | random       | SERIES                |
+      | Номер             | random       | NUMBER                |
       | Дата выдачи       | ISSUE_DATE   | ISSUEDATE             |
-      | Кем выдан         | ОВД      | ISSUER                |
-      | Код подразделения | random   | ISSUERCODE            |
-      | Пол               | random   | SEX                   |
-      | Место рождения    | random   | BIRTHLACATION         |
-      | Регион            | true     | REGION                |
-      | Нас. пункт        | true     | TOWN                  |
-      | Улица             | true     | STREET                |
-      | Дом/владение      | random   | HOUSE                 |
-      | Строение          | random   | null                  |
-      | Корпус            | random   | null                  |
-      | Квартира          | random   | FLAT                  |
+      | Кем выдан         | ОВД          | ISSUER                |
+      | Код подразделения | random       | ISSUERCODE            |
+      | Пол               | random       | SEX                   |
+      | Место рождения    | random       | BIRTHLACATION         |
+      | Регион            | true         | REGION                |
+      | Нас. пункт        | true         | TOWN                  |
+      | Улица             | true         | STREET                |
+      | Дом/владение      | random       | HOUSE                 |
+      | Строение          | random       | null                  |
+      | Корпус            | random       | null                  |
+      | Квартира          | random       | FLAT                  |
 
 
     * добавляем данные в JSON объект "ADDRESS" сохраняем в память:

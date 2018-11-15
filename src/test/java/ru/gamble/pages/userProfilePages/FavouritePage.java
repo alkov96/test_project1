@@ -2,6 +2,7 @@ package ru.gamble.pages.userProfilePages;
 
 
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -25,7 +26,6 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.openqa.selenium.By.xpath;
@@ -92,24 +92,23 @@ public class FavouritePage extends AbstractPage {
     @ActionTitle("проверяет что переходы с игр из Избранного работают верно")
     public void goFromFavourite(){
         WebDriver driver = PageFactory.getDriver();
-        boolean flag=true;
+        boolean flag = true;
+        String period = Stash.getValue("keyPeriod");
         List<WebElement> allMyGames = driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']"));
         List<String> names = Stash.getValue("nameGameKey");
         List<String> teams = new ArrayList<>();
-        names.forEach(name->teams.add(CommonStepDefs.stringParse(name)));
+        names.forEach(name -> teams.add(CommonStepDefs.stringParse(name)));
         List<String> types = Stash.getValue("typeGameKey");
         LOG.info("Переход из избранного на игры");
         for (int MyGameN = 0; MyGameN < allMyGames.size(); MyGameN++) {
             String nameMyGame = allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title");
             int index;
+            index = teams.indexOf(CommonStepDefs.stringParse(nameMyGame));
+            Assert.assertFalse(
+                    "Игра в Избранное не добавлялась. Игра [" + CommonStepDefs.stringParse(nameMyGame) + "], а в Избранном [" + teams + "]",
+                    index<0
+            );
 
-            try {
-                index = teams.indexOf(CommonStepDefs.stringParse(nameMyGame));
-            } catch (Exception e) {
-                LOG.info("Игра в Избранное не добавлялась. Игра " + CommonStepDefs.stringParse(nameMyGame) + "а в Избранном "+ teams);
-                LOG.error("Exception " + e);
-                return;
-            }
             LOG.info("gameis" + allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title"));
 //переходим на игру из Избранного и ждем загрузки страницы
             //driver.findElement(By.xpath("//*[@id='private_panel']/li[3]/div[1]/div[1]/div[2]/div[" + (MyGameN + 1) + "]")).click();
@@ -118,28 +117,27 @@ public class FavouritePage extends AbstractPage {
             //   switch(typeGame){
             switch (types.get(index)) {
                 case "PrematchVnePeriod":
-                    flag&=EventViewerPage.pagePrematch(teams.get(index), "Любое время",true);
+                    flag=EventViewerPage.pagePrematch(teams.get(index), "Любое время",true);
+                    Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "PrematchInPeriod":
-                    flag&=EventViewerPage.pagePrematch(teams.get(index),  "2 часа",true);
+                    flag=EventViewerPage.pagePrematch(teams.get(index),  period,true);
+                    Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "LiveWithVideo":
-                    flag&=VewingEventsPage.pageLive(teams.get(index),true,true);
+                    flag=VewingEventsPage.pageLive(teams.get(index),true,true);
+                    Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "LiveWithoutVideo":
-                    flag&=VewingEventsPage.pageLive(teams.get(index),  true,true);
+                    flag=VewingEventsPage.pageLive(teams.get(index),  true,true);
+                    Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 default:
-                    flag=false;
-                    LOG.error("В избранном игра, для которой не сохранился тип");
+                    fail("В избранном игра, для которой не сохранился тип");
                     break;
             }
-
-//            driver.findElement(By.className("topLogo888")).click();
-//            inspector.expectation();
             driver.findElement(By.xpath("//*[@id='elected']")).click();
             CommonStepDefs.workWithPreloader();
-//            inspector.expectation();
         }
     }
 
@@ -200,7 +198,7 @@ public class FavouritePage extends AbstractPage {
         LOG.info("Проверка что в Избранном игр не больше, чем добавлялось");
         if (teams.size() < allMyGames.size())
         {
-            fail("В избранном лишние игры");
+            fail("В избранном лишние игры:" + allMyGames.size() + " вместо " + teams.size());
         }
         LOG.info("Проверка названий игр, которе оказались в Избранном по названию");
         for (WebElement gameN : allMyGames){
@@ -219,7 +217,7 @@ public class FavouritePage extends AbstractPage {
         String previous;
         LOG.info("Нажимаем на кнопку с шетсерёнкой");
         preferences.click();
-        List<WebElement> listCoeff =driver.findElements(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__val')]"));
+        List<WebElement> listCoeff = driver.findElements(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__val')]"));
         if(!listCoeff.isEmpty()){
             Thread.sleep(500);
             previous = listCoeff.get(0).getAttribute("innerText");
@@ -239,6 +237,5 @@ public class FavouritePage extends AbstractPage {
         }
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
-
 }
 
