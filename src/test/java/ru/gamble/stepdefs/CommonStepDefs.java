@@ -59,6 +59,7 @@ import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
 import static ru.gamble.pages.mainPages.FooterPage.opensNewTabAndChecksPresenceOFElement;
+import static ru.gamble.pages.userProfilePages.FavouritePage.clearFavouriteGames;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
 
@@ -2088,6 +2089,11 @@ public class CommonStepDefs extends GenericStepDefs {
             throw new AutotestError("Ошибка! Не удалось нажать на копку [" + param + "]\n" + e.getMessage());
         }
 
+    }
+
+    @Когда("^очищаем избранное$")
+    public void clearFavourite() throws Exception{
+        clearFavouriteGames();
     }
 }
 
