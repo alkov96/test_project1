@@ -219,7 +219,7 @@ public class FavouritePage extends AbstractPage {
         String previous;
         LOG.info("Нажимаем на кнопку с шетсерёнкой");
         preferences.click();
-        List<WebElement> listCoeff =driver.findElements(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__val')]")).stream().collect(Collectors.toList());
+        List<WebElement> listCoeff =driver.findElements(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__val')]"));
         if(!listCoeff.isEmpty()){
             Thread.sleep(500);
             previous = listCoeff.get(0).getAttribute("innerText");
