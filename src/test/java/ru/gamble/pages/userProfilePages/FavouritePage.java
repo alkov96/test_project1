@@ -26,7 +26,6 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.openqa.selenium.By.xpath;
@@ -93,12 +92,12 @@ public class FavouritePage extends AbstractPage {
     @ActionTitle("проверяет что переходы с игр из Избранного работают верно")
     public void goFromFavourite(){
         WebDriver driver = PageFactory.getDriver();
-        boolean flag=true;
+        boolean flag = true;
         String period = Stash.getValue("keyPeriod");
         List<WebElement> allMyGames = driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']"));
         List<String> names = Stash.getValue("nameGameKey");
         List<String> teams = new ArrayList<>();
-        names.forEach(name->teams.add(CommonStepDefs.stringParse(name)));
+        names.forEach(name -> teams.add(CommonStepDefs.stringParse(name)));
         List<String> types = Stash.getValue("typeGameKey");
         LOG.info("Переход из избранного на игры");
         for (int MyGameN = 0; MyGameN < allMyGames.size(); MyGameN++) {
@@ -106,7 +105,7 @@ public class FavouritePage extends AbstractPage {
             int index;
             index = teams.indexOf(CommonStepDefs.stringParse(nameMyGame));
             Assert.assertFalse(
-                    "Игра в Избранное не добавлялась. Игра " + CommonStepDefs.stringParse(nameMyGame) + "а в Избранном "+ teams,
+                    "Игра в Избранное не добавлялась. Игра [" + CommonStepDefs.stringParse(nameMyGame) + "], а в Избранном [" + teams + "]",
                     index<0
             );
 
@@ -137,12 +136,8 @@ public class FavouritePage extends AbstractPage {
                     fail("В избранном игра, для которой не сохранился тип");
                     break;
             }
-
-//            driver.findElement(By.className("topLogo888")).click();
-//            inspector.expectation();
             driver.findElement(By.xpath("//*[@id='elected']")).click();
             CommonStepDefs.workWithPreloader();
-//            inspector.expectation();
         }
     }
 
@@ -222,7 +217,7 @@ public class FavouritePage extends AbstractPage {
         String previous;
         LOG.info("Нажимаем на кнопку с шетсерёнкой");
         preferences.click();
-        List<WebElement> listCoeff =driver.findElements(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__val')]")).stream().collect(Collectors.toList());
+        List<WebElement> listCoeff = driver.findElements(By.xpath("//ul[@class='prefs']//span[contains(@class, 'prefs__val')]"));
         if(!listCoeff.isEmpty()){
             Thread.sleep(500);
             previous = listCoeff.get(0).getAttribute("innerText");
@@ -242,6 +237,5 @@ public class FavouritePage extends AbstractPage {
         }
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
-
 }
 
