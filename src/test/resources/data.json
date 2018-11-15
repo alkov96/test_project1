@@ -1,7 +1,7 @@
 {
   "DEV_BK": {
     "ESB_URL": "http://dev-bk-bet-esb.tsed.orglot.office:8081",
-    "MAIN_URL": "https://dev-bk-bet-site.tsed.orglot.office/",
+    "MAIN_URL": "https://dev-bk-bet-site.tsed.orglot.office",
     "ADMIN_URL": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
     "MOBILE_URL": "https://dev-bk-bet-mobile-site.tsed.orglot.office",
     "REGISTRATION_URL": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
@@ -39,6 +39,7 @@
   },
   "TEST_INT": {
     "MAIN_URL": "https://test-int-bet-site1.tsed.orglot.office",
+    "MOBILE_URL": "https://test-int-bet-site1.tsed.orglot.office",
     "REGISTRATION_URL": "https://test-int-bet-site1.tsed.orglot.office/test_registration/",
     "PASSWORD": "Acer0808",
     "PASS": "Parol123",
