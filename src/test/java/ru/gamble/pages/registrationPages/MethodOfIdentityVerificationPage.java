@@ -43,6 +43,11 @@ public class MethodOfIdentityVerificationPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         LOG.info("Перешли на страницу  [" + PageFactory.getInstance().getCurrentPageTitle() + "]");
     }
 
