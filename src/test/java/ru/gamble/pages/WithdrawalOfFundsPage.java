@@ -56,7 +56,7 @@ public class WithdrawalOfFundsPage extends AbstractPage{
         driver.findElement(By.xpath(xpathCard)).click();
 
         min = pattern.matcher(min).replaceAll("");
-        fillField(summInput,min);
+        slowFillField(summInput, min, 250);
         List <WebElement> bonuses = driver.findElements(By.xpath("//p[contains(@class,'money-in-out__bonus-money')]"));
         if (bonuses.isEmpty()){
             Stash.put("bonusPlus","0");
@@ -68,7 +68,11 @@ public class WithdrawalOfFundsPage extends AbstractPage{
         String tmp = summInput.getAttribute("value");
         Stash.put(keyMinSumm, tmp);
         LOG.info("Ввели и сохранили в память минимальная сумма вывода: key=>[" + keyMinSumm + "] value=>[" + tmp + "]");
-        Thread.sleep(1000);}
+//        Thread.sleep(1000);
+        new WebDriverWait(driver,10)
+                .withMessage("Кнопка 'Вывести' так и не стала активной")
+                .until(ExpectedConditions.not(ExpectedConditions.attributeContains(By.xpath("//button[contains(@id,'submit-money-out')]"),"disabled","disabled")));
+    }
 
     private void checkForErrorLoadingPaymentSystems(){
         WebDriver driver = PageFactory.getWebDriver();
