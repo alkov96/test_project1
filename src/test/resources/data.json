@@ -39,9 +39,9 @@
   },
   "TEST_INT": {
     "MAIN_URL": "https://test-int-bet-site1.tsed.orglot.office",
-    "MOBILE_URL": "https://test-int-bet-site1.tsed.orglot.office",
+    "MOBILE_URL": "https://test-int-bet-mobile-site1.tsed.orglot.office",
     "REGISTRATION_URL": "https://test-int-bet-site1.tsed.orglot.office/test_registration/",
-    "MOBILE_URL": "https://test-int-bet-site1.tsed.orglot.office",
+    "USER": "testregistrator+71110023368@inbox.ru",
     "PASSWORD": "Acer0808",
     "PASS": "Parol123",
     "DB_REGISTRATION": {
