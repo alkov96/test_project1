@@ -55,7 +55,7 @@
       | Кем выдан         | ОВД        | ISSUER                |
       | Код подразделения | random     | ISSUERCODE            |
       | Пол               | random     | SEX                   |
-      | Место рождения    | random     | BIRTHLACATION         |
+      | Место рождения    | random     | BIRTHLOCATION         |
       | Регион            | true       | REGION                |
       | Нас. пункт        | true       | TOWN                  |
       | Улица             | true       | STREET                |
@@ -107,7 +107,7 @@
     | paternalname        | PATERNALNAME  |
     | sex                 | SEX           |
     | birthdate           | BIRTHDATE     |
-    | birthlocation       | BIRTHLACATION |
+    | birthlocation       | BIRTHLOCATION |
     | citizenship         | "RUS"         |
     | publicperson        | null          |
     | publicperson        | null          |
@@ -127,6 +127,31 @@
 
     * (закрываем окно 'Перейти в ЦУПИС' если выскочит)
     * пользователь (проверяет присутствие текста) "Вы зарегистрированы"
+
+    * пользователь (нажимает кнопку) "Иконка юзера"
+
+    * открывается страница "Мини Личный Кабинет"
+    * пользователь (переходит по ссылке) "Профиль"
+
+    * открывается страница "Профиль"
+    * пользователь (сравнивает значения в ЛК с тем, с которыми пользователь регистрировался) данными
+      | Электронная почта | EMAIL         |
+      | Телефон           | PHONE         |
+      | Фамилия           | LASTNAME      |
+      | Имя               | FIRSTNAME     |
+      | Отчество          | PATERNALNAME  |
+      | Дата рождения     | BIRTH_DATE    |
+      | Место рождения    | BIRTHLOCATION |
+      | Регион            | REGION        |
+      | Нас. пункт        | TOWN          |
+      | Улица             | STREET        |
+      | Дом/владение      | HOUSE         |
+      | Квартира          | FLAT          |
+      | Серия             | SERIES        |
+      | Номер             | NUMBER        |
+      | Дата выдачи       | ISSUEDATE     |
+      | Кем выдан         | ISSUER        |
+      | Код подразд.      | ISSUERCODE    |
 
 
 
