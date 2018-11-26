@@ -16,6 +16,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -1516,6 +1518,8 @@ public class CommonStepDefs extends GenericStepDefs {
             con.setRequestMethod(method);
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
+         //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
 
             OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), StandardCharsets.UTF_8);
             if(!(null == dataTable)) { writer.write(String.valueOf(params)); }
@@ -1599,7 +1603,22 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
     public void userOpenNewUrl(String url){
-        PageFactory.getDriver().get(url);
+        WebDriver driver = PageFactory.getDriver();
+//        Set<String> handles = driver.getWindowHandles();
+//        Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
+//        String browserName = caps.getBrowserName();
+//        if (browserName.contains("chrome")){
+//            ((ChromeDriver) driver).executeScript("window.open()");
+//        }
+//        else {
+//            driver.findElement(By.cssSelector("Body")).sendKeys(Keys.CONTROL + "n");
+//        }
+//        Set<String> newHandles = driver.getWindowHandles();
+//        newHandles.removeAll(handles);
+//        driver.switchTo().window(newHandles.toArray()[0].toString());
+        driver.get(url);
+        new WebDriverWait(driver, 10).until(ExpectedConditions.urlToBe(url));
+
     }
 
     public static void closingCurrtWin(String title) {
@@ -2094,6 +2113,12 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^очищаем избранное$")
     public void clearFavourite() throws Exception{
         clearFavouriteGames();
+    }
+
+    @Когда("^нажимает кнопку НАЗАД$")
+    public void backToPage(){
+        WebDriver driver = PageFactory.getWebDriver();
+        driver.navigate().back();
     }
 }
 

@@ -1,8 +1,10 @@
 package ru.gamble.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -68,8 +70,11 @@ public class TestingServicePage extends AbstractPage{
         WebDriver driver = PageFactory.getDriver();
         String currentPage = driver.getCurrentUrl();
         String sms, number = "";
+        Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
+        String browserName = caps.getBrowserName();
+        String phoneString = browserName.contains("chrome") ? "PHONE":"PHONE_FIREFOX";
         try {
-            number = keyPhoneNumber.equals(DEFAULT) ? JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue() : keyPhoneNumber ;
+            number = keyPhoneNumber.equals(DEFAULT) ? JsonLoader.getData().get(STARTING_URL).get(phoneString).getValue() : keyPhoneNumber ;
         } catch (DataException e) {
             e.printStackTrace();
         }
