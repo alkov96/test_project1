@@ -12,13 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @RunWith(Cucumber.class)
 @CucumberOptions(
         monochrome = true,
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm","pretty"},
-        tags = {"@ortax"})
+        tags = {"@AuthenticationOnSiteAndExit_1"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
