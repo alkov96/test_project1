@@ -1779,7 +1779,6 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-
     /**
      * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
@@ -1788,6 +1787,11 @@ public class CommonStepDefs extends GenericStepDefs {
     public void returnRegistrationValue(Scenario scenario){
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
+    }
+
+    @After(value = "@ortax")
+    public void logPhone(Scenario scenario){
+        LOG.info("Номер телефона зарегистрированного ползьваотеля: " + Stash.getValue("PHONE"));
     }
 
 
