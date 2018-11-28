@@ -3,17 +3,22 @@ package ru.gamble.stepdefs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.ws.client.*;
+import com.sun.activation.registries.LogSupport;
 import cucumber.api.DataTable;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
+import io.qameta.allure.Attachment;
+import io.qameta.allure.Step;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.junit.jupiter.api.DisplayName;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -46,6 +51,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -176,7 +183,9 @@ public class CommonStepDefs extends GenericStepDefs {
         }else{
             descktopSiteLogOut(driver);
         }
+
     }
+
 
     private void descktopSiteLogOut(WebDriver driver){
         try {
@@ -187,6 +196,9 @@ public class CommonStepDefs extends GenericStepDefs {
             Thread.sleep(1000);
             LOG.info("Ищем кнопку 'Выход' и нажимаем");
             driver.findElement(By.id("log-out-button")).click();
+            new WebDriverWait(driver,15)
+                    .withMessage("Разлогинивали-разлогинивали, да не ралогинили. На сайте все еще кто-то авторизован")
+                    .until(ExpectedConditions.not(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon"))));
         }catch (Exception e){
             LOG.info("На сайте никто не авторизован");
         }
@@ -1870,7 +1882,6 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-
     /**
      * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
@@ -1880,7 +1891,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
-
 
     @Когда("^определяем дату завтрашнего дня \"([^\"]*)\"$")
     public void tomorrowDate(String keyParams){
