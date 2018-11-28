@@ -41,12 +41,12 @@
       | building     |                |
       | housing      |                |
       | flat         | FLAT           |
-      | phone        | 1110023309     |
+      | phone        | PHONE     |
       | comment      | COMMENT        |
       | date         | DATE           |
       | time         | "10:00 - 17:00"|
 
-    * запрос к API "api/mobile/v5/sendIdentificationOrderToDD" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v5/createDostavistaOrder " и сохраняем в "RESPONCE_API":
       | devId       | DEVID    |
       | authToken   | AUTHTOKEN|
       | source      | 16       |
@@ -57,13 +57,32 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | identificationStatus":1 |
 
+    * получаем и сохраняем в память recipient_id и partner_order_id "RECIPIENT_ID" "PARTNER_ORDER_ID" телефона "PHONE"
 
-    * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
-      | devId       | DEVID    |
-      | authToken   | AUTHTOKEN|
-      | source      | 16       |
+    * добавляем данные в JSON объект "DATA" сохраняем в память:
+      | recipient_id            | RECIPIENT_ID                     |
+      | partner_order_id        | PARTNER_ORDER_ID                 |
+      | delivery_address        | "Тверская ул."                   |
+      | delivery_time_start     | "2018-11-15T20:00:00+03:00"      |
+      | delivery_time_finish    | "2018-11-15T21:00:00+03:00"      |
+
+
+    * запрос к esb "tasktype_endpoint/partner_notification" и сохраняем в "RESPONCE_API":
+
+      | event_type   | "recipient_agreed"              |
+      | event_date   | "2018-11-15T15:05:23+03:00"     |
+      | data         | DATA                            |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
-    * проверка ответа API из "RESPONCE_API":
-      | exepted     | identificationStatus":1 |
+
+
+#    * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
+#      | devId       | DEVID    |
+#      | authToken   | AUTHTOKEN|
+#      | source      | 16       |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted     | "code":0 |
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted     | identificationStatus":1 |

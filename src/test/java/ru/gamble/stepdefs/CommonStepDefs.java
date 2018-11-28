@@ -42,6 +42,8 @@ import java.awt.event.InputEvent;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -882,6 +884,33 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Получили код подтверждения телефона: " + code);
     }
 
+    @Когда("^получаем и сохраняем в память recipient_id и partner_order_id \"([^\"]*)\" \"([^\"]*)\" телефона \"([^\"]*)\"$")
+    public static void getIdForDostavista(String key_recipient_id, String key_partner_order_id, String keyPhone){
+        String phone = Stash.getValue(keyPhone);
+        String sqlRequest;
+        String sqlRequest1;
+        sqlRequest= "SELECT recipient_id FROM gamebet. `dostavistaorder` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "')";
+        sqlRequest1 = "SELECT partner_order_id FROM gamebet. `dostavistaorder` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "')";
+        String partner_order_id = workWithDBgetResult(sqlRequest1, "partner_order_id");
+        String recipient_id = workWithDBgetResult(sqlRequest, "recipient_id");
+        Stash.put(key_recipient_id, recipient_id);
+        Stash.put(key_partner_order_id, partner_order_id);
+        LOG.info("Получили recipient_id " + recipient_id);
+        LOG.info("Получили partner_order_id " + partner_order_id);
+    }
+
+    @Когда("^запрос к esb \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestESB(String path, String keyStash, DataTable dataTable) {
+        try {
+            StringBuilder fullPath = new StringBuilder();
+            fullPath.append(JsonLoader.getData().get(STARTING_URL).get("ESB_URL").getValue() +  "/" + path);
+            LOG.info("Строчка запроса: " + fullPath);
+            requestByHTTP(fullPath.toString(),keyStash,dataTable,"POST");
+        } catch (DataException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Когда("^получаем и сохраняем в память код \"([^\"]*)\" подтверждения почты \"([^\"]*)\"$")
     public static void confirmEmail(String keyEmailCode, String keyEmail) {
         String email = Stash.getValue(keyEmail);
@@ -1473,6 +1502,68 @@ public class CommonStepDefs extends GenericStepDefs {
             if (connect!=null){
                 connect.disconnect();
             }
+        }
+    }
+
+
+
+
+    protected void requestByHTTP(String requestFull, String keyStash, DataTable dataTable, String method){
+
+        if(!(null == dataTable)) { Map<String, String> table = dataTable.asMap(String.class, String.class); }
+        Object params = null;
+        URL url;
+
+        LOG.info("Собираем параметы в JSON строку");
+        JSONObject jsonObject = new JSONObject();
+        if(!(null == dataTable)) {
+            params = collectParametersInJSONString(dataTable);
+        }
+
+        try {
+
+            HostnameVerifier allHostsValid = (hostname, session) -> true;
+            url = new URL(requestFull);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setRequestMethod(method);
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
+            //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
+
+
+            byte[] postData       = String.valueOf(params).getBytes( StandardCharsets.UTF_8 );
+            DataOutputStream wr = new DataOutputStream( con.getOutputStream());
+
+            wr.write(postData);
+            wr.close();
+
+//            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), StandardCharsets.UTF_8);
+//            if(!(null == dataTable)) { writer.write(String.valueOf(params)); }
+//            writer.close();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuffer jsonString = new StringBuffer();
+            String line;
+            while ((line = br.readLine()) != null) {
+                jsonString.append(line);
+            }
+            br.close();
+            con.disconnect();
+            LOG.info("Получаем ответ и записываем в память [" + jsonString.toString() + "]");
+            if (StringUtils.isNoneEmpty(jsonString)) {
+                Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
+            } else {
+                throw new AutotestError("ОШИБКА! Пустая строка JSON");
+            }
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

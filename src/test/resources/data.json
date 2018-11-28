@@ -1,6 +1,6 @@
 {
   "DEV_BK": {
-    "ESB_URL": "http://dev-bk-bet-esb.tsed.orglot.office:8081",
+    "ESB_URL": "http://dev-bk-bet-esb.tsed.orglot.office:8660",
     "MAIN_URL": "https://dev-bk-bet-site.tsed.orglot.office",
     "ADMIN_URL": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
     "MOBILE_URL": "https://dev-bk-bet-mobile-site.tsed.orglot.office",
