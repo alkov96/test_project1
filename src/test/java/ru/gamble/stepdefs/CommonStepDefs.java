@@ -896,19 +896,13 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Получили код подтверждения телефона: " + code);
     }
 
-    @Когда("^получаем и сохраняем в память recipient_id и partner_order_id \"([^\"]*)\" \"([^\"]*)\" телефона \"([^\"]*)\"$")
-    public static void getIdForDostavista(String key_recipient_id, String key_partner_order_id, String keyPhone){
+    @Когда("^получаем и сохраняем в память все строки для достависты телефона \"([^\"]*)\"$")
+    public static void getAllRowsForDostavista(String keyPhone){
         String phone = Stash.getValue(keyPhone);
         String sqlRequest;
-        String sqlRequest1;
-        sqlRequest= "SELECT recipient_id FROM gamebet. `dostavistaorder` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "')";
-        sqlRequest1 = "SELECT partner_order_id FROM gamebet. `dostavistaorder` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "')";
-        String partner_order_id = workWithDBgetResult(sqlRequest1, "partner_order_id");
-        String recipient_id = workWithDBgetResult(sqlRequest, "recipient_id");
-        Stash.put(key_recipient_id, recipient_id);
-        Stash.put(key_partner_order_id, partner_order_id);
-        LOG.info("Получили recipient_id " + recipient_id);
-        LOG.info("Получили partner_order_id " + partner_order_id);
+        sqlRequest = "SELECT * FROM gamebet. `dostavistaorder` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "')";
+        workWithDBresult(sqlRequest);
+
     }
 
     @Когда("^запрос к esb \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
@@ -1122,6 +1116,15 @@ public class CommonStepDefs extends GenericStepDefs {
         String id = workWithDBgetResult(sqlRequest, "id");
         Stash.put(keyId, id);
         LOG.info("Вычислили id::" + id);
+    }
+
+    @Когда("^смотрим изменился ли статус \"([^\"]*)\" на \"([^\"]*)\"$")
+    public void checkEventType(String keyEventType,String myEvent) {
+        String eventType =Stash.getValue(keyEventType);
+        if (!eventType.equals(myEvent)){
+            Assertions.fail("Время ожидани звонка скайп не изменилось");
+        }
+        LOG.info("Тип события совпадает: " + eventType + " и " + myEvent);
     }
 
 
