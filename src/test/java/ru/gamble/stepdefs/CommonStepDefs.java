@@ -1119,10 +1119,10 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^смотрим изменился ли статус \"([^\"]*)\" на \"([^\"]*)\"$")
-    public void checkEventType(String keyEventType,String myEvent) {
+    public void checkEventType(String keyEventType,String myEvent) throws InterruptedException {
         String eventType =Stash.getValue(keyEventType);
         if (!eventType.equals(myEvent)){
-            Assertions.fail("Время ожидани звонка скайп не изменилось");
+            Assertions.fail("Статус события и статус в БД  не совпадают!");
         }
         LOG.info("Тип события совпадает: " + eventType + " и " + myEvent);
     }

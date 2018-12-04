@@ -15,8 +15,8 @@
       | COMMENT  | random |
 
 
-  @DD_identification
-  Сценарий: Отправка заявки в Домашние Деньги и проверка статуса заявки
+  @fin_dostavka_identification
+  Сценарий: Отправка заявки в ФинДоставку и проверка статуса заявки
 
     * ищем пользователя с ограничениями "ALLROWS"
 
@@ -75,7 +75,13 @@
       | data         | DATA                            |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted     | "code":0 |
+      | exepted     | "taskId": |
+
+    * ожидание "5" сек
+
+    * получаем и сохраняем в память все строки для достависты телефона "PHONE"
+
+    * смотрим изменился ли статус "EVENTTYPE" на "RECIPIENT_AGREED"
 
     * добавляем данные в JSON объект "COURIER" сохраняем в память:
       | phone                   | "88005553535"                     |
@@ -95,7 +101,9 @@
       | data         | DATA                            |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted     | "code":0 |
+      | exepted     |  "taskId":|
+
+    * ожидание "5" сек
 
     * получаем и сохраняем в память все строки для достависты телефона "PHONE"
 
@@ -115,8 +123,10 @@
       | data         | DATA                                    |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted     | "code":0 |
+      | exepted     | "taskId":|
 
+
+    * ожидание "5" сек
 
     * получаем и сохраняем в память все строки для достависты телефона "PHONE"
 
@@ -134,19 +144,11 @@
       | data         | DATA                                    |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted     | "code":0 |
+      | exepted     | "taskId": |
 
+    * ожидание "5" сек
 
     * получаем и сохраняем в память все строки для достависты телефона "PHONE"
 
     * смотрим изменился ли статус "EVENTTYPE" на "RECIPIENT_COMPLETED"
 
-#    * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID    |
-#      | authToken   | AUTHTOKEN|
-#      | source      | 16       |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | identificationStatus":1 |
