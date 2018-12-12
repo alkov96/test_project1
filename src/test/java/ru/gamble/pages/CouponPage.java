@@ -324,10 +324,10 @@ public class CouponPage extends AbstractPage {
                     .stream().filter(element -> element.isDisplayed()).collect(Collectors.toList());
             if (!oldCoef.isEmpty()) break;
         }
-        float coefCoupon = Float.valueOf(allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[2]")).getAttribute("innerText"));
-        String oldString = allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[1]")).getAttribute("class");
+        float coefCoupon = Float.valueOf(allBets.get(param).findElement(xpath(".//div[@class='coupon-bet__coeffs']/span[2]")).getAttribute("innerText"));
+        String oldString = allBets.get(param).findElement(xpath(".//div[@class='coupon-bet__coeffs']/span[1]")).getAttribute("class");
         float coefOld;
-        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(xpath("li[2]/div[@class='coupon-bet__coeffs']/span[1]")).getAttribute("innerText"));
+        coefOld = oldString.contains("ng-hide") ? coefCoupon : Float.valueOf(allBets.get(param).findElement(xpath(".//div[@class='coupon-bet__coeffs']/span[1]")).getAttribute("innerText"));
         LOG.info("Старый коэф: " + coefOld);
         LOG.info("Текущий коэф: " + coefCoupon);
         return coefCoupon - coefOld;
