@@ -223,7 +223,7 @@ public class CouponPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         String ishod = driver.findElement(xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getAttribute("innerText").split("\n")[1];
         String ishodName = Stash.getValue(ishodKey);//ожидаемое название исхода
-        switch (ishod) {
+        switch (ishod.trim()) {
             case "П1":
                 ishod = Stash.getValue("team1key").toString();
                 break;

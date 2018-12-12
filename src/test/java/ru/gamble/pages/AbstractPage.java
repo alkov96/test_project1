@@ -92,7 +92,7 @@ public abstract class AbstractPage extends Page{
     protected WebElement quickBetFlag;
 
     @ElementTitle("Очистить всё")
-    @FindBy(xpath = "//span[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']")
+    @FindBy(xpath = "//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']")
     protected WebElement clearCoupon;
 
     @ElementTitle("Сервисное сообщение")

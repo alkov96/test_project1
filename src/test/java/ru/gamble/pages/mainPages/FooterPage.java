@@ -1,16 +1,15 @@
 package ru.gamble.pages.mainPages;
 
 import cucumber.api.DataTable;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -27,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.useDefaultRepresentation;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.*;
 
@@ -129,12 +129,26 @@ public class FooterPage extends AbstractPage {
         WebDriver driver = PageFactory.getWebDriver();
         String link = "";
 
+
+        try {
+            Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
+            String browserName = caps.getBrowserName();
+            if (browserName.contains("explorer")){
+                goTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+                return;
+            }
+
+        }catch (Exception e){
+            return;
+        }
+
         // Достаем ссылку из элемента
         try {
             link = PageFactory.getInstance().getCurrentPage().getElementByTitle(linkTitle).getAttribute("href");
         } catch (PageException e) {
             e.printStackTrace();
         }
+
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
@@ -148,26 +162,56 @@ public class FooterPage extends AbstractPage {
 
         driver.switchTo().window(newWindow);
         workWithPreloader();
+        checkPageByText(xpath);
 
-            List <WebElement> requiredElements;
-
-            // Цикл обновления страницы в случае неудачи её прогрузки
-            for(int j = 0; j < 10; j++) {
-                new WebDriverWait(driver, 3);
-                requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-                LOG.info("Текущая страница::" + driver.getCurrentUrl());
-                if(!requiredElements.isEmpty()){
-                    LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getAttribute("innerText").replaceAll("\n", " "));
-                    break;
-                }
-                driver.navigate().refresh();
-                if(j >= 9){
-                    throw new AutotestError("Ошибка! Не нашли элемент " + xpath + " после " + j + " попыток перезагрузки страницы");
-                }
-            }
         driver.switchTo().window(currentHandle);
         js.executeScript("second_window.close()");
     }
+
+    /**
+     * Метод щелкает на элемент и проверяет что открывшаяся вкладка соответсвует ожиданиям
+     * @param linkTitle - название ссылки по которой нужно открыть новую вкладку
+     * @param currentHandle - идентификатор текущей страницы
+     * @param xpath - поисковая строка для требуемоего элемента
+     */
+    public static void goTabAndChecksPresenceOFElement(String linkTitle, String currentHandle, String xpath) {
+        WebDriver driver = PageFactory.getWebDriver();
+        WebElement element = null;
+        try {
+            element = PageFactory.getInstance().getCurrentPage().getElementByTitle(linkTitle);
+        } catch (PageException e) {
+            e.printStackTrace();
+        }
+        element.click();
+        workWithPreloader();
+        checkPageByText(xpath);
+        driver.navigate().back();
+        new WebDriverWait(driver,10)
+                .withMessage("Не удалось вернуться а предыдущую страницу " + currentHandle)
+                .until(ExpectedConditions.titleIs(currentHandle));
+    }
+
+
+    public static void checkPageByText(String xpath){
+        WebDriver driver = PageFactory.getWebDriver();
+        List <WebElement> requiredElements;
+
+        // Цикл обновления страницы в случае неудачи её прогрузки
+        for(int j = 0; j < 10; j++) {
+            new WebDriverWait(driver, 3);
+            requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+            LOG.info("Текущая страница::" + driver.getCurrentUrl());
+            if(!requiredElements.isEmpty()){
+                LOG.info("Понадобилось обновлений страницы::" + j + " Найдено::" + requiredElements.get(0).getAttribute("innerText").replaceAll("\n", " "));
+                break;
+            }
+            driver.navigate().refresh();
+            if(j >= 9){
+                throw new AutotestError("Ошибка! Не нашли элемент " + xpath + " после " + j + " попыток перезагрузки страницы");
+            }
+        }
+    }
+
 
     @ActionTitle("проверяет присутствие ссылки")
     public void checkSportsbook_888ru(String param){
@@ -179,6 +223,14 @@ public class FooterPage extends AbstractPage {
 
     @ActionTitle("проверяет что число платёжных систем")
     public void checkNumberPaymentSystem(String number){
+        WebDriver driver = PageFactory.getWebDriver();
+        if (!driver.findElement(By.xpath("//div[contains(@class,'footer_collapsible')]")).getAttribute("class").contains("open")){
+            driver.findElement(By.xpath("//div[@class='footer__pin']")).click();
+            LOG.info("Футер закрыт, раскроем его");
+            new WebDriverWait(driver,10).withMessage("На стрелочку кликнули, а футер не развернулся")
+                    .until(ExpectedConditions.attributeContains(By.xpath("//div[contains(@class,'footer_collapsible')]"),"class","open"));
+        }
+
         String xpath = "//div[contains(@class,'payment-systems-item')]";
         List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         int expected = Integer.parseInt(number);

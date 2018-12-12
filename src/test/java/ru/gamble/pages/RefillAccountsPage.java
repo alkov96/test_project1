@@ -103,6 +103,7 @@ public class RefillAccountsPage extends AbstractPage{
             }
             LOG.info("Сравниваем два максимума [" + maxLimitInDB.toString() + "] и [" + maxLimitByWSS + "]");
             exeptedMaxLimit = (maxLimitInDB.compareTo(maxLimitByWSS) > 0) ? maxLimitByWSS.toString() : maxLimitInDB.toString();
+            exeptedMaxLimit = exeptedMaxLimit.split(".")[0];//на тот случай, если лимиты с копейками - убираем копейки, оставляем только целую часть
             LOG.info("Ожидаемый максимум должен быть[" + exeptedMaxLimit + "]");
 
             maxValueOnPage = new BigDecimal(list.get(list.size()-1).getAttribute("innerText").replaceAll(" +",""));
