@@ -706,8 +706,8 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("включает фрибет если есть и проверяет наличие экспресс-бонуса")
     public void onFreebet() {
         WebDriver driver = PageFactory.getDriver();
-        boolean hasFreeBet = !driver.findElements(xpathFreeBet).isEmpty();
-        if (hasFreeBet) {
+        boolean hasNotFreeBet = driver.findElements(xpathFreeBet).isEmpty();
+        if (hasNotFreeBet) {
             LOG.info("Фрибета нет у этого пользователя");
         } else {
             driver.findElement(xpathFreeBet).click();
