@@ -478,7 +478,7 @@ public class CouponPage extends AbstractPage {
         waitingForPreloaderToDisappear(30);
 
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
-        Thread.sleep(10000);
+        Thread.sleep(20000);
         if (driver.findElements(xpath("//ul[@class='coupon-bet__content']")).size() > expectedCouponSize) {
             Assertions.fail("Ошибка! Ставка не принялась((");
         } else LOG.info("Ставка принялась!");
