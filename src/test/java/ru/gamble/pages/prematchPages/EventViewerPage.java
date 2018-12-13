@@ -47,6 +47,8 @@ public class EventViewerPage extends AbstractPage {
     @FindBy(xpath = "//div[contains(@class,'periods__input')]")
     private WebElement selectPeriod;
 
+    private static By xpathForsportsPrematch = By.xpath("//*[@id='sports-list-container']//li[contains(@id,'sport') and not(contains(@id,'sport--'))]");
+
 
     public EventViewerPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -317,57 +319,58 @@ public class EventViewerPage extends AbstractPage {
 
         LOG.info("Сворачиваем все виды спорта");
         closeSports();
-        int sportCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li")).size();
-        for (int sportN = 4; sportN <= sportCount; sportN++) {
+        int sportCount = driver.findElements(xpathForsportsPrematch).size();
+        for (int sportN = 1; sportN < sportCount; sportN++) {
             //разворачиваем спорт(начнем с тенниса просто потому что не хочу футбол)
             LOG.info("Разворачиваем один спорт");
-            driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]")).click();
-            LOG.info(driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/a")).getAttribute("title"));
+            driver.findElements(xpathForsportsPrematch).get(sportN).click();
+            LOG.info(driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./a")).getAttribute("title"));
             CommonStepDefs.workWithPreloader();
             //количество регионов в указанном спорте Например Мир,Европа и т.д.
-            int regionsInSport = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/ul[1]/li")).size();
+            int regionsInSport = driver.findElements(xpathForsportsPrematch).get(sportN).findElements(By.xpath("./ul[1]/li")).size();
             count = 15;
             while (regionsInSport <= 1 && count > 0) {
                 Thread.sleep(1000);
-                regionsInSport = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/ul[1]/li")).size();
+                regionsInSport = driver.findElements(xpathForsportsPrematch).get(sportN).findElements(By.xpath("./ul[1]/li")).size();
                 count--;
                 if (count == 0) {
                     LOG.info("Очень долго раскрывается спорт: за 15 секунд так и не развернулся");
                 }
             }
-            for (int region = 1; region < regionsInSport; region++) {
+            for (int region = 1; region <= regionsInSport; region++) {
                 menu = driver.findElement(By.id("menu-toggler"));
                 if (!menu.getAttribute("class").contains("collapsed")) {
                     LOG.info("Развернули ЛМ");
                     menu.click();
                 }
                 LOG.info("Разворачиваем регион");
-                driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/ul[1]/li[" + region + "]")).click();
+                driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./ul[1]/li[" + region + "]")).click();
                 CommonStepDefs.workWithPreloader();
+                String pathToTours = "./ul[1]/li[" + region + "]//div[contains(@class,'left-menu__list-item-region-compitition')]";
                 //В каждом регионе может быть несколько соревнований.
-                int toursCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/ul[1]/li[1]/div")).size();
+                int toursCount = driver.findElements(xpathForsportsPrematch).get(sportN).findElements(By.xpath(pathToTours)).size();
 
-                for (int tour = 1; tour <= toursCount; tour++) {
+                for (int tour = 0; tour < toursCount; tour++) {
                     LOG.info("Выбираем соревнование");
                     menu = driver.findElement(By.id("menu-toggler"));
                     if (!menu.getAttribute("class").contains("collapsed")) menu.click();
-                    driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/ul[1]/li[" + region + "]/div[1]/div[" + tour + "]/h4[1]")).click();
+                    driver.findElements(xpathForsportsPrematch).get(sportN).findElements(By.xpath(pathToTours)).get(tour).findElement(By.xpath("./h4[1]")).click();
                     CommonStepDefs.workWithPreloader();
                     //все игры в этом соревновании
-                    List<WebElement> allGames = driver.findElements(By.xpath("//div[@class = 'prematch-competitions scroll-contain ng-scope']/div[1]/div[1]/div/div[1]/div[1]/div[1]/div[1]/div[1]"));
+                    List<WebElement> allGames = driver.findElements(By.xpath("//div[contains(@class,'bets-block__header-bet-name')]"));
                     LOG.info("Смотрим все игры в спорте, в соответствующем соревновании. Ищем игру подходящую по фильтру времени " + hour + inPeriod);
                     for (int GameInTour = 0; GameInTour < allGames.size(); GameInTour++) {
                         dateGame = formatter.parse(allGames.get(GameInTour).getAttribute("innerText"));
 
                         if (!gameIsAdding && (dateGame.getTime() <= Period.getTime()) == inPeriod) {
 
-                            nameGamefull = driver.findElement(By.xpath("//div[@class = 'prematch-competitions scroll-contain ng-scope']/div[1]/div[1]/div[" + (GameInTour + 1) + "]/div[1]/div[1]/div[1]/div[2]")).getAttribute("title");
+                            nameGamefull = allGames.get(GameInTour).findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("title");
                             CommonStepDefs.addStash("nameGameKey",nameGamefull);
                             CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
                             CommonStepDefs.addStash("typeGameKey",typeGame);
                             if (adding) {
                                 LOG.info("Нужную игру нашли. Добавляем ее в Избранное");
-                                driver.findElement(By.xpath("//div[@class = 'prematch-competitions scroll-contain ng-scope']/div[1]/div[1]/div[" + (GameInTour + 1) + "]/div[1]/div[1]/div[1]/div[1]/i[1]")).click();
+                                allGames.get(GameInTour).findElement(By.xpath(".//i[contains(@class,'bets-block__header-icon_star')]")).click();
                             }
                             gameIsAdding = true;
                         }
@@ -376,12 +379,12 @@ public class EventViewerPage extends AbstractPage {
                     }
                 }
                 if (!menu.getAttribute("class").contains("collapsed")) menu.click();
-                driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/ul[1]/li[" + region + "]/a[1]")).click();//свернули регион
+                driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./ul[1]/li[" + region + "]/a[1]")).click();//свернули регион
                 LOG.info("Нужной игры в этом регионе не было. Ищем в следующем");
                 CommonStepDefs.workWithPreloader();
             }
             if (!menu.getAttribute("class").contains("collapsed")) menu.click();
-            driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + sportN + "]/a[1]")).click();//свернули спорт
+            driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./a[1]")).click();//свернули спорт
             LOG.info("Нужной игры в этом спорте не было. Ищем в следующем");
             CommonStepDefs.workWithPreloader();
         }
@@ -392,7 +395,6 @@ public class EventViewerPage extends AbstractPage {
         CommonStepDefs.workWithPreloader();
 
     }
-
     @ActionTitle("включает фильтр по времени")
     public void onTriggerPeriod(String period){
         WebDriver driver = PageFactory.getDriver();

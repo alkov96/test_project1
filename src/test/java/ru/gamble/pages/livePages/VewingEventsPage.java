@@ -33,6 +33,8 @@ public class VewingEventsPage extends AbstractPage {
     @FindBy(xpath = "//a[@class='ulTransBorder__link active']")
     private WebElement pageTitle;
 
+    private static By xpathForSports = By.xpath("//li[contains(@id,'sport-') and not(contains(@class,'hide')) and not(contains(@id,'sport--'))]");
+
     public VewingEventsPage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
@@ -88,21 +90,26 @@ public class VewingEventsPage extends AbstractPage {
         }
 
 
-        int sportsInLiveCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li")).size();
-        for (int sportCategory = 2; sportCategory <= sportsInLiveCount; sportCategory++) {
+        int sportsInLiveCount = driver.findElements(xpathForSports).size();
+        for (int sportCategory = 0; sportCategory < sportsInLiveCount; sportCategory++) {
             LOG.info("Разворачиваем вид спорта");
-            driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]")).click();
-            int gamesInSportCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul/li/div/div/ul/li")).size();
+            driver.findElements(xpathForSports).get(sportCategory).click();
+            String pathToNameGame = ".//*[contains(@class,'left-menu__list-item-games-teams')]";
+            String pathToStarGame = ".//*[contains(@class,'item-games-fav-game-star')]";
+            int gamesInSportCount = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).size();
             LOG.info("Ищем игру у которой видео-трансляция " + withVideo);
             int gameNumber = hasVideo(sportCategory, gamesInSportCount, withVideo);
             //если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
             if (gameNumber != -1 && !gameIsAdding) {
-                String nameGamefull = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul/li/div/div/ul/li/div[1]/div[1]/div[1]")).get(gameNumber).findElement(By.xpath("../p")).getAttribute("innerText");
+                String nameGamefull = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).get(gameNumber).getAttribute("innerText");
                 CommonStepDefs.addStash("nameGameKey",nameGamefull);
                 CommonStepDefs.addStash("typeGameKey",typeGame);
                 if (adding) {
                     LOG.info("Нужная игра найдена. Добавляем ее в Избранное.");
-                    driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportCategory + "]/ul[1]/li/div/div/ul/li/div[1]/div[1]/div[2]/div[1]")).get(gameNumber).click();
+                    if (!driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).isDisplayed()){
+                        driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).findElement(By.xpath("./ancestor::div[contains(@class,'poup-sports')]/preceding-sibling::h4")).click();
+                    }
+                    driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).click();
                 }
                 gameIsAdding = true;
             }
@@ -130,9 +137,9 @@ public class VewingEventsPage extends AbstractPage {
      */
     public int hasVideo(int sportNumber, int gameNumber, boolean withVideo) {
         WebDriver driver = PageFactory.getDriver();
-        List<WebElement> allGameInSport = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[1]/li[" + sportNumber + "]/ul/li/div/div/ul/li/div[1]/div[1]/div[1]"));
+        List<WebElement> allGameInSport = driver.findElements(xpathForSports).get(sportNumber).findElements(By.xpath(".//div[contains(@class,'icon-video')]"));
         for (int count = 0; count < gameNumber; count++) {
-            if (allGameInSport.get(count).isDisplayed() == withVideo) {
+            if (allGameInSport.get(count).getAttribute("class").contains("hide")!=withVideo) {
                 return count;
             }
         }
