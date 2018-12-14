@@ -476,15 +476,15 @@ public class CouponPage extends AbstractPage {
         LOG.info("Жмём 'Заключить пари'");
         buttonBet.click();
         LOG.info("Ждём пока прогресс-бар принятия ставки заполнится на 100%");
-        new WebDriverWait(driver,15)
-                .withMessage("За 15 секунд прогресс-бар не стал равен 100%, значит ставка не принялась")
+        new WebDriverWait(driver,30)
+                .withMessage("За 30 секунд прогресс-бар не стал равен 100%, значит ставка не принялась")
                 .until(ExpectedConditions.attributeContains((By.xpath("//*[contains(@class,'coupon__progress-count')]")),"innerText","100%"));
 
-
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
-        if (driver.findElements(xpath("//ul[@class='coupon-bet__content']")).size() > expectedCouponSize) {
-            Assertions.fail("Ошибка! Ставка не принялась((");
-        } else LOG.info("Ставка принялась!");
+        //Thread.sleep(10000);
+        new WebDriverWait(driver,10)
+                .withMessage("За 10 секунд ставка из купона так и не убралась")
+                .until(ExpectedConditions.numberOfElementsToBeLessThan(xpath("//ul[@class='coupon-bet__content']"),(expectedCouponSize+1)));
 
     }
 
