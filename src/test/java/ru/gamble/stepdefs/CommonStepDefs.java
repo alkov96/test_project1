@@ -28,10 +28,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.utility.DBUtils;
-import ru.gamble.utility.Generators;
-import ru.gamble.utility.JsonLoader;
-import ru.gamble.utility.NaiveSSLContext;
+import ru.gamble.utility.*;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
@@ -880,6 +877,31 @@ public class CommonStepDefs extends GenericStepDefs {
         } finally {
             DBUtils.closeAll(con, null, null);
         }
+    }
+
+    @Когда("^записываем изначальный пароль для пользователя \"([^\"]*)\"$")
+    public void saveCurrentPassword(String email){
+        if(email.equals(Constants.DEFAULT)) {
+            try {
+                email = JsonLoader.getData().get(STARTING_URL).get("USER").getValue();
+            } catch (DataException e) {
+                e.getMessage();
+            }
+        }
+        String sqlRequest = "select password from gamebet.`user` WHERE `email` = '"+email+"'";
+        String currentPassword = workWithDBgetResult(sqlRequest);
+        Stash.put("currentUser", email);
+        Stash.put("currentPassword", currentPassword);
+        LOG.info("Записали хэш текущего пароля "+currentPassword+" для пользователя "+email);
+    }
+
+    @Когда("^возвращаем изначальный пароль$")
+    public void saveCurrentPassword(){
+        String sqlRequest = "update gamebet.`user` set password = '"+Stash.getValue("currentPassword")+"' WHERE `email` = '"+Stash.getValue("currentUser")+"'";
+        workWithDB(sqlRequest);
+        sqlRequest = "select password from gamebet.`user` WHERE `email` = '"+Stash.getValue("currentUser")+"'";
+        String changeCheck = workWithDBgetResult(sqlRequest);
+        LOG.info("вернули изначальный пароль "+changeCheck+" для пользователя "+Stash.getValue("currentUser"));
     }
 
     @Когда("^получаем и сохраняем в память код подтверждения \"([^\"]*)\" телефона \"([^\"]*)\" \"([^\"]*)\"$")
