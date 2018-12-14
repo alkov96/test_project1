@@ -879,15 +879,16 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^записываем изначальный пароль для пользователя \"([^\"]*)\"$")
-    public void saveCurrentPassword(String email){
-        if(email.equals(Constants.DEFAULT)) {
+
+    @Before(value = "@ChangePassword_C1043")
+    public void saveCurrentPassword(){
+       String email = null;
             try {
                 email = JsonLoader.getData().get(STARTING_URL).get("USER").getValue();
             } catch (DataException e) {
                 e.getMessage();
             }
-        }
+
         String sqlRequest = "select password from gamebet.`user` WHERE `email` = '"+email+"'";
         String currentPassword = workWithDBgetResult(sqlRequest);
         Stash.put("currentUser", email);
@@ -895,8 +896,8 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Записали хэш текущего пароля "+currentPassword+" для пользователя "+email);
     }
 
-    @Когда("^возвращаем изначальный пароль$")
-    public void saveCurrentPassword(){
+    @After(value="@ChangePassword_C1043")
+    public void revertCurrentPassword(){
         String sqlRequest = "update gamebet.`user` set password = '"+Stash.getValue("currentPassword")+"' WHERE `email` = '"+Stash.getValue("currentUser")+"'";
         workWithDB(sqlRequest);
         sqlRequest = "select password from gamebet.`user` WHERE `email` = '"+Stash.getValue("currentUser")+"'";
