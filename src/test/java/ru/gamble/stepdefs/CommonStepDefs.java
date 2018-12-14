@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.DisplayName;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -881,12 +882,15 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Before(value = "@ChangePassword_C1043")
-    public void saveCurrentPassword(){
+    public void saveCurrentPassword() throws DataException {
        String email = null;
-            try {
-                email = JsonLoader.getData().get(STARTING_URL).get("USER").getValue();
-            } catch (DataException e) {
-                e.getMessage();
+        WebDriver driver = PageFactory.getWebDriver();
+        Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
+        String browserName = caps.getBrowserName();
+        if (browserName.contains("chrome")) {
+            email = JsonLoader.getData().get(STARTING_URL).get("USER_CHROME").getValue();
+        }else {
+            email = JsonLoader.getData().get(STARTING_URL).get("USER_FIREFOX").getValue();
             }
 
         String sqlRequest = "select password from gamebet.`user` WHERE `email` = '"+email+"'";
