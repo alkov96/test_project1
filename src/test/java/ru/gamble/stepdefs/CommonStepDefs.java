@@ -2252,5 +2252,39 @@ public class CommonStepDefs extends GenericStepDefs {
         WebDriver driver = PageFactory.getWebDriver();
         driver.navigate().back();
     }
+
+    @Когда("^редактируем параметры сайта$")
+    public void rememberParams(DataTable param) {
+        Map<String, String> table = param.asMap(String.class, String.class);
+        List<String> paramsList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+            String paramTitle = entry.getKey();
+            paramsList.add(paramTitle);
+        }
+        Stash.put("paramsList", paramsList);
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+            String newValue = entry.getValue();
+            String paramTitle = entry.getKey();
+            String sqlRequest = "SELECT * FROM gamebet.`params` WHERE title='"+paramTitle+"'";
+            String oldValue = workWithDBgetResult(sqlRequest, "value");
+            Stash.put("old "+paramTitle, oldValue);
+            LOG.info("Запомнено старое значение параметра " + "old "+paramTitle + " "+ oldValue);
+            sqlRequest = "UPDATE gamebet.`params` SET value = '"+newValue+"' WHERE title='"+paramTitle+"'";
+            workWithDB(sqlRequest);
+            LOG.info("Установлено новое значение параметра " + paramTitle + " " + newValue);
+        }
+    }
+
+    @Когда("^выставляем обратно старые значения параметров сайта$")
+    public void removeParams() {
+        List<String> params = Stash.getValue("paramsList");
+        for (String p: params){
+            String sqlRequest = "UPDATE gamebet.`params` SET value = '"+Stash.getValue("old "+ p)+"' WHERE title='"+p+"'";
+            workWithDB(sqlRequest);
+            sqlRequest = "SELECT * FROM gamebet.`params` WHERE title='"+p+"'";
+            String newValue = workWithDBgetResult(sqlRequest, "value");
+            LOG.info("Вернули значение параметра " + p + " " + newValue);
+        }
+    }
 }
 
