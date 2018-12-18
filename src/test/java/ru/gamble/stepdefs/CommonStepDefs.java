@@ -636,18 +636,16 @@ public class CommonStepDefs extends GenericStepDefs {
         String actual = JSONValue.toJSONString(Stash.getValue(keyResponce));
         actual = actual.replace("{\"code\":0,\"data\":","").replace("}","");
         String[] linesResponce = actual.split("swarmUserId");
-        int i = new Random().nextInt(linesResponce.length);
-        String idUser = linesResponce[i].split(",")[0].replace("\":","");
+        int i = 1+new Random().nextInt(linesResponce.length-1);
+        String idUser = actual.split("swarmUserId")[i].replace("\":","").split(",")[0];
         String dateForUser = null;
         if (actual.contains("videoIdentDate")){
-            int a = linesResponce[i].replaceAll("\"","").indexOf("videoIdentDate");
-            dateForUser = linesResponce[i].replaceAll("\"","").substring(a+15,a+34);
+            dateForUser = actual.split("videoIdentDate")[i].replace("\":","").split(",")[0].replaceAll("\"","");
             oldFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm:ss");
             newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         }
         if (actual.contains("skypeSendDate")){
-            int a = linesResponce[i].replaceAll("\"","").indexOf("skypeSendDate");
-            dateForUser = linesResponce[i].replaceAll("\"","").substring(a+14,a+30);
+            dateForUser = actual.split("skypeSendDate")[i].replace("\":","").split(",")[0].replaceAll("\"","");
             oldFormat = new SimpleDateFormat("dd.MM.yyyy kk:mm");
             newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
         }
@@ -1518,8 +1516,8 @@ public class CommonStepDefs extends GenericStepDefs {
             connect = (HttpURLConnection) new URL(requestFull).openConnection();
             connect.setRequestMethod("GET");
             connect.setUseCaches(false);
-            connect.setConnectTimeout(250);
-            connect.setReadTimeout(250);
+            connect.setConnectTimeout(500);
+            connect.setReadTimeout(500);
             connect.connect();
 
             StringBuilder jsonString = new StringBuilder();
