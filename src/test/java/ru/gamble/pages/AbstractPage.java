@@ -467,7 +467,7 @@ public abstract class AbstractPage extends Page{
 //            clearCoupon.click();
 //        }
 
-        if (!getWebDriver().findElements(pathToclearCoupon).isEmpty()){
+        if (!getWebDriver().findElements(pathToclearCoupon).isEmpty() && clearCoupon.isDisplayed()){
             clearCoupon.click();
         }
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
