@@ -95,6 +95,8 @@ public abstract class AbstractPage extends Page{
     @FindBy(xpath = "//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']")
     protected WebElement clearCoupon;
 
+    protected By pathToclearCoupon = By.xpath("//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']");
+
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
     private WebElement serviceMessage;
@@ -461,7 +463,11 @@ public abstract class AbstractPage extends Page{
 
     @ActionTitle("очищает купон")
     public void clearCoupon(){
-        if (clearCoupon.isDisplayed()){
+//        if (clearCoupon.isDisplayed()){
+//            clearCoupon.click();
+//        }
+
+        if (!getWebDriver().findElements(pathToclearCoupon).isEmpty()){
             clearCoupon.click();
         }
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
