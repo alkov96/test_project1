@@ -399,6 +399,7 @@ public abstract class AbstractPage extends Page{
     public void waitForElementPresent(final By by, int timeout) {
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(PageFactory.getWebDriver(), timeout)
                 .ignoring(StaleElementReferenceException.class);
+        wait.withMessage("Элемент " + by + " так и не появился за " + timeout + " секунд");
         wait.until((ExpectedCondition<Boolean>) webDriver -> {
             WebElement element = Objects.requireNonNull(webDriver).findElement(by);
             return element != null && element.isDisplayed();
