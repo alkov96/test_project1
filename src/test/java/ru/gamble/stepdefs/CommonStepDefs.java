@@ -2273,7 +2273,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    @Когда("^выставляем обратно старые значения параметров сайта$")
+//    @Когда("^выставляем обратно старые значения параметров сайта$")
     public void removeParams() {
         List<String> params = Stash.getValue("paramsList");
         for (String p: params){
