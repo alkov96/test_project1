@@ -1753,6 +1753,14 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
+    @Когда("^пользователь открывает новое окно с url \"([^\"]*)\"$")
+    public void userOpenNewUrl2(String url){
+        WebDriver driver2 = new ChromeDriver();
+        driver2.get(url);
+        new WebDriverWait(driver2, 10).until(ExpectedConditions.urlToBe(url));
+        Stash.put("driver",driver2);
+    }
+
     public static void closingCurrtWin(String title) {
         PageFactory.getWebDriver().close();
         for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
