@@ -71,7 +71,7 @@ public class WithdrawalOfFundsPage extends AbstractPage{
 //        Thread.sleep(1000);
         new WebDriverWait(driver,10)
                 .withMessage("Кнопка 'Вывести' так и не стала активной")
-                .until(ExpectedConditions.not(ExpectedConditions.attributeContains(By.xpath("//button[contains(@id,'submit-money-out')]"),"disabled","disabled")));
+                .until(ExpectedConditions.not(ExpectedConditions.attributeContains(By.xpath("//button[contains(@id,'submit-money-out')]"),"disabled","true")));
     }
 
     private void checkForErrorLoadingPaymentSystems(){

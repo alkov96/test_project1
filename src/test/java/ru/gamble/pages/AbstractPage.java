@@ -853,5 +853,14 @@ public abstract class AbstractPage extends Page{
         driver.quit();
     }
 
+
+    @ActionTitle("запоминает смс-код для подтверждения вывода средств")
+    public void rememberSMSforWithdraw(String keyPhone, String keyCode){
+        WebDriver driver = Stash.getValue("driver");
+        LOG.info("Ищем и запоминаем смс-код подтверждения вывода");
+        TestingServicePage.userSearchesForLastSentSMSByNumberAndRemembersIn(keyPhone,keyCode,driver);
+        driver.close();
+        driver.quit();
+    }
 }
 
