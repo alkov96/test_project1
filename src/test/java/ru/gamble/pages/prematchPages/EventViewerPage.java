@@ -774,5 +774,10 @@ public class EventViewerPage extends AbstractPage {
                 withMessage("Контейнер многовыборного режима не очистился по кнопке 'очистить'").
                 until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]/div[1]/div/div"),0));
     }
+
+    @ActionTitle("открывает соревнование с играми со ставкой исход")
+    public void openListGames(){
+
+    }
 }
 

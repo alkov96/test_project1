@@ -2229,7 +2229,20 @@ public class CommonStepDefs extends GenericStepDefs {
             expectedText = aTable.get(TEXT);
             String xpath = "//*[contains(text(),'" + expectedText + "')]";
             LOG.info("Переходим по клику на элемент " + linkTitle);
-            opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+            try {
+                opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+                Thread.sleep(500);
+            }
+            catch (TimeoutException e){
+                LOG.info("С первого раза ссылка " + linkTitle + " не открылась, попробуем второй раз");
+                driver.close();
+                driver.switchTo().window(currentHandle);
+                driver.navigate().refresh();
+                opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+            }
+            catch (InterruptedException e2) {
+                e2.printStackTrace();
+            }
         }
     }
     public static void pressButton(String param) {

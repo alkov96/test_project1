@@ -1,6 +1,7 @@
 package ru.gamble.pages.mainPages;
 
 import cucumber.api.DataTable;
+import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.useDefaultRepresentation;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.*;
 
@@ -198,7 +200,7 @@ public class FooterPage extends AbstractPage {
 
         // Цикл обновления страницы в случае неудачи её прогрузки
         for(int j = 0; j < 10; j++) {
-            new WebDriverWait(driver, 3);
+            //new WebDriverWait(driver, 3);
             requiredElements = driver.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
             LOG.info("Текущая страница::" + driver.getCurrentUrl());
             if(!requiredElements.isEmpty()){
@@ -216,9 +218,11 @@ public class FooterPage extends AbstractPage {
     @ActionTitle("проверяет присутствие ссылки")
     public void checkSportsbook_888ru(String param){
         String expected = "https://888.ru/webdav/sportsbook-888ru.apk";
+        String expected2 = "https://dev-bk-bet-site.tsed.orglot.office/mobile/app/android/last_version";
         String actual = PageFactory.getWebDriver().findElement(By.xpath("//a[contains(.,'" + param + "')]")).getAttribute("href");
-        assertThat(actual)
-              .as("Не найдена ссылка::" + expected).isEqualTo(expected);
+        Assertions.assertTrue(
+                actual.equals(expected) || actual.equals(expected2),
+                "Не найдена ссылка::" + expected + ", или " + expected2);
     }
 
     @ActionTitle("проверяет что число платёжных систем")
