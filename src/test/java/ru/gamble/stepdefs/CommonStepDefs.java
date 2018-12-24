@@ -3,33 +3,29 @@ package ru.gamble.stepdefs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.ws.client.*;
-import com.sun.activation.registries.LogSupport;
 import cucumber.api.DataTable;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
-import io.qameta.allure.Attachment;
-import io.qameta.allure.Step;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.junit.jupiter.api.DisplayName;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.utility.*;
+import ru.gamble.utility.DBUtils;
+import ru.gamble.utility.Generators;
+import ru.gamble.utility.JsonLoader;
+import ru.gamble.utility.NaiveSSLContext;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
@@ -49,8 +45,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -1642,14 +1636,19 @@ public class CommonStepDefs extends GenericStepDefs {
 
             HostnameVerifier allHostsValid = (hostname, session) -> true;
             //************
-
+            HttpURLConnection con;
             url = new URL(requestFull);
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setRequestMethod(method);
-            con.setRequestProperty("Accept", "application/json");
-            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            if(requestFull.contains("https:")){
+                con = (HttpsURLConnection) url.openConnection();
+            }else {
+                con = (HttpURLConnection) url.openConnection();
+            }
+                con.setDoInput(true);
+                con.setDoOutput(true);
+                con.setRequestMethod(method);
+                con.setRequestProperty("Accept", "application/json");
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
             //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
          //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
 
