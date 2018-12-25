@@ -452,4 +452,46 @@ public class MainPage extends AbstractPage {
         Stash.put(ishodKey,team1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
         Stash.put(coefKey,p1);
     }
+
+
+
+    @ActionTitle("переходит на игру из Горячих ставок со ставкой Исход и запоминает id игры")
+    public void goToGameFromHBandRememberID(String keyGameId){
+
+        String path = "//div[contains(@class,'lastMinutesBets')]";
+        WebDriver driver = PageFactory.getDriver();
+        List<WebElement> games;
+        List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете
+        int number = 0;
+        do {
+            if(allSport.get(0).getAttribute("innerText").contains("Подходящих игр не найдено")) {
+                throw new AutotestError("Ошибка! Подходящих игр не найдено");
+            }
+            games = driver.findElements(By.xpath(path + "//td[contains(@class,'bets-item_k1')]//span[contains(@class,'bets-widget-table__price')]"));
+            if (!games.isEmpty()) {
+                break;
+            }
+            allSport.get(number).click();
+
+            CommonStepDefs.workWithPreloader();
+
+            number++;
+
+        } while (number <= allSport.size() - 1);
+
+        WebElement selectGame = games.get(0).findElement(By.xpath("ancestor::tr"));
+
+        LOG.info("Переход на игру из Горячих ставок " + selectGame.getAttribute("innerText"));
+        selectGame.click();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
+        CommonStepDefs.workWithPreloader();
+
+
+        String game = driver.getCurrentUrl().split("game=")[1];
+        Stash.put(keyGameId,game);
+        driver.findElement(By.id("main-logo")).click();
+
+    }
+
+
 }

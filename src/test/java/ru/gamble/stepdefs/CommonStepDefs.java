@@ -2304,5 +2304,53 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info("Вернули значение параметра " + p + " " + newValue);
         }
     }
+
+    @Когда("^включает симпл-баннер$")
+    public void onSimpleBanner(){
+        Calendar dateBegin = Calendar.getInstance();
+        Calendar dateEnd = Calendar.getInstance();
+        String activeStartTime,activeFinishTime;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        dateBegin.add(Calendar.DAY_OF_YEAR,-1);
+        activeStartTime = format.format(dateBegin.getTime());
+        dateEnd.add(Calendar.DAY_OF_YEAR,+1);
+        activeFinishTime = format.format(dateEnd.getTime());
+        String sqlRequest = "SELECT * FROM gamebet.`banner` WHERE bannertemplate_id=1 AND slider_id=1";
+        String id = workWithDBgetResult(sqlRequest, "id");
+        LOG.info("Нашли и запомнинил ID баннера");
+
+        sqlRequest = "UPDATE gamebet.`banner` SET active=1,url='https://music.yandex.ru/tag/newyear',activeStartTime='" + activeStartTime + "',activeFinishTime='" + activeFinishTime + "' WHERE id=" + id;
+        workWithDB(sqlRequest);
+
+        LOG.info("Добавлен в автивные simple баннер с id = " + id);
+    }
+
+
+
+    @Когда("^включает матчевый баннер \"([^\"]*)\"$")
+    public void onMatchBanner(String keyGameID){
+        Calendar dateBegin = Calendar.getInstance();
+        Calendar dateEnd = Calendar.getInstance();
+        String activeStartTime,activeFinishTime;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        dateBegin.add(Calendar.DAY_OF_YEAR,-1);
+        activeStartTime = format.format(dateBegin.getTime());
+        dateEnd.add(Calendar.DAY_OF_YEAR,+1);
+        activeFinishTime = format.format(dateEnd.getTime());
+
+
+        String sqlRequest = "SELECT * FROM gamebet.`banner` WHERE bannertemplate_id=3 AND slider_id=1";
+        String id = workWithDBgetResult(sqlRequest, "id");
+        String gameID = Stash.getValue(keyGameID);
+        LOG.info("Нашли и запомнинил ID баннера");
+
+        sqlRequest = "UPDATE gamebet.`banner` SET active=1,game_id=" + gameID + " ,activeStartTime='" + activeStartTime + "',activeFinishTime='" + activeFinishTime + "' WHERE id" + id;
+        workWithDB(sqlRequest);
+
+        LOG.info("Добавлен в автивные баннер с id = " + id + ", ведущий на игру gameID = " + gameID);
+    }
+
 }
 
