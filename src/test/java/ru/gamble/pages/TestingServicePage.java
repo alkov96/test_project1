@@ -21,6 +21,8 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+import sun.java2d.pipe.PixelDrawPipe;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static ru.gamble.utility.Constants.DEFAULT;
@@ -65,9 +67,8 @@ public class TestingServicePage extends AbstractPage{
     }
 
 
-    @ActionTitle("ищет последнее отправленное SMS по номеру и запоминает в")
-    public void userSearchesForLastSentSMSByNumberAndRemembersIn(String keyPhoneNumber, String keySMS) {
-        WebDriver driver = PageFactory.getDriver();
+//    @ActionTitle("ищет последнее отправленное SMS по номеру и запоминает в")
+    public static void userSearchesForLastSentSMSByNumberAndRemembersIn(String keyPhoneNumber, String keySMS, WebDriver driver) {
         String currentPage = driver.getCurrentUrl();
         String sms, number = "";
         Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
@@ -82,7 +83,7 @@ public class TestingServicePage extends AbstractPage{
         String xpath = "//p[contains(.,'Последние отправленные смс:')]/following-sibling::ul/li[contains(.,'" + number + "')]";
         StringBuilder tmp = new StringBuilder();
 
-            sms = PageFactory.getDriver().findElement(By.xpath(xpath)).getAttribute("innerText");
+            sms = driver.findElement(By.xpath(xpath)).getAttribute("innerText");
 
             Pattern pat = Pattern.compile("(?<= код\\s)[\\d]{4}");
             Matcher matcher = pat.matcher(sms);

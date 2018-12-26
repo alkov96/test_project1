@@ -231,6 +231,13 @@ public class CouponPage extends AbstractPage {
             case "П2":
                 ishod = Stash.getValue("team2key").toString();
                 break;
+            case "П1 0":
+                ishod = Stash.getValue("team1key").toString();
+                break;
+
+            case "П2 0":
+                ishod = Stash.getValue("team2key").toString();
+                break;
         }
 
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {

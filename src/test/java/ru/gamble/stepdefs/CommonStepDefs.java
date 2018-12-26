@@ -3,33 +3,29 @@ package ru.gamble.stepdefs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.ws.client.*;
-import com.sun.activation.registries.LogSupport;
 import cucumber.api.DataTable;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
-import io.qameta.allure.Attachment;
-import io.qameta.allure.Step;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.junit.jupiter.api.DisplayName;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.utility.*;
+import ru.gamble.utility.DBUtils;
+import ru.gamble.utility.Generators;
+import ru.gamble.utility.JsonLoader;
+import ru.gamble.utility.NaiveSSLContext;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
@@ -49,8 +45,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -1642,14 +1636,19 @@ public class CommonStepDefs extends GenericStepDefs {
 
             HostnameVerifier allHostsValid = (hostname, session) -> true;
             //************
-
+            HttpURLConnection con;
             url = new URL(requestFull);
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setRequestMethod(method);
-            con.setRequestProperty("Accept", "application/json");
-            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            if(requestFull.contains("https:")){
+                con = (HttpsURLConnection) url.openConnection();
+            }else {
+                con = (HttpURLConnection) url.openConnection();
+            }
+                con.setDoInput(true);
+                con.setDoOutput(true);
+                con.setRequestMethod(method);
+                con.setRequestProperty("Accept", "application/json");
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
             //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
          //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
 
@@ -1751,6 +1750,14 @@ public class CommonStepDefs extends GenericStepDefs {
         driver.get(url);
         new WebDriverWait(driver, 10).until(ExpectedConditions.urlToBe(url));
 
+    }
+
+    @Когда("^пользователь открывает новое окно с url \"([^\"]*)\"$")
+    public void userOpenNewUrl2(String url){
+        WebDriver driver2 = new ChromeDriver();
+        driver2.get(url);
+        new WebDriverWait(driver2, 10).until(ExpectedConditions.urlToBe(url));
+        Stash.put("driver",driver2);
     }
 
     public static void closingCurrtWin(String title) {
@@ -2221,7 +2228,20 @@ public class CommonStepDefs extends GenericStepDefs {
             expectedText = aTable.get(TEXT);
             String xpath = "//*[contains(text(),'" + expectedText + "')]";
             LOG.info("Переходим по клику на элемент " + linkTitle);
-            opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+            try {
+                opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+                Thread.sleep(500);
+            }
+            catch (TimeoutException e){
+                LOG.info("С первого раза ссылка " + linkTitle + " не открылась, попробуем второй раз");
+                driver.close();
+                driver.switchTo().window(currentHandle);
+                driver.navigate().refresh();
+                opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+            }
+            catch (InterruptedException e2) {
+                e2.printStackTrace();
+            }
         }
     }
     public static void pressButton(String param) {
@@ -2284,5 +2304,53 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info("Вернули значение параметра " + p + " " + newValue);
         }
     }
+
+    @Когда("^включает симпл-баннер$")
+    public void onSimpleBanner(){
+        Calendar dateBegin = Calendar.getInstance();
+        Calendar dateEnd = Calendar.getInstance();
+        String activeStartTime,activeFinishTime;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        dateBegin.add(Calendar.DAY_OF_YEAR,-1);
+        activeStartTime = format.format(dateBegin.getTime());
+        dateEnd.add(Calendar.DAY_OF_YEAR,+1);
+        activeFinishTime = format.format(dateEnd.getTime());
+        String sqlRequest = "SELECT * FROM gamebet.`banner` WHERE bannertemplate_id=1 AND slider_id=1";
+        String id = workWithDBgetResult(sqlRequest, "id");
+        LOG.info("Нашли и запомнинил ID баннера");
+
+        sqlRequest = "UPDATE gamebet.`banner` SET active=1,url='https://music.yandex.ru/tag/newyear',activeStartTime='" + activeStartTime + "',activeFinishTime='" + activeFinishTime + "' WHERE id=" + id;
+        workWithDB(sqlRequest);
+
+        LOG.info("Добавлен в автивные simple баннер с id = " + id);
+    }
+
+
+
+    @Когда("^включает матчевый баннер \"([^\"]*)\"$")
+    public void onMatchBanner(String keyGameID){
+        Calendar dateBegin = Calendar.getInstance();
+        Calendar dateEnd = Calendar.getInstance();
+        String activeStartTime,activeFinishTime;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        dateBegin.add(Calendar.DAY_OF_YEAR,-1);
+        activeStartTime = format.format(dateBegin.getTime());
+        dateEnd.add(Calendar.DAY_OF_YEAR,+1);
+        activeFinishTime = format.format(dateEnd.getTime());
+
+
+        String sqlRequest = "SELECT * FROM gamebet.`banner` WHERE bannertemplate_id=3 AND slider_id=1";
+        String id = workWithDBgetResult(sqlRequest, "id");
+        String gameID = Stash.getValue(keyGameID);
+        LOG.info("Нашли и запомнинил ID баннера");
+
+        sqlRequest = "UPDATE gamebet.`banner` SET active=1,game_id=" + gameID + " ,activeStartTime='" + activeStartTime + "',activeFinishTime='" + activeFinishTime + "' WHERE id" + id;
+        workWithDB(sqlRequest);
+
+        LOG.info("Добавлен в автивные баннер с id = " + id + ", ведущий на игру gameID = " + gameID);
+    }
+
 }
 

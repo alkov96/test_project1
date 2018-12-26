@@ -512,8 +512,9 @@ public class EventViewerPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait =  new WebDriverWait(driver,10);
         boolean turnOn = onOrOff.equalsIgnoreCase("включает")?true:false;
+        By xpathMultiviewButton = By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]");
 
-        WebElement multiviewButton = driver.findElement(By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]"));
+
 
 
         if (!driver.findElements(preloaderOnPage).isEmpty()){
@@ -534,10 +535,10 @@ public class EventViewerPage extends AbstractPage {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]")));
 
         LOG.info("Проверяем активность кнопки многовыборного режима");
-        boolean isOn = multiviewButton.getAttribute("class").contains("active");
+        boolean isOn = driver.findElement(xpathMultiviewButton).getAttribute("class").contains("active");
         if (isOn!=turnOn){
-            multiviewButton.findElement(By.xpath("./i")).click();
-            isOn = multiviewButton.getAttribute("class").contains("active");
+            driver.findElement(xpathMultiviewButton).findElement(By.xpath("./i")).click();
+            isOn = driver.findElement(xpathMultiviewButton).getAttribute("class").contains("active");
         }
         Assert.assertTrue(
                 "Не изменилось состояние многовыборного режима. Ожидалось " + turnOn + ", а на самом деле " + isOn,
@@ -602,7 +603,7 @@ public class EventViewerPage extends AbstractPage {
                             By.xpath(xpathCurrentSport + "/ul[1]/li//div[contains(@class,'left-menu__list-item-region-compitition')]"),0));
         }
         LOG.info("Добавляем первый турнир в регионе в контейнер многовыборного режима");
-        allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]")).click();//выбрали турнир
+        allSports.get(index).findElement(By.xpath("./ul[1]/li[1]//label[contains(@for,'checkbox-competition')]")).click();//выбрали турнир
         LOG.info("Запоминаем название соревнования в ЛМ");
         String nameTour = allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]/i")).getAttribute("innerText");//название турнира в ЛМ
         setExpandCollapseMenusButton(false);
@@ -614,7 +615,7 @@ public class EventViewerPage extends AbstractPage {
     public void addOneGameToMultiview(String numberSport, String keyNameGame){
         WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait =  new WebDriverWait(driver,10);
-        List<WebElement> allSports = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li"));
+
         int index = Integer.valueOf(numberSport);
 
         LOG.info("Добавляем одну игру из соревновани в контейнер");
@@ -622,6 +623,7 @@ public class EventViewerPage extends AbstractPage {
         LOG.info("Сворачиваем все виды спорта");
         closeSports();//свернули все виды спорта
         LOG.info("Разворачиваем следующий спорт");
+        List<WebElement> allSports = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li"));
         allSports.get(index).click();//развернули спорт
         wait.withMessage("Спорт номер " + index + " не развернулся за 10 секунд");
         wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
@@ -638,7 +640,7 @@ public class EventViewerPage extends AbstractPage {
         }
         WebElement tour = allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]"));
         Actions actions = new Actions(driver);
-        LOG.info("Наводим мышку на название соревнования, чтобы открлось всплывающее меню с переенм игр");
+        LOG.info("Наводим мышку на название соревнования, чтобы открлось всплывающее меню с перечнем игр");
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -708,15 +710,24 @@ public class EventViewerPage extends AbstractPage {
         setExpandCollapseMenusButton(true);
 
         int index = Integer.valueOf(numberSport);
+        String xpathCurrentSport = "//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + (index+1) + "]";
         List<WebElement> allSports = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li"));
-        if (!allSports.get(index).findElement(By.xpath("ul[1]/li[1]")).getAttribute("class").contains("active"))
+        if (!allSports.get(index).getAttribute("class").contains("active")) {
+            LOG.info("Спорт свернут - разворачиваем его");
+            allSports.get(index).findElement(By.xpath(".//b[contains(@class,'left-menu__list-item-arrow_sport')]")).click();
+            wait.withMessage("Спорт не развернулся за 10 секунд");
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                    By.xpath(xpathCurrentSport+"/ul[1]/li"),
+                    0));//проверяем что спорт развернулся
+        }
+        if (!allSports.get(index).findElement(By.xpath("./ul[1]/li[1]")).getAttribute("class").contains("active"))
         {
             LOG.info("регион в спорте свернут - разворачиваем его");
             allSports.get(index).findElement(By.xpath("ul[1]/li[1]//div[contains(@class,'left-menu__list-item-arrow_region')]")).click();//развернули регион
             wait.withMessage("Регион не развернулся за 10 секунд");
             wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
-                    By.xpath("//*[@id='sports-list-container']/ul[2]/ng-include[2]/li[" + (index+1) + "]/ul[1]/li[1]//label[contains(@for,'checkbox-competition')]"),
-                    0));//проверяем что спорт развернулся
+                    By.xpath(xpathCurrentSport + "/ul[1]/li[1]//label[contains(@for,'checkbox-competition')]"),
+                    0));//проверяем что регион развернулся
         }
         WebElement tour = allSports.get(index).findElement(By.xpath("ul[1]/li[1]//label[contains(@for,'checkbox-competition')]"));
         Actions actions = new Actions(driver);
@@ -762,6 +773,11 @@ public class EventViewerPage extends AbstractPage {
         new WebDriverWait(driver,10).
                 withMessage("Контейнер многовыборного режима не очистился по кнопке 'очистить'").
                 until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]/div[1]/div/div"),0));
+    }
+
+    @ActionTitle("открывает соревнование с играми со ставкой исход")
+    public void openListGames(){
+
     }
 }
 

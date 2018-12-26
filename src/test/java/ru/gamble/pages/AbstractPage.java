@@ -1,6 +1,8 @@
 package ru.gamble.pages;
 
+import cucumber.api.DataTable;
 import cucumber.api.Scenario;
+import cucumber.api.java.ru.Когда;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
@@ -9,6 +11,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +28,7 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -399,6 +399,7 @@ public abstract class AbstractPage extends Page{
     public void waitForElementPresent(final By by, int timeout) {
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(PageFactory.getWebDriver(), timeout)
                 .ignoring(StaleElementReferenceException.class);
+        wait.withMessage("Элемент " + by + " так и не появился за " + timeout + " секунд");
         wait.until((ExpectedCondition<Boolean>) webDriver -> {
             WebElement element = Objects.requireNonNull(webDriver).findElement(by);
             return element != null && element.isDisplayed();
@@ -467,7 +468,7 @@ public abstract class AbstractPage extends Page{
 //            clearCoupon.click();
 //        }
 
-        if (!getWebDriver().findElements(pathToclearCoupon).isEmpty()){
+        if (!getWebDriver().findElements(pathToclearCoupon).isEmpty() && clearCoupon.isDisplayed()){
             clearCoupon.click();
         }
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
@@ -551,7 +552,7 @@ public abstract class AbstractPage extends Page{
 
         LOG.info("Копируем смс-код для подтверждения телефона");
         try {
-            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
+            new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
         }catch (Exception e){
             e.getMessage();
             throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
@@ -812,5 +813,54 @@ public abstract class AbstractPage extends Page{
         }
     }
 
+    @ActionTitle("завершает регу в Евросети с")
+    public void EuroReg(DataTable dataTable){
+        LOG.info("sdf");
+        Map<String,String> table = dataTable.asMap(String.class, String.class);
+        WebDriver driver = Stash.getValue("driver");
+        String key = null;
+        String value = null;
+        String tagField = null;
+        StringBuilder asd = new StringBuilder();
+        WebElement field;
+        int aa = 0;
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+            key=entry.getKey();
+            value = entry.getValue();
+            if (value.matches("[A-Z]*")){
+                value=Stash.getValue(value);
+            }
+
+            if (driver.findElements(By.xpath("//*[contains(text(),'"+key+"')]/following-sibling::*")).isEmpty()){
+                continue;
+            }
+            field = driver.findElements(By.xpath("//*[contains(text(),'"+key+"')]/following-sibling::*")).get(0);
+            tagField = field.getTagName();
+            asd.append(tagField);
+
+            if (tagField.equals("input")) {
+                field.clear();
+                field.sendKeys(value);
+            } else if (tagField.equals("select")) {
+                Select select = new Select(field);
+                select.selectByVisibleText(value);
+            }
+        }
+        driver.findElement(By.xpath("//*[contains(@value,'"+table.get("button")+"')]")).click();
+        value = table.get("textis");
+        new WebDriverWait(driver,10).until(attributeContains(By.xpath("//body"),"innerText",value));
+        driver.close();
+        driver.quit();
+    }
+
+
+    @ActionTitle("запоминает смс-код для подтверждения вывода средств")
+    public void rememberSMSforWithdraw(String keyPhone, String keyCode){
+        WebDriver driver = Stash.getValue("driver");
+        LOG.info("Ищем и запоминаем смс-код подтверждения вывода");
+        TestingServicePage.userSearchesForLastSentSMSByNumberAndRemembersIn(keyPhone,keyCode,driver);
+        driver.close();
+        driver.quit();
+    }
 }
 
