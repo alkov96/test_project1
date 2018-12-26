@@ -3,7 +3,7 @@
     "ESB_URL": "dev-bet-esb.dev.bet.orglot.office:8660",
     "MAIN_URL": "https://dev-bet-site.dev.bet.orglot.office",
     "ADMIN_URL": "dev-bet-dbproca.dev.bet.orglot.office/admin",
-    "MOBILE_URL": "https://dev-bk-bet-mobile-site.tsed.orglot.office",
+    "MOBILE_URL": "https://dev-bet-mobile-site.dev.bet.orglot.office",
     "REGISTRATION_URL": "https://dev-bet-site.dev.bet.orglot.office/test_registration/",
     "USER": "testingsto+86@mail.ru",
     "USER_CHROME": "testingsto+86@mail.ru",
