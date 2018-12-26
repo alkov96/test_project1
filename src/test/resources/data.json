@@ -13,7 +13,7 @@
     "PHONE": "79088767878",
     "PHONE_FIREFOX": "70010020701",
     "DB_REGISTRATION": {
-      "DB_URL": "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306",
+      "DB_URL": "jdbc:mysql://dev-bet-dbproc.dev.bet.orglot.office:3306",
       "DB_USER": "webdev_adm",
       "DB_PASSWORD": "tao9Gu8Waenotahv"
     }
