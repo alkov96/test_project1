@@ -1,10 +1,10 @@
 {
   "DEV_BK": {
-    "ESB_URL": "http://dev-bk-bet-esb.tsed.orglot.office:8660",
-    "MAIN_URL": "https://dev-bk-bet-site.tsed.orglot.office",
-    "ADMIN_URL": "http://dev-bk-bet-dbproca.tsed.orglot.office/admin/",
+    "ESB_URL": "dev-bet-esb.dev.bet.orglot.office:8660",
+    "MAIN_URL": "https://dev-bet-site.dev.bet.orglot.office",
+    "ADMIN_URL": "dev-bet-dbproca.dev.bet.orglot.office/admin",
     "MOBILE_URL": "https://dev-bk-bet-mobile-site.tsed.orglot.office",
-    "REGISTRATION_URL": "https://dev-bk-bet-site.tsed.orglot.office/test_registration/",
+    "REGISTRATION_URL": "https://dev-bet-site.dev.bet.orglot.office/test_registration/",
     "USER": "testingsto+86@mail.ru",
     "USER_CHROME": "testingsto+86@mail.ru",
     "USER_FIREFOX": "user_for_firefox@mailinator.com",
