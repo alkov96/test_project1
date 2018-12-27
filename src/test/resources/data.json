@@ -14,8 +14,8 @@
     "PHONE_FIREFOX": "70010020701",
     "DB_REGISTRATION": {
       "DB_URL": "jdbc:mysql://dev-bet-dbproc.dev.bet.orglot.office:3306",
-      "DB_USER": "webdev_adm",
-      "DB_PASSWORD": "tao9Gu8Waenotahv"
+      "DB_USER": "webdev_user",
+      "DB_PASSWORD": "hahmuKoC8cha4Poo"
     }
   },
   "DEMO": {
