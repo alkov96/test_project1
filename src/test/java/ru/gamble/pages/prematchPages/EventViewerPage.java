@@ -398,6 +398,12 @@ public class EventViewerPage extends AbstractPage {
     @ActionTitle("включает фильтр по времени")
     public void onTriggerPeriod(String period){
         WebDriver driver = PageFactory.getDriver();
+        //если меню свернуто - разворачиваем
+        WebElement menu = driver.findElement(By.id("menu-toggler"));
+        if (!menu.getAttribute("class").contains("collapsed")) {
+            menu.click();
+            CommonStepDefs.workWithPreloader();
+        }
         driver.findElement(By.xpath("//div[@class='periods']//div[contains(@class,'periods__input')]")).click();
         driver.findElement(By.xpath("//div[@class='periods']//ul[@class='periods__list']/li[contains(text(),'"+period+"')]")).click();
         CommonStepDefs.workWithPreloader();
