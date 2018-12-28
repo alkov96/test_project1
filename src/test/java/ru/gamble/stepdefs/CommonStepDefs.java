@@ -1043,7 +1043,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void confirmEmail(String keyPhone) {
         String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7111002%' ORDER BY phone";
         String phoneLast = workWithDBgetResult(sqlRequest, "phone");
-        String phone = "7111002" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
+        String phone = "7333001" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
         Stash.put(keyPhone, phone);
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
