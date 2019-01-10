@@ -781,9 +781,5 @@ public class EventViewerPage extends AbstractPage {
                 until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]/div[1]/div/div"),0));
     }
 
-    @ActionTitle("открывает соревнование с играми со ставкой исход")
-    public void openListGames(){
-
-    }
 }
 

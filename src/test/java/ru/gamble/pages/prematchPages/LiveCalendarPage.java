@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
@@ -41,7 +42,7 @@ public class LiveCalendarPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(centralMarkets));
-        tryingLoadPage(menuForSelectingSports,5, 10);
+        tryingLoadPage(menuForSelectingSports, 5, 10);
         workWithPreloader();
     }
 
@@ -51,16 +52,16 @@ public class LiveCalendarPage extends AbstractPage {
         List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
         int tryPage = 0;
         boolean isCoeffFound = false;
-        while (!isCoeffFound && tryPage < allDaysPages.size()-1) {
+        while (!isCoeffFound && tryPage < allDaysPages.size() - 1) {
             try {
                 waitForElementPresent(By.xpath("//div[contains(@class,'livecal-table__coefficient')]"), 3);
-            }catch (Exception e){
+            } catch (Exception e) {
                 LOG.info("На странице [" + allDaysPages.get(tryPage).getAttribute("innerText") + "] нет событий");
             }
             List<WebElement> correctCoeffs = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='table livecal-table ng-scope']/div[contains(text(), '" + coeff + "')]"));
-            if (correctCoeffs.size()>0) {
-                for(WebElement element : correctCoeffs){
-                    if (element.isDisplayed()){
+            if (correctCoeffs.size() > 0) {
+                for (WebElement element : correctCoeffs) {
+                    if (element.isDisplayed()) {
                         element.click();
                         isCoeffFound = true;
                         break;
@@ -88,10 +89,11 @@ public class LiveCalendarPage extends AbstractPage {
 
     /**
      * Добавление в купон нескольких ставок со страницы Лайв-календарь
+     *
      * @param param - сколько ставок нужно доабвить в купон
      */
     @ActionTitle("добавляет ставки из разных событий в количестве")
-    public void addToCouponDifferentBets(String param){
+    public void addToCouponDifferentBets(String param) {
         String xpathCoefficient = "//preceding-sibling::td[contains(@class,'livecal-table__col_event')]";
         WebDriver driver = PageFactory.getDriver();
         List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')and not(contains(@class,'empty'))]"));
@@ -101,11 +103,11 @@ public class LiveCalendarPage extends AbstractPage {
         int num;
 
         LOG.info("Жмём на коэфициенты");
-        if(coefficients.size() == 0){
+        if (coefficients.size() == 0) {
             throw new AutotestError("Ошибка! Количество событий::" + coefficients.size());
         }
         do {
-            if (coefficients.size()<=number){
+            if (coefficients.size() <= number) {
                 LOG.info("Всего добавлось ставок" + count);
                 break;
             }
@@ -124,7 +126,7 @@ public class LiveCalendarPage extends AbstractPage {
     }
 
     @ActionTitle("в меню выбора видов спорта выбирает")
-    public void inSportsSelectionMenuSelect(String sport){
+    public void inSportsSelectionMenuSelect(String sport) {
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Нажимаем на выпадающее меню видов спорта");
         waitingForPreloaderToDisappear(30);
@@ -132,7 +134,7 @@ public class LiveCalendarPage extends AbstractPage {
         LOG.info("Выбираем вид спорта::" + sport);
         WebElement selectSport = menuForSelectingSports.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
         selectSport.click();
-        new WebDriverWait(driver,5).until(ExpectedConditions.visibilityOf(menuForSelectingSports));
+        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(menuForSelectingSports));
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -143,7 +145,7 @@ public class LiveCalendarPage extends AbstractPage {
     }
 
     @ActionTitle("выбирает следующий день недели с более чем событиями")
-    public void selectsNextDayOfWeek(String numberOfIvents){
+    public void selectsNextDayOfWeek(String numberOfIvents) {
         String xpathCurrentDayOfWeek = "//li[contains(@class,'tabs__tab tabs__tab_livecal') and contains(@class,'tabs__tab_active')]";
         String xpathNextDayOfWeek = "following-sibling::li";
 
@@ -153,10 +155,10 @@ public class LiveCalendarPage extends AbstractPage {
         List<WebElement> listOtherDaysOfWeek = currentDayOfWeek.findElements(By.xpath(xpathNextDayOfWeek));
         int actualIvents = 0;
 
-        for(WebElement el:listOtherDaysOfWeek){
+        for (WebElement el : listOtherDaysOfWeek) {
             workWithPreloader();
             actualIvents = el.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1') and not(contains(@class,'empty'))]")).size();
-            if(actualIvents > Integer.parseInt(numberOfIvents)) {
+            if (actualIvents > Integer.parseInt(numberOfIvents)) {
                 return;
             }
             el.click();
@@ -165,6 +167,11 @@ public class LiveCalendarPage extends AbstractPage {
         throw new AutotestError("Ошибка! Недостаточно событий. Ожидали[" + numberOfIvents + "], а фактически[" + actualIvents + "]");
     }
 
-
-
+    @ActionTitle("переходит на игру с активной ставкой")
+    public void goToGameWithBets() {
+        WebDriver driver = PageFactory.getWebDriver();
+        WebElement actualEvent = driver.findElement(By.xpath("//td[contains(@class,'livecal-table__col_1') and not(contains(@class,'empty'))]/preceding-sibling::td[contains(@class,'livecal-table__col_event')]/span"));
+        actualEvent.click();
+        CommonStepDefs.workWithPreloader();
+    }
 }

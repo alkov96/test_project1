@@ -1041,7 +1041,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^определяем незанятый номер телефона и сохраняем в \"([^\"]*)\"$")
     public static void confirmEmail(String keyPhone) {
-        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7111002%' ORDER BY phone";
+        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone";
         String phoneLast = workWithDBgetResult(sqlRequest, "phone");
         String phone = "7333001" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
         Stash.put(keyPhone, phone);
