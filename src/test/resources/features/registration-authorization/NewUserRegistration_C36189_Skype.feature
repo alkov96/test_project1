@@ -95,6 +95,8 @@
 
     * редактируем некоторые активные опции сайта
       |identification_with_video|true|
+      |identification_with_skype_only|false|
+      |identification_with_wave|true|
     * открывается страница "Способ подтверждения личности"
 
     * пользователь (нажимает на 'ИНН или СНИЛС')
