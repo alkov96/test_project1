@@ -17,11 +17,179 @@
 
 
 
+#
+#    предыстория для реги
+#
+#  * сохраняем в память
+#  | FIRSTNAME | random |
+#  * сохраняем в память
+#  | SURNAME | random |
+#  * сохраняем в память
+#  | PATRONYMIC | random |
+#  * сохраняем в память
+#  | BIRTHDATE | randomDate |
+#  * сохраняем в память
+#  | DEVID  | randomNumber 4 |
+#    * сохраняем в память
+#      | STREET  | "Волгоградский проспект" |
+#    * сохраняем в память
+#      | FLAT  | randomNumber 3 |
+#    * сохраняем в память
+#      | HOUSE  | randomNumber 2 |
+#      * сохраняем в память
+#        | COMMENT  | random |
+#
+#
+#  * определяем незанятый номер телефона и сохраняем в "PHONE"
+##    * сохраняем в память
+##      | PHONE  | 71110024400 |
+#  * сохраняем в память
+#  | EMAIL  | randomEmail |
+#
+#  * сохраняем в память
+#  | PASSWORD  | Default |
+#  * сохраняем в память
+#  | ISSUEPLACE  | random |
+#  * сохраняем в память
+#  | CITY  | random |
+#  * сохраняем в память
+#  | STREET  | random |
+#  * сохраняем в память
+#  | BIRTHPLACE  | random |
+#  * сохраняем в память
+#  | CODEPLACE  | randomNumber 6 |
+#  * сохраняем в память
+#  | HOUSE  | randomNumber 2 |
+#  * сохраняем в память
+#  | DOCNUM  | randomNumber 6 |
+#  * сохраняем в память
+#  | DOCSERIES  | randomNumber 4 |
+#  * сохраняем в память
+#  | FLAT  | randomNumber 2 |
+#  * сохраняем в память
+#  | GENDER | randomSex |
+#  * сохраняем в память
+#  | SKYPELOGIN | skypeLoginGenerate |
+#  * сохраняем в память
+#  | INN | 775459885706 |
+#  * сохраняем в память
+#  | SNILS | 37487545236 |
+#
+#
+#  * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+#  | devId | DEVID |
+#  | phone | PHONE |
+#
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "code":0 |
+#
+#  * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
+#
+#  * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+#  |  devId                 | DEVID      |
+#  |  source                | 16         |
+#  |  first_name            | FIRSTNAME  |
+#  |  surname               | SURNAME    |
+#  |  patronymic            | PATRONYMIC |
+#  |  birth_date            | BIRTHDATE  |
+#  |  phone                 | PHONE      |
+#  |  phoneConfirmationCode | CODE       |
+#  |  email                 | EMAIL      |
+#  |  pass                  | PASSWORD   |
+#
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "code":0 |
+#
+#  * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
+#
+#  * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+#  | code   | CODEEMAIL |
+#  | source | 16        |
+#
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "code":0 |
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "status":10 |
+#
+#  * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+#  | devId  | DEVID |
+#  | email  | EMAIL |
+#  | pass   | PASSWORD  |
+#  | source | 16    |
+#
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "code":0 |
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "status":10 |
+#
+#  * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+#
+#  * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
+#
+#
+#
+#  * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
+#  | gender                  | GENDER         |
+#  | birthplace              | BIRTHPLACE     |
+#  | region                  | Москва         |
+#  | locality                | CITY           |
+#  | street                  | STREET         |
+#  | house                   | HOUSE          |
+#  | construction            |                |
+#  | housing                 |                |
+#  | flat                    | FLAT           |
+#  | docNum                  | DOCNUM         |
+#  | docSeries               | DOCSERIES      |
+#  | issueDate               | INVALIDISSUEDATE |
+#  | issuePlace              | ISSUEPLACE     |
+#  | codePlace               | 123-456        |
+#
+#  * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
+#  | devId                   | DEVID        |
+#  | authToken               | AUTHTOKEN    |
+#  | source                  | 16           |
+#  | personalData            | PERSONALDATA |
+#
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "code":27 |
+#
+#
+#  * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
+#  | gender                  | GENDER         |
+#  | birthplace              | BIRTHPLACE     |
+#  | region                  | Москва         |
+#  | regionKLADR             | 77             |
+#  | locality                | CITY           |
+#  | street                  | STREET         |
+#  | house                   | HOUSE          |
+#  | construction            |                |
+#  | housing                 |                |
+#  | flat                    | FLAT           |
+#  | docNum                  | DOCNUM         |
+#  | docSeries               | DOCSERIES      |
+#  | issueDate               | VALIDISSUEDATE |
+#  | issuePlace              | ISSUEPLACE     |
+#  | codePlace               | 123-456        |
+#
+#  * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
+#  | devId                   | DEVID        |
+#  | authToken               | AUTHTOKEN    |
+#  | source                  | 16           |
+#  | personalData            | PERSONALDATA |
+#
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "code":0 |
+#  * проверка ответа API из "RESPONCE_API":
+#  | exepted | "status":11 |
 
-    ## предыстория для реги
 
-  * сохраняем в память
-  | FIRSTNAME | random |
+  @api
+  @rega
+
+   Сценарий: Мобильная регистрация полная через SKYPE для того, чтобы прошла ФинДоставка
+
+    * сохраняем в память
+   | FIRSTNAME | random |
   * сохраняем в память
   | SURNAME | random |
   * сохраняем в память
@@ -183,9 +351,7 @@
   | exepted | "status":11 |
 
 
-  @api
-  @rega
-  Сценарий: Мобильная регистрация полная через SKYPE для того, чтобы прошла ФинДоставка
+
 
    * редактируем некоторые активные опции сайта
       |identification_with_video|true|
