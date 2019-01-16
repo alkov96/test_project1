@@ -32,7 +32,9 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.in;
+import static org.openqa.selenium.By.xpath;
 import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
+import static org.openqa.selenium.support.ui.ExpectedConditions.not;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.PERIOD;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
@@ -799,8 +801,8 @@ public class EventViewerPage extends AbstractPage {
     }
 
 
-    @ActionTitle("проверяет наличие ставки исход в мультирынке для активной игры")
-    public void haveP1P2market(){
+    @ActionTitle("проверяет совпадение названия маркета и размера коэффициента в центральной области и в контейнере мультирынка для активной игры")
+    public void checkMarktandCoef(){
         WebDriver driver = PageFactory.getDriver();
         String nameMarketMulti;
         String marketis;
@@ -808,7 +810,7 @@ public class EventViewerPage extends AbstractPage {
         WebElement activeGameOnPage;
 
         WebElement activeGameMulti = driver.findElement(By.xpath("//div[contains(@class,'bets-block__header_multimarket') and contains(@class,'prematch-active')]"));
-        List<WebElement> coefsInMulti = activeGameMulti.findElements(By.xpath("./following-sibling::div[@class='bets-block__multimarket-wrapper']//div[contains(@class,'bet-cell_multimarket')]"));
+        List<WebElement> coefsInMulti = activeGameMulti.findElements(By.xpath("./following-sibling::div[@class='bets-block__multimarket-wrapper']//div[contains(@class,'bet-cell_multimarket')]//span[contains(@class,'cell-content-price')]"));
         List<String> listMarketsInMulti = driver.findElements(By.xpath("//div[contains(@class,'multimarket-market-title')]")).stream()
                 .map(element->element.getAttribute("innerText").trim()).collect(Collectors.toList());
         listMarketsInMulti.add(listMarketsInMulti.size(),listMarketsInMulti.get(listMarketsInMulti.size()-1) + " 2");
@@ -838,6 +840,15 @@ public class EventViewerPage extends AbstractPage {
                     "Маркет на страниуе и в контейнере мультимаркета не совпал. " + marketis + " против " + nameMarketMulti,
                     marketis.contains(nameMarketMulti)
             );
+
+            LOG.info("Убираем игру из купона нажатием на коэффициент в центральной области");
+            activeGameOnPage.click();
+            new WebDriverWait(driver,10)
+                    .withMessage("Купон не очистился, хотя нажали на активную ставку еще раз - она должна была удалться из купона")
+                    .until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul"),0));
+            new WebDriverWait(driver,10)
+                    .withMessage("В контейнере мультирынков или в центральной области ставка осталась выделенной желтым")
+                    .until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'bets-block__bet-cell_active')]"),0));
         }
 
     }
