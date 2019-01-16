@@ -71,6 +71,7 @@ public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
     private static final String sep = File.separator;
 
+
     @Когда("^запрашиваем дату-время и сохраняем в память$")
     public static void requestAndSaveToMamory(DataTable dataTable){
         List<String> data = dataTable.asList(String.class);
