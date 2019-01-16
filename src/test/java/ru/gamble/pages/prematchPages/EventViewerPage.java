@@ -781,5 +781,41 @@ public class EventViewerPage extends AbstractPage {
                 until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]/div[1]/div/div"),0));
     }
 
+    @ActionTitle("режим мультирынков")
+    public void onOffMultimarkets(String onOrOff){
+        boolean needOn = onOrOff.contains("включает")?true:false;
+        WebDriver driver = PageFactory.getDriver();
+        WebElement multiMarkets = driver.findElement(By.id("multiMarkets"));
+        LOG.info("Нажимаем на тумблер перехода в режим Мультирынков");
+        if (multiMarkets.getAttribute("class").contains("not-empty")!=needOn){
+            multiMarkets.findElement(By.xpath("following-sibling::label[contains(@class,'jumper__body')]")).click();
+            CommonStepDefs.workWithPreloader();
+            Assert.assertTrue(
+                    "Режим мультирынков is " + !needOn + ", хотя на тумблер нажали",
+                    multiMarkets.getAttribute("class").contains("not-empty")==needOn);
+        }
+        LOG.info("Режим мультирынков is " + needOn);
+    }
+
+
+    @ActionTitle("проверяет наличие ставки исход в мультирынке для активной игры")
+    public void haveP1P2market(){
+        WebDriver driver = PageFactory.getDriver();
+        WebElement activeGameMulti = driver.findElement(By.xpath("//div[contains(@class,'bets-block__header_multimarket') and contains(@class,'prematch-active')]"));
+        List<WebElement> coefsInMulti = activeGameMulti.findElements(By.xpath("./following-sibling::div[@class='bets-block__multimarket-wrapper']//div[contains(@class,'bet-cell_multimarket')]"));
+        List<String> listMarketsInMulti = driver.findElements(By.xpath("//div[contains(@class,'multimarket-market-title')]")).stream()
+                .map(element->element.getAttribute("innerText").trim()).collect(Collectors.toList());
+        listMarketsInMulti.add(listMarketsInMulti.size(),listMarketsInMulti.get(listMarketsInMulti.size()-1) + " больше");
+        coefsInMulti.get(0).click();
+        WebElement activeGameOnPage = driver.findElement(By.xpath("//div[contains(@class,'bets-block__bet-cell_active') and not(contains(@class,'multimarket'))]"));
+        //activeGameOnPage.findElement(By.xpath(".//span[contains(@class,'bets-block__bet-cell-content-name')]")).getAttribute("innerText");
+        String coefOnPage = activeGameOnPage.findElement(By.xpath(".//span[contains(@class,'bets-block__bet-cell-content-ratio')]")).getAttribute("innerText");
+        String marketis = activeGameOnPage.findElement(By.xpath("./ancestor-or-self::div[contains(@class,'bets-block__body')]/preceding-sibling::div[@class='bets-block__header']")).getAttribute("innerText");
+        String nameMarketMulti = listMarketsInMulti.get(0).contains("П1")||listMarketsInMulti.get(0).contains("П2")?"Исход":listMarketsInMulti.get(0);
+        if (!coefOnPage.equals(coefsInMulti.get(0).getAttribute("innerText").trim())){
+            LOG.info("все плохо . коэф на странице и в контейнере мультимаркета не совпал. " + coefOnPage + " против " + coefsInMulti.get(0).getAttribute("innerText").trim());
+        }
+    }
+
 }
 

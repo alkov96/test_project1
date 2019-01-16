@@ -265,6 +265,31 @@ public class MyBetting extends AbstractPage {
         }
     }
 
+
+//выставление даты начала ставок в МОИХ ПАРИ на самую раннюю из возможных
+    private void datapickerOnBegin(){
+        WebDriver driver = PageFactory.getWebDriver();
+        WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
+        if (!datapickerBegin.getAttribute("class").contains("active")){
+            datapickerBegin.click();
+            new WebDriverWait(driver,10)
+                    .withMessage("Дата начала не раскрылась")
+                    .until(ExpectedConditions.attributeContains(datapickerBegin,"class","active"));
+        }
+        LOG.info("Если доступно - нажимаем на стрелочку 'год назад'");
+        By BYarrowLeft;
+        for(int lineNumber=1;lineNumber<=2;lineNumber++){
+            BYarrowLeft= By.xpath("//div[@class='datepicker__line' and position()=" + lineNumber + "]//i[contains(@class,'arrow-left6')]");
+
+        while (!driver.findElement(BYarrowLeft).findElement(By.xpath("ancestor-or-self::div[contains(@class,'datepicker__btn')]")).getAttribute("class").contains("bound")){
+            driver.findElement(BYarrowLeft).click();
+        }
+        }
+        LOG.info("Год и месяц отщелкали на начало. Теперь день выбирем самый ранний");
+        driver.findElement(By.xpath("//div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).click();
+        CommonStepDefs.workWithPreloader();
+    }
+
     @ActionTitle("ищет и запоминает ожидаемые события по фильтру")
     public void remeberMyBets(String filter, String nameList) {
         WebDriver driver = PageFactory.getWebDriver();
@@ -274,6 +299,9 @@ public class MyBetting extends AbstractPage {
         driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
         driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
         CommonStepDefs.workWithPreloader();
+
+        LOG.info("Отматываем дату начала на самую раннюю");
+        datapickerOnBegin();
 
         LOG.info("Теперь включаем фильтр по типу ставки " + filter);
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));

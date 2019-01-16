@@ -457,110 +457,110 @@
 
 
 
-#
-#  @api
-#  @Registration_mobile
-#  Сценарий: Мобильная регистрация полная через Евросеть
-#
-#    * редактируем некоторые активные опции сайта
-#      |identification_with_euroset|true|
-#      |identification_with_skype_only|false|
-#
-#    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
-#      | devId                   | DEVID        |
-#      | authToken               | AUTHTOKEN    |
-#      | source                  | 16           |
-#
+
+  @api
+  @Registration_mobile
+  Сценарий: Мобильная регистрация полная через Евросеть
+
+    * редактируем некоторые активные опции сайта
+      |identification_with_euroset|true|
+      |identification_with_skype_only|false|
+
+    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+      | identType               |  2           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * запрос к API "api/mobile/v5/sendEmailInstructions" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
 #    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#
-#    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
-#      | devId                   | DEVID        |
-#      | authToken               | AUTHTOKEN    |
-#      | source                  | 16           |
-#      | identType               |  2           |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#
-#    * запрос к API "api/mobile/v5/sendEmailInstructions" и сохраняем в "RESPONCE_API":
-#      | devId                   | DEVID        |
-#      | authToken               | AUTHTOKEN    |
-#      | source                  | 16           |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-##    * проверка ответа API из "RESPONCE_API":
-##      | exepted | "errorMsg":null |
-#
-#
-#  @Registration_mobile
-#  Сценарий: Мобильная регистрация полная через DD
-#
-#    * редактируем некоторые активные опции сайта
-#      | identification_with_courier |true|
-#      |identification_with_skype_only|false|
-#
-#
-#    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
-#      | devId                   | DEVID        |
-#      | authToken               | AUTHTOKEN    |
-#      | source                  | 16           |
-#
-#    * определяем дату завтрашнего дня "DATE"
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#
-#    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
-#      | devId                   | DEVID        |
-#      | authToken               | AUTHTOKEN    |
-#      | source                  | 16           |
-#      | identType               | 6            |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "status":21 |
-#
-#    #* находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
-#
-#    * добавляем данные в JSON объект "DATA" сохраняем в память:
-#      | street       | "Тверская ул." |
-#      | house        | HOUSE          |
-#      | building     |                |
-#      | housing      |                |
-#      | flat         | FLAT           |
-#      | phone        | 1110023309     |
-#      | comment      | COMMENT        |
-#      | date         | DATE           |
-#      | time         | "10:00 - 17:00"|
-#
-#    * запрос к API "api/mobile/v5/sendIdentificationOrderToDD" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID    |
-#      | authToken   | AUTHTOKEN|
-#      | source      | 16       |
-#      | data        | DATA     |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "identificationStatus":1 |
-#
-#    * проверка полей и типов в ответе "RESPONCE_API":
-#      | Параметр                         | Тип    |
-#      | courierIdentificationRequestDate | Timestamp   |
-#
-#   * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID    |
-#      | authToken   | AUTHTOKEN|
-#      | source      | 16       |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | identificationStatus":1 |
+#      | exepted | "errorMsg":null |
+
+
+  @Registration_mobile
+  Сценарий: Мобильная регистрация полная через DD
+
+    * редактируем некоторые активные опции сайта
+      | identification_with_courier |true|
+      |identification_with_skype_only|false|
+
+
+    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * определяем дату завтрашнего дня "DATE"
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+      | identType               | 6            |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "status":21 |
+
+    #* находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * добавляем данные в JSON объект "DATA" сохраняем в память:
+      | street       | "Тверская ул." |
+      | house        | HOUSE          |
+      | building     |                |
+      | housing      |                |
+      | flat         | FLAT           |
+      | phone        | 1110023309     |
+      | comment      | COMMENT        |
+      | date         | DATE           |
+      | time         | "10:00 - 17:00"|
+
+    * запрос к API "api/mobile/v5/sendIdentificationOrderToDD" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID    |
+      | authToken   | AUTHTOKEN|
+      | source      | 16       |
+      | data        | DATA     |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "identificationStatus":1 |
+
+    * проверка полей и типов в ответе "RESPONCE_API":
+      | Параметр                         | Тип    |
+      | courierIdentificationRequestDate | Timestamp   |
+
+   * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID    |
+      | authToken   | AUTHTOKEN|
+      | source      | 16       |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | identificationStatus":1 |
 #
 #
 #
