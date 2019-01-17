@@ -52,7 +52,9 @@ public class OperationHistoryPage extends AbstractPage {
     private boolean pageUpdate(List<String> id) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         Thread.sleep(1000);
-        List<WebElement> newList = driver.findElements(By.xpath("//span[@class='history__id']/span"));
+        List<WebElement> newList = driver.findElements(By.xpath("//span[@class='history__id']")).stream()
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут")).collect(Collectors.toList());
+        //этот фильтр убирает операции кэшаута из списка. потмоу что у ставки и кэшаута будут одинаковые id. поэтому кэшаут будеим просто не учитывать
         newList.forEach(element -> {
             if (id.contains(element.getAttribute("innerText"))) {
                 id.add("idbad");
@@ -73,8 +75,11 @@ public class OperationHistoryPage extends AbstractPage {
 
         id.clear();
 
-        operationsId = driver.findElements(By.xpath("//span[@class='history__id']/span"));
+//этот фильтр убирает операции кэшаута из списка. потмоу что у ставки и кэшаута будут одинаковые id. поэтому кэшаут будеим просто не учитывать
+        operationsId = driver.findElements(By.xpath("//span[@class='history__id']")).stream()
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут")).collect(Collectors.toList());
         operationsId.forEach(element -> id.add(element.getAttribute("innerText")));
+
         currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         page.click();
 
