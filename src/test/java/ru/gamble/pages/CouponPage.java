@@ -758,8 +758,10 @@ public class CouponPage extends AbstractPage {
             LOG.info("Запомнили строчку из истории пари в купоне");
         }
 
-        LOG.info("Первые " + cou + " ставок(ки) в истории в купоне это: \n" +
-                betsOnMyBets.get(0).getType() + "\n" + betsOnMyBets.get(1).getType() + "\n" + betsOnMyBets.get(2).getType());
+        if (betsOnMyBets.size()>=3) {
+            LOG.info("Первые " + cou + " ставок(ки) в истории в купоне это: \n" +
+                    betsOnMyBets.get(0).getType() + "\n" + betsOnMyBets.get(1).getType() + "\n" + betsOnMyBets.get(2).getType());
+        }
         Stash.put(nameList,betsOnMyBets);
     }
 

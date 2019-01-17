@@ -517,7 +517,7 @@ public class EventViewerPage extends AbstractPage {
     }
 
     @ActionTitle("многовыборный режим")
-    public void multiGamesOnOff(String onOrOff){
+    public static void multiGamesOnOff(String onOrOff){
         WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait =  new WebDriverWait(driver,10);
         boolean turnOn = onOrOff.equalsIgnoreCase("включает")?true:false;

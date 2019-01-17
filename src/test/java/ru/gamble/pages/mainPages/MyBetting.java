@@ -105,8 +105,8 @@ public class MyBetting extends AbstractPage {
 
     public String rememberId() throws InterruptedException {
         WebDriver driver = PageFactory.getWebDriver();
-        int value = new Random().nextInt(6);
         List<WebElement> all_id = driver.findElements(xpath("//div[@ng-bind-html='bet.id | formatText:search']"));
+        int value = new Random().nextInt(all_id.size());
         Thread.sleep(5000);
         String id = all_id.get(value).getAttribute("innerText").trim().toLowerCase();
         return id;
@@ -137,14 +137,6 @@ public class MyBetting extends AbstractPage {
             }
         }
 
-    @ActionTitle("переключается на другую дату")
-    public void chooseAnotherDate() throws InterruptedException {
-        WebDriver driver = PageFactory.getWebDriver();
-        driver.findElements(xpath("//span[contains(@class,'datapicker__form')]")).get(0).click(); //нажимаем на первый календарь
-        driver.findElements(xpath("//div[@class='datepicker__btn']")).get(0).click(); //нажимаем на месяц назад
-        driver.findElements(xpath("//div[contains(@class,'datepicker__day')]/div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).get(3).click(); //выбираем дату
-        Thread.sleep(7000);
-    }
 
     @ActionTitle("проверяет сортировку по сумме")
     public void sortSumm() throws InterruptedException {
@@ -224,8 +216,7 @@ public class MyBetting extends AbstractPage {
             filterByTypeOfBid.findElement(xpath("//custom-select//div/span[contains(.,'" + typeOfOutcome + "')]")).click();
             workWithPreloader();
 
-            List<WebElement> rows = PageFactory.getWebDriver().findElements(xpath("//tr[contains(@class,'showBetInfo ')]"))
-                    .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+            List<WebElement> rows = PageFactory.getWebDriver().findElements(xpath("//tr[contains(@class,'showBetInfo ')]"));
             LOG.info("Всего пари::" + rows.size());
             LOG.info("Проверяем, что даты ставок попадают в диапазон");
 
@@ -244,9 +235,9 @@ public class MyBetting extends AbstractPage {
                     if (selectedOutcome.contains("Экспресс") || selectedOutcome.contains("Система")) {
                         LOG.info("Проверяем что в [" + selectedOutcome + "] больше одного события");
                         subIvens = row.findElements(xpath(".//div//tr[contains(@class,'table-inner__row')]"));
-                        if (subIvens.size() > 1) {
-                            subIvens.remove(0);
-                        } //Здесь удаляем мусорную строку
+//                        if (subIvens.size() > 1) {
+//                            subIvens.remove(0);
+//                        } //Здесь удаляем мусорную строку
                         assertThat(subIvens.size())
                                 .as("Ошибка! В типе пари [" + typeOfOutcome + "] меньше чем " + subIvens.size() + " пари").isGreaterThan(1);
                         for (WebElement subIvent : subIvens) {
@@ -266,8 +257,10 @@ public class MyBetting extends AbstractPage {
     }
 
 
+
 //выставление даты начала ставок в МОИХ ПАРИ на самую раннюю из возможных
-    private void datapickerOnBegin(){
+    @ActionTitle("отматывает дату начала МОИХ ПАРИ на самую раннюю")
+    public void datapickerOnBegin(){
         WebDriver driver = PageFactory.getWebDriver();
         WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
         if (!datapickerBegin.getAttribute("class").contains("active")){
@@ -300,8 +293,8 @@ public class MyBetting extends AbstractPage {
         driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
         CommonStepDefs.workWithPreloader();
 
-        LOG.info("Отматываем дату начала на самую раннюю");
-        datapickerOnBegin();
+//        LOG.info("Отматываем дату начала на самую раннюю");
+//        datapickerOnBegin();
 
         LOG.info("Теперь включаем фильтр по типу ставки " + filter);
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
