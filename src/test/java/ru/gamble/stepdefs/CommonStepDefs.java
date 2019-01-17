@@ -2220,7 +2220,7 @@ public class CommonStepDefs extends GenericStepDefs {
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, expectedText;
-        String link = "";
+        String link = ""; //а это тут зачем?))
         String currentHandle = driver.getWindowHandle();
 
         for (Map<String, String> aTable : table) {
@@ -2241,6 +2241,55 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             catch (InterruptedException e2) {
                 e2.printStackTrace();
+            }
+        }
+    }
+    @Когда("^проверяем ТЕКСТ при переходе по ссылкам из футера$")
+    public static void checkTextWhenClickingOnLinkWithFromFooter(DataTable dataTable) throws InterruptedException, PageException {
+        WebDriver driver = PageFactory.getWebDriver();
+        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
+        String linkTitle, expectedText;
+
+        for (Map<String, String> aTable : table) {
+            linkTitle = aTable.get(LINK);
+            expectedText = aTable.get(TEXT);
+            String xpath = "//*[contains(text(),'" + expectedText + "')]";
+            LOG.info("Переходим по клику на элемент " + linkTitle);
+            try {
+                PageFactory.getInstance().getCurrentPage().getElementByTitle(linkTitle).click();
+            }
+            catch (Exception e){
+                Thread.sleep(3000);
+                try {
+                    PageFactory.getInstance().getCurrentPage().getElementByTitle(linkTitle).click();
+                } catch (Exception exc){
+                    LOG.info("Не удалось кликнуть на " + linkTitle);
+                    exc.printStackTrace();
+                }
+            }
+            workWithPreloader();
+            ArrayList<String> multipleTabs = new ArrayList<String>(driver.getWindowHandles());
+            if (multipleTabs.size() >= 2) {
+                driver.switchTo().window(multipleTabs.get(1));
+                try {
+                    driver.findElement(By.xpath(xpath));
+                    LOG.info("Текст " + expectedText + " найден на странице, возвращаемся");
+                    driver.close();
+                    driver.switchTo().window(multipleTabs.get(0));
+                } catch (Exception e){
+                    LOG.info("Текст " + expectedText + " не обнаружен");
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    driver.findElement(By.xpath(xpath));
+                    LOG.info("Текст " + expectedText + " найден на странице, возвращаемся");
+                    driver.get(Stash.getValue("MAIN_URL"));
+                    workWithPreloader();
+                }catch (Exception e){
+                    LOG.info("Текст " + expectedText + " не обнаружен");
+                    e.printStackTrace();
+                }
             }
         }
     }

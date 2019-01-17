@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.utility.JsonLoader;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
@@ -52,7 +53,7 @@ public class FooterPage extends AbstractPage {
     private WebElement howGetWinLink;
 
     @ElementTitle("Мобильное приложение")
-    @FindBy(xpath = "//a[@href='/landing/app']")
+    @FindBy(xpath = "//div[@class='footer6__inner']//a[@href='/landing/app']")
     private WebElement mobileAppLink;
 
     @ElementTitle("Онлайн-чат")
@@ -60,7 +61,7 @@ public class FooterPage extends AbstractPage {
     private WebElement onlineChatLink;
 
     @ElementTitle("Для iOS")
-    @FindBy(xpath = "//a[contains(.,'Для iOS')]")
+    @FindBy(xpath = "//div[@class='footer6__inner']//a[contains(.,'Для iOS')]")
     private WebElement foriOSLink;
 
 //    @ElementTitle("для айфонов")
@@ -218,7 +219,7 @@ public class FooterPage extends AbstractPage {
     @ActionTitle("проверяет присутствие ссылки")
     public void checkSportsbook_888ru(String param){
         String expected = "https://888.ru/webdav/sportsbook-888ru.apk";
-        String expected2 = "https://dev-bk-bet-site.tsed.orglot.office/mobile/app/android/last_version";
+        String expected2 = Stash.getValue("MAIN_URL")+"/mobile/app/android/last_version";
         String actual = PageFactory.getWebDriver().findElement(By.xpath("//a[contains(.,'" + param + "')]")).getAttribute("href");
         Assertions.assertTrue(
                 actual.equals(expected) || actual.equals(expected2),
@@ -227,14 +228,14 @@ public class FooterPage extends AbstractPage {
 
     @ActionTitle("проверяет что число платёжных систем")
     public void checkNumberPaymentSystem(String number){
-        WebDriver driver = PageFactory.getWebDriver();
-        if (!driver.findElement(By.xpath("//div[contains(@class,'footer_collapsible')]")).getAttribute("class").contains("open")){
+ //       WebDriver driver = PageFactory.getWebDriver();
+ /*       if (!driver.findElement(By.xpath("//div[contains(@class,'footer_collapsible')]")).getAttribute("class").contains("open")){
             driver.findElement(By.xpath("//div[@class='footer__pin']")).click();
             LOG.info("Футер закрыт, раскроем его");
             new WebDriverWait(driver,10).withMessage("На стрелочку кликнули, а футер не развернулся")
                     .until(ExpectedConditions.attributeContains(By.xpath("//div[contains(@class,'footer_collapsible')]"),"class","open"));
-        }
-
+        }*/
+        workWithPreloader();
         String xpath = "//div[contains(@class,'payment-systems-item')]";
         List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         int expected = Integer.parseInt(number);
