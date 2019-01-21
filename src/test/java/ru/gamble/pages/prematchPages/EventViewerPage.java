@@ -309,11 +309,13 @@ public class EventViewerPage extends AbstractPage {
         WebElement menu = driver.findElement(By.id("menu-toggler"));
         if (!menu.getAttribute("class").contains("collapsed")) menu.click();
         if (inPeriod) {
+            LOG.info("Включаем фильтр по времени на " + period);
             typeGame = "PrematchInPeriod";
             driver.findElement(By.xpath("//div[@class='periods']/div")).click();//включим фильтр по временеи чтоб не мучиться с поисками игры
             driver.findElement(By.xpath("//div[@class='periods']//li[contains(normalize-space(text()),'" + hour + "')]")).click();
             CommonStepDefs.workWithPreloader();
         } else {
+            LOG.info("Выключаем фильтр по времени");
             typeGame = "PrematchVnePeriod";
             driver.findElement(By.xpath("//div[@class='periods']/div")).click();// если ищем игру вне периода то убедимся что фильтр выключен
             driver.findElement(By.xpath("//div[@class='periods']/ul/li[1]")).click();
@@ -326,6 +328,8 @@ public class EventViewerPage extends AbstractPage {
         for (int sportN = 1; sportN < sportCount; sportN++) {
             //разворачиваем спорт(начнем с тенниса просто потому что не хочу футбол)
             LOG.info("Разворачиваем один спорт");
+            driver.findElements(By.xpath("//li[contains(@id,'sport--') and contains(@class,'active')]")).forEach(element -> element.findElement(By.xpath("./a")).click());
+//популярные соревнования и нулевая маржа могут развернуться сами по себе, даже после того как нажали "свернуть все". поэтому нужные вид спорта уходят вниз за область экрана. потом нчего не рабоатет. чтобы этого избежать - нужно свернуть все эти доп.группы
             driver.findElements(xpathForsportsPrematch).get(sportN).click();
             LOG.info(driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./a")).getAttribute("title"));
             CommonStepDefs.workWithPreloader();
@@ -347,7 +351,9 @@ public class EventViewerPage extends AbstractPage {
                     menu.click();
                 }
                 LOG.info("Разворачиваем регион");
-                driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./ul[1]/li[" + region + "]")).click();
+                if (!driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./ul[1]/li[" + region + "]")).getAttribute("class").contains("active")){
+                    driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./ul[1]/li[" + region + "]")).click();
+                }
                 CommonStepDefs.workWithPreloader();
                 String pathToTours = "./ul[1]/li[" + region + "]//div[contains(@class,'left-menu__list-item-region-compitition')]";
                 //В каждом регионе может быть несколько соревнований.
@@ -399,7 +405,7 @@ public class EventViewerPage extends AbstractPage {
 
     }
     @ActionTitle("включает фильтр по времени")
-    public void onTriggerPeriod(String period){
+    public static void onTriggerPeriod(String period){
         WebDriver driver = PageFactory.getDriver();
         //если меню свернуто - разворачиваем
         WebElement menu = driver.findElement(By.id("menu-toggler"));
@@ -445,6 +451,7 @@ public class EventViewerPage extends AbstractPage {
         if (isFavorit){
             flag &= inLeftMenuGameYellow(team1);
         }
+        onTriggerPeriod(expectedPeriod);//включаем обратнофильтр по времени
         return flag;
     }
 

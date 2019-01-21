@@ -74,17 +74,18 @@ public class VewingEventsPage extends AbstractPage {
         closeSports();
 
         boolean gameIsAdding = false;
-        String typeGame;
+        String typeGame;LOG.info("Выставлем фильтр по видео на " + withVideo);
+
         if (withVideo) {
             typeGame = "LiveWithVideo";
             if (!driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).getAttribute("class").contains("active")) {//включим ильтр видео если ищем игру с видео
-                driver.findElement(By.xpath("//div[@id='video-filter-toggler']/i")).click();
+                driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).click();
                 CommonStepDefs.workWithPreloader();
             }
         } else {
             typeGame = "LiveWithoutVideo";
             if (driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).getAttribute("class").contains("active")) {//выключим фильтр по видео, если ищем игру без видео
-                driver.findElement(By.xpath("//div[@id='video-filter-toggler']/i")).click();
+                driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).click();
                 CommonStepDefs.workWithPreloader();
             }
         }
