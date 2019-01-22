@@ -109,7 +109,7 @@ public class FavouritePage extends AbstractPage {
                     index<0
             );
 
-            LOG.info("gameis" + allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title"));
+            LOG.info("game is " + nameMyGame);
 //переходим на игру из Избранного и ждем загрузки страницы
             //driver.findElement(By.xpath("//*[@id='private_panel']/li[3]/div[1]/div[1]/div[2]/div[" + (MyGameN + 1) + "]")).click();
             driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']//div[contains(@class,'elected__teams')]")).get(MyGameN).click();
