@@ -16,6 +16,7 @@ import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
+import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
@@ -41,6 +42,24 @@ public class ProfilePage extends AbstractPage {
     @FindBy(xpath = "//i[contains(@class,'ico-eye')]")
     private WebElement PDeye;
 
+    @ElementTitle("изменить пароль")
+    @FindBy(xpath = "//div[@class='user-profile__group']/div[4]//span[@class='user-profile__link']")
+    protected WebElement changePassword;
+
+    @ElementTitle("Старый пароль")
+    @FindBy(xpath = "//input[@ng-model='password.oldPassword']")
+    protected WebElement oldPassword;
+
+    @ElementTitle("Новый пароль")
+    @FindBy(xpath = "//input[@ng-model='password.newPassword']")
+    protected WebElement newPassword;
+
+    @ElementTitle("Сохранить пароль")
+    @FindBy(xpath = "//button[@ng-click='updatePassword()']")
+    protected WebElement savePassword;
+
+
+
     public ProfilePage() {
         WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
@@ -53,14 +72,14 @@ public class ProfilePage extends AbstractPage {
     public void changePassword(String currentPass, String newPass) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         CommonStepDefs.workWithPreloader();
-        driver.findElement(By.cssSelector("span.user-profile__link")).click();
-        driver.findElement(By.xpath("//input[@type='password']")).clear();
-        driver.findElement(By.xpath("//input[@type='password']")).sendKeys(currentPass);
-        driver.findElement(By.name("profile_new_pass")).clear();
-        driver.findElement(By.name("profile_new_pass")).sendKeys(newPass);
+        changePassword.click();
+        oldPassword.clear();
+        oldPassword.sendKeys(currentPass);
+        newPassword.clear();
+        newPassword.sendKeys(newPass);
         LOG.info("Форма заполнена, жмём Сохранить");
         driver.findElement(By.className("user-profile__group-line")).click(); //кликаем в пустоту
-        driver.findElement(By.cssSelector("div.user-profile__text > button:nth-child(1)")).click(); // Сохранить
+        savePassword.click(); // Сохранить
 
         Thread.sleep(2000);
 
