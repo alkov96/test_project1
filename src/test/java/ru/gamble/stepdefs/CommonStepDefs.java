@@ -22,6 +22,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.livePages.VewingEventsPage;
 import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
@@ -57,6 +58,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -325,6 +327,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         PageFactory.getInstance().getPage(title);
     }
+
 
 
     /**
@@ -2410,5 +2413,60 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Добавлен в автивные баннер с id = " + id + ", ведущий на игру gameID = " + gameID);
     }
 
+
+    @Когда("^проверяем, совпадает ли дата и время игры с ожидаемыми \"([^\"]*)\" \"([^\"]*)\"$")
+    public void checkDateTimeGame(String keyData,String typeGame){
+        WebDriver driver = PageFactory.getWebDriver();
+        String fullDateTime = Stash.getValue(keyData).toString().replace("\n"," ");
+
+        switch(typeGame){
+            case "live":
+                LOG.info("Судя по времени, указанному на баннере, игра должна быть лайвовской. Проверять будем только что раздел соответствует ЛАЙВу " + fullDateTime);
+                Assert.assertTrue(
+                        "Раздел ЛАЙВ не активен",
+                        driver.findElement(By.xpath("//*[@id='live']/..")).getAttribute("class").contains("active"));
+                break;
+            case "prematch":
+                LOG.info("Судя по времени, указанному на баннере, игра должна быть прематчевской. Проверять будем и дату, и время игры в ПРЕМАТЧе " + fullDateTime);
+                Assert.assertTrue(
+                        "Раздел ПРЕМАТЧ не активен",
+                        driver.findElement(By.xpath("//*[@id='prematch']/..")).getAttribute("class").contains("active"));
+                String dateTimeGameOnP = driver.findElement(By.xpath("//div[contains(@class,'prematch-competition-games_active')]//*[contains(@class,'prematch-competition-games__item-date')]")).getAttribute("innerText");
+                SimpleDateFormat formatPrematch = new SimpleDateFormat("hh:mm - dd MMM yyyy");
+                Calendar datePrematch = Calendar.getInstance();
+                Calendar dateTimeGame = Stash.getValue(keyData);
+
+                try {
+                    datePrematch.setTime(formatPrematch.parse(dateTimeGameOnP));
+                    Assert.assertTrue(
+                            "Время игры на баннере и на странице ПРЕМАТЧ не свопадает. На баннере: " + fullDateTime + ", в прематче: " + dateTimeGameOnP,
+                            datePrematch.equals(dateTimeGame));
+                } catch (ParseException e) {
+                    LOG.info("Не удалось распарсить дату и время игры, указанные на баннере. Возможно не совпадает формат: " + dateTimeGameOnP + ". Формат: " + formatPrematch);
+                    e.printStackTrace();
+                }
+                break;
+        }
+
+    }
+
+
+    @Когда("^проверяем, совпадают ли коэффициенты на странице с теми, что на баннере \"([^\"]*)\"$")
+    public void checkAllCoefs(String keyCoefs)
+    {
+        WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Формируем список коэффициентов для маркета ИСход на странице игры");
+        List<String> coefsOnPage =
+        driver.findElements(By.xpath("//div[contains(@class,'game-center-container__live')]//div[contains(@class,'bets-block__bet-cell_active')]/..//span[contains(@class,'bets-block__bet-cell-content-price')]"))
+                .stream().map(el -> el.getAttribute("innerText")+"%").collect(Collectors.toList());
+        LOG.info(coefsOnPage + "\n% - это просто разделитель. все норм");
+        LOG.info("Теперь сравним этот список,с тем что было на баннере");
+        List<String> coefsOnBanners = Stash.getValue(keyCoefs);
+        Assert.assertTrue(
+                "Коэффициенты на странице и на баннере не совпадают. \n" + coefsOnPage + " вместо; \n" + coefsOnBanners,
+                coefsOnBanners.equals(coefsOnPage)
+        );
+        LOG.info("Коэффициенты на беннере и на странице совпадают");
+    }
 }
 
