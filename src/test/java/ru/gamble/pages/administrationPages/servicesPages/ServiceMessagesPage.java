@@ -28,23 +28,23 @@ import java.util.regex.Pattern;
 public class ServiceMessagesPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceMessagesPage.class);
 
-    @FindBy(xpath = "//tbody[@id='gridview-1569-body']")
+    @FindBy(xpath = "//tbody[@id='gridview-1472-body']")
     private WebElement table;
 
     @ElementTitle("Последняя страница")
-    @FindBy(xpath = "//span[@id='button-1525-btnIconEl']")
+    @FindBy(xpath = "//span[@id='button-1460-btnIconEl']")
     private WebElement lastPage;
 
     @ElementTitle("Предыдущая страница")
-    @FindBy(xpath = "//span[@id='button-1518-btnIconEl']")
+    @FindBy(xpath = "//span[@id='button-1453-btnIconEl']")
     private WebElement prePage;
 
     @ElementTitle("Поле с количеством страниц")
-    @FindBy(xpath = "//div[@id='tbtext-1523']")
+    @FindBy(xpath = "//div[@id='tbtext-1457']")
     private WebElement maxPagesText;
 
     @ElementTitle("Добавить сообщение")
-    @FindBy(xpath = "//span[@id='button-1540-btnIconEl']")
+    @FindBy(xpath = "//span[@id='button-1474-btnIconEl']")
     private WebElement newMessageBotton;
 
     public ServiceMessagesPage() {
@@ -56,7 +56,7 @@ public class ServiceMessagesPage extends AbstractPage {
     @ActionTitle("очищает все активные сообщения")
     public void clearActives() {
         WebDriver driver = PageFactory.getWebDriver();
-        String xpath = "//td[contains (@class,'x-grid-cell-checkcolumn-1534')]";
+        String xpathActiveBox = "//td[contains (@class,'x-grid-cell-checkcolumn-1468')]";
         if (lastPage.isDisplayed()) {
             lastPage.click();
         }
@@ -67,16 +67,26 @@ public class ServiceMessagesPage extends AbstractPage {
             pageCount = Integer.parseInt(matcher.group());
         }
         for (int i = 0; i < pageCount; i++) {
-            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
-            List<WebElement> activeBoxes = driver.findElements(By.xpath(xpath));
+            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathActiveBox)));
+            List<WebElement> activeBoxes = driver.findElements(By.xpath(xpathActiveBox));
             for (int z = 0; z < activeBoxes.size(); z++) {
-                new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+                new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathActiveBox)));
+                boolean check = false;
+                while (check == false){
+                    try {
+                        activeBoxes.get(z).findElement(By.xpath("div/img"));
+                        check = true;
+                    } catch (Exception e){
+                        check = false;
+                        activeBoxes = driver.findElements(By.xpath(xpathActiveBox));
+                    }
+                }
                 if (activeBoxes.get(z).findElement(By.xpath("div/img")).getAttribute("class").contains("checked")) {
                     PageFactory.getActions().doubleClick(activeBoxes.get(z)).build().perform();
-                    String activeBottomId = PageFactory.getWebDriver().findElement(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-checkbox x-field-default x-anchor-form-item x-form-cb-checked x-form-dirty']")).getAttribute("id");
+                    String activeBottomId = PageFactory.getWebDriver().findElement(By.xpath("//table[contains(@class,'x-form-cb-checked')]")).getAttribute("id");
                     PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + activeBottomId + "-inputEl']")).click();
                     PageFactory.getWebDriver().findElement(By.xpath("//a[@class='x-btn x-unselectable x-box-item x-toolbar-item x-btn-default-small x-noicon x-btn-noicon x-btn-default-small-noicon']")).click();
-                    activeBoxes = PageFactory.getWebDriver().findElements(By.xpath(xpath));
+                    activeBoxes = PageFactory.getWebDriver().findElements(By.xpath(xpathActiveBox));
                 }
             }
             if (prePage.isDisplayed()) {
