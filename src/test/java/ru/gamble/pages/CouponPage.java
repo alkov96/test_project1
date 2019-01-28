@@ -211,6 +211,10 @@ public class CouponPage extends AbstractPage {
         String couponGame = driver.findElement(xpath("//li[@class='coupon-bet__row']/span[@class='coupon-bet__title']")).getAttribute("innerText");//cuponGame - наше добавленные события в купоне.
         String team1 = Stash.getValue(team1key);
         String team2 = Stash.getValue(team2key);
+        if (team1==null && team2==null){
+            LOG.info("В памяти не хранятся названия команд. сверять не с чем");
+            return;
+        }
         if (CommonStepDefs.stringParse(team1 + team2).equals(CommonStepDefs.stringParse(couponGame))) {
             LOG.info("Названия команд в купоне совпадают с ожидаемыми: [" + team1 + "] - [" + team2 + "] <=> [" + couponGame + "]");
         } else
@@ -221,24 +225,18 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("проверяет, совпадает ли исход в купоне с ожидаемым")
     public void checkIshod(String ishodKey) {
         WebDriver driver = PageFactory.getDriver();
-        String ishod = driver.findElement(xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getAttribute("innerText").split("\n")[1];
         String ishodName = Stash.getValue(ishodKey);//ожидаемое название исхода
-        switch (ishod.trim()) {
-            case "П1":
-                ishod = Stash.getValue("team1key").toString();
-                break;
-
-            case "П2":
-                ishod = Stash.getValue("team2key").toString();
-                break;
-            case "П1 0":
-                ishod = Stash.getValue("team1key").toString();
-                break;
-
-            case "П2 0":
-                ishod = Stash.getValue("team2key").toString();
-                break;
+        if (ishodName==null){
+            LOG.info("В памяти не хранится название команды, на которую поставили. сверять не с чем");
+            return;
         }
+        String ishod = driver.findElement(xpath("//ul[@class='coupon-bet__content']/li[2]/div")).getAttribute("innerText").split("\n")[1].trim();
+        if(ishod.matches("^[П].*[1].*"))
+        {ishod = driver.findElement(By.xpath("//span[contains(@class,'coupon-bet__title')]")).getAttribute("innerText").split("–")[0].trim();
+        } else if (ishod.matches("^[П].*[2].*")){
+            ishod = driver.findElement(By.xpath("//span[contains(@class,'coupon-bet__title')]")).getAttribute("innerText").split("–")[1].trim();
+        }
+
 
         if (CommonStepDefs.stringParse(ishod).equals(CommonStepDefs.stringParse(ishodName))) {
             LOG.info("Выбранных исход в купоне совпадает с ожидаемым: " + ishod + " <=> " + ishodName);
