@@ -98,7 +98,7 @@ public abstract class AbstractPage extends Page{
     protected By pathToclearCoupon = By.xpath("//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']");
 
     @ElementTitle("Сервисное сообщение")
-    @FindBy(xpath = "//div[contains(@class,'tech-msg__content')]")
+    @FindBy(xpath = "//div[contains(@class,'tech-msg active')]")
     private WebElement serviceMessage;
 
     @ElementTitle("Иконка закрытия сервисного сообщения")
@@ -431,16 +431,21 @@ public abstract class AbstractPage extends Page{
 
 
     private boolean checkCloseServiceMessage(WebElement element) {
-        return element.isDisplayed();
+        try {
+            return element.isDisplayed();
+        } catch (Exception e){
+            return false;
+        }
     }
 
     private boolean checkServiceMessage(String text) throws InterruptedException {
         int count = 0;
-        while (count < 40) {
-            if (serviceMessage.isDisplayed()) {
-                MatcherAssert.assertThat(true, equalTo(serviceMessage.getAttribute("innerText").equals(text)));
+        while (count < 5) {
+            try {
+                serviceMessage.isDisplayed();
+                MatcherAssert.assertThat(true, equalTo(serviceMessage.findElement(By.xpath("//div[contains(@class,'tech-msg__content')]")).getAttribute("innerText").equals(text)));
                 return true;
-            } else {
+            } catch (Exception e){
                 count++;
                 Thread.sleep(1000);
                 PageFactory.getWebDriver().navigate().refresh();

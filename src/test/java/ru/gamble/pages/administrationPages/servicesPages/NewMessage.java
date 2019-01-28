@@ -48,7 +48,7 @@ public class NewMessage extends AbstractPage{
     }
 
     @ActionTitle("создаёт новое сообщение с")
-    public void createMessage(DataTable params) {
+    public void createMessage(DataTable params) throws InterruptedException {
         Map<String, String> data = params.asMap(String.class, String.class);
         String afterMinutes = data.get("Активно через, мин");
         String isActive = data.get("Активность");
@@ -85,6 +85,7 @@ public class NewMessage extends AbstractPage{
         textAreas = PageFactory.getWebDriver().findElements(By.xpath("//table[@class='x-field x-table-plain x-form-item x-form-type-text x-field-default x-anchor-form-item']"));
         PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + textAreas.get(1).getAttribute("id") + "-inputEl']")).clear();
         PageFactory.getWebDriver().findElement(By.xpath("//input[@id='" + textAreas.get(1).getAttribute("id") + "-inputEl']")).sendKeys(formatForDateEnd.format(dateStart));
+        Thread.sleep(1000);
         saveBotton.click();
     }
 

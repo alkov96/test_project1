@@ -42,6 +42,10 @@ public class ProfilePage extends AbstractPage {
     @FindBy(xpath = "//i[contains(@class,'ico-eye')]")
     private WebElement PDeye;
 
+    @ElementTitle("адрес почты")
+    @FindBy(xpath = "//div[@class='user-profile__group']/div[4]//span[@class='user-profile__link']")
+    protected WebElement email;
+
     @ElementTitle("изменить пароль")
     @FindBy(xpath = "//div[@class='user-profile__group']/div[4]//span[@class='user-profile__link']")
     protected WebElement changePassword;
@@ -126,7 +130,7 @@ public class ProfilePage extends AbstractPage {
             PDeye.findElement(By.xpath("./following-sibling::span")).click();
         }
 
-        LOG.info("Формируем список тех данных, тчо отображаются в ЛК пользователя");
+        LOG.info("Формируем список тех данных, что отображаются в ЛК пользователя");
         SimpleDateFormat formatDateInLK = new SimpleDateFormat("dd-MM-yyyy");
         SimpleDateFormat formatDateInMemory = new SimpleDateFormat("yyyy-MM-dd");
         List<String> linesInLK = driver.findElements(By.xpath("//div[@class='user-profile__label']")).stream().map(el->el.getAttribute("innerText")).collect(Collectors.toList());
@@ -145,6 +149,11 @@ public class ProfilePage extends AbstractPage {
 
             if (line.contains("Телефон")){
                 valueLine = valueLine.replaceAll("[-]*[ ]*[+]*","");
+                valueInMemory = valueInMemory + "Изменить";
+            }
+
+            if (line.contains("почта")) {
+                valueInMemory = valueInMemory + " Изменить";
             }
 
             Assert.assertTrue("Значение в ЛИЧНОМ КАБИНЕТЕ пользователя не совпадает с тем, с которым регистрировались. " +
