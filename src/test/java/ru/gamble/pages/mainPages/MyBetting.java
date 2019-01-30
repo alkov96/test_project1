@@ -387,4 +387,29 @@ public class MyBetting extends AbstractPage {
 
         return bet;
     }
+
+
+    @ActionTitle("запоминает ID ставки и ее исход")
+    public void rememberIDandResultBet(String keyMap,DataTable dataTable){
+        WebDriver driver = PageFactory.getWebDriver();
+        Map<String,String> bets = new HashMap<>();
+        String id;
+        List<String> data = dataTable.asList(String.class);
+        for (String state : data){
+            selectReseltsBet(state);
+            id = driver.findElement(By.xpath("//*[contains(@class,'howBetInfo table__row')]/td")).getAttribute("innerText"); //у первой записи запоминаем id
+            bets.put(state,id);
+        }
+        Stash.put(keyMap,bets);
+    }
+
+    @ActionTitle("выставляет фильтр исхода пари на")
+    public void selectReseltsBet(String result){
+        WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Сначала включаем фильтр '" + result + "'");
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
+        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + result + "']")).click();
+        CommonStepDefs.workWithPreloader();
+    }
 }
