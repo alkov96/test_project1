@@ -22,8 +22,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.livePages.VewingEventsPage;
-import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -956,10 +954,10 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("вернули изначальный пароль "+changeCheck+" для пользователя "+Stash.getValue("currentUser"));
     }
 
-    @After(value = "@LeftMenuTriggersPrematch_C1057")
-    public void offMultigames(){
-        EventViewerPage.multiGamesOnOff("выключает");
-    }
+//    @After(value = "@LeftMenuTriggersPrematch_C1057")
+//    public void offMultigames(){
+//        EventViewerPage.multiGamesOnOff("выключает");
+//    }
 
     @Когда("^получаем и сохраняем в память код подтверждения \"([^\"]*)\" телефона \"([^\"]*)\" \"([^\"]*)\"$")
     public static void confirmPhone(String keyCode, String keyPhone, String type) {
