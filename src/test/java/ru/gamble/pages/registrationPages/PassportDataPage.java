@@ -44,16 +44,16 @@ public class PassportDataPage extends AbstractPage {
     private WebElement passpNumberInput;
 
     @ElementTitle("Кем выдан")
-    @FindBy(id = "passport_issuer")
+    @FindBy(id = "passportIssuer")
     private WebElement issuedByInput;
 
     @ElementTitle("Код подразделения")
-    @FindBy(id = "passport_issuer_code")
+    @FindBy(id = "passportIssuerCode")
     private WebElement unitCodeInput;
 
 
     @ElementTitle("Место рождения")
-    @FindBy(id = "birth_place")
+    @FindBy(id = "birthPlace")
     private WebElement placeOfBirthInput;
 
     @ElementTitle("Регион")

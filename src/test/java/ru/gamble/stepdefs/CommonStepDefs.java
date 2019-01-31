@@ -53,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -2284,29 +2285,33 @@ public class CommonStepDefs extends GenericStepDefs {
             workWithPreloader();
             ArrayList<String> multipleTabs = new ArrayList<String>(driver.getWindowHandles());
             if (multipleTabs.size() >= 2) {
-                driver.switchTo().window(multipleTabs.get(1));
-                try {
-                    driver.findElement(By.xpath(xpath));
-                    LOG.info("Текст " + expectedText + " найден на странице, возвращаемся");
-                    driver.close();
-                    driver.switchTo().window(multipleTabs.get(0));
-                } catch (Exception e){
-                    LOG.info("Текст " + expectedText + " не обнаружен");
-                    e.printStackTrace();
-                }
+                switchHandle(false);
+                Assert.assertFalse("Текст " + expectedText + " не обнаружен",driver.findElements(By.xpath(xpath)).isEmpty());
+                LOG.info("Текст " + expectedText + " найден на странице, возвращаемся");
+              switchHandle(true);
             } else {
-                try {
-                    driver.findElement(By.xpath(xpath));
-                    LOG.info("Текст " + expectedText + " найден на странице, возвращаемся");
-                    driver.get(Stash.getValue("MAIN_URL"));
-                    workWithPreloader();
-                }catch (Exception e){
-                    LOG.info("Текст " + expectedText + " не обнаружен");
-                    e.printStackTrace();
-                }
+                Assert.assertFalse("Текст " + expectedText + " не обнаружен",driver.findElements(By.xpath(xpath)).isEmpty());
+                LOG.info("Текст " + expectedText + " найден на странице, возвращаемся");
+                driver.get(Stash.getValue("MAIN_URL"));
+                workWithPreloader();
             }
         }
     }
+    /**
+     * Метод меняет активную вкладку. Если требуется не только сменить активность, но и закрыть - передаём true.
+     */
+    public static void switchHandle(Boolean needClose) {
+        WebDriver driver = PageFactory.getWebDriver();
+        ArrayList<String> multipleTabs = new ArrayList<String>(driver.getWindowHandles());
+        String currentHandle = driver.getWindowHandle();
+        String finalCurrentHandle = currentHandle;
+        multipleTabs.removeIf(element -> element.equals(finalCurrentHandle));
+        if (needClose == true){
+            driver.close();
+        }
+        driver.switchTo().window(multipleTabs.get(0));
+    }
+
     public static void pressButton(String param) {
         Page page;
         WebElement button;

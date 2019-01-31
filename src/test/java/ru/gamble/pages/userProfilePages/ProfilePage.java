@@ -141,7 +141,7 @@ public class ProfilePage extends AbstractPage {
                 continue;
             }
             String valueInMemory = Stash.getValue(key).toString().trim();
-            String valueLine = driver.findElement(By.xpath(String.format(xpathForValueLine,line))).getAttribute("innerText").trim();
+            String valueLine = driver.findElement(By.xpath(String.format(xpathForValueLine,line))).getAttribute("innerText").replaceAll("Изменить","").trim();
 
             if (line.contains("Дата")){
                 valueLine = CommonStepDefs.newFormatDate(formatDateInLK,formatDateInMemory,valueLine);
@@ -149,12 +149,12 @@ public class ProfilePage extends AbstractPage {
 
             if (line.contains("Телефон")){
                 valueLine = valueLine.replaceAll("[-]*[ ]*[+]*","");
-                valueInMemory = valueInMemory + "Изменить";
+//                valueInMemory = valueInMemory + "Изменить";
             }
 
-            if (line.contains("почта")) {
-                valueInMemory = valueInMemory + " Изменить";
-            }
+//            if (line.contains("почта")) {
+////                valueInMemory = valueInMemory + " Изменить";
+//            }
 
             Assert.assertTrue("Значение в ЛИЧНОМ КАБИНЕТЕ пользователя не совпадает с тем, с которым регистрировались. " +
                             line + " в ЛК: " + valueLine + ", а регистрирвоали: " + valueInMemory,

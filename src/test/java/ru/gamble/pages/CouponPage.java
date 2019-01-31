@@ -575,7 +575,7 @@ public class CouponPage extends AbstractPage {
         gear.click();
 
         LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
-        driver.findElement(xpath("//span[text()='Любые изменения']")).click();
+        driver.findElement(xpath("//span[text()='Любые коэффициенты']")).click();
         LOG.info("Возвращаемся к списку событий в купоне");
         driver.findElement(xpath("//span[text()='Купон']")).click();
         if (buttonBet.isEnabled()!=disabled){

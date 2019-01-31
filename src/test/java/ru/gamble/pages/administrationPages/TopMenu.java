@@ -27,11 +27,11 @@ public class TopMenu extends AbstractPage {
     private WebElement topMenu;
 
     @ElementTitle("Сервисы")
-    @FindBy(xpath = "//span[@id='tab-2017-btnInnerEl']")
+    @FindBy(xpath = "//span[@id='tab-2014-btnInnerEl']")
     private WebElement serviceBotton;
 
     @ElementTitle("Выйти")
-    @FindBy(xpath = "//span[@id='button-2027-btnIconEl']")
+    @FindBy(xpath = "//span[@id='button-2024-btnIconEl']")
     private WebElement exitBotton;
 
     @ElementTitle("Подтвердить выход")
