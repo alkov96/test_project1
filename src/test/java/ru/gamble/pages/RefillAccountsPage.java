@@ -24,6 +24,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,7 +83,9 @@ public class RefillAccountsPage extends AbstractPage{
     public void verifiesCorrectnessOfChangeOfMaximumAmountWhenChoosingRefill(String methodsKey,String keyJsonByWSS){
         String methodName, exeptedMaxLimit;
         BigDecimal maxLimitInDB,maxLimitByWSS, maxValueOnPage;
-        Object jsonByDB =  JSONValue.parse(Stash.getValue(methodsKey).toString()), checkValueByNull;
+        //Object jsonByDB =  JSONValue.parse(Stash.getValue(methodsKey).toString()), checkValueByNull;
+        Map<String,String> methodsInBD = Stash.getValue(methodsKey);
+        String checkValueByNull;
         Object jsonByWSS =  JSONValue.parse(Stash.getValue(keyJsonByWSS).toString());
         List<WebElement> methodsOfRefill = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'moneyChnl')]//label/div")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         LOG.info("Нашли на странице [" + methodsOfRefill.size() + "] элементов способов пополенния");
@@ -92,7 +95,9 @@ public class RefillAccountsPage extends AbstractPage{
             methodName = method.getAttribute("class").replace("payPartner ","");
             method.click();
             LOG.info("Нажали на метод [" + methodName + "]");
-            checkValueByNull = JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByDB, methodName),"limit"),"max");
+//            checkValueByNull = Stash.getValue(methodName.replaceAll("_","").toUpperCase());
+            checkValueByNull = methodsInBD.get(methodName.replaceAll("_","").toUpperCase());
+//            checkValueByNull = JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByDB, methodName),"limit"),"max");
             maxLimitInDB = new BigDecimal(checkValueByNull == null ? "0" : String.valueOf(checkValueByNull)).divide( new BigDecimal("100"));
             LOG.info("Достали из [" + methodsKey + "] по имени способа[" + methodName + "] максимальный лимит[" + maxLimitInDB.toString() + "]");
             maxLimitByWSS = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByWSS,"data"),"limits"),methodName),"max_deposit").toString()).divide( new BigDecimal("100"));

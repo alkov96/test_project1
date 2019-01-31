@@ -879,6 +879,55 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
+
+
+    private static void workWithDBresultTwoRows(String sqlRequest,String keyForMap){
+        Connection con = DBUtils.getConnection();
+        Statement stmt;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        StringBuilder keyNormal = new StringBuilder();
+        ResultSetMetaData allRows;
+        String key,value;
+        Map<String,String> mapResult = new HashMap<>();
+
+        try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlRequest);
+            rs.first();
+            int count = rs.getMetaData().getColumnCount();
+            if (count == 0) {
+                throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул кол-во результатов [" + count + "]");
+            }
+
+            do {
+                allRows = rs.getMetaData();
+
+                for (int i = 1; i <= count; i++) {
+                    key = rs.getString(allRows.getColumnName(1));
+                    value = rs.getString(allRows.getColumnName(2));
+                    for (String part : key.split("_")) {
+                        keyNormal.append(part);
+                    }
+                    LOG.info(keyNormal + "=" + value);
+                    if (keyNormal.toString().toUpperCase().equals("PASSWORD")) {
+                        continue;
+                    }
+                    //Stash.put(keyNormal.toString().toUpperCase(), value);
+                    mapResult.put(keyNormal.toString().toUpperCase(), value);
+                    keyNormal.setLength(0);
+                }
+            }while (rs.next());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtils.closeAll(con, null, null);
+        }
+        Stash.put(keyForMap,mapResult);
+    }
+
+
     @Before(value = "@ChangePassword_C1043")
     public void saveCurrentPassword() throws DataException {
        String email = null;
@@ -2014,8 +2063,10 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^запрашиваем параметры способов пополения и сохраняем в память как \"([^\"]*)\"$")
     public void requestParametersOfRefillMethodsAndStoreToStash(String KeyInStash){
-        String sqlRequest = "SELECT value FROM gamebet.params WHERE name ='" + KeyInStash + "'";
-        requestFromDBAndSaveToStash(sqlRequest,KeyInStash);
+//        String sqlRequest = "SELECT value FROM gamebet.params WHERE name ='" + KeyInStash + "'";
+//        requestFromDBAndSaveToStash(sqlRequest,KeyInStash);
+        String sqlRequest = "SELECT  NAME,max_amount FROM gamebet.`paymentservices` WHERE channel=1";
+        workWithDBresultTwoRows(sqlRequest,KeyInStash);
     }
 
     private void requestFromDBAndSaveToStash(String sqlRequest, String KeyInStash){
