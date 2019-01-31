@@ -831,7 +831,7 @@ public class EventViewerPage extends AbstractPage {
 
             switch (listMarketsInMulti.get(i).replaceAll("[^а-яА-Я]", "")) {
                 case "П":
-                    nameMarketMulti = "Исход";
+                    nameMarketMulti = "Исход Победитель матча";
                     break;
                 default:
                     nameMarketMulti = listMarketsInMulti.get(i).replaceAll("[^а-яА-Я]", "");
@@ -845,7 +845,7 @@ public class EventViewerPage extends AbstractPage {
             );
             Assert.assertTrue(
                     "Маркет на страниуе и в контейнере мультимаркета не совпал. " + marketis + " против " + nameMarketMulti,
-                    marketis.contains(nameMarketMulti)
+                    nameMarketMulti.contains(marketis.replaceAll("\n",""))
             );
 
             LOG.info("Убираем игру из купона нажатием на коэффициент в центральной области");
