@@ -1,5 +1,6 @@
 package ru.gamble.pages.userProfilePages;
 
+import cucumber.api.DataTable;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -10,8 +11,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
+import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
@@ -35,6 +38,10 @@ public class OperationHistoryPage extends AbstractPage {
 
     @FindBy(xpath = "//div[@class='history__table']")
     private WebElement historyTable;
+
+    @ElementTitle("Поле поиска")
+    @FindBy(xpath = "//div[contains(@class,'input-search__wrapper_history')]/input")
+    private WebElement searchInput;
 
     public OperationHistoryPage() {
         WebDriver driver = PageFactory.getDriver();
@@ -165,17 +172,17 @@ public class OperationHistoryPage extends AbstractPage {
     public void checkSearch(){
         WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
-        WebElement search = driver.findElement(By.xpath("//div[contains(@class,'input-search__wrapper_history')]/input")); //поле поиска
-        search.clear();
-        search.sendKeys("asd");//в поле поиска вводим буквы, по идее они не должны приниматься.
-        if (!search.getAttribute("value").isEmpty()) //если поле поиск не пустое, значит буквы принялись, а это неправильно
+//        WebElement search = driver.findElement(By.xpath("//div[contains(@class,'input-search__wrapper_history')]/input")); //поле поиска
+        searchInput.clear();
+        searchInput.sendKeys("asd");//в поле поиска вводим буквы, по идее они не должны приниматься.
+        if (!searchInput.getAttribute("value").isEmpty()) //если поле поиск не пустое, значит буквы принялись, а это неправильно
         {
             flag = false;
             Assert.fail("В поле ввода можно ввести буквы, но там должны быть только цифры - поиск по ID");
         }
-        search.clear();
+        searchInput.clear();
         String randomID = String.valueOf((int) (1 + Math.random() * 998));
-        search.sendKeys(randomID);
+        searchInput.sendKeys(randomID);
         List<WebElement> operationsID = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell']//span[@class='history__id']/span"));
 
         int count = 0;
@@ -186,8 +193,8 @@ public class OperationHistoryPage extends AbstractPage {
             }
             LOG.info("Не нашлось операций с ID " + randomID);
             randomID = String.valueOf((int) (1 + Math.random() * 998));
-            search.clear();
-            search.sendKeys(randomID);
+            searchInput.clear();
+            searchInput.sendKeys(randomID);
             operationsID = driver.findElements(By.xpath("//div[@ng-controller='historyWalletCtrl']//div[@class='history__table']//tr[@class='repeated-item ng-scope']/td[@class='table__body-cell']//span[@class='history__id']/span"));
 
             count++;
@@ -198,5 +205,44 @@ public class OperationHistoryPage extends AbstractPage {
                 Assert.fail("Поиск не сработал. Искали по подстроке " + randomID + ", но нашлась операция с номером " + element.getAttribute("innerText"));
             }
         }
+    }
+
+    @ActionTitle("вводит в поиск ID ставки и проверяет что баланс после нее изменился правильно")
+    public void searchIdAndCheckBalance(String keyListBet, DataTable dataTable) throws InterruptedException {
+        LOG.info("Достаем из памяти список ставок с разными результатами");
+        WebDriver driver = PageFactory.getDriver();
+        Map<String,String> bets = Stash.getValue(keyListBet);
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        String id;
+        String changeBalance;
+        String expectedBet;
+        String resultOneBet;
+        List<WebElement> lineInContainer;
+        for (Map.Entry<String, String> entry : table.entrySet()) {
+
+            resultOneBet = entry.getKey();
+            id = bets.get(resultOneBet); // достаем из параметров результат ставки и ищем id для этого результата в bets
+            LOG.info("Вводим в поле поиска id = " + id.toString().replace("\n",""));
+            searchInput.clear();
+            searchInput.sendKeys(id.toString().replace("\n",""));
+            Thread.sleep(1500);
+            expectedBet = resultOneBet.equals("Проигрыш")|| resultOneBet.equals("Ожидается")? "Ставка": resultOneBet;
+            lineInContainer = driver.findElements(By.xpath("//tr[contains(@class,'repeated-item')]"));
+            for (WebElement line:lineInContainer){
+                if (line.getAttribute("innerText").contains(expectedBet)){
+                    LOG.info("Проверим изменился баланс в нужную сторону или нет");
+                    changeBalance = line.findElement(By.xpath(".//span[contains(@class,'history-summ')]")).getAttribute("innerText");
+                    Assert.assertTrue("Изменение баланса не совпадает с ожидаемым. Для данного события ожидали " + entry.getKey() + ", а на самом деле " + changeBalance,
+                            changeBalance.contains("-")==entry.getValue().equals("минус"));
+                    LOG.info("Все верно. Идём дальше");
+
+                    break;
+                }
+                if (lineInContainer.indexOf(line)==lineInContainer.size()-1){
+                    Assert.fail("В истории операций есть записи по нужному id, но тип не тот. Ожидали что это будет " + expectedBet + " а на самом деле " + line.getAttribute("innerText"));
+                }
+            }
+        }
+
     }
 }

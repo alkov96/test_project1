@@ -30,6 +30,7 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
+import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
@@ -2525,6 +2526,32 @@ public class CommonStepDefs extends GenericStepDefs {
                 coefsOnBanners.equals(coefsOnPage)
         );
         LOG.info("Коэффициенты на беннере и на странице совпадают");
+    }
+
+
+    //выставление даты начала (например в истории операций или в моих пари) на самую раннюю из возможных
+    @Когда("^отматывает дату начала на самую раннюю$")
+    public void datapickerOnBegin(){
+        WebDriver driver = PageFactory.getWebDriver();
+        WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
+        if (!datapickerBegin.getAttribute("class").contains("active")){
+            datapickerBegin.click();
+            new WebDriverWait(driver,10)
+                    .withMessage("Дата начала не раскрылась")
+                    .until(ExpectedConditions.attributeContains(datapickerBegin,"class","active"));
+        }
+        LOG.info("Если доступно - нажимаем на стрелочку 'год назад'");
+        By BYarrowLeft;
+        for(int lineNumber=1;lineNumber<=2;lineNumber++){
+            BYarrowLeft= By.xpath("//div[@class='datepicker__line' and position()=" + lineNumber + "]//i[contains(@class,'arrow-left6')]");
+
+            while (!driver.findElement(BYarrowLeft).findElement(By.xpath("ancestor-or-self::div[contains(@class,'datepicker__btn')]")).getAttribute("class").contains("bound")){
+                driver.findElement(BYarrowLeft).click();
+            }
+        }
+        LOG.info("Год и месяц отщелкали на начало. Теперь день выбирем самый ранний");
+        driver.findElement(By.xpath("//div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).click();
+        CommonStepDefs.workWithPreloader();
     }
 }
 
