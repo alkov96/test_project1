@@ -49,5 +49,24 @@
       "DB_USER": "gamebet_dml",
       "DB_PASSWORD": "kahcheezao6fa=hfai3Ae"
     }
+  },
+    "DEV_GAMEBET": {
+      "ESB_URL": "http://dev-bet-esb.dev.bet.orglot.office:8660",
+      "MAIN_URL": "http://dev.gamebet.ru",
+      "ADMIN_URL": "http://dev-bet-dbproca.dev.bet.orglot.office/admin",
+      "MOBILE_URL": "http://dev-mobile.gamebet.ru",
+      "REGISTRATION_URL": "https://dev.gamebet.ru/test_registration/",
+      "USER": "testingsto+86@mail.ru",
+      "USER_CHROME": "testingsto+86@mail.ru",
+      "USER_FIREFOX": "user_for_firefox@mailinator.com",
+      "PASSWORD": "Acer0808",
+      "PASS": "Parol123",
+      "PHONE": "79088767878",
+      "PHONE_FIREFOX": "70010020701",
+      "DB_REGISTRATION": {
+        "DB_URL": "jdbc:mysql://dev-bet-dbproc.dev.bet.orglot.office:3306",
+        "DB_USER": "webdev_user",
+        "DB_PASSWORD": "hahmuKoC8cha4Poo"
+      }
+    }
   }
-}
