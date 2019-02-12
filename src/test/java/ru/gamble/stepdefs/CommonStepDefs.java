@@ -174,12 +174,7 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Переход на главную страницу");
         goToMainPage("site");
         cleanCookies();
-        if(driver.getCurrentUrl().contains("mobile")){
-            mobileSiteLogOut(driver);
-        }else{
-            descktopSiteLogOut(driver);
-        }
-
+        descktopSiteLogOut(driver);
     }
 
 
@@ -198,6 +193,9 @@ public class CommonStepDefs extends GenericStepDefs {
         }catch (Exception e){
             LOG.info("На сайте никто не авторизован");
         }
+
+        driver.navigate().refresh();
+        LOG.info("Обновили страницу на всякий случай");
     }
 
     private void mobileSiteLogOut(WebDriver driver){
