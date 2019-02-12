@@ -52,9 +52,9 @@
   },
     "DEV_GAMEBET": {
       "ESB_URL": "http://dev-bet-esb.dev.bet.orglot.office:8660",
-      "MAIN_URL": "http://dev.gamebet.ru",
+      "MAIN_URL": "https://dev.gamebet.ru",
       "ADMIN_URL": "http://dev-bet-dbproca.dev.bet.orglot.office/admin",
-      "MOBILE_URL": "http://dev-mobile.gamebet.ru",
+      "MOBILE_URL": "https://dev-mobile.gamebet.ru",
       "REGISTRATION_URL": "https://dev.gamebet.ru/test_registration/",
       "USER": "testingsto+86@mail.ru",
       "USER_CHROME": "testingsto+86@mail.ru",
