@@ -47,7 +47,7 @@ public class WithdrawalOfFundsPage extends AbstractPage{
         checkForErrorLoadingPaymentSystems();
         WebDriver driver = PageFactory.getWebDriver();
         Pattern pattern = Pattern.compile("(?u)[^0-9]");
-        List<WebElement> allWayWithdraw = driver.findElements(By.xpath("//table[@class='moneyInOutTable']//tr[3]/td[2]/div[not(contains(@class,'not-available'))]/span/label[contains(@for, 'withdraw-method')]"));
+        List<WebElement> allWayWithdraw = driver.findElements(By.xpath("//table[@class='moneyInOutTable']/tbody[contains(@class,'methods-group')]/tr/td/div[contains(@class,'moneyChnl') and not(contains(@class,'not-available'))]"));
         String min = allWayWithdraw.get(0).findElement(By.xpath("//div/span[@ng-if='method.limit.min']")).getAttribute("innerText");
 
         String xpathCard = "//label[@for='withdraw-method-cupis_card']";
