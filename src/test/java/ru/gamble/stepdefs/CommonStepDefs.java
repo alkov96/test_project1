@@ -1783,7 +1783,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^составляем новый номер телефона \"([^\"]*)\" вместо старого \"([^\"]*)\"$")
     public void newPhone(String keyNewPhone, String keyOldPhone) {
         String oldPhone = Stash.getValue(keyOldPhone);
-        String newPhone = "7222" + oldPhone.substring(4,11);
+        String newPhone = "7444" + oldPhone.substring(4,11);
         Stash.put(keyNewPhone,newPhone);
         LOG.info("Новый нмоер телефона: " + newPhone);
     }
