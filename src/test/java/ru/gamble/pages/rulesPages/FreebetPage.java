@@ -21,7 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 public class FreebetPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FreebetPage.class);
 
-    @FindBy(xpath = "//h1[text()='Получите фрибет на 1000 бонусов']")
+    @FindBy(xpath = "//h1[contains(text(),'Фрибет')]")
     private WebElement header;
 
     public FreebetPage() {
