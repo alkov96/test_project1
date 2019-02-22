@@ -1949,7 +1949,6 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-
     /**
      * Возвращаем активные опции сайста в исходное положение до тестов
      * @param scenario
