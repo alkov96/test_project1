@@ -75,6 +75,8 @@
     "MOBILE_URL": "https://test-func-bet-mobile-site.tsed.orglot.office",
     "REGISTRATION_URL": "https://test-func-bet-site.tsed.orglot.office/test_registration",
     "USER": "testingsto+86@mail.ru",
+    "USER_CHROME": "testingsto+86@mail.ru",
+    "USER_FIREFOX": "user_for_firefox@mailinator.com",
     "PASSWORD": "Acer0808",
     "PASS": "Parol123",
     "PHONE": "79088767878",

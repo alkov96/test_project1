@@ -16,6 +16,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -249,7 +250,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 currentUrl = siteUrl;
                 break;
         }
-            PageFactory.getWebDriver().get(currentUrl);
+        PageFactory.getWebDriver().get(currentUrl);
             LOG.info("Перешли на страницу [" + currentUrl + "]");
         }catch (DataException e) {
             LOG.error(e.getMessage());
