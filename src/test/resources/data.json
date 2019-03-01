@@ -73,13 +73,15 @@
   "TEST-FUNC": {
     "MAIN_URL": "https://test-func-bet-site.tsed.orglot.office",
     "MOBILE_URL": "https://test-func-bet-mobile-site.tsed.orglot.office",
+    "ESB_URL": "http://test-func-bet-dbproca.tsed.orglot.office:8660",
+    "ADMIN_URL": "http://test-func-bet-dbproca.dev.bet.orglot.office/admin",
     "REGISTRATION_URL": "https://test-func-bet-site.tsed.orglot.office/test_registration",
-    "USER": "testingsto+86@mail.ru",
-    "USER_CHROME": "testingsto+86@mail.ru",
+    "USER": "testregistrator+73330018153@inbox.ru",
+    "USER_CHROME": "testregistrator+73330018153@inbox.ru",
     "USER_FIREFOX": "user_for_firefox@mailinator.com",
     "PASSWORD": "Acer0808",
     "PASS": "Parol123",
-    "PHONE": "79088767878",
+    "PHONE": "73330018162",
     "PHONE_FIREFOX": "70010020701",
     "DB_REGISTRATION": {
       "DB_URL": "jdbc:mysql://test-func-bet-dbproc.tsed.orglot.office:3306",
