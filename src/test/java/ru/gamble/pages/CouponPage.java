@@ -487,8 +487,8 @@ public class CouponPage extends AbstractPage {
 
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
         //Thread.sleep(10000);
-        new WebDriverWait(driver,10)
-                .withMessage("За 10 секунд ставка из купона так и не убралась")
+        new WebDriverWait(driver,20)
+                .withMessage("За 20 секунд ставка из купона так и не убралась")
                 .until(ExpectedConditions.numberOfElementsToBeLessThan(xpath("//ul[@class='coupon-bet__content']"),(expectedCouponSize+1)));
 
     }

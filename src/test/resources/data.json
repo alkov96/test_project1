@@ -12,6 +12,7 @@
     "PASS": "Parol123",
     "PHONE": "79088767878",
     "PHONE_FIREFOX": "70010020701",
+    "MERCHANT":"favorit_test",
     "DB_REGISTRATION": {
       "DB_URL": "jdbc:mysql://dev-bet-dbproc.dev.bet.orglot.office:3306",
       "DB_USER": "webdev_user",
@@ -31,6 +32,7 @@
     "PASS": "Parol123",
     "PHONE":"70010020718",
     "PHONE_FIREFOX": "70010020704",
+    "MERCHANT":"favorit_demo",
     "DB_REGISTRATION": {
       "DB_URL": "jdbc:mysql://main-demo.wd.orglot.office:3306",
       "DB_USER": "stoloto_main",
@@ -44,6 +46,7 @@
     "USER": "testregistrator+71110023368@inbox.ru",
     "PASSWORD": "Acer0808",
     "PASS": "Parol123",
+    "MERCHANT":"favorit_test_int",
     "DB_REGISTRATION": {
       "DB_URL": "jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office:3306",
       "DB_USER": "gamebet_dml",
@@ -63,6 +66,7 @@
       "PASS": "Parol123",
       "PHONE": "79088767878",
       "PHONE_FIREFOX": "70010020701",
+      "MERCHANT":"favorit_test",
       "DB_REGISTRATION": {
         "DB_URL": "jdbc:mysql://dev-bet-dbproc.dev.bet.orglot.office:3306",
         "DB_USER": "webdev_user",
@@ -83,6 +87,7 @@
     "PASS": "Parol123",
     "PHONE": "73330018162",
     "PHONE_FIREFOX": "70010020701",
+    "MERCHANT":"favorit",
     "DB_REGISTRATION": {
       "DB_URL": "jdbc:mysql://test-func-bet-dbproc.tsed.orglot.office:3306",
       "DB_USER": "gamebet_test",
