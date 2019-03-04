@@ -224,7 +224,7 @@ public abstract class AbstractPage extends Page{
             new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
         }
         LOG.info("Переходим по ссылке из e-mail");
-        driver.get(url + "?action=verify&" + link);
+        driver.get(url + "/registration/email/verify?" + link);
 
         if(url.contains("mobile")){
            return;

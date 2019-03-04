@@ -106,7 +106,7 @@ public class MailSearcher {
         String line;
 
         while ((line = buffer.readLine()) != null) {
-            if (line.contains("action=verify"))
+            if (line.contains("verify"))
                 break;
         }
         if (line == null) {
