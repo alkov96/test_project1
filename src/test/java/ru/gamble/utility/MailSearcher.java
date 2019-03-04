@@ -23,11 +23,15 @@ public class MailSearcher {
     public String getEmailLink(String mail, Properties properties){
 
         String link;
+        String linkSpam;
+
 
         for (int i = 1; i >= 0; i--) {
-            link = linkSearcher(mail, properties);
-            if (link != null) {
-                return link;
+            link = linkSearcher(mail, properties, "INBOX");
+            linkSpam = linkSearcher(mail, properties, "Спам");
+            if (link != null || linkSpam != null) {
+                LOG.info("Письмо найдено в папке " + link==null?"Спам":"INBOX");
+                return link==null?linkSpam:link;
             } else {
                 LOG.info("Connect to email. Remained attempts : " + i);
             }
@@ -37,7 +41,7 @@ public class MailSearcher {
         return null;
     }
 
-    private String linkSearcher(String mail, Properties properties)  {
+    private String linkSearcher(String mail, Properties properties, String nameFolder)  {
         Store store;
         Folder inbox;
         String link = "";
@@ -52,7 +56,7 @@ public class MailSearcher {
             //подключаемся к почтовому серверу
             store.connect(properties.get(HOST).toString(), properties.get(USER).toString(), properties.get(PASS).toString());
             //открываем её для чтения и записи
-            inbox = store.getFolder("INBOX");
+            inbox = store.getFolder(nameFolder);
             inbox.open(Folder.READ_WRITE);
             int count = 5;
             while (inbox.getMessageCount() == 0 && count >= 0) {
