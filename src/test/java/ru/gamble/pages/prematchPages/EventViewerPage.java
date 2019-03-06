@@ -414,6 +414,7 @@ public class EventViewerPage extends AbstractPage {
             CommonStepDefs.workWithPreloader();
         }
         driver.findElement(By.xpath("//div[@class='periods']//div[contains(@class,'periods__input')]")).click();
+        //включает фильтр по времени
         driver.findElement(By.xpath("//div[@class='periods']//ul[@class='periods__list']/li[contains(text(),'"+period+"')]")).click();
         CommonStepDefs.workWithPreloader();
         Stash.put("keyPeriod",period);
