@@ -2074,7 +2074,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^запрос к WSS \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestByWSSAndSave(String wSSPath, String KeyInStash, DataTable dataTable){
-        requestToWSS(wSSPath,KeyInStash,dataTable);
+        requestToWSS(Stash.getValue(wSSPath),KeyInStash,dataTable);
 
 
     }
@@ -2089,7 +2089,7 @@ public class CommonStepDefs extends GenericStepDefs {
         if (!(null == dataTable)) {
             params = collectParametersInJSONString(dataTable);
         }
-        String therdRequest = "{\"command\":\"payment_services\",\"params\":{},\"rid\":\"15355431498522\"}";
+        String therdRequest = "{\"command\":\"payment_services\",\"params\":{},\"rid\":\""+Stash.getValue("RID")+ "\"}";
         StringBuilder builder = new StringBuilder();
 
         try {
