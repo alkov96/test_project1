@@ -117,7 +117,7 @@ public class FavouritePage extends AbstractPage {
             //   switch(typeGame){
             switch (types.get(index)) {
                 case "PrematchVnePeriod":
-                    flag=EventViewerPage.pagePrematch(teams.get(index), "Любое время",true);
+                    flag=EventViewerPage.pagePrematch(teams.get(index), "Выберите время",true);
                     Assert.assertTrue("Переход на игру " + teams.get(index) +" не удался", flag);
                     break;
                 case "PrematchInPeriod":

@@ -14,7 +14,10 @@
       | SOURCE | 16 |
 
     * сохраняем в память
-      | RID | 15355431498522 |
+      | RID | 42-485-40-1551879275728-13 |
+
+    * сохраняем в память
+      | WS_SWARM | Default |
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId    | DEVID    |
@@ -27,7 +30,7 @@
     * добавляем данные в JSON объект "PARAMS" сохраняем в память:
       | auth_token | AUTHTOKEN |
 
-    * запрос к WSS "wss://swarm-test.betfavorit.cf:8443/" и сохраняем в "JSON_LIMITS_BY_WSS":
+    * запрос к WSS "WS_SWARM" и сохраняем в "JSON_LIMITS_BY_WSS":
     | command | restore_login |
     | params  | PARAMS        |
     | rid     | RID           |
