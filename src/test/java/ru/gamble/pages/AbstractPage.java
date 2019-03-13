@@ -350,7 +350,7 @@ public abstract class AbstractPage extends Page{
             Thread.sleep(3000);
             waitForElementPresent(By.xpath(findCoeffs), 10);
             correctMarkets = getWebDriver().findElements(By.xpath(findCoeffs))
-                    .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) >= 1.260)
+                    .stream().filter(e -> e.isDisplayed() && Double.parseDouble(e.getAttribute("innerText")) >= 1.260)
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
