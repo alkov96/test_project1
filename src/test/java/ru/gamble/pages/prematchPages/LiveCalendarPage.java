@@ -79,12 +79,12 @@ public class LiveCalendarPage extends AbstractPage {
 
     @ActionTitle("добавляет корректные события, пока их не станет")
     public void fillCouponCorrectEvents(String value) throws InterruptedException {
-        fillCouponFinal(Integer.parseInt(value), "correct", By.xpath("//div[contains(@class,'livecal-table__coefficient')]"));
+        fillCouponFinal(Integer.parseInt(value), "correct", "//div[contains(@class,'livecal-table__coefficient') and not(contains(@class,'no-link'))]");
     }
 
     @ActionTitle("добавляет некорректные события, пока их не станет")
     public void fillCouponIncorrectEvents(String value) throws InterruptedException {
-        fillCouponFinal(Integer.parseInt(value), "incorrect", By.xpath("//div[contains(@class,'livecal-table__coefficient')]"));
+        fillCouponFinal(Integer.parseInt(value), "incorrect", "//div[contains(@class,'livecal-table__coefficient') and not(contains(@class,'no-link'))]");
     }
 
     /**
