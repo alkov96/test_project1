@@ -343,14 +343,14 @@ public abstract class AbstractPage extends Page{
         MatcherAssert.assertThat(false, equalTo(checkCloseServiceMessage(closeServiceMessage)));
     }
 
-    public void fillCouponFinal(int count, String ifForExperss, By findCoeffs) throws InterruptedException {
+    public void fillCouponFinal(int count, String ifForExperss, String findCoeffs) throws InterruptedException {
         if (ifForExperss.equals("correct")) {
             List<WebElement> eventsInCoupon;
             List<WebElement> correctMarkets;
             Thread.sleep(3000);
-            waitForElementPresent(findCoeffs, 10);
-            correctMarkets = getWebDriver().findElements(findCoeffs)
-                    .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) >= 1.260)
+            waitForElementPresent(By.xpath(findCoeffs), 10);
+            correctMarkets = getWebDriver().findElements(By.xpath(findCoeffs))
+                    .stream().filter(e -> e.isDisplayed() && Double.parseDouble(e.getAttribute("innerText")) >= 1.260)
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
@@ -365,13 +365,13 @@ public abstract class AbstractPage extends Page{
         if (ifForExperss.equals("incorrect")) {
             List<WebElement> eventsInCoupon;
             List<WebElement> inCorrectMarkets = null;
-            waitForElementPresent(findCoeffs, 10);
+            waitForElementPresent(By.xpath(findCoeffs), 10);
             List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
             int tryPage = 0;
             int counter = 10;
             do {
                 try {
-                    inCorrectMarkets = getWebDriver().findElements(findCoeffs)
+                    inCorrectMarkets = getWebDriver().findElements(By.xpath(findCoeffs))
                             .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) < 1.25)
                             .limit(count + 3).collect(Collectors.toList());
                 } catch (StaleElementReferenceException e) {
