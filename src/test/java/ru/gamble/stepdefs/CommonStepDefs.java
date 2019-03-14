@@ -23,6 +23,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -2550,6 +2551,18 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Год и месяц отщелкали на начало. Теперь день выбирем самый ранний");
         driver.findElement(By.xpath("//div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).click();
         CommonStepDefs.workWithPreloader();
+    }
+
+    @After(value = "@coupon")
+    public void clearCouponAfter() throws InterruptedException {
+        WebDriver driver = PageFactory.getWebDriver();
+        goToMainPage("site");
+        driver.findElement(By.id("prematch")).click(); //переходим в прематч
+        Thread.sleep(5000);
+        LOG.info("Перешли в прематч и сейчас будет чистить купон");
+        AbstractPage.clearCoupon();
+        LOG.info("Отчистили купон");
+
     }
 }
 

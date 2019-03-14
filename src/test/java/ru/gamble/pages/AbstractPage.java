@@ -93,9 +93,9 @@ public abstract class AbstractPage extends Page{
 
     @ElementTitle("Очистить всё")
     @FindBy(xpath = "//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']")
-    protected WebElement clearCoupon;
+    protected static WebElement clearCoupon;
 
-    protected By pathToclearCoupon = By.xpath("//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']");
+    public static By pathToclearCoupon = By.xpath("//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']");
 
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg active')]")
@@ -468,7 +468,7 @@ public abstract class AbstractPage extends Page{
     }
 
     @ActionTitle("очищает купон")
-    public void clearCoupon(){
+    public static void clearCoupon(){
 //        if (clearCoupon.isDisplayed()){
 //            clearCoupon.click();
 //        }
