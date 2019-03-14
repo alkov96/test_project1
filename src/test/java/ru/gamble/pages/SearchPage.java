@@ -203,7 +203,7 @@ public class SearchPage extends AbstractPage{
                 Assert.assertTrue("Неполадки при переходе на лайв-игру",VewingEventsPage.pageLive(gameName,  false,false));
                 break;
             case "PrematchVnePeriod":
-                Assert.assertTrue("Неполадки при переходе на прематч-игру",EventViewerPage.pagePrematch(gameName, "Любое время",false));
+                Assert.assertTrue("Неполадки при переходе на прематч-игру",EventViewerPage.pagePrematch(gameName, "Выберите время",false));
                 break;
             case "PrematchInPeriod":
                 Assert.assertTrue("Неполадки при переходе на прематч-игру",EventViewerPage.pagePrematch(gameName,  "2 часа",false));
