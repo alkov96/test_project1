@@ -741,7 +741,7 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("запоминает первые события в заключенных пари")
-    public void rememberHistoryInCoupon(String nameList) throws InterruptedException {
+    public void rememberHistoryInCoupon(String nameList) {
         WebDriver driver = PageFactory.getDriver();
         int  cou = 3;
         List<BetFull> betsOnMyBets= new ArrayList<>();
@@ -765,7 +765,7 @@ public class CouponPage extends AbstractPage {
 
 
 
-    public BetFull remeberLineInHistoryCoupon(int ind) throws InterruptedException {
+    public BetFull remeberLineInHistoryCoupon(int ind)  {
 
         WebElement sumElement;
         WebDriver driver = PageFactory.getDriver();
