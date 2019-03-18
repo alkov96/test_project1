@@ -460,7 +460,7 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("заключает пари")
-    public void doBet() throws AuthenticationException, InterruptedException {
+    public void doBet() {
         WebDriver driver = PageFactory.getDriver();
         String xpathBet = "//input[contains(@class,'input coupon__input') and not(@id='bet-input')]";
 
