@@ -2092,7 +2092,7 @@ public class CommonStepDefs extends GenericStepDefs {
 //        if (!(null == dataTable)) {
 //            params = collectParametersInJSONString(dataTable);
 //        }
-//        String therdRequest = "{\"command\":\"get\",\"params\":{\"source\": \"betting\" \"subscribe\": \"true\"},\"rid\":\"" + Stash.getValue("RID") + "\"}";
+//        String therdRequest = "{\"command\":\"get\",\"params\":{\"source\": \"betting\"\n\"subscribe\": \"true\"},\"rid\":\"" + Stash.getValue("RID") + "\"}";
 //
 //        StringBuilder builder = new StringBuilder();
 //
