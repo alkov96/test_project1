@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.CouponPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -30,12 +31,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.assertj.core.api.Assertions.in;
 import static org.openqa.selenium.By.xpath;
-import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
-import static org.openqa.selenium.support.ui.ExpectedConditions.not;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.PERIOD;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
@@ -50,6 +46,15 @@ public class EventViewerPage extends AbstractPage {
     @ElementTitle("Период времени")
     @FindBy(xpath = "//div[contains(@class,'periods__input')]")
     private WebElement selectPeriod;
+
+    @ElementTitle("Кнопка МАКСБЕТ")
+    @FindBy(xpath = "//i[contains(@class,'icon-maxbet')]")
+    private WebElement maxBet;
+
+    @ElementTitle("Инпут размера ставки")
+    @FindBy(xpath = "//i[contains(@class,'icon-maxbet')]")
+    private WebElement input;
+
 
     private static By xpathForsportsPrematch = By.xpath("//*[@id='sports-list-container']//li[contains(@id,'sport') and not(contains(@id,'sport--'))]");
 
@@ -862,41 +867,87 @@ public class EventViewerPage extends AbstractPage {
 
     }
 
-    @ActionTitle("проверяет нулевую маржу")
-    public void checkZeroMargin(){
+    @ActionTitle("ищет ставку с маленьким значением maxbet")
+    public void searchBetFromSuperbet(String betOk){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        Actions actions = new Actions(driver);
+        int has = 0;
+        LOG.info("Сворачиваем все виды спорта");
+        closeSports();//свернули все виды спорта
+        LOG.info("Разворачиваем футбол");
+        WebElement football = driver.findElement(By.xpath("//*[@id='sports-list-container']//li[@id='sport-1']"));
+        football.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_sport')]")).click();
+        wait.withMessage("Футбол не развернулся спустя 10 секунд");
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__submenu']/li"),0));
+        List<WebElement> regions = football.findElements(By.xpath(".//ul[@class='left-menu__submenu']/li"));
+        LOG.info("Ищем игру со ставкой Точный счёт, чей коэф > 50.0. Потмоуч о у ставок с меньшим коэффициентом вероятен большой максимум");
+        for (WebElement region : regions){
+            if(!region.getAttribute("class").contains("active")){
+                region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();
+                LOG.info("регион " + region.getAttribute("innerText"));
+                wait.withMessage("Регион " + region.getAttribute("innerText") + " не развернулс за 10 секунл");
+                wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'left-menu__list-item-region-compitition')]"),0));
+                List<WebElement> comps = region.findElements(By.xpath(".//div[contains(@class,'left-menu__list-item-region-compitition')]"));
+                for (WebElement competition:comps){
+                    competition.click();
+                    workWithPreloader();
+                    List<WebElement> games = driver.findElements(By.xpath("//div[contains(@class,'bets-block prematch-competition-games__item')]"));
+                    for (WebElement game : games){
+                        game.findElement(By.xpath(".//div[contains(@class,'bets-block__header-inner_left')]")).click();
+                        workWithPreloader();
+                        has = driver.findElements(By.xpath("//div[@class='game-container__bets-area-wrpr']//div[contains(@class,'bets-block')]//span[@class='bets-block__header-bet-name' and contains(@title,'Точный счет')]")).size();
+                        if (has==0){
+                            continue;
+                        }
+                        WebElement score = driver.findElement(By.xpath("//div[@class='game-container__bets-area-wrpr']//div[contains(@class,'bets-block')]//span[@class='bets-block__header-bet-name' and contains(@title,'Точный счет')]"));
+                        //          List<WebElement> scores = score.findElement(By.xpath("ancestor::div[@class='bets-block__header']/following-sibling::div[contains(@class,'bets-block__body')]")).findElements(By.xpath("./div[contains(@class,'bets-block__bet-cell')]//span[position()=2]"));
+                        List<WebElement> betsAll = score.findElement(By.xpath("ancestor::div[@class='bets-block__header']/following-sibling::div[contains(@class,'bets-block__body')]")).findElements(By.xpath("./div[contains(@class,'bets-block__bet-cell')]//span[position()=2]"));
+                        List<WebElement> betsFilter = betsAll.stream().filter(e->Float.valueOf(e.getAttribute("innerText"))>50.0).collect(Collectors.toList());
+                        if (betsFilter.size()==0){
+                            LOG.info("У текущей игры нет ставок с коэффициентом больше 50.0, значит и maxBet будт большим, даже проверять не будем. Попрообуем на следующей игре");
+                            continue;
+                        }
+                        LOG.info("Пройдемся по ставкам в этой игре, и поищем ту, у которой maxBet меньше " + betOk);
+                        for (WebElement bet:betsFilter){
+                            bet.click();
+                            new CouponPage().checkListOfCoupon();
+                            maxBet.click();
+                            actions.moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();
+                            wait.withMessage("При нажатии на кнопку МаксБет поле с размером ставки не заполнилось");
+                            wait.until(ExpectedConditions.attributeToBeNotEmpty(CouponPage.couponInputOrdinar,"value"));
+                            String max = CouponPage.couponInputOrdinar.getAttribute("value");
+                            if(Float.valueOf(max)<=Float.valueOf(betOk)){
+                                LOG.info("Найденная игра и ставка: " + game.getAttribute("innerText").replaceAll("\n"," ") +
+                                        " Ставка на точный счет " + bet.getAttribute("innerText"));
+                                return;
+                            }
+                            LOG.info("max=" + max);
+                            driver.findElement(By.xpath("//button[@class='btn btn_full-width']")).click();
+                            wait.until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'coupon__bet-block')]/div"),0));
+                        }
+                        LOG.info("" + game.getAttribute("innerText"));
+                        LOG.info("\nbetsFilter.size = " + betsFilter.size());
+                    }
+                }
+                region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();//сворачиваем регион
+            }
+            LOG.info("клик");
+        }
+    }
+
+    @ActionTitle("добавляем рандомное событие из Нулевой маржи")
+    public void addZeroMarginToCoupon(){
         WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
-        String by_games = "//div[contains(@class, 'bets-block__header bets-block__header_prematch')]";
-        By by_competitions = xpath("//li[@id='sport--14']/ul[@class='left-menu__submenu']//div[contains(@class,'left-menu__list-item-region-compitition')]");
-        closeSports();
-        wait.until(CommonStepDefs.elementIsOnPage(By.id("sport--14"),"Нет нулевой маржи!"));
-        driver.findElement(By.id("sport--14")).click();
-        List<WebElement> competitions =driver.findElements(by_competitions);
-        for (int i = 0; i < competitions.size(); i++) {
-            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by_competitions, competitions.size()-1));
-            wait.until(CommonStepDefs.elementIsOnPage((By.xpath(by_games)),"Не прогрузились игры"));
-            driver.findElements(by_competitions).get(i).click();
-            int size_games = driver.findElements(By.xpath(by_games)).size();
-            int by_size_zero_margin = driver.findElements(xpath(by_games + "/div[contains(@class, 'bets-block__header-inner bets-block__header-inner_right')]/i[@title='Нулевая маржа']")).size();
-            wait.withMessage("Количество игр и количество значков нулевой маржи не совпадают:" + by_size_zero_margin + " и " + size_games);
-            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(xpath(by_games + "/div[contains(@class, 'bets-block__header-inner bets-block__header-inner_right')]/i[@title='Нулевая маржа']"),size_games-1));
-            LOG.info("В разделе Нулевая маржа у каждой игры есть значок нулевой маржи");
-            }
-        }
-
-
-   @ActionTitle("добавляем рандомное событие из Нулевой маржи")
-    public void addZeroMarginToCoupon(){
-       WebDriver driver = PageFactory.getDriver();
-       WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
-       Random random = new Random();
-       List<WebElement> competitions =driver.findElements(xpath("//li[@id='sport--14']/ul[@class='left-menu__submenu']//div[contains(@class,'left-menu__list-item-region-compitition')]"));
-       competitions.get(1).click();
-       wait.until(CommonStepDefs.elementIsOnPage((By.xpath( "//div[contains(@class, 'bets-block__header bets-block__header_prematch')]")),"Не прогрузились игры"));
-       List<WebElement> coeffs = driver.findElements(xpath("//div[@class='bets-block prematch-competition-games__item']/div[contains(@class,'bets-block__body')]/div[contains(@class,'bets-block__bet-cell')]"));
-       int num = random.nextInt(Math.abs(coeffs.size()-1));
-       coeffs.get(num).click();
-   }
+        Random random = new Random();
+        List<WebElement> competitions =driver.findElements(xpath("//li[@id='sport--14']/ul[@class='left-menu__submenu']//div[contains(@class,'left-menu__list-item-region-compitition')]"));
+        competitions.get(1).click();
+        wait.until(CommonStepDefs.elementIsOnPage((By.xpath( "//div[contains(@class, 'bets-block__header bets-block__header_prematch')]")),"Не прогрузились игры"));
+        List<WebElement> coeffs = driver.findElements(xpath("//div[@class='bets-block prematch-competition-games__item']/div[contains(@class,'bets-block__body')]/div[contains(@class,'bets-block__bet-cell')]"));
+        int num = random.nextInt(Math.abs(coeffs.size()-1));
+        coeffs.get(num).click();
     }
+}
 
 
