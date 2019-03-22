@@ -1,5 +1,39 @@
 # language: ru
 Функционал: 5_Лайв, Прематч и динамическое меню
+#  Предыстория:
+#    * сохраняем в память
+#      | DEVID | randomNumber 4 |
+#
+#    * сохраняем в память
+#      | USER  | Default |
+#
+#    * сохраняем в память
+#      | PASSWORD  | Default |
+#
+#    * сохраняем в память
+#      | SOURCE | 16 |
+#
+#    * сохраняем в память
+#      | RID | 42-93-220-1553257444451-10 |
+#
+#    * сохраняем в память
+#      | WS_SWARM | Default |
+#
+#    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+#      | devId    | DEVID    |
+#      | email    | USER     |
+#      | pass     | PASSWORD |
+#      | source   | SOURCE   |
+#
+#    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+#
+#    * добавляем данные в JSON объект "PARAMS" сохраняем в память:
+#      | auth_token | AUTHTOKEN |
+#
+#    * запрос к тест-WSS "WS_SWARM" и сохраняем в "JSON_LIMITS_BY_WSS":
+#      | command | restore_login |
+#      | params  | PARAMS        |
+#      | rid     | RID           |
 
   @regress
   @ZeroMargin
