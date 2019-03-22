@@ -1,12 +1,14 @@
 package ru.gamble.pages;
 
 
+import cucumber.api.java.bs.A;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -62,7 +64,7 @@ public class CouponPage extends AbstractPage {
 
     @ElementTitle("Очистить всё")
     @FindBy(xpath = "//span[@class='btn btn_full-width']")
-    protected WebElement clearCoupon;
+    public static WebElement clearCoupon;
 
     @ElementTitle("Тип купона")
     @FindBy(xpath = "//div[contains(@class,'coupon__types')]//li[contains(@class,'selected')]")
@@ -79,7 +81,7 @@ public class CouponPage extends AbstractPage {
 
     @ElementTitle("поле суммы ставки Ординар")
     @FindBy(xpath = "//input[contains(@class,'input coupon__input') and not(@id='bet-input')]")
-    private WebElement couponInputOrdinar;
+    public static WebElement couponInputOrdinar;
 
     @ElementTitle("поле суммы ставки типа Система")
     @FindBy(xpath = "//input[contains(@class,'input coupon__input') and @id='bet-input']")
@@ -841,6 +843,108 @@ public class CouponPage extends AbstractPage {
             LOG.info("Проверили одну строчку");
         }
         LOG.info("Записи в 'Моих пари' и в купоне в 'заключенных пари' совпадают!");
+    }
+
+    @ActionTitle("вводит сумму ставки больше максимума")
+    public void superBet(){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        Actions actions = new Actions(driver);
+        LOG.info("Запоминаем максимум для выбранной ставки");
+        driver.findElement(By.xpath("//i[contains(@class,'icon-maxbet')]")).click();
+        actions.moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();
+        wait.withMessage("При нажатии на кнопку МаксБет поле с размером ставки не заполнилось");
+        wait.until(ExpectedConditions.attributeToBeNotEmpty(CouponPage.couponInputOrdinar,"value"));
+        String max = CouponPage.couponInputOrdinar.getAttribute("value");
+        LOG.info("maxBet = " + max);
+        LOG.info("Теперь увеличиваем ставку на 5 рублей");
+        Float superbetValue = Float.valueOf(max) + 5;
+        couponInputOrdinar.clear();
+        couponInputOrdinar.sendKeys(String.valueOf(superbetValue));
+    }
+
+    @ActionTitle("включаем в настройках купона 'принимать все изменения'")
+    public void acceptedAll(){
+        WebDriver driver = PageFactory.getDriver();
+        String xpathBet = "//input[contains(@class,'input coupon__input') and not(@id='bet-input')]";
+
+        int sizeCoupon = driver.findElements(xpath(xpathBet)).size();
+        int i = 0;
+        LOG.info("Ищем и нажимаем на шестерёнку в Купоне [" + i + "]");
+        WebElement gear = driver.findElement(xpath("//span[contains(@class,'coupon-tabs__item-link')]/i"));
+        gear.click();
+
+        LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
+        driver.findElement(xpath("//span[text()='Любые коэффициенты']")).click();
+        LOG.info("Возвращаемся к списку событий в купоне");
+        driver.findElement(xpath("//span[text()='Купон']")).click();
+    }
+
+    @ActionTitle("неудачно пытается заключить пари")
+    public void failDoBet(){
+        WebDriver driver = PageFactory.getDriver();
+        String expectedError = "Сумма пари превысила установленный лимит";
+        LOG.info("Жмём 'Заключить пари'");
+        buttonBet.click();
+        LOG.info("Прогресс-бар не должен заполниться до до конца, а должна появиться ошибка");
+        new WebDriverWait(driver,30)
+                .withMessage("За 30 секунд ошибка в купоне не появилась, а должна была")
+                .until(ExpectedConditions.numberOfElementsToBeMoreThan((By.xpath("//div[contains(@class,'coupon__message_error')]/div")),0));
+
+        checkExpectedErrorOnCoupon(expectedError);
+
+        LOG.info("Проверяем что ставка из купоне НЕ исчезла");
+        //Thread.sleep(10000);
+        Assert.assertFalse("В купоне не осталось ставок! Хотя ставка без включенного супербета не должна была заключаться, и значит не должна исчезать из купона",
+                driver.findElements(xpath("//ul[@class='coupon-bet__content']")).size()==0);
+    }
+
+    @ActionTitle("супербет")
+    public void onSuperBet(String onOrOff){
+        WebDriver driver = PageFactory.getDriver();
+        String active = driver.findElement(By.xpath("//input[contains(@id,'superBet')]")).getAttribute("class");
+        if (onOrOff.equals("включает")!=active.contains("not-empty")) {
+            driver.findElement(By.xpath("//input[contains(@id,'superBet')]/following-sibling::label[contains(@class,'coupon-btn_super-bet')]")).click();
+            CommonStepDefs.workWithPreloader();
+        }
+        new Actions(driver).moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();//это деалем потому что после нажатия на кнопку супербет или максимум - появляется уведомлялка и се закрывает!!!!! нужно сместить мышку чтобы эта уведомлялка исчезла и не мешала
+    }
+
+    private void checkExpectedErrorOnCoupon(String expError){
+        WebDriver driver = PageFactory.getDriver();
+        boolean flag = false;
+        List<String> allErrors = driver.findElements(By.xpath("//div[contains(@class,'coupon__message_error')]/div")).stream().map(e->e.getAttribute("innerText")).collect(Collectors.toList());
+        for (String error:allErrors){
+            flag|=error.replaceAll("[\\s|\\u00A0]+"," ").contains(expError);//replasceAll замеяет все символы, которые выглядят как пробел, но им не являются. заменяем на конкретно пробел. Спасибо фронту за такой отстой
+        }
+        Assert.assertTrue("В купоне нет той ошибки, что ожидалась: " + allErrors,flag);
+    }
+
+    @ActionTitle("заключает супербет-ставку")
+    public void superBetDo(){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,30);
+        LOG.info("После включения супербета размер ставки опять выставился на максимум. Нужно заново ввести сумму большую max");
+        String max = CouponPage.couponInputOrdinar.getAttribute("value");
+        Float superbetValue = Float.valueOf(max) + 5;
+        couponInputOrdinar.clear();
+        couponInputOrdinar.sendKeys(String.valueOf(superbetValue));
+       wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(xpath("//div[contains(@class,'coupon__button-group_bet')]"),0));
+        LOG.info("Жмём кнопку 'Предложить'");
+        driver.findElement(By.xpath("//button[@class='btn btn_coupon-small btn_green']")).click();
+        LOG.info("Ждём пока прогресс-бар принятия ставки заполнится на 100%");
+        new WebDriverWait(driver,30)
+                .withMessage("За 30 секунд прогресс-бар не стал равен 100%, значит ставка не принялась")
+                .until(ExpectedConditions.attributeContains((By.xpath("//*[contains(@class,'coupon__progress-count')]")),"innerText","100%"));
+
+        LOG.info("Ожидаем исчезновения из купона принятой ставки");
+        //Thread.sleep(10000);
+        new WebDriverWait(driver,20)
+                .withMessage("За 20 секунд ставка из купона так и не убралась")
+                .until(ExpectedConditions.numberOfElementsToBe(xpath("//ul[@class='coupon-bet__content']"),0));
+
+        BigDecimal sum = new BigDecimal(Float.toString(superbetValue)).setScale(2, RoundingMode.UP);
+        Stash.put("sumKey",sum.toString());
     }
 }
 
