@@ -12,9 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 //del /q C:\Workspace\autotests-888-m\allure-results
 @RunWith(Cucumber.class)
 @CucumberOptions(

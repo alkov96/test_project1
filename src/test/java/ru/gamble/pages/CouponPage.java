@@ -462,7 +462,7 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("заключает пари")
-    public void doBet() throws AuthenticationException, InterruptedException {
+    public void doBet() {
         WebDriver driver = PageFactory.getDriver();
         String xpathBet = "//input[contains(@class,'input coupon__input') and not(@id='bet-input')]";
 
@@ -743,7 +743,7 @@ public class CouponPage extends AbstractPage {
     }
 
     @ActionTitle("запоминает первые события в заключенных пари")
-    public void rememberHistoryInCoupon(String nameList){
+    public void rememberHistoryInCoupon(String nameList) {
         WebDriver driver = PageFactory.getDriver();
         int  cou = 3;
         List<BetFull> betsOnMyBets= new ArrayList<>();
@@ -767,10 +767,11 @@ public class CouponPage extends AbstractPage {
 
 
 
-    public BetFull remeberLineInHistoryCoupon(int ind) {
+    public BetFull remeberLineInHistoryCoupon(int ind)  {
 
         WebElement sumElement;
         WebDriver driver = PageFactory.getDriver();
+        waitForElementPresent(By.xpath("//div[@class='coupon__outcome-betslip-wrapper']/div[contains(@class,'coupon__bet-block')]"),10);
         WebElement element = driver.findElements(By.xpath("//div[@class='coupon__outcome-betslip-wrapper']/div[contains(@class,'coupon__bet-block')]")).get(ind);
         By xpathTypeBet = By.xpath("div[contains(@class,'coupon__outcome-betslip-title')]");
         SimpleDateFormat formatNo = new SimpleDateFormat("dd MMMM");

@@ -229,7 +229,7 @@ public class MyBetting extends AbstractPage {
                         assertThat(selectedOutcome).doesNotContain("Экспресс");
                     } else {
                         assertThat(selectedOutcome)
-                                .as("Ошибка! Текст [" + selectedOutcome + "] не соответсвует [" + betType + "]").contains(betType);
+                                .as("Ошибка! Текст [" + selectedOutcome + "] не соответсвует [" + betType + "").contains(betType);
                     }
                     LOG.info("Текст [" + selectedOutcome + "] соответсвует [" + betType + "]");
                     if (selectedOutcome.contains("Экспресс") || selectedOutcome.contains("Система")) {

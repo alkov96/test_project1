@@ -29,8 +29,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.in;
+import static org.openqa.selenium.By.xpath;
+import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
+import static org.openqa.selenium.support.ui.ExpectedConditions.not;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.PERIOD;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
@@ -935,4 +942,20 @@ public class EventViewerPage extends AbstractPage {
         }
     }
 }
+
+
+   @ActionTitle("добавляем рандомное событие из Нулевой маржи")
+    public void addZeroMarginToCoupon(){
+       WebDriver driver = PageFactory.getDriver();
+       WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
+       Random random = new Random();
+       List<WebElement> competitions =driver.findElements(xpath("//li[@id='sport--14']/ul[@class='left-menu__submenu']//div[contains(@class,'left-menu__list-item-region-compitition')]"));
+       competitions.get(1).click();
+       wait.until(CommonStepDefs.elementIsOnPage((By.xpath( "//div[contains(@class, 'bets-block__header bets-block__header_prematch')]")),"Не прогрузились игры"));
+       List<WebElement> coeffs = driver.findElements(xpath("//div[@class='bets-block prematch-competition-games__item']/div[contains(@class,'bets-block__body')]/div[contains(@class,'bets-block__bet-cell')]"));
+       int num = random.nextInt(Math.abs(coeffs.size()-1));
+       coeffs.get(num).click();
+   }
+    }
+
 

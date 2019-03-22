@@ -23,6 +23,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.AbstractPage;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -77,7 +78,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^запрашиваем дату-время и сохраняем в память$")
-    public static void requestAndSaveToMamory(DataTable dataTable){
+    public static void requestAndSaveToMamory(DataTable dataTable) {
         List<String> data = dataTable.asList(String.class);
         String key, value, date;
         key = data.get(0);
@@ -86,7 +87,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         if (value.equals("Current")) {
             date = formatter.format(System.currentTimeMillis());
-            Stash.put(key,date);
+            Stash.put(key, date);
             LOG.info(key + "<==[" + date + "]");
         }
     }
@@ -105,7 +106,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
         if (value.equals(DEFAULT)) {
             try {
-               value = JsonLoader.getData().get(STARTING_URL).get(key).getValue();
+                value = JsonLoader.getData().get(STARTING_URL).get(key).getValue();
             } catch (DataException e) {
                 e.getMessage();
             }
@@ -142,7 +143,7 @@ public class CommonStepDefs extends GenericStepDefs {
             value = "70" + Generators.randomNumber(9);
         }
 
-        if(value.equals(RANDOME_SEX)){
+        if (value.equals(RANDOME_SEX)) {
             value = Generators.randomGender();
         }
 
@@ -165,12 +166,12 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info("Найдено прелоадеров [" + preloaders.size() + "]");
             driverWait.until(ExpectedConditions.invisibilityOfAllElements(preloaders));
             LOG.info("Прелоадеры закрылись");
-        }catch (Exception e){
+        } catch (Exception e) {
         }
     }
 
     @Когда("^разлогиниваем пользователя$")
-    public void logOut(){
+    public void logOut() {
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Переход на главную страницу");
         goToMainPage("site");
@@ -179,7 +180,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-    private void descktopSiteLogOut(WebDriver driver){
+    private void descktopSiteLogOut(WebDriver driver) {
         try {
             LOG.info("Ищем наличие кнопки с силуетом пользователя.");
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
@@ -188,10 +189,10 @@ public class CommonStepDefs extends GenericStepDefs {
             Thread.sleep(1000);
             LOG.info("Ищем кнопку 'Выход' и нажимаем");
             driver.findElement(By.id("log-out-button")).click();
-            new WebDriverWait(driver,15)
+            new WebDriverWait(driver, 15)
                     .withMessage("Разлогинивали-разлогинивали, да не ралогинили. На сайте все еще кто-то авторизован")
                     .until(ExpectedConditions.not(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon"))));
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.info("На сайте никто не авторизован");
         }
 
@@ -199,7 +200,7 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Обновили страницу на всякий случай");
     }
 
-    private void mobileSiteLogOut(WebDriver driver){
+    private void mobileSiteLogOut(WebDriver driver) {
         try {
             LOG.info("Ищем наличие ссылки депозита.");
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/private/balance/deposit']")));
@@ -210,7 +211,7 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info("Ищем кнопку 'Выход' нажимаем и обновляем страницу");
             driver.findElement(By.xpath("//span[contains(.,'Выход')]")).click();
             driver.navigate().refresh();
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.info("На сайте никто не авторизован");
         }
     }
@@ -231,28 +232,29 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * Метод параметризованного перехода на страницу по siteUrl
      * или по-умолчанию указанную в файле application.properties
+     *
      * @param siteUrl - URL страницы
      */
     @Когда("^переходит на страницу '(.+)'$")
     public static void goToMainPage(String siteUrl) {
         String currentUrl;
         try {
-        switch (siteUrl) {
-            case "site":
-                currentUrl = Stash.getValue("MAIN_URL");
-                break;
-            case "admin":
-                currentUrl = JsonLoader.getData().get(STARTING_URL).get("ADMIN_URL").getValue();
-                break;
-            case "registr":
-                currentUrl = JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
-            default:
-                currentUrl = siteUrl;
-                break;
-        }
-        PageFactory.getWebDriver().get(currentUrl);
+            switch (siteUrl) {
+                case "site":
+                    currentUrl = Stash.getValue("MAIN_URL");
+                    break;
+                case "admin":
+                    currentUrl = JsonLoader.getData().get(STARTING_URL).get("ADMIN_URL").getValue();
+                    break;
+                case "registr":
+                    currentUrl = JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
+                default:
+                    currentUrl = siteUrl;
+                    break;
+            }
+            PageFactory.getWebDriver().get(currentUrl);
             LOG.info("Перешли на страницу [" + currentUrl + "]");
-        }catch (DataException e) {
+        } catch (DataException e) {
             LOG.error(e.getMessage());
         }
 
@@ -271,10 +273,10 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^определяем \"([^\"]*)\" пользователя \"([^\"]*)\"$")
-    public static void getUserID(String key,String keyEmail) {
+    public static void getUserID(String key, String keyEmail) {
         String sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(keyEmail) + "'";
         String id = workWithDBgetResult(sqlRequest, "id");
-        Stash.put(key,id);
+        Stash.put(key, id);
     }
 
 
@@ -326,7 +328,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         PageFactory.getInstance().getPage(title);
     }
-
 
 
     /**
@@ -451,7 +452,7 @@ public class CommonStepDefs extends GenericStepDefs {
      *
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      */
-    public void checkLinkToGame(){
+    public void checkLinkToGame() {
         WebDriver driver = PageFactory.getDriver();
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         workWithPreloader();
@@ -545,10 +546,10 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^(пользователь |он) очищает cookies$")
     public static void cleanCookies() {
         try {
-        if(PageFactory.getWebDriver().manage().getCookies().size()>0) {
-            LOG.info("Удаляем Cookies");
-            PageFactory.getWebDriver().manage().deleteAllCookies();
-        }
+            if (PageFactory.getWebDriver().manage().getCookies().size() > 0) {
+                LOG.info("Удаляем Cookies");
+                PageFactory.getWebDriver().manage().deleteAllCookies();
+            }
         } catch (Exception e) {
             LOG.error("Cookies не было!");
         }
@@ -597,10 +598,11 @@ public class CommonStepDefs extends GenericStepDefs {
 
     /**
      * функиця, которая ждет пока элмент станет доступным. ждет, но не кликает
+     *
      * @param element
      * @throws Exception
      */
-    public static void waitEnabled(WebElement element){
+    public static void waitEnabled(WebElement element) {
         int count = 20;
         try {
             while (count > 0) {
@@ -626,24 +628,23 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-
     @Когда("^выбираем одну дату из \"([^\"]*)\" и сохраняем в \"([^\"]*)\" а id_user в \"([^\"]*)\"$")
     public void selectOneDateInResponce(String keyResponce, String keyDate, String keyId) throws ParseException {
         SimpleDateFormat oldFormat = new SimpleDateFormat("dd.MM.yyyy kk:mm");
         SimpleDateFormat newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
         String actual = JSONValue.toJSONString(Stash.getValue(keyResponce));
-        actual = actual.replace("{\"code\":0,\"data\":","").replace("}","");
+        actual = actual.replace("{\"code\":0,\"data\":", "").replace("}", "");
         String[] linesResponce = actual.split("swarmUserId");
-        int i = 1+new Random().nextInt(linesResponce.length-1);
-        String idUser = actual.split("swarmUserId")[i].replace("\":","").split(",")[0];
+        int i = 1 + new Random().nextInt(linesResponce.length - 1);
+        String idUser = actual.split("swarmUserId")[i].replace("\":", "").split(",")[0];
         String dateForUser = null;
-        if (actual.contains("videoIdentDate")){
-            dateForUser = actual.split("videoIdentDate")[i].replace("\":","").split(",")[0].replaceAll("\"","");
+        if (actual.contains("videoIdentDate")) {
+            dateForUser = actual.split("videoIdentDate")[i].replace("\":", "").split(",")[0].replaceAll("\"", "");
             oldFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm:ss");
             newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         }
-        if (actual.contains("skypeSendDate")){
-            dateForUser = actual.split("skypeSendDate")[i].replace("\":","").split(",")[0].replaceAll("\"","");
+        if (actual.contains("skypeSendDate")) {
+            dateForUser = actual.split("skypeSendDate")[i].replace("\":", "").split(",")[0].replaceAll("\"", "");
             oldFormat = new SimpleDateFormat("dd.MM.yyyy kk:mm");
             newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
         }
@@ -654,38 +655,38 @@ public class CommonStepDefs extends GenericStepDefs {
         Calendar newDateTime = new GregorianCalendar();
 
         newDateTime.setTime(oldFormat.parse(dateForUser));
-        newDateTime.add(Calendar.MINUTE,-1);
+        newDateTime.add(Calendar.MINUTE, -1);
         LOG.info("Теперь переведем дату в нужны формат");
-        dateForUser = newFormat.format(newDateTime.getTime()).replace(" ","T")+":00";
+        dateForUser = newFormat.format(newDateTime.getTime()).replace(" ", "T") + ":00";
 
-        Stash.put(keyDate,dateForUser);
-        Stash.put(keyId,idUser);
+        Stash.put(keyDate, dateForUser);
+        Stash.put(keyId, idUser);
 
         LOG.info("Новая дата: " + dateForUser);
     }
 
 
     @Когда("^проверка что в ответе \"([^\"]*)\" нет юзера с \"([^\"]*)\"$")
-    public void checkResponceNotConains(String keyResponce, String keyId){
+    public void checkResponceNotConains(String keyResponce, String keyId) {
         String actual = JSONValue.toJSONString(Stash.getValue(keyResponce));
         String userId = Stash.getValue(keyId);
-        Assert.assertFalse("В ответе есть пользователь "  + userId + ", хотя он не вписывается в заданные ts и ts_end:" + Stash.getValue("PARAMS"),
+        Assert.assertFalse("В ответе есть пользователь " + userId + ", хотя он не вписывается в заданные ts и ts_end:" + Stash.getValue("PARAMS"),
                 actual.contains("\"swarmUserId\":" + userId));
         LOG.info("В ответе действительно теперь нет записи о пользователе с id=" + userId);
     }
 
     @Когда("^проверка что в ответе \"([^\"]*)\" верные даты  \"([^\"]*)\":$")
-    public void checkResponceAPIgoodDate(String keyStash, String keyParams) throws ParseException{
+    public void checkResponceAPIgoodDate(String keyStash, String keyParams) throws ParseException {
         String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        String params =  Stash.getValue(keyParams).toString();
+        String params = Stash.getValue(keyParams).toString();
         SimpleDateFormat formatTS = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         SimpleDateFormat formatResponse = new SimpleDateFormat("dd.MM.yyy hh:mm");
-        String ts = params.split("ts=")[1].substring(0,16).replace("T"," ");
+        String ts = params.split("ts=")[1].substring(0, 16).replace("T", " ");
         Date tsDate = formatTS.parse(ts);
         Date tsEndDate = new Date();
         String ts_end = null;
-        if (params.contains("ts_end")){
-            ts_end = params.split("ts_end=")[1].substring(0,16).replace("T"," ");
+        if (params.contains("ts_end")) {
+            ts_end = params.split("ts_end=")[1].substring(0, 16).replace("T", " ");
             tsEndDate = formatTS.parse(ts_end);
         }
 
@@ -693,23 +694,23 @@ public class CommonStepDefs extends GenericStepDefs {
 
         Date dateInResponce = new Date();
         boolean a;
-        for (int i=1; i<actual.split("\"skypeSendDate"+"\":").length; i++){
-            dateInResponceString = actual.split("\"skypeSendDate"+"\":")[i].split("}")[0].replaceAll("\"","");
+        for (int i = 1; i < actual.split("\"skypeSendDate" + "\":").length; i++) {
+            dateInResponceString = actual.split("\"skypeSendDate" + "\":")[i].split("}")[0].replaceAll("\"", "");
             dateInResponce = formatResponse.parse(dateInResponceString);
             Assert.assertTrue("В ответе есть результаты, выходящие за пределы ts-ts_end (" + ts + "   ---   " + ts_end + ")"
-                    +":\n" + dateInResponceString,
+                            + ":\n" + dateInResponceString,
                     dateInResponce.after(tsDate) && dateInResponce.before(tsEndDate));
         }
         LOG.info("Да, все результаты запроса вписываются по времени в значения ts и ts_end");
     }
 
     @Когда("^проверка что ответ \"([^\"]*)\" \"([^\"]*)\"$")
-    public void checkResponceFill(String keyStash,String isEmpty) throws ParseException{
+    public void checkResponceFill(String keyStash, String isEmpty) throws ParseException {
         String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        actual = actual.replace("{\"code\":0,\"data\":","").replace("}","");
-        boolean expectedEmpty=isEmpty.equals("пустой");
+        actual = actual.replace("{\"code\":0,\"data\":", "").replace("}", "");
+        boolean expectedEmpty = isEmpty.equals("пустой");
         Assert.assertTrue("Ожидалось что результат будет " + isEmpty + ", но это не так.\n" + actual,
-                actual.equals("[]")==expectedEmpty);
+                actual.equals("[]") == expectedEmpty);
         LOG.info("Да, RESPONCE действительно " + isEmpty);
     }
 
@@ -720,7 +721,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
         String expected = table.get("exepted");
         boolean actualsOk = actual.contains(expected.split("or")[0].trim()) || actual.contains(expected.split("or")[1].trim());
-        Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|",actualsOk);
+        Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|", actualsOk);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 
@@ -731,9 +732,9 @@ public class CommonStepDefs extends GenericStepDefs {
         ObjectMapper mapper = new ObjectMapper();
 
         //Преобразуем в строку JSON-объект в зависимости от его структуры
-        if(JSONValue.isValidJson(Stash.getValue(sourceString).toString())){
-            tmp  = Stash.getValue(sourceString).toString();
-        }else {
+        if (JSONValue.isValidJson(Stash.getValue(sourceString).toString())) {
+            tmp = Stash.getValue(sourceString).toString();
+        } else {
             tmp = JSONValue.toJSONString(Stash.getValue(sourceString));
         }
 
@@ -758,24 +759,23 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-
-    private static Map<String,String> workWithDBgetTwoRows(String sqlRequest) {
+    private static Map<String, String> workWithDBgetTwoRows(String sqlRequest) {
         Connection con = DBUtils.getConnection();
         Statement stmt;
         PreparedStatement ps = null;
         ResultSet rs;
-        Map<String,String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>();
         try {
             con.setAutoCommit(false);// Отключаем автокоммит
             stmt = con.createStatement();
             rs = stmt.executeQuery(sqlRequest);
             con.commit();
-           // rs.last();
-            while (rs.next()){
-                result.put(rs.getString(1),rs.getString(2));
+            // rs.last();
+            while (rs.next()) {
+                result.put(rs.getString(1), rs.getString(2));
             }
 
-            if(result.isEmpty()){
+            if (result.isEmpty()) {
                 throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
             }
             LOG.info("SQL-request [" + result + "]");
@@ -803,7 +803,7 @@ public class CommonStepDefs extends GenericStepDefs {
             rs.last();
             result = rs.getString(param);
 
-            if(result.isEmpty()){
+            if (result.isEmpty()) {
                 throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул [" + result + "]");
             }
             LOG.info("SQL-request [" + result + "]");
@@ -826,7 +826,7 @@ public class CommonStepDefs extends GenericStepDefs {
             stmt = con.createStatement();
             rs = stmt.executeQuery(sqlRequest);
             rs.last();
-            result = rs.getString(1).replaceAll("\n","").replaceAll(" +"," ");
+            result = rs.getString(1).replaceAll("\n", "").replaceAll(" +", " ");
             LOG.info("SQL-request [" + result + "]");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -838,10 +838,11 @@ public class CommonStepDefs extends GenericStepDefs {
 
     /**
      * запрос на БД и сохранение всего ответа в map
+     *
      * @param sqlRequest
      * @return
      */
-    private static void workWithDBresult(String sqlRequest){
+    private static void workWithDBresult(String sqlRequest) {
         Connection con = DBUtils.getConnection();
         Statement stmt;
         PreparedStatement ps = null;
@@ -853,23 +854,23 @@ public class CommonStepDefs extends GenericStepDefs {
             rs.last();
             ResultSetMetaData allRows = rs.getMetaData();
             int count = allRows.getColumnCount();
-            if(count == 0){
+            if (count == 0) {
                 throw new AutotestError("Ошибка! Запрос к базе [" + sqlRequest + "] вернул кол-во результатов [" + count + "]");
             }
-            for (int i = 1; i <= count; i++){
+            for (int i = 1; i <= count; i++) {
                 String key = allRows.getColumnName(i);
                 String value = rs.getString(key);
-                for (String part: key.split("_")){
+                for (String part : key.split("_")) {
                     keyNormal.append(part);
                 }
                 LOG.info(keyNormal + "=" + value);
-                if(keyNormal.toString().toUpperCase().equals("PASSWORD")){
+                if (keyNormal.toString().toUpperCase().equals("PASSWORD")) {
                     continue;
                 }
-                Stash.put(keyNormal.toString().toUpperCase(),value);
+                Stash.put(keyNormal.toString().toUpperCase(), value);
                 keyNormal.setLength(0);
             }
-            } catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             DBUtils.closeAll(con, null, null);
@@ -877,17 +878,15 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-
-
-    private static void workWithDBresultTwoRows(String sqlRequest,String keyForMap){
+    private static void workWithDBresultTwoRows(String sqlRequest, String keyForMap) {
         Connection con = DBUtils.getConnection();
         Statement stmt;
         PreparedStatement ps = null;
         ResultSet rs;
         StringBuilder keyNormal = new StringBuilder();
         ResultSetMetaData allRows;
-        String key,value;
-        Map<String,String> mapResult = new HashMap<>();
+        String key, value;
+        Map<String, String> mapResult = new HashMap<>();
 
         try {
             stmt = con.createStatement();
@@ -915,43 +914,43 @@ public class CommonStepDefs extends GenericStepDefs {
                     mapResult.put(keyNormal.toString().toUpperCase(), value);
                     keyNormal.setLength(0);
                 }
-            }while (rs.next());
+            } while (rs.next());
 
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             DBUtils.closeAll(con, null, null);
         }
-        Stash.put(keyForMap,mapResult);
+        Stash.put(keyForMap, mapResult);
     }
 
 
     @Before(value = "@ChangePassword_C1043")
     public void saveCurrentPassword() throws DataException {
-       String email = null;
+        String email = null;
         WebDriver driver = PageFactory.getWebDriver();
         Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
         String browserName = caps.getBrowserName();
         if (browserName.contains("chrome")) {
             email = JsonLoader.getData().get(STARTING_URL).get("USER_CHROME").getValue();
-        }else {
+        } else {
             email = JsonLoader.getData().get(STARTING_URL).get("USER_FIREFOX").getValue();
-            }
+        }
 
-        String sqlRequest = "select password from gamebet.`user` WHERE `email` = '"+email+"'";
+        String sqlRequest = "select password from gamebet.`user` WHERE `email` = '" + email + "'";
         String currentPassword = workWithDBgetResult(sqlRequest);
         Stash.put("currentUser", email);
         Stash.put("currentPassword", currentPassword);
-        LOG.info("Записали хэш текущего пароля "+currentPassword+" для пользователя "+email);
+        LOG.info("Записали хэш текущего пароля " + currentPassword + " для пользователя " + email);
     }
 
-    @After(value="@ChangePassword_C1043")
-    public void revertCurrentPassword(){
-        String sqlRequest = "update gamebet.`user` set password = '"+Stash.getValue("currentPassword")+"' WHERE `email` = '"+Stash.getValue("currentUser")+"'";
+    @After(value = "@ChangePassword_C1043")
+    public void revertCurrentPassword() {
+        String sqlRequest = "update gamebet.`user` set password = '" + Stash.getValue("currentPassword") + "' WHERE `email` = '" + Stash.getValue("currentUser") + "'";
         workWithDB(sqlRequest);
-        sqlRequest = "select password from gamebet.`user` WHERE `email` = '"+Stash.getValue("currentUser")+"'";
+        sqlRequest = "select password from gamebet.`user` WHERE `email` = '" + Stash.getValue("currentUser") + "'";
         String changeCheck = workWithDBgetResult(sqlRequest);
-        LOG.info("вернули изначальный пароль "+changeCheck+" для пользователя "+Stash.getValue("currentUser"));
+        LOG.info("вернули изначальный пароль " + changeCheck + " для пользователя " + Stash.getValue("currentUser"));
     }
 
 //    @After(value = "@LeftMenuTriggersPrematch_C1057")
@@ -963,11 +962,10 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void confirmPhone(String keyCode, String keyPhone, String type) {
         String phone = Stash.getValue(keyPhone);
         String sqlRequest;
-        if (type.equals("новый")){
-            sqlRequest="SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "') ORDER BY creation_date";
-        }
-        else {
-            sqlRequest="SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
+        if (type.equals("новый")) {
+            sqlRequest = "SELECT code FROM gamebet. `useroperation` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "') ORDER BY creation_date";
+        } else {
+            sqlRequest = "SELECT code FROM gamebet. `phoneconfirmationcode` WHERE phone='" + phone + "' ORDER BY creation_date";
         }
         String code = workWithDBgetResult(sqlRequest, "code");
         Stash.put(keyCode, code);
@@ -975,7 +973,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^получаем и сохраняем в память все строки для достависты телефона \"([^\"]*)\"$")
-    public static void getAllRowsForDostavista(String keyPhone){
+    public static void getAllRowsForDostavista(String keyPhone) {
         String phone = Stash.getValue(keyPhone);
         String sqlRequest;
         sqlRequest = "SELECT * FROM gamebet. `dostavistaorder` WHERE user_id IN (SELECT id FROM gamebet. `user` WHERE phone='" + phone + "')";
@@ -987,9 +985,9 @@ public class CommonStepDefs extends GenericStepDefs {
     public void requestESB(String path, String keyStash, DataTable dataTable) {
         try {
             StringBuilder fullPath = new StringBuilder();
-            fullPath.append(JsonLoader.getData().get(STARTING_URL).get("ESB_URL").getValue() +  "/" + path);
+            fullPath.append(JsonLoader.getData().get(STARTING_URL).get("ESB_URL").getValue() + "/" + path);
             LOG.info("Строчка запроса: " + fullPath);
-            requestByHTTP(fullPath.toString(),keyStash,dataTable,"POST");
+            requestByHTTP(fullPath.toString(), keyStash, dataTable, "POST");
         } catch (DataException e) {
             e.printStackTrace();
         }
@@ -1011,10 +1009,10 @@ public class CommonStepDefs extends GenericStepDefs {
         String birthDateString = Stash.getValue("BIRTHDATE");
         SimpleDateFormat formatDate = new SimpleDateFormat();
         formatDate.applyPattern("dd.MM.yyyy");
-        if (birthDateString.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")){
+        if (birthDateString.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) {
             SimpleDateFormat formatgut = new SimpleDateFormat();
             formatgut.applyPattern("yyyy-MM-dd");
-            birthDateString=formatDate.format(formatgut.parse(birthDateString));
+            birthDateString = formatDate.format(formatgut.parse(birthDateString));
         }
 
         Date birthDate = formatDate.parse(birthDateString);
@@ -1062,7 +1060,7 @@ public class CommonStepDefs extends GenericStepDefs {
         formatgut.applyPattern("yyyy-MM-dd");
         String data = Stash.getValue(keyData);
         try {
-            data=formatgut.format(formatDate.parse(data));
+            data = formatgut.format(formatDate.parse(data));
             Stash.put(keyData, data);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -1085,8 +1083,8 @@ public class CommonStepDefs extends GenericStepDefs {
                 value = entry.getValue();
             }
             //Если попадются числовые значения, в JSON объект кладём как строку
-            if (value instanceof String && !StringUtils.isBlank((String) value) &&  ((String) value).matches("[0-9]+")) {
-                String str  = (String) value;
+            if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
+                String str = (String) value;
                 jsonObject.put(key, value);
             } else {
                 jsonObject.put(key, JSONValue.parse(String.valueOf(value)));
@@ -1101,13 +1099,13 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void confirmEmail(String keyPhone) {
         String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone";
         String phoneLast = workWithDBgetResult(sqlRequest, "phone");
-        String phone = "7333001" + String.format("%4s",Integer.valueOf(phoneLast.substring(7))+1).replace(' ','0');
+        String phone = "7333001" + String.format("%4s", Integer.valueOf(phoneLast.substring(7)) + 1).replace(' ', '0');
         Stash.put(keyPhone, phone);
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
 
     @Когда("^подтверждаем скайп через админку \"([^\"]*)\"$")
-    public void skypeConfirm(String keyPhone) throws Exception{
+    public void skypeConfirm(String keyPhone) throws Exception {
         WebDriver driver = PageFactory.getDriver();
         String registrationUrl = "https://test-int-bet-dbproca.tsed.orglot.office/admin/";
         String currentHandle = driver.getWindowHandle();
@@ -1140,10 +1138,10 @@ public class CommonStepDefs extends GenericStepDefs {
 
         PageFactory.getActions().doubleClick(driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../.."))).build().perform();
         driver.findElement(By.id("editDataBtn-btnEl")).click();
-        int yy  =driver.findElement(By.id("confirmSkypeMenuBtn-btnWrap")).getLocation().getY() + 116;
+        int yy = driver.findElement(By.id("confirmSkypeMenuBtn-btnWrap")).getLocation().getY() + 116;
         int xx = driver.findElement(By.id("confirmSkypeMenuBtn-btnWrap")).getLocation().getX() + 156;
         Robot robot = new Robot();
-        robot.mouseMove(xx,yy);
+        robot.mouseMove(xx, yy);
         robot.delay(500);
         robot.mousePress(InputEvent.BUTTON1_MASK);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
@@ -1152,7 +1150,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^в админке смотрим id пользователя \"([^\"]*)\" \"([^\"]*)\"$")
-    public void getIDFromAdmin(String keyPhone,String keyId) throws Exception{
+    public void getIDFromAdmin(String keyPhone, String keyId) throws Exception {
         WebDriver driver = PageFactory.getDriver();
         String registrationUrl = "https://test-int-bet-dbproca.tsed.orglot.office/admin/";
         String currentHandle = driver.getWindowHandle();
@@ -1184,7 +1182,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String phone = Stash.getValue(keyPhone);
 
         String id = driver.findElement(By.xpath("//td[@role='gridcell']/div[text()='" + phone + "']/../../td[1]/div")).getAttribute("innerText");
-        Stash.put(keyId,id);
+        Stash.put(keyId, id);
     }
 
 
@@ -1197,9 +1195,9 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^смотрим изменился ли статус \"([^\"]*)\" на \"([^\"]*)\"$")
-    public void checkEventType(String keyEventType,String myEvent) throws InterruptedException {
-        String eventType =Stash.getValue(keyEventType);
-        if (!eventType.equals(myEvent)){
+    public void checkEventType(String keyEventType, String myEvent) throws InterruptedException {
+        String eventType = Stash.getValue(keyEventType);
+        if (!eventType.equals(myEvent)) {
             Assertions.fail("Статус события и статус в БД  не совпадают!");
         }
         LOG.info("Тип события совпадает: " + eventType + " и " + myEvent);
@@ -1207,14 +1205,15 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^смотрим изменился ли \"([^\"]*)\" из \"([^\"]*)\"$")
-    public void checkTimeLeft(String keyTimeLeft,String keyResponse) {
-        Integer timewasS =Stash.getValue(keyTimeLeft);
-        fingingAndSave(keyTimeLeft,keyResponse);
+    public void checkTimeLeft(String keyTimeLeft, String keyResponse) {
+        Integer timewasS = Stash.getValue(keyTimeLeft);
+        fingingAndSave(keyTimeLeft, keyResponse);
         Integer timenowS = Stash.getValue(keyTimeLeft);
-        if (timenowS.compareTo(timewasS)>=0){
+        if (timenowS.compareTo(timewasS) >= 0) {
             Assertions.fail("Время ожидани звонка скайп не изменилось");
         }
     }
+
     @Когда("^ожидание \"([^\"]*)\" сек$")
     public static void justsleep(String sleep) throws InterruptedException {
         long mcsleep = Long.parseLong(sleep) * 1000;
@@ -1226,13 +1225,13 @@ public class CommonStepDefs extends GenericStepDefs {
      * и возвращает либо значение по искомогу ключу или null
      *
      * @param keyJSONObject - Ключ объекта из памяти
-     * @param dataTable - таблица проверяемых параметров
+     * @param dataTable     - таблица проверяемых параметров
      */
     @Когда("^проверка полей и типов в ответе \"([^\"]*)\":$")
     public void checkFieldsAndTypesInResponse(String keyJSONObject, DataTable dataTable) {
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String param, type, currentValue;
-        Object json =  Stash.getValue(keyJSONObject);
+        Object json = Stash.getValue(keyJSONObject);
 
         for (Map<String, String> aTable : table) {
             param = aTable.get(PARAMETER);
@@ -1244,51 +1243,54 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     private Boolean checkType(String value, String type) {
-            if (type.equals("Long")) {
-                Long.valueOf(value);
-                return true;
-            }if (type.equals("Integer")) {
-                Integer.valueOf(value);
-                return true;
-            }if (type.equals("Timestamp")) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-                Date date = new Date(Long.valueOf(value));
-                simpleDateFormat.format(date);
-                return true;
-            }if(type.equals("Boolean")){
-                Boolean.valueOf(value);
-                return true;
-            }
-            if(type.equals("String")) {
-                String.valueOf(value);
-                return true;
-            }
-            if(type.equals("List")){
-                List<Object> items = Collections.singletonList(JSONValue.parse(value));
-                return true;
-            }
-            return false;
+        if (type.equals("Long")) {
+            Long.valueOf(value);
+            return true;
+        }
+        if (type.equals("Integer")) {
+            Integer.valueOf(value);
+            return true;
+        }
+        if (type.equals("Timestamp")) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+            Date date = new Date(Long.valueOf(value));
+            simpleDateFormat.format(date);
+            return true;
+        }
+        if (type.equals("Boolean")) {
+            Boolean.valueOf(value);
+            return true;
+        }
+        if (type.equals("String")) {
+            String.valueOf(value);
+            return true;
+        }
+        if (type.equals("List")) {
+            List<Object> items = Collections.singletonList(JSONValue.parse(value));
+            return true;
+        }
+        return false;
     }
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
-    public void searchUserStatus2(String status,String keyEmail) {
-      //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7333%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
+    public void searchUserStatus2(String status, String keyEmail) {
+        //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7333%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
-        searchUser(keyEmail,sqlRequest);
+        searchUser(keyEmail, sqlRequest);
     }
 
     @Когда("^ищем пользователя с ограничениями \"([^\"]*)\"$")
     public void searchUserAlt(String keyEmail) {
         //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
-       // String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND (phone LIKE '7333002%' OR phone LIKE '7111002%') ORDER BY id DESC";
+        // String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND (phone LIKE '7333002%' OR phone LIKE '7111002%') ORDER BY id DESC";
         //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND phone LIKE '7333%' ORDER BY id DESC";
 
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND email = '" + Stash.getValue("EMAIL") + "' AND phone LIKE '7333%' ORDER BY id DESC";
-        searchUser(keyEmail,sqlRequest);
+        searchUser(keyEmail, sqlRequest);
     }
 
     @Когда("^обновляем оферту пользователю \"([^\"]*)\" \"([^\"]*)\"$")
-    public static void offertUpdate(String offer_state,String keyEmail) {
+    public static void offertUpdate(String offer_state, String keyEmail) {
         String sqlRequest = "UPDATE gamebet.`user` SET offer_state=" + offer_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
 
@@ -1296,14 +1298,14 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^запоминаем дату рождения пользователя \"([^\"]*)\" \"([^\"]*)\"$")
-    public static void rememberBirthDate(String keyBD,String keyEmail) throws ParseException {
-        String sqlRequest = "SELECT birth_date FROM gamebet.`user` WHERE email='"+Stash.getValue(keyEmail) + "'";
+    public static void rememberBirthDate(String keyBD, String keyEmail) throws ParseException {
+        String sqlRequest = "SELECT birth_date FROM gamebet.`user` WHERE email='" + Stash.getValue(keyEmail) + "'";
         String birthDate = workWithDBgetResult(sqlRequest, "birth_date");
         SimpleDateFormat formatDate = new SimpleDateFormat();
         SimpleDateFormat formatgut = new SimpleDateFormat();
         formatgut.applyPattern("dd.MM.yyyy");
         formatDate.applyPattern("yyyy-MM-dd");
-        birthDate=formatgut.format(formatDate.parse(birthDate));
+        birthDate = formatgut.format(formatDate.parse(birthDate));
         Stash.put(keyBD, birthDate);
         LOG.info("Дата рождения: " + birthDate);
     }
@@ -1312,7 +1314,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void checkValueOfFieldsInResponse(String keyJSONObject, DataTable dataTable) {
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String param, value, currentValue, tmp;
-        Object json =  Stash.getValue(keyJSONObject);
+        Object json = Stash.getValue(keyJSONObject);
 
         for (Map<String, String> aTable : table) {
             param = aTable.get(PARAMETER);
@@ -1375,30 +1377,28 @@ public class CommonStepDefs extends GenericStepDefs {
 //        }
 
 
-
-
         StringBuilder lal = new StringBuilder();
-        FileReader file = new FileReader("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
+        FileReader file = new FileReader("src" + sep + "test" + sep + "resources" + sep + "full_alt.txt");
         Scanner scan = new Scanner(file);
 //lal.append(scan.next());
 
         String user = scan.nextLine();
-        String separator = user.contains("\t") ?"\t":"\\s";
+        String separator = user.contains("\t") ? "\t" : "\\s";
         String phone = user.trim().split(separator)[0];
         String birthDate = user.trim().split(separator)[1];
         SimpleDateFormat formatDate = new SimpleDateFormat();
         SimpleDateFormat formatgut = new SimpleDateFormat();
         formatgut.applyPattern("dd.MM.yyyy");
         formatDate.applyPattern("yyyy-MM-dd");
-        birthDate=formatgut.format(formatDate.parse(birthDate));
-        Stash.put(keyPhone,phone);
-        Stash.put(keyBD,birthDate);
+        birthDate = formatgut.format(formatDate.parse(birthDate));
+        Stash.put(keyPhone, phone);
+        Stash.put(keyBD, birthDate);
 
-        while (scan.hasNext()){
+        while (scan.hasNext()) {
             lal.append(scan.nextLine()).append(System.lineSeparator());
         }
 
-        FileWriter nfile = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt",false);
+        FileWriter nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "full_alt.txt", false);
         nfile.write(lal.toString());
         nfile.close();
         file.close();
@@ -1408,11 +1408,11 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^поиск пользователя проходившего ускоренную регистрацию \"([^\"]*)\"$")
     public void searchUserNotPD(String keyEmail) {
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE tsupis_status IN (1,2) AND personal_data_state=1 AND email LIKE 'testregistrator+%'";
-        searchUser(keyEmail,sqlRequest);
+        searchUser(keyEmail, sqlRequest);
     }
 
     @Когда("^сбрасываем пользователю статус ПД до \"([^\"]*)\" \"([^\"]*)\"$")
-    public static void updatePDState(String peronal_data_state,String keyEmail) {
+    public static void updatePDState(String peronal_data_state, String keyEmail) {
         String sqlRequest = "UPDATE gamebet.`user` SET personal_data_state=" + peronal_data_state + " WHERE `email` = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
     }
@@ -1424,7 +1424,7 @@ public class CommonStepDefs extends GenericStepDefs {
         StringBuilder setter = new StringBuilder();
         table.forEach((key, value) -> setter.append(key).append("=").append(value).append(","));
         LOG.info(setter.toString());
-        String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length()-1,setter.length()).toString() +  " WHERE email = '" + Stash.getValue(keyEmail) + "'";
+        String sqlRequest = "UPDATE gamebet.`user` SET " + setter.delete(setter.length() - 1, setter.length()).toString() + " WHERE email = '" + Stash.getValue(keyEmail) + "'";
         workWithDB(sqlRequest);
     }
 
@@ -1434,7 +1434,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String key;
         Object value, selectedObject = null;
         ObjectMapper oMapper = new ObjectMapper();
-        Object json =  Stash.getValue(keyListTranslation);
+        Object json = Stash.getValue(keyListTranslation);
         map = oMapper.convertValue(json, Map.class);
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -1442,14 +1442,14 @@ public class CommonStepDefs extends GenericStepDefs {
             value = entry.getValue();
             selectedObject = ((Map) value).entrySet().toArray()[new Random().nextInt(((Map) value).size())];
         }
-            Stash.put(keyGameId, selectedObject);
+        Stash.put(keyGameId, selectedObject);
     }
 
     @Когда("^достаём параметр из \"([^\"]*)\" и сохраняем в переменую:$")
-    public void takeParamFromAndSaveInVariable (String keyJSONObject, DataTable dataTable) {
+    public void takeParamFromAndSaveInVariable(String keyJSONObject, DataTable dataTable) {
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String param, keyVariable, currentValue;
-        Object json =  Stash.getValue(keyJSONObject);
+        Object json = Stash.getValue(keyJSONObject);
         Object key, value;
         ObjectMapper oMapper = new ObjectMapper();
         Map<String, Object> map;
@@ -1477,24 +1477,24 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestToAPI(String path, String keyStash, DataTable dataTable) {
         String fullPath = collectQueryString(path);
-        requestByHTTPS(fullPath,keyStash,"POST",dataTable);
+        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
     @Когда("^запрос по прямому адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestTo(String fullPath, String keyStash, DataTable dataTable) {
-        requestByHTTPS(fullPath,keyStash,"POST",dataTable);
+        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public void requestToAPI(String path, String keyStash) {
         String fullPath = collectQueryString(path);
-        requestByHTTPS(fullPath, keyStash,"GET",null);
+        requestByHTTPS(fullPath, keyStash, "GET", null);
     }
 
     @Когда("^запрос к IMG \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public void requestToIMGAndSaveIn(String path, String keyStash) {
-        String fullPath = (Stash.getValue(path)).toString().replaceAll("\\\\","");
-        requestByHTTPS(fullPath, keyStash,"GET",null);
+        String fullPath = (Stash.getValue(path)).toString().replaceAll("\\\\", "");
+        requestByHTTPS(fullPath, keyStash, "GET", null);
     }
 
 
@@ -1502,7 +1502,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void requestCollect(String path, String keyParams, String keyStash) {
         try {
             StringBuilder fullPath = new StringBuilder();
-            fullPath.append(JsonLoader.getData().get(STARTING_URL).get("ESB_URL").getValue() +  "/" + path);
+            fullPath.append(JsonLoader.getData().get(STARTING_URL).get("ESB_URL").getValue() + "/" + path);
             fullPath.append("?" + Stash.getValue(keyParams));
             LOG.info("Строчка запроса: " + fullPath);
             requestByHTTPGet(fullPath.toString(), keyStash);
@@ -1512,7 +1512,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^формирум параметры и сохраняем в \"([^\"]*)\"$")
-    public void collectParametrs(String keyParams, DataTable dataTable){
+    public void collectParametrs(String keyParams, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         Map<String, Object> map;
         String key, value;
@@ -1525,36 +1525,35 @@ public class CommonStepDefs extends GenericStepDefs {
             Calendar dateNow = Calendar.getInstance();
 
             value = entry.getValue();
-            if (value.matches("[A-Z]*")){
-                value="fromStash";
+            if (value.matches("[A-Z]*")) {
+                value = "fromStash";
             }
 
-            switch (value){
+            switch (value) {
                 case "прошлый месяц":
-                    dateNow.add(Calendar.DAY_OF_YEAR,-30);
+                    dateNow.add(Calendar.DAY_OF_YEAR, -30);
                     value = formatDate.format(dateNow.getTime()) + "T" + formatTime.format(Calendar.getInstance().getTime());
                     break;
                 case "текущая дата-время":
                     value = formatDate.format(dateNow.getTime()) + "T" + formatTime.format(Calendar.getInstance().getTime());
                     break;
                 case "следующий месяц":
-                    dateNow.add(Calendar.DAY_OF_YEAR,30);
+                    dateNow.add(Calendar.DAY_OF_YEAR, 30);
                     value = formatDate.format(dateNow.getTime()) + "T" + formatTime.format(Calendar.getInstance().getTime());
                     break;
                 case "fromStash":
                     value = Stash.getValue(entry.getValue());
                     break;
             }
-            params.append(key+"="+value+"&");
+            params.append(key + "=" + value + "&");
         }
         LOG.info("Параметры получились: " + params);
-        Stash.put(keyParams,params);
+        Stash.put(keyParams, params);
 
     }
 
 
-
-    private String collectQueryString(String path){
+    private String collectQueryString(String path) {
         String requestFull = "";
         LOG.info("Собираем строку запроса.");
         try {
@@ -1567,10 +1566,10 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-    protected void requestByHTTPGet(String requestFull, String keyStash){
+    protected void requestByHTTPGet(String requestFull, String keyStash) {
 
         HttpURLConnection connect = null;
-        try{
+        try {
             connect = (HttpURLConnection) new URL(requestFull).openConnection();
             connect.setRequestMethod("GET");
             connect.setUseCaches(false);
@@ -1579,43 +1578,41 @@ public class CommonStepDefs extends GenericStepDefs {
             connect.connect();
 
             StringBuilder jsonString = new StringBuilder();
-            if (HttpURLConnection.HTTP_OK == connect.getResponseCode()){
-                BufferedReader in  = new BufferedReader(new InputStreamReader(connect.getInputStream()));
+            if (HttpURLConnection.HTTP_OK == connect.getResponseCode()) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
                 String line;
-                while ((line=in.readLine())!=null){
+                while ((line = in.readLine()) != null) {
                     jsonString.append(line);
                     jsonString.append("\n");
                 }
                 LOG.info(jsonString.toString());
                 Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
-            }
-            else {
+            } else {
                 LOG.info("fail" + connect.getResponseCode() + ", " + connect.getResponseMessage());
-                Stash.put(keyStash, JSONValue.parse(connect.getResponseMessage()));}
+                Stash.put(keyStash, JSONValue.parse(connect.getResponseMessage()));
+            }
             jsonString.toString();
-        }
-        catch (Throwable cause){
+        } catch (Throwable cause) {
             cause.printStackTrace();
-        }
-        finally {
-            if (connect!=null){
+        } finally {
+            if (connect != null) {
                 connect.disconnect();
             }
         }
     }
 
 
+    protected void requestByHTTP(String requestFull, String keyStash, DataTable dataTable, String method) {
 
-
-    protected void requestByHTTP(String requestFull, String keyStash, DataTable dataTable, String method){
-
-        if(!(null == dataTable)) { Map<String, String> table = dataTable.asMap(String.class, String.class); }
+        if (!(null == dataTable)) {
+            Map<String, String> table = dataTable.asMap(String.class, String.class);
+        }
         Object params = null;
         URL url;
 
         LOG.info("Собираем параметы в JSON строку");
         JSONObject jsonObject = new JSONObject();
-        if(!(null == dataTable)) {
+        if (!(null == dataTable)) {
             params = collectParametersInJSONString(dataTable);
         }
 
@@ -1633,8 +1630,8 @@ public class CommonStepDefs extends GenericStepDefs {
             //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
 
 
-            byte[] postData       = String.valueOf(params).getBytes( StandardCharsets.UTF_8 );
-            DataOutputStream wr = new DataOutputStream( con.getOutputStream());
+            byte[] postData = String.valueOf(params).getBytes(StandardCharsets.UTF_8);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 
             wr.write(postData);
             wr.close();
@@ -1667,13 +1664,15 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
-        if(!(null == dataTable)) { Map<String, String> table = dataTable.asMap(String.class, String.class); }
+        if (!(null == dataTable)) {
+            Map<String, String> table = dataTable.asMap(String.class, String.class);
+        }
         Object params = null;
         URL url;
 
         LOG.info("Собираем параметы в JSON строку");
         JSONObject jsonObject = new JSONObject();
-        if(!(null == dataTable)) {
+        if (!(null == dataTable)) {
             params = collectParametersInJSONString(dataTable);
         }
 
@@ -1683,9 +1682,11 @@ public class CommonStepDefs extends GenericStepDefs {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
                     }
+
                     public void checkClientTrusted(
                             java.security.cert.X509Certificate[] certs, String authType) {
                     }
+
                     public void checkServerTrusted(
                             java.security.cert.X509Certificate[] certs, String authType) {
                     }
@@ -1696,28 +1697,30 @@ public class CommonStepDefs extends GenericStepDefs {
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
+            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
             HostnameVerifier allHostsValid = (hostname, session) -> true;
             //************
             HttpURLConnection con;
             url = new URL(requestFull);
-            if(requestFull.contains("https:")){
+            if (requestFull.contains("https:")) {
                 con = (HttpsURLConnection) url.openConnection();
-            }else {
+            } else {
                 con = (HttpURLConnection) url.openConnection();
             }
-                con.setDoInput(true);
-                con.setDoOutput(true);
-                con.setRequestMethod(method);
-                con.setRequestProperty("Accept", "application/json");
-                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setRequestMethod(method);
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
             //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
-         //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
+            //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
 
             OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), StandardCharsets.UTF_8);
-            if(!(null == dataTable)) { writer.write(String.valueOf(params)); }
+            if (!(null == dataTable)) {
+                writer.write(String.valueOf(params));
+            }
             writer.close();
 
             BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -1749,43 +1752,43 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^обновим версию мобильного приложения для \"([^\"]*)\" \"([^\"]*)\" до \"([^\"]*)\" \"([^\"]*)\"$")
     public void updateVersionApp(String typeOS, String keyTypeOS, String vers, String hardVers) {
         String type;
-        switch (typeOS){
+        switch (typeOS) {
             case "Android":
-                type="1";
+                type = "1";
                 break;
             case "IOS":
-                type="2";
+                type = "2";
                 break;
             default:
-                type=typeOS;
+                type = typeOS;
         }
-        Stash.put(keyTypeOS,type);
+        Stash.put(keyTypeOS, type);
         String sqlDel = "DELETE FROM  gamebet.`appversion` WHERE (version=" + vers + " OR hard_update_version=" + hardVers + ") AND type_os=" + type + " AND active_version=0";
         workWithDB(sqlDel);
-        String     sqlRequest = "UPDATE gamebet.`appversion` SET version=" + vers + ", hard_update_version=" + hardVers + " WHERE active_version=1 AND type_os=" + type;
-               // String sqlRequest = "INSERT INTO gamebet.`appversion` (VERSION,apk,hard_update_version,active_version,type_os) VALUES("+vers+", 'android.apk',"+hardVers+",'1',"+type+")";
+        String sqlRequest = "UPDATE gamebet.`appversion` SET version=" + vers + ", hard_update_version=" + hardVers + " WHERE active_version=1 AND type_os=" + type;
+        // String sqlRequest = "INSERT INTO gamebet.`appversion` (VERSION,apk,hard_update_version,active_version,type_os) VALUES("+vers+", 'android.apk',"+hardVers+",'1',"+type+")";
         workWithDB(sqlRequest);
     }
 
-    private void searchUser(String keyEmail, String sqlRequest){
-    if (keyEmail.equals("ALLROWS")){
-        try {
-            workWithDBresult(sqlRequest);
-            return;
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void searchUser(String keyEmail, String sqlRequest) {
+        if (keyEmail.equals("ALLROWS")) {
+            try {
+                workWithDBresult(sqlRequest);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-    }
-    String email = workWithDBgetResult(sqlRequest, "email");
-    Stash.put(keyEmail, email);
-    LOG.info("Подходящий пользователь найден : " + email);
+        String email = workWithDBgetResult(sqlRequest, "email");
+        Stash.put(keyEmail, email);
+        LOG.info("Подходящий пользователь найден : " + email);
     }
 
     @Когда("^составляем новый номер телефона \"([^\"]*)\" вместо старого \"([^\"]*)\"$")
     public void newPhone(String keyNewPhone, String keyOldPhone) {
         String oldPhone = Stash.getValue(keyOldPhone);
-        String newPhone = "7444" + oldPhone.substring(4,11);
-        Stash.put(keyNewPhone,newPhone);
+        String newPhone = "7444" + oldPhone.substring(4, 11);
+        Stash.put(keyNewPhone, newPhone);
         LOG.info("Новый нмоер телефона: " + newPhone);
     }
 
@@ -1793,11 +1796,11 @@ public class CommonStepDefs extends GenericStepDefs {
     public void delayGromBanner(String keyDelay) {
         String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='index_main_default'";
         String delay = workWithDBgetResult(sqlRequest, "delay");
-        Stash.put(keyDelay,delay);
+        Stash.put(keyDelay, delay);
     }
 
     @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
-    public void userOpenNewUrl(String url){
+    public void userOpenNewUrl(String url) {
         WebDriver driver = PageFactory.getDriver();
 //        Set<String> handles = driver.getWindowHandles();
 //        Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
@@ -1817,11 +1820,11 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^пользователь открывает новое окно с url \"([^\"]*)\"$")
-    public void userOpenNewUrl2(String url){
+    public void userOpenNewUrl2(String url) {
         WebDriver driver2 = new ChromeDriver();
         driver2.get(url);
         new WebDriverWait(driver2, 10).until(ExpectedConditions.urlToBe(url));
-        Stash.put("driver",driver2);
+        Stash.put("driver", driver2);
     }
 
     public static void closingCurrtWin(String title) {
@@ -1836,7 +1839,7 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^эмулируем регистрацию через терминал Wave \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
-    public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable){
+    public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable) {
         String fullPath = collectQueryString(path);
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
@@ -1846,16 +1849,16 @@ public class CommonStepDefs extends GenericStepDefs {
      * это когда активне опции сайта в отдельной таблице
      */
     @Before(value = "@before or @api")
-    public void saveRegistrationValue2(){
+    public void saveRegistrationValue2() {
         rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
 
     @Before()
-    public void titleTest(Scenario scenario){
+    public void titleTest(Scenario scenario) {
         LOG.info("<================START...TEST================>");
         LOG.info("NAME: " + scenario.getName());
         LOG.info("TAGS: " + scenario.getSourceTagNames());
-        LOG.info("ID: " + scenario.getId().replaceAll("\\D+","") );
+        LOG.info("ID: " + scenario.getId().replaceAll("\\D+", ""));
         String mainUrl;
 
         try {
@@ -1875,10 +1878,10 @@ public class CommonStepDefs extends GenericStepDefs {
      * когда активные опции сайта в отдельной таблице
      */
     @Когда("^запоминаем все активные опции сайта в \"([^\"]*)\"$")
-    public void rememberEnabledFeatures (String activeOptionKey){
-        Map<String,String> activeOpt =
+    public void rememberEnabledFeatures(String activeOptionKey) {
+        Map<String, String> activeOpt =
                 workWithDBgetTwoRows("SELECT NAME,state FROM gamebet.`enabled_features`");
-        Stash.put(activeOptionKey,activeOpt);
+        Stash.put(activeOptionKey, activeOpt);
         LOG.info("Записали в память: key=>[" + activeOptionKey + "] ; value=>[" + activeOpt + "]");
     }
 
@@ -1892,25 +1895,24 @@ public class CommonStepDefs extends GenericStepDefs {
         StringBuilder optionFalse = new StringBuilder();
         String sqlRequest;
 
-        Map<String,String> table = dataTable.asMap(String.class,String.class);
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
         for (Map.Entry<String, String> entry : table.entrySet()) {
             if (entry.getValue().equals("true")) {
                 optionTrue.append(",'" + entry.getKey() + "'");
                 LOG.info("[" + entry.getKey() + "] = true");
-            }
-            else {
+            } else {
                 optionFalse.append(",'" + entry.getKey() + "'");
                 LOG.info("[" + entry.getKey() + "] = false");
             }
         }
-        optionTrue.delete(0,1);
-        optionFalse.delete(0,1);
-        if(!optionTrue.toString().isEmpty()) {
+        optionTrue.delete(0, 1);
+        optionFalse.delete(0, 1);
+        if (!optionTrue.toString().isEmpty()) {
             sqlRequest = "UPDATE gamebet.`enabled_features` SET state=1 WHERE NAME in (" + optionTrue + ")";
             workWithDB(sqlRequest);
             LOG.info("Включили опиции [" + optionTrue.toString() + "]");
         }
-        if(!optionFalse.toString().isEmpty()) {
+        if (!optionFalse.toString().isEmpty()) {
             sqlRequest = "UPDATE gamebet.`enabled_features` SET state=0 WHERE NAME in (" + optionFalse + ")";
             workWithDB(sqlRequest);
             LOG.info("Выключили опиции [" + optionFalse.toString() + "]");
@@ -1919,46 +1921,47 @@ public class CommonStepDefs extends GenericStepDefs {
 
     /**
      * когда активные опции сайта в таблице
+     *
      * @param key
      */
     @Когда("^выставляем обратно старое значение активных опций сайта \"([^\"]*)\"$")
-    public void revertEnabledFeatures(String key){
-        Map<String,String> oldEnabledFeatures = (HashMap)Stash.getValue(key);
+    public void revertEnabledFeatures(String key) {
+        Map<String, String> oldEnabledFeatures = (HashMap) Stash.getValue(key);
         StringBuilder optionFalse = new StringBuilder();
         StringBuilder optionTrue = new StringBuilder();
         for (Map.Entry<String, String> entry : oldEnabledFeatures.entrySet()) {
             if (entry.getValue().equals("1")) {
                 optionTrue.append(",'" + entry.getKey() + "'");
                 LOG.info("[" + entry.getKey() + "] = true");
-            }
-            else {
+            } else {
                 optionFalse.append(",'" + entry.getKey() + "'");
                 LOG.info("[" + entry.getKey() + "] = false");
             }
         }
-        optionTrue.delete(0,1);
-        optionFalse.delete(0,1);
+        optionTrue.delete(0, 1);
+        optionFalse.delete(0, 1);
         String sqlRequest = "UPDATE gamebet.`enabled_features` SET state=1 WHERE NAME in (" + optionTrue + ")";
         workWithDB(sqlRequest);
         sqlRequest = "UPDATE gamebet.`enabled_features` SET state=0 WHERE NAME in (" + optionFalse + ")";
         workWithDB(sqlRequest);
-        Map<String,String> activeOpt =
+        Map<String, String> activeOpt =
                 workWithDBgetTwoRows("SELECT NAME,state FROM gamebet.`enabled_features`");
         LOG.info("Вернули активные опции сайта [" + activeOpt + "]");
         Assert.assertTrue("Не удалось вернуть опции сайта к старому значению. было: " + oldEnabledFeatures +
-        "\n!!!!!!!!!!!!!!!!!\nCтало:" + activeOpt, activeOpt.equals(oldEnabledFeatures));
+                "\n!!!!!!!!!!!!!!!!!\nCтало:" + activeOpt, activeOpt.equals(oldEnabledFeatures));
     }
 
 
     /**
      * Возвращаем активные опции сайста в исходное положение до тестов
+     *
      * @param scenario
      */
     @After(value = "@after")
-    public void returnRegistrationValueWithScreenshot(Scenario scenario){
+    public void returnRegistrationValueWithScreenshot(Scenario scenario) {
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
-        if(scenario.isFailed()) {
+        if (scenario.isFailed()) {
             final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
             scenario.embed(screenshot, "image/jpeg");
         }
@@ -1968,7 +1971,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * Возвращаем десятичный тип отображения коэффициентов
      */
     @After(value = "@ChangeTypeOfCoefficientOnMain_C1066 or @ChangeTypeOfCoefficientCoupon_C1066 or @ChangeTypeOfCoefficientFav_C1066")
-    public void returnDecTypeCoef(){
+    public void returnDecTypeCoef() {
         WebDriver driver = PageFactory.getDriver();
         WebElement preferences = driver.findElement(By.id("preferences"));
         LOG.info("переходит в настройки и меняет коэффицент");
@@ -1983,30 +1986,31 @@ public class CommonStepDefs extends GenericStepDefs {
 
     /**
      * Возвращаем активные опции сайста в исходное положение до тестов
+     *
      * @param scenario
      */
     @After(value = "@0Registration_mobile or @requestVideoChatConfirmation or @1Registration_fullalt_mobile or @requestPhoneCall or @requestVideoChatConfirmation")
-    public void returnRegistrationValue(Scenario scenario){
+    public void returnRegistrationValue(Scenario scenario) {
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
 
     @Когда("^определяем дату завтрашнего дня \"([^\"]*)\"$")
-    public void tomorrowDate(String keyParams){
+    public void tomorrowDate(String keyParams) {
         Calendar today = Calendar.getInstance();
-        today.add(Calendar.DATE,1);
+        today.add(Calendar.DATE, 1);
         Date dateTomorrow = new Date();
         dateTomorrow.setTime(today.getTimeInMillis());
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         String date = format.format(dateTomorrow);
-        Stash.put(keyParams,date);
+        Stash.put(keyParams, date);
         LOG.info("Завтрашняя дата: " + dateTomorrow);
     }
 
 
     @Когда("^запоминаем текущую страницу в \"([^\"]*)\"$")
-    public void rememberCurenPageTo(String keyCurrentPage){
-        Stash.put(keyCurrentPage,PageFactory.getDriver().getWindowHandle());
+    public void rememberCurenPageTo(String keyCurrentPage) {
+        Stash.put(keyCurrentPage, PageFactory.getDriver().getWindowHandle());
         LOG.info("Записали key [" + keyCurrentPage + "] <== value [" + PageFactory.getDriver().getWindowHandle() + "]");
     }
 
@@ -2017,7 +2021,7 @@ public class CommonStepDefs extends GenericStepDefs {
             driver.close();
             driver.switchTo().window(Stash.getValue(keyPage));
             LOG.info("Вернулись на ранее запомненую страницу");
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new AutotestError("Ошибка! Не смогли вернуться на страницу.");
         }
     }
@@ -2025,8 +2029,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^записываем значение баланса бонусов в \"([^\"]*)\"$")
     public void writeValueOfBonusBalanceIn(String bonusKey) {
         List<WebElement> bonusElement = PageFactory.getWebDriver().findElements(By.xpath("//span[contains(@class,'subMenuBonus bonusmoney-text')]"));
-        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getAttribute("innerText").replaceAll("[^0-9.]","");
-        Stash.put(bonusKey,bonus);
+        String bonus = bonusElement.isEmpty() ? "0" : bonusElement.get(0).getAttribute("innerText").replaceAll("[^0-9.]", "");
+        Stash.put(bonusKey, bonus);
         LOG.info("Записали в key [" + bonusKey + "] <== value [" + bonus + "]");
     }
 
@@ -2034,23 +2038,23 @@ public class CommonStepDefs extends GenericStepDefs {
     public void writeValueOfBalanceIn(String balanceKey) {
         List<WebElement> balanceElement = PageFactory.getWebDriver().findElements(By.id("topPanelWalletBalance"));
         String balance = balanceElement.isEmpty() ? "0" : balanceElement.get(0).getAttribute("innerText");
-        Stash.put(balanceKey,balance);
+        Stash.put(balanceKey, balance);
         LOG.info("Записали в key [" + balanceKey + "] <== value [" + balance + "]");
     }
 
     @Когда("^проверяем что с баланса \"([^\"]*)\" снялась сумма \"([^\"]*)\"$")
     public void checkThatBalanceWasWithdrawnAmount(String balanceKey, String amountKey) {
-        new WebDriverWait(PageFactory.getWebDriver(),10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[@class='userBalance']")));
+        new WebDriverWait(PageFactory.getWebDriver(), 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[@class='userBalance']")));
         try {
             BigDecimal actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"));
             BigDecimal previousBalance = new BigDecimal(Stash.getValue(balanceKey).toString());
             BigDecimal withdrawnAmount = new BigDecimal(Stash.getValue(amountKey).toString());
             BigDecimal expectedBalance = previousBalance.subtract(withdrawnAmount);
             assertEquals("Ошибка! Ожидаемый баланс [" + expectedBalance.toString() + "] не равен текущему [" + actualBalance.toString() + "]", 0, expectedBalance.compareTo(actualBalance));
-        }catch (NumberFormatException nf){
-           throw new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
+        } catch (NumberFormatException nf) {
+            throw new AutotestError("Ошибка! Одно из полей с суммами оказалось пустым\n" + nf.getMessage());
         }
-        BigDecimal actualBalance,previousBalance,withdrawnAmount,expectedBalance;
+        BigDecimal actualBalance, previousBalance, withdrawnAmount, expectedBalance;
         actualBalance = new BigDecimal(PageFactory.getWebDriver().findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"));
         previousBalance = new BigDecimal((String) Stash.getValue(balanceKey));
         withdrawnAmount = new BigDecimal((String) Stash.getValue(amountKey));
@@ -2059,25 +2063,26 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^запрашиваем параметры способов пополения и сохраняем в память как \"([^\"]*)\"$")
-    public void requestParametersOfRefillMethodsAndStoreToStash(String KeyInStash){
+    public void requestParametersOfRefillMethodsAndStoreToStash(String KeyInStash) {
 //        String sqlRequest = "SELECT value FROM gamebet.params WHERE name ='" + KeyInStash + "'";
 //        requestFromDBAndSaveToStash(sqlRequest,KeyInStash);
         String sqlRequest = "SELECT  NAME,max_amount FROM gamebet.`paymentservices` WHERE channel=1";
-        workWithDBresultTwoRows(sqlRequest,KeyInStash);
+        workWithDBresultTwoRows(sqlRequest, KeyInStash);
     }
 
-    private void requestFromDBAndSaveToStash(String sqlRequest, String KeyInStash){
-        String result = workWithDBgetResult(sqlRequest).replaceAll("\n","");
-        Stash.put(KeyInStash,result);
+    private void requestFromDBAndSaveToStash(String sqlRequest, String KeyInStash) {
+        String result = workWithDBgetResult(sqlRequest).replaceAll("\n", "");
+        Stash.put(KeyInStash, result);
         LOG.info("Сохранили в память key [" + KeyInStash + "] <== value [" + result + "]");
     }
 
     @Когда("^запрос к WSS \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
-    public void requestByWSSAndSave(String wSSPath, String KeyInStash, DataTable dataTable){
-        requestToWSS(Stash.getValue(wSSPath),KeyInStash,dataTable);
+    public void requestByWSSAndSave(String wSSPath, String KeyInStash, DataTable dataTable) {
+        requestToWSS(Stash.getValue(wSSPath), KeyInStash, dataTable);
 
 
     }
+
     private void requestToWSS(String requestFull, String keyStash, DataTable dataTable) {
         if (!(null == dataTable)) {
             Map<String, String> table = dataTable.asMap(String.class, String.class);
@@ -2089,11 +2094,11 @@ public class CommonStepDefs extends GenericStepDefs {
         if (!(null == dataTable)) {
             params = collectParametersInJSONString(dataTable);
         }
-        String therdRequest = "{\"command\":\"payment_services\",\"params\":{},\"rid\":\""+Stash.getValue("RID")+ "\"}";
+        String therdRequest = "{\"command\":\"payment_services\",\"params\":{},\"rid\":\"" + Stash.getValue("RID") + "\"}";
         StringBuilder builder = new StringBuilder();
 
         try {
-            WebSocket ws = connect(builder,requestFull);
+            WebSocket ws = connect(builder, requestFull);
             ws.sendText(JSONValue.toJSONString(params));
             Thread.sleep(2000);
             ws.sendText(therdRequest);
@@ -2104,9 +2109,9 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         String limits = builder.toString();
 
-        if(!limits.isEmpty()){
-            Stash.put(keyStash,limits);
-        }else {
+        if (!limits.isEmpty()) {
+            Stash.put(keyStash, limits);
+        } else {
             throw new AutotestError("Ошибка! По WSS получили[" + limits + "]");
         }
     }
@@ -2128,7 +2133,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 .addListener(new WebSocketAdapter() {
                     // A text message arrived from the server.
                     public void onTextMessage(WebSocket websocket, String message) {
-                        if(message.contains("deposit")) {
+                        if (message.contains("deposit")) {
                             tmp.append(message);
                             LOG.info("Получили ответ::" + tmp.toString());
                         }
@@ -2139,22 +2144,22 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^вычленяем из названия игры одно слово \"([^\"]*)\" \"([^\"]*)\"$")
-    public void oneWordSearch(String keySearch,String type){
+    public void oneWordSearch(String keySearch, String type) {
         LOG.info(Stash.getValue("nameGameKey") + " время начала ");
-        List <String> types = Stash.getValue("typeGameKey");
+        List<String> types = Stash.getValue("typeGameKey");
         int index = types.indexOf(type);
         List<String> names = Stash.getValue("nameGameKey");
-        for (String str:names.get(index).split(" ")){
-            if (str.length()>3) {
-                Stash.put(keySearch,str);
-                LOG.info(keySearch  + ": " + str);
+        for (String str : names.get(index).split(" ")) {
+            if (str.length() > 3) {
+                Stash.put(keySearch, str);
+                LOG.info(keySearch + ": " + str);
                 break;
             }
         }
     }
 
     @Когда("^генерируем дату рождения от 18 до 50 лет и сохраняем в \"([^\"]*)\"$")
-    public void generationRandomBerthDate(String keyBirthDate){
+    public void generationRandomBerthDate(String keyBirthDate) {
         String birthDate = Generators.generateDateInRequiredRange();
         Stash.put(keyBirthDate, birthDate);
         LOG.info("Сохранили в память key [" + keyBirthDate + "] <== value [" + birthDate + "]");
@@ -2170,47 +2175,48 @@ public class CommonStepDefs extends GenericStepDefs {
             e.printStackTrace();
             throw new AutotestError("Ошибка! Что-то не так с форматом даты");
         }
-        Stash.put(keyIssueDate,issueDate);
+        Stash.put(keyIssueDate, issueDate);
         LOG.info("Сохранили в память key [" + keyIssueDate + "] <== value [" + issueDate + "]");
     }
 
     @Когда("^генерим номер карты и сохраняем в \"([^\"]*)\"$")
     public void generateCardNumberAndSaveTo(String keyCardNumber) {
         String numberCard = Generators.generateCardNumber();
-        Stash.put(keyCardNumber,numberCard);
+        Stash.put(keyCardNumber, numberCard);
         LOG.info("Сохранили в память key [" + keyCardNumber + "] <== value [" + numberCard + "]");
     }
 
     @Когда("^генерим дату действия краты в \"([^\"]*)\"$")
     public void generateDateOfGard(String keyGardDate) {
         String gardDate = generateDateForGard();
-        Stash.put(keyGardDate,gardDate);
+        Stash.put(keyGardDate, gardDate);
         LOG.info("Сохранили в память key [" + keyGardDate + "] <== value [" + gardDate + "]");
     }
 
     @Когда("^генерим имя и фамилию на латинском в \"([^\"]*)\"$")
     public void translateNameAndFamilyToLatin(String kyeNameAndFamily) {
         String nameAndFamily = Generators.randomBigLatinString(8) + " " + Generators.randomBigLatinString(8);
-        Stash.put(kyeNameAndFamily,nameAndFamily);
+        Stash.put(kyeNameAndFamily, nameAndFamily);
         LOG.info("Сохранили в память key [" + kyeNameAndFamily + "] <== value [" + nameAndFamily + "]");
     }
 
     /**
      * Метода переводит один формат даты в другой
+     *
      * @old - исходный формат даты
      * @newFormat - необходимый формат даты
      * @oldDate - дата
      */
-    public static String newFormatDate(SimpleDateFormat old, SimpleDateFormat newFormat, String oldDate){
+    public static String newFormatDate(SimpleDateFormat old, SimpleDateFormat newFormat, String oldDate) {
         String newDate = new String();
-        if(oldDate.isEmpty() || oldDate == null){
+        if (oldDate.isEmpty() || oldDate == null) {
             LOG.info("Дату [" + oldDate + "] не удалось перевести");
             return null;
         } else {
             try {
                 newDate = newFormat.format(old.parse(oldDate));
             } catch (ParseException e) {
-               throw new AutotestError("Ошибка! Не удалось перевести дату [" + oldDate + "] в нужный формат [" + newFormat.toString() + "]");
+                throw new AutotestError("Ошибка! Не удалось перевести дату [" + oldDate + "] в нужный формат [" + newFormat.toString() + "]");
             }
         }
         return newDate;
@@ -2218,70 +2224,71 @@ public class CommonStepDefs extends GenericStepDefs {
 
     /**
      * Метода запрашивает у базы код SMS
+     *
      * @requestToDB - строка SQL-запроса
      */
-    public static String returnCode(String requestToDB){
+    public static String returnCode(String requestToDB) {
         return workWithDBgetResult(requestToDB, "code");
     }
 
     @Когда("^выбираем ФИО \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\"$")
     public void selectName(String keyName, String keySurName, String keyPatronymic) throws IOException {
         StringBuilder lal = new StringBuilder();
-        FileReader file = new FileReader("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt");
+        FileReader file = new FileReader("src" + sep + "test" + sep + "resources" + sep + "FIOUsers.txt");
         Scanner scan = new Scanner(file);
 
         String user = scan.nextLine();
         String strLine;
         List<String> allLines = new ArrayList<>();
-        while (scan.hasNext()){
+        while (scan.hasNext()) {
             allLines.add(scan.nextLine());
         }
-        String separator = user.contains("\t") ?"\t":"\\s";
-        int randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        String separator = user.contains("\t") ? "\t" : "\\s";
+        int randomNumber = new Random().nextInt(allLines.size() - 1) + 1;
         String name = allLines.get(randomNumber).split(separator)[1];
-        randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        randomNumber = new Random().nextInt(allLines.size() - 1) + 1;
         String surname = allLines.get(randomNumber).split(separator)[0];
-        randomNumber = new Random().nextInt(allLines.size()-1)+1;
+        randomNumber = new Random().nextInt(allLines.size() - 1) + 1;
         String patronymic = allLines.get(randomNumber).split(separator)[2];
 
-        Stash.put(keyName,name);
-        Stash.put(keySurName,surname);
-        Stash.put(keyPatronymic,patronymic);
+        Stash.put(keyName, name);
+        Stash.put(keySurName, surname);
+        Stash.put(keyPatronymic, patronymic);
         LOG.info("Выбранные ФИО: " + surname + " " + name + " " + patronymic);
 
         file.close();
     }
 
     @Когда("^вычисляем телефон \"([^\"]*)\"$")
-    public void selectPhone(String keyPhone) throws IOException{
+    public void selectPhone(String keyPhone) throws IOException {
 
         StringBuilder lal = new StringBuilder();
-        FileReader file = new FileReader("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt");
+        FileReader file = new FileReader("src" + sep + "test" + sep + "resources" + sep + "FIOUsers.txt");
         Scanner scan = new Scanner(file);
 
         String line = scan.nextLine();
-        String phone = "700100"+String.valueOf(Integer.valueOf(line.substring(6)) + 1);
+        String phone = "700100" + String.valueOf(Integer.valueOf(line.substring(6)) + 1);
         LOG.info("Номер телефона" + phone);
-        Stash.put(keyPhone,phone);
+        Stash.put(keyPhone, phone);
 
         lal.append(phone + "\n");
-        while (scan.hasNext()){
+        while (scan.hasNext()) {
             lal.append(scan.nextLine()).append(System.lineSeparator());
         }
 
-        FileWriter nfile = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "FIOUsers.txt",false);
+        FileWriter nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "FIOUsers.txt", false);
         nfile.write(lal.toString());
         nfile.close();
         file.close();
     }
 
     @Когда("^нажмем Продолжить регу на всякий$")
-    public void rega(){
+    public void rega() {
         PageFactory.getWebDriver().findElement(By.id("continue-registration")).click();
     }
 
     @Когда("^проверяем ТЕКСТ при переходе по ссылке с$")
-    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable){
+    public static void checkTextWhenClickingOnLinkWith(DataTable dataTable) {
         WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, expectedText;
@@ -2296,19 +2303,18 @@ public class CommonStepDefs extends GenericStepDefs {
             try {
                 opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
                 Thread.sleep(500);
-            }
-            catch (TimeoutException e){
+            } catch (TimeoutException e) {
                 LOG.info("С первого раза ссылка " + linkTitle + " не открылась, попробуем второй раз");
                 driver.close();
                 driver.switchTo().window(currentHandle);
                 driver.navigate().refresh();
                 opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
-            }
-            catch (InterruptedException e2) {
+            } catch (InterruptedException e2) {
                 e2.printStackTrace();
             }
         }
     }
+
     @Когда("^проверяем ТЕКСТ при переходе по ссылкам из футера$")
     public static void checkTextWhenClickingOnLinkWithFromFooter(DataTable dataTable) throws InterruptedException, PageException {
         WebDriver driver = PageFactory.getWebDriver();
@@ -2322,12 +2328,11 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info("Переходим по клику на элемент " + linkTitle);
             try {
                 PageFactory.getInstance().getCurrentPage().getElementByTitle(linkTitle).click();
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 Thread.sleep(3000);
                 try {
                     PageFactory.getInstance().getCurrentPage().getElementByTitle(linkTitle).click();
-                } catch (Exception exc){
+                } catch (Exception exc) {
                     LOG.info("Не удалось кликнуть на " + linkTitle);
                     exc.printStackTrace();
                 }
@@ -2336,17 +2341,18 @@ public class CommonStepDefs extends GenericStepDefs {
             ArrayList<String> multipleTabs = new ArrayList<String>(driver.getWindowHandles());
             if (multipleTabs.size() >= 2) {
                 switchHandle(false);
-                Assert.assertFalse("Текст " + expectedText + " не обнаружен",driver.findElements(By.xpath(xpath)).isEmpty());
+                Assert.assertFalse("Текст " + expectedText + " не обнаружен", driver.findElements(By.xpath(xpath)).isEmpty());
                 LOG.info("Текст " + expectedText + " найден на странице, возвращаемся");
-              switchHandle(true);
+                switchHandle(true);
             } else {
-                Assert.assertFalse("Текст " + expectedText + " не обнаружен",driver.findElements(By.xpath(xpath)).isEmpty());
+                Assert.assertFalse("Текст " + expectedText + " не обнаружен", driver.findElements(By.xpath(xpath)).isEmpty());
                 LOG.info("Текст " + expectedText + " найден на странице, возвращаемся");
                 driver.get(Stash.getValue("MAIN_URL"));
                 workWithPreloader();
             }
         }
     }
+
     /**
      * Метод меняет активную вкладку. Если требуется не только сменить активность, но и закрыть - передаём true.
      */
@@ -2356,7 +2362,7 @@ public class CommonStepDefs extends GenericStepDefs {
         String currentHandle = driver.getWindowHandle();
         String finalCurrentHandle = currentHandle;
         multipleTabs.removeIf(element -> element.equals(finalCurrentHandle));
-        if (needClose == true){
+        if (needClose == true) {
             driver.close();
         }
         driver.switchTo().window(multipleTabs.get(0));
@@ -2379,12 +2385,12 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^очищаем избранное$")
-    public void clearFavourite() throws Exception{
+    public void clearFavourite() throws Exception {
         clearFavouriteGames();
     }
 
     @Когда("^нажимает кнопку НАЗАД$")
-    public void backToPage(){
+    public void backToPage() {
         WebDriver driver = PageFactory.getWebDriver();
         driver.navigate().back();
     }
@@ -2401,38 +2407,38 @@ public class CommonStepDefs extends GenericStepDefs {
         for (Map.Entry<String, String> entry : table.entrySet()) {
             String newValue = entry.getValue();
             String paramTitle = entry.getKey();
-            String sqlRequest = "SELECT * FROM gamebet.`params` WHERE title='"+paramTitle+"'";
+            String sqlRequest = "SELECT * FROM gamebet.`params` WHERE title='" + paramTitle + "'";
             String oldValue = workWithDBgetResult(sqlRequest, "value");
-            Stash.put("old "+paramTitle, oldValue);
-            LOG.info("Запомнено старое значение параметра " + "old "+paramTitle + " "+ oldValue);
-            sqlRequest = "UPDATE gamebet.`params` SET value = '"+newValue+"' WHERE title='"+paramTitle+"'";
+            Stash.put("old " + paramTitle, oldValue);
+            LOG.info("Запомнено старое значение параметра " + "old " + paramTitle + " " + oldValue);
+            sqlRequest = "UPDATE gamebet.`params` SET value = '" + newValue + "' WHERE title='" + paramTitle + "'";
             workWithDB(sqlRequest);
             LOG.info("Установлено новое значение параметра " + paramTitle + " " + newValue);
         }
     }
 
-//    @Когда("^выставляем обратно старые значения параметров сайта$")
+    //    @Когда("^выставляем обратно старые значения параметров сайта$")
     public void removeParams() {
         List<String> params = Stash.getValue("paramsList");
-        for (String p: params){
-            String sqlRequest = "UPDATE gamebet.`params` SET value = '"+Stash.getValue("old "+ p)+"' WHERE title='"+p+"'";
+        for (String p : params) {
+            String sqlRequest = "UPDATE gamebet.`params` SET value = '" + Stash.getValue("old " + p) + "' WHERE title='" + p + "'";
             workWithDB(sqlRequest);
-            sqlRequest = "SELECT * FROM gamebet.`params` WHERE title='"+p+"'";
+            sqlRequest = "SELECT * FROM gamebet.`params` WHERE title='" + p + "'";
             String newValue = workWithDBgetResult(sqlRequest, "value");
             LOG.info("Вернули значение параметра " + p + " " + newValue);
         }
     }
 
     @Когда("^включает симпл-баннер$")
-    public void onSimpleBanner(){
+    public void onSimpleBanner() {
         Calendar dateBegin = Calendar.getInstance();
         Calendar dateEnd = Calendar.getInstance();
-        String activeStartTime,activeFinishTime;
+        String activeStartTime, activeFinishTime;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-        dateBegin.add(Calendar.DAY_OF_YEAR,-1);
+        dateBegin.add(Calendar.DAY_OF_YEAR, -1);
         activeStartTime = format.format(dateBegin.getTime());
-        dateEnd.add(Calendar.DAY_OF_YEAR,+1);
+        dateEnd.add(Calendar.DAY_OF_YEAR, +1);
         activeFinishTime = format.format(dateEnd.getTime());
         String sqlRequest = "SELECT * FROM gamebet.`banner` WHERE bannertemplate_id=1 AND slider_id=1";
         String id = workWithDBgetResult(sqlRequest, "id");
@@ -2445,17 +2451,16 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-
     @Когда("^включает матчевый баннер \"([^\"]*)\"$")
-    public void onMatchBanner(String keyGameID){
+    public void onMatchBanner(String keyGameID) {
         Calendar dateBegin = Calendar.getInstance();
         Calendar dateEnd = Calendar.getInstance();
-        String activeStartTime,activeFinishTime;
+        String activeStartTime, activeFinishTime;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-        dateBegin.add(Calendar.DAY_OF_YEAR,-1);
+        dateBegin.add(Calendar.DAY_OF_YEAR, -1);
         activeStartTime = format.format(dateBegin.getTime());
-        dateEnd.add(Calendar.DAY_OF_YEAR,+1);
+        dateEnd.add(Calendar.DAY_OF_YEAR, +1);
         activeFinishTime = format.format(dateEnd.getTime());
 
 
@@ -2472,11 +2477,11 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^проверяем, совпадает ли дата и время игры с ожидаемыми \"([^\"]*)\" \"([^\"]*)\"$")
-    public void checkDateTimeGame(String keyData,String typeGame){
+    public void checkDateTimeGame(String keyData, String typeGame) {
         WebDriver driver = PageFactory.getWebDriver();
-        String fullDateTime = Stash.getValue(keyData).toString().replace("\n"," ");
+        String fullDateTime = Stash.getValue(keyData).toString().replace("\n", " ");
 
-        switch(typeGame){
+        switch (typeGame) {
             case "live":
                 LOG.info("Судя по времени, указанному на баннере, игра должна быть лайвовской. Проверять будем только что раздел соответствует ЛАЙВу " + fullDateTime);
                 Assert.assertTrue(
@@ -2509,13 +2514,12 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^проверяем, совпадают ли коэффициенты на странице с теми, что на баннере \"([^\"]*)\"$")
-    public void checkAllCoefs(String keyCoefs)
-    {
+    public void checkAllCoefs(String keyCoefs) {
         WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Формируем список коэффициентов для маркета ИСход на странице игры");
         List<String> coefsOnPage =
-        driver.findElements(By.xpath("//div[contains(@class,'game-center-container__live')]//div[contains(@class,'bets-block__bet-cell_active')]/..//span[contains(@class,'bets-block__bet-cell-content-price')]"))
-                .stream().map(el -> el.getAttribute("innerText")+"%").collect(Collectors.toList());
+                driver.findElements(By.xpath("//div[contains(@class,'game-center-container__live')]//div[contains(@class,'bets-block__bet-cell_active')]/..//span[contains(@class,'bets-block__bet-cell-content-price')]"))
+                        .stream().map(el -> el.getAttribute("innerText") + "%").collect(Collectors.toList());
         LOG.info(coefsOnPage + "\n% - это просто разделитель. все норм");
         LOG.info("Теперь сравним этот список,с тем что было на баннере");
         List<String> coefsOnBanners = Stash.getValue(keyCoefs);
@@ -2529,27 +2533,54 @@ public class CommonStepDefs extends GenericStepDefs {
 
     //выставление даты начала (например в истории операций или в моих пари) на самую раннюю из возможных
     @Когда("^отматывает дату начала на самую раннюю$")
-    public void datapickerOnBegin(){
+    public void datapickerOnBegin() {
         WebDriver driver = PageFactory.getWebDriver();
         WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
-        if (!datapickerBegin.getAttribute("class").contains("active")){
+        if (!datapickerBegin.getAttribute("class").contains("active")) {
             datapickerBegin.click();
-            new WebDriverWait(driver,10)
+            new WebDriverWait(driver, 10)
                     .withMessage("Дата начала не раскрылась")
-                    .until(ExpectedConditions.attributeContains(datapickerBegin,"class","active"));
+                    .until(ExpectedConditions.attributeContains(datapickerBegin, "class", "active"));
         }
         LOG.info("Если доступно - нажимаем на стрелочку 'год назад'");
         By BYarrowLeft;
-        for(int lineNumber=1;lineNumber<=2;lineNumber++){
-            BYarrowLeft= By.xpath("//div[@class='datepicker__line' and position()=" + lineNumber + "]//i[contains(@class,'arrow-left6')]");
+        for (int lineNumber = 1; lineNumber <= 2; lineNumber++) {
+            BYarrowLeft = By.xpath("//div[@class='datepicker__line' and position()=" + lineNumber + "]//i[contains(@class,'arrow-left6')]");
 
-            while (!driver.findElement(BYarrowLeft).findElement(By.xpath("ancestor-or-self::div[contains(@class,'datepicker__btn')]")).getAttribute("class").contains("bound")){
+            while (!driver.findElement(BYarrowLeft).findElement(By.xpath("ancestor-or-self::div[contains(@class,'datepicker__btn')]")).getAttribute("class").contains("bound")) {
                 driver.findElement(BYarrowLeft).click();
             }
         }
         LOG.info("Год и месяц отщелкали на начало. Теперь день выбирем самый ранний");
         driver.findElement(By.xpath("//div[contains(@class,'datepicker__day-btn') and not(contains(@class,'disabled'))]")).click();
         CommonStepDefs.workWithPreloader();
+    }
+
+    @After(value = "@coupon")
+    public void clearCouponAfter() throws InterruptedException {
+        WebDriver driver = PageFactory.getWebDriver();
+        goToMainPage("site");
+        driver.findElement(By.id("prematch")).click(); //переходим в прематч
+        Thread.sleep(5000);
+        LOG.info("Перешли в прематч и сейчас будет чистить купон");
+        AbstractPage.clearCoupon();
+        LOG.info("Отчистили купон");
+
+    }
+
+    public static ExpectedCondition<Boolean> elementIsOnPage(final By locator, final String messages) {
+        return new ExpectedCondition<Boolean>() {
+
+            @Override
+            public Boolean apply(WebDriver driver) {
+                return (!driver.findElements(locator).isEmpty());
+            }
+
+            @Override
+            public String toString() {
+                return messages;
+            }
+        };
     }
 }
 
