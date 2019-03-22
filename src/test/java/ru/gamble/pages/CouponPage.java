@@ -934,14 +934,12 @@ public class CouponPage extends AbstractPage {
         LOG.info("Жмём кнопку 'Предложить'");
         driver.findElement(By.xpath("//button[@class='btn btn_coupon-small btn_green']")).click();
         LOG.info("Ждём пока прогресс-бар принятия ставки заполнится на 100%");
-        new WebDriverWait(driver,30)
-                .withMessage("За 30 секунд прогресс-бар не стал равен 100%, значит ставка не принялась")
+        wait.withMessage("За 30 секунд прогресс-бар не стал равен 100%, значит ставка не принялась")
                 .until(ExpectedConditions.attributeContains((By.xpath("//*[contains(@class,'coupon__progress-count')]")),"innerText","100%"));
 
         LOG.info("Ожидаем исчезновения из купона принятой ставки");
         //Thread.sleep(10000);
-        new WebDriverWait(driver,20)
-                .withMessage("За 20 секунд ставка из купона так и не убралась")
+        wait.withMessage("За 20 секунд ставка из купона так и не убралась")
                 .until(ExpectedConditions.numberOfElementsToBe(xpath("//ul[@class='coupon-bet__content']"),0));
 
         BigDecimal sum = new BigDecimal(Float.toString(superbetValue)).setScale(2, RoundingMode.UP);
