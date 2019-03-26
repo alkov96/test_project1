@@ -2255,11 +2255,49 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Сохранили в память key [" + KeyInStash + "] <== value [" + result + "]");
     }
 
+//    @Когда("^запрос к тест-WSS \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+//    public void requestByWSSAndSaveTest(String wSSPath, String KeyInStash, DataTable dataTable) {
+//        requestToWSSTest(Stash.getValue(wSSPath), KeyInStash, dataTable);
+//    }
+//
+//    private void requestToWSSTest(String requestFull, String keyStash, DataTable dataTable) {
+//        if (!(null == dataTable)) {
+//            Map<String, String> table = dataTable.asMap(String.class, String.class);
+//        }
+//        Object params = null;
+//
+//        LOG.info("Собираем параметы в JSON строку");
+//        JSONObject jsonObject = new JSONObject();
+//        if (!(null == dataTable)) {
+//            params = collectParametersInJSONString(dataTable);
+//        }
+//        String therdRequest = "{\"command\":\"get\",\"params\":{\"source\": \"betting\"\n\"subscribe\": \"true\"},\"rid\":\"" + Stash.getValue("RID") + "\"}";
+//
+//        StringBuilder builder = new StringBuilder();
+//
+//        try {
+//            WebSocket ws = connect(builder, requestFull);
+//            ws.sendText(JSONValue.toJSONString(params));
+//            Thread.sleep(2000);
+//            ws.sendText(therdRequest);
+//            Thread.sleep(2000);
+//        } catch (IOException | WebSocketException | InterruptedException | NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//            throw new AutotestError("Ошибка! Проблемы с WebSocket.");
+//        }
+//        String limits = builder.toString();
+//
+//        if (!limits.isEmpty()) {
+//            Stash.put(keyStash, limits);
+//        } else {
+//            throw new AutotestError("Ошибка! По WSS получили[" + limits + "]");
+//        }
+//    }
+
+
     @Когда("^запрос к WSS \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestByWSSAndSave(String wSSPath, String KeyInStash, DataTable dataTable) {
         requestToWSS(Stash.getValue(wSSPath), KeyInStash, dataTable);
-
-
     }
 
     private void requestToWSS(String requestFull, String keyStash, DataTable dataTable) {
