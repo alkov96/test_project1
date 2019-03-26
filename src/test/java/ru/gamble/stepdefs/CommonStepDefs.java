@@ -37,6 +37,7 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
+import sun.util.calendar.LocalGregorianCalendar;
 
 import javax.net.ssl.*;
 import java.awt.*;
@@ -76,6 +77,19 @@ public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
     private static final String sep = File.separator;
 
+
+    @Когда("^ждем некоторое время \"([^\"]*)\"$")
+    public void waiting(String sec) throws InterruptedException {
+        int seconds;
+        if (sec.matches("^[0-9]+")) {
+            seconds = Integer.parseInt(sec);
+        }
+        else
+        {
+            seconds = Integer.parseInt(Stash.getValue(sec));
+        }
+        Thread.sleep(seconds*1000);
+    }
 
     @Когда("^запрашиваем дату-время и сохраняем в память$")
     public static void requestAndSaveToMamory(DataTable dataTable) {
@@ -627,6 +641,15 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 
+    @Когда("^проверка ответа API из \"([^\"]*)\", значение берем из памяти$")
+    public void checkresponceAPI2(String keyStash, DataTable dataTable) {
+        Map<String, String> table = dataTable.asMap(String.class, String.class);
+        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
+        String expected = Stash.getValue(table.get("exepted"));
+        assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
+        LOG.info("|" + expected + "| содержится в |" + actual + "|");
+    }
+
 
     @Когда("^выбираем одну дату из \"([^\"]*)\" и сохраняем в \"([^\"]*)\" а id_user в \"([^\"]*)\"$")
     public void selectOneDateInResponce(String keyResponce, String keyDate, String keyId) throws ParseException {
@@ -723,6 +746,15 @@ public class CommonStepDefs extends GenericStepDefs {
         boolean actualsOk = actual.contains(expected.split("or")[0].trim()) || actual.contains(expected.split("or")[1].trim());
         Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|", actualsOk);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
+    }
+
+    @Когда("^проверим что время \"([^\"]*)\" уменьшилось в \"([^\"]*)\"$")
+    public void checkTimebecomeLes(String keyTime, String keyResponse){
+        int oldTime = Stash.getValue(keyTime);
+        fingingAndSave(keyTime,keyResponse);
+        int newTime = Stash.getValue(keyTime);
+        Assert.assertTrue("Время " + keyTime + " должно было уменьшиться в этом запросе, но " + newTime + ">=" + oldTime,
+                newTime<oldTime);
     }
 
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
@@ -924,6 +956,41 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyForMap, mapResult);
     }
 
+    public static List<String> workWithDBAndGetFullColumn(String sqlReq){
+        Connection con = DBUtils.getConnection();
+        Statement stmt;
+        ResultSet rs;
+        List<String> result=new ArrayList<>();
+        try {
+
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sqlReq);
+//            con.commit();
+            int count = rs.getMetaData().getColumnCount();
+            if (count == 0) {
+                throw new AutotestError("Ошибка! Запрос к базе [" + sqlReq + "] вернул кол-во результатов [" + count + "]");
+            }
+            while (true){
+                try{
+                    rs.next();
+                    result.add(rs.getString(1));
+                }
+                catch (Exception e){
+                    break;
+                }
+            }
+            con.close();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+            throw new AutotestError("Ошибка! Что-то не так в запросе, проверьте руками [" + sqlReq + "]");
+        }
+        finally {
+            DBUtils.closeAll(con, null, null);
+        }
+        return result;
+    }
+
 
     @Before(value = "@ChangePassword_C1043")
     public void saveCurrentPassword() throws DataException {
@@ -1104,6 +1171,23 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Вычислили подходящий номер телефона::" + phone);
     }
 
+    @Когда("^определяем занятый номер телефона и сохраняем в \"([^\"]*)\"$")
+    public static void getPhone(String keyPhone) {
+        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone DESC";
+        String phoneLast = workWithDBgetResult(sqlRequest, "phone");
+        Stash.put(keyPhone, phoneLast);
+        LOG.info("Вычислили подходящий номер телефона::" + phoneLast);
+    }
+
+    @Когда("^определяем занятый адрес email и сохраняем в \"([^\"]*)\"$")
+    public static void getOldEmail(String keyPhone) {
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone DESC";
+        String emailLast = workWithDBgetResult(sqlRequest, "email");
+        Stash.put(keyPhone, emailLast);
+        LOG.info("Вычислили подходящий адрес почты::" + emailLast);
+    }
+
+
     @Когда("^подтверждаем скайп через админку \"([^\"]*)\"$")
     public void skypeConfirm(String keyPhone) throws Exception {
         WebDriver driver = PageFactory.getDriver();
@@ -1272,11 +1356,106 @@ public class CommonStepDefs extends GenericStepDefs {
         return false;
     }
 
+    @Когда("^запоминаем код подтверждения аккаунта \"([^\"]*)\" для пользователя \"([^\"]*)\"$")
+    public void getConfirmAccountCode(String keyCode, String keyEmail){
+        String sqlReq = "SELECT t.value FROM gamebet.`user_profile_edit_code` t LEFT JOIN gamebet.`user_profile_edit` tt ON ( t.edit_id = tt.id) " +
+                "WHERE t.is_new_type = FALSE AND tt.user_id = (SELECT id FROM gamebet.`user` WHERE email='" + Stash.getValue(keyEmail).toString() + "')";
+        String code = workWithDBgetResult(sqlReq);
+        Stash.put(keyCode,code);
+    }
+
+    @Когда("^запоминаем код подтверждения смены Базовых Бараметров \"([^\"]*)\" для пользователя \"([^\"]*)\"$")
+    public void getConfirmCode(String keyCode, String keyEmail){
+        String sqlReq = "SELECT t.value FROM gamebet.`user_profile_edit_code` t LEFT JOIN gamebet.`user_profile_edit` tt ON ( t.edit_id = tt.id) " +
+                "WHERE t.is_new_type = TRUE AND tt.user_id = (SELECT id FROM gamebet.`user` WHERE email='" + Stash.getValue(keyEmail).toString() + "')";
+        String code = workWithDBgetResult(sqlReq);
+        Stash.put(keyCode,code);
+    }
+
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {
         //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7333%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
         searchUser(keyEmail, sqlRequest);
+    }
+
+    @Когда("^поиск акаунта для проверки изменений базовых параметров \"([^\"]*)\"$")
+    public void searchUserForEdit(String keyEmail){
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id=2 ORDER BY id DESC";
+        List<String> results = workWithDBAndGetFullColumn(sqlRequest);
+        int count = 0;
+        int count2 = 0;
+
+        SimpleDateFormat formatgut = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.add(Calendar.MONTH,-1);
+        String dateOneMonth = formatgut.format(cal.getTime());
+        cal = GregorianCalendar.getInstance();
+        cal.add(Calendar.DAY_OF_YEAR,-1);
+        String dateOneDay = formatgut.format(cal.getTime());
+
+        for (String email: results){
+            count2=0;
+            sqlRequest = "SELECT COUNT(*) FROM gamebet.`user_profile_edit` WHERE edit_date_finish>'" + dateOneMonth + "' AND user_id=(SELECT id FROM gamebet.`user` WHERE email='" + email + "')";
+            count = Integer.valueOf(workWithDBgetResult(sqlRequest));
+            sqlRequest = "SELECT attemps_count FROM gamebet.`user_profile_edit` WHERE edit_date_start>'" + dateOneDay + "' AND user_id=(SELECT id FROM gamebet.`user` WHERE email='" + email + "')";
+            List<String> attemps = workWithDBAndGetFullColumn(sqlRequest);
+            for (String attemp:attemps){
+                count2+=Integer.valueOf(attemp);
+            }
+            if (count<2 && count2<20){
+                LOG.info("email:" + email);
+                Stash.put(keyEmail,email);
+                break;
+            }
+        }
+    }
+
+    @Когда("^поиск акаунта с закончившимися успешными попытками смены БП \"([^\"]*)\"$")
+    public void searchUserWithoutEdit(String keyEmail){
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id=2 ORDER BY id DESC";
+        List<String> results = workWithDBAndGetFullColumn(sqlRequest);
+        int count = 0;
+
+        SimpleDateFormat formatgut = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.add(Calendar.MONTH,-1);
+        String dateOneMonth = formatgut.format(cal.getTime());
+
+        for (String email: results){
+            sqlRequest = "SELECT COUNT(*) FROM gamebet.`user_profile_edit` WHERE edit_date_finish>'" + dateOneMonth + "' AND user_id=(SELECT id FROM gamebet.`user` WHERE email='" + email + "')";
+            count = Integer.valueOf(workWithDBgetResult(sqlRequest));
+            if (count==2){
+                LOG.info("email:" + email);
+                Stash.put(keyEmail,email);
+                break;
+            }
+        }
+    }
+
+    @Когда("^поиск акаунта с закончившимися суточными попытками смены БП \"([^\"]*)\"$")
+    public void searchUserWithoutEditOneDay(String keyEmail){
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id=2 ORDER BY id DESC";
+        List<String> results = workWithDBAndGetFullColumn(sqlRequest);
+        int count = 0;
+
+        SimpleDateFormat formatgut = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.add(Calendar.DAY_OF_YEAR,-1);
+        String dateOneDay = formatgut.format(cal.getTime());
+
+        for (String email: results){
+            sqlRequest = "SELECT attemps_count FROM gamebet.`user_profile_edit` WHERE edit_date_start>'" + dateOneDay + "' AND user_id=(SELECT id FROM gamebet.`user` WHERE email='" + email + "')";
+            List<String> attemps = workWithDBAndGetFullColumn(sqlRequest);
+            for (String attemp:attemps){
+                count+=Integer.valueOf(attemp);
+            }
+            if (count==20){
+                LOG.info("email:" + email);
+                Stash.put(keyEmail,email);
+                break;
+            }
+        }
     }
 
     @Когда("^ищем пользователя с ограничениями \"([^\"]*)\"$")
@@ -2581,6 +2760,12 @@ public class CommonStepDefs extends GenericStepDefs {
                 return messages;
             }
         };
+    }
+
+
+    @Когда("^комментарий \"([^\"]*)\"$")
+    public void loginfo(String message){
+        LOG.info("\n\n\u001B[33m" + message + "\n\n\u001B[37m");
     }
 }
 
