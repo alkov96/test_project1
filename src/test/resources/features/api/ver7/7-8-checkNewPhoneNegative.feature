@@ -118,7 +118,7 @@
   Сценарий: Проверка checkNewPhone при невалидном номере телефона(буквы в номере телефона)
 
     * добавляем данные в JSON объект "DATA" сохраняем в память:
-      | phone                       | asd555555     |
+      | phone                       | 7dasd256818     |
       | updateToken                 | UPDATETOKEN   |
 
     * запрос к API "api/mobile/v7/checkNewPhone" и сохраняем в "RESPONCE_API":

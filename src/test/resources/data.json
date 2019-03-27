@@ -38,7 +38,8 @@
       "DB_URL": "jdbc:mysql://main-demo.wd.orglot.office:3306",
       "DB_USER": "stoloto_main",
       "DB_PASSWORD": "lizByr4WO#"
-    }
+    },
+    "SWAGGER":"http://192.168.11.6"
   },
   "TEST_INT": {
     "MAIN_URL": "https://test-int-bet-site1.tsed.orglot.office",
@@ -53,7 +54,8 @@
       "DB_URL": "jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office:3306",
       "DB_USER": "gamebet_dml",
       "DB_PASSWORD": "kahcheezao6fa=hfai3Ae"
-    }
+    },
+    "SWAGGER":"http://192.168.14.100"
   },
     "DEV_GAMEBET": {
       "ESB_URL": "http://dev-bet-esb.dev.bet.orglot.office:8660",
@@ -64,7 +66,7 @@
       "USER": "testingsto+86@mail.ru",
       "USER_CHROME": "testingsto+86@mail.ru",
       "USER_FIREFOX": "user_for_firefox@mailinator.com",
-      "PASSWORD": "Acer0808!",
+      "PASSWORD": "Acer0808",
       "PASS": "Parol123",
       "PHONE": "79088767878",
       "PHONE_FIREFOX": "70010020701",
@@ -74,7 +76,8 @@
         "DB_URL": "jdbc:mysql://dev-bet-dbproc.dev.bet.orglot.office:3306",
         "DB_USER": "webdev_user",
         "DB_PASSWORD": "hahmuKoC8cha4Poo"
-      }
+      },
+      "SWAGGER":"http://192.168.11.4"
     },
 
   "TEST-FUNC": {
@@ -86,7 +89,7 @@
     "USER": "chrome-test-shmest@mailinator.com",
     "USER_CHROME": "chrome-test-shmest@mailinator.com",
     "USER_FIREFOX": "user_for_firefox@mailinator.com",
-    "PASSWORD": "Acer0808!",
+    "PASSWORD": "Acer0808",
     "PASS": "Parol123",
     "PHONE": "73330018162",
     "PHONE_FIREFOX": "70010020701",
@@ -96,6 +99,7 @@
       "DB_URL": "jdbc:mysql://test-func-bet-dbproc.tsed.orglot.office:3306",
       "DB_USER": "gamebet_test",
       "DB_PASSWORD": "hRFhiFGDpf9qosY4"
-    }
+    },
+    "SWAGGER":"http://192.168.11.2"
   }
 }

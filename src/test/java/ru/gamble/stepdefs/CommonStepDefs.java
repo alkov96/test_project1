@@ -16,7 +16,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -32,14 +31,13 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
-import sun.util.calendar.LocalGregorianCalendar;
 
 import javax.net.ssl.*;
+import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.io.*;
@@ -57,7 +55,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1149,8 +1146,14 @@ public class CommonStepDefs extends GenericStepDefs {
             } else {
                 value = entry.getValue();
             }
+            if (entry.getValue().matches("^[/(][A-Z]+[/)]")){
+                value = String.valueOf(value).replace("(","").replace(")","");
+                JSONObject asd = Stash.getValue( String.valueOf(value));
+                JSONObject[] dfg = {Stash.getValue( String.valueOf(value))};
+                jsonObject.put(key,dfg);
+            }
             //Если попадются числовые значения, в JSON объект кладём как строку
-            if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
+            else if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
                 String str = (String) value;
                 jsonObject.put(key, value);
             } else {
@@ -1521,45 +1524,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^выбираем fullalt пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public static void searchFullAlt(String keyPhone, String keyBD) throws Exception {
-//        RandomAccessFile fr = new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r");
-//
-//        String line;
-//        StringBuilder sbt = new StringBuilder();
-//        String user = fr.readLine();
-//        String separator = user.contains("\t") ?"\t":"\\s";
-//        String phone = user.trim().split(separator)[0];
-//        String birthDate = user.trim().split(separator)[1];
-//        SimpleDateFormat formatDate = new SimpleDateFormat();
-//        SimpleDateFormat formatgut = new SimpleDateFormat();
-//        formatgut.applyPattern("dd.MM.yyyy");
-//        formatDate.applyPattern("yyyy-MM-dd");
-//        birthDate=formatgut.format(formatDate.parse(birthDate));
-//        Stash.put(keyPhone,phone);
-//        Stash.put(keyBD,birthDate);
-//        Thread.sleep(500);
-//        while ((line = fr.readLine()) != null){
-//            sbt.append(line).append(System.lineSeparator());
-//        }
-//        FileWriter fw = new FileWriter("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
-//        BufferedWriter bw = new BufferedWriter(fw);
-//        LOG.info("перезаписываем файл " + "src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt");
-//        Thread.sleep(500);
-//        bw.write(sbt.toString());
-//        bw.flush();
-//        bw.close();
-//        fr.close();
-//        LOG.info(phone + " " +birthDate);
-//
-//
-//        if ( new RandomAccessFile("src" + sep +"test" + sep + "resources"+ sep + "full_alt.txt", "r").readLine().trim().split(separator)[0].equals(phone)){
-//            Assert.fail("Все плохо. файл опть не перезаписался!");
-//        }
-
-
         StringBuilder lal = new StringBuilder();
         FileReader file = new FileReader("src" + sep + "test" + sep + "resources" + sep + "full_alt.txt");
         Scanner scan = new Scanner(file);
-//lal.append(scan.next());
 
         String user = scan.nextLine();
         String separator = user.contains("\t") ? "\t" : "\\s";
@@ -1814,10 +1781,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
             wr.write(postData);
             wr.close();
-
-//            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), StandardCharsets.UTF_8);
-//            if(!(null == dataTable)) { writer.write(String.valueOf(params)); }
-//            writer.close();
 
             BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuffer jsonString = new StringBuffer();
@@ -2804,6 +2767,34 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^комментарий \"([^\"]*)\"$")
     public void loginfo(String message){
         LOG.info("\n\n\u001B[33m" + message + "\n\n\u001B[37m");
+    }
+
+    @Когда("^запрос в swagger на пополнение баланса рублей/бонусов \"([^\"]*)\"$")
+    public void refill(String responseKey, DataTable dataTable) throws DataException {
+        String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
+        path=path+"/refill";
+        LOG.info("path:" + path);
+        requestByHTTPS(path,responseKey,"POST",dataTable);
+    }
+
+    @Когда("^запрос в swagger на добавление НДФЛ \"([^\"]*)\"$")
+    public void addNDFL(String responseKey,DataTable dataTable) throws DataException {
+        String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
+        path=path+"/createPacket";
+        LOG.info("path:" + path);
+        requestByHTTPS(path,responseKey,"POST",dataTable);
+    }
+
+
+    @Когда("^формируем параметры для запроса swagger$")
+    public void generateBodyRequest(DataTable dataTable){
+        Map<String, String> bodyRequest = dataTable.asMap(String.class,String.class);
+        String value = new String();
+        Date dateNow = new Date();
+        for (String param : bodyRequest.keySet()) {
+                value = String.valueOf(dateNow.getTime());
+                Stash.put(bodyRequest.get(param),value);
+        }
     }
 }
 
