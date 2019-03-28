@@ -449,8 +449,18 @@ public class EventViewerPage extends AbstractPage {
         }
 
         LOG.info("Проверим что нужная игра открыта по центарльной части страницы");
-        String nameOnPage = driver.findElement(By.xpath("//div[contains(@class,'header-teams')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("innerText");
-        nameOnPage = CommonStepDefs.stringParse(nameOnPage);
+        //String nameOnPage = driver.findElement(By.xpath("//div[contains(@class,'header-teams')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("innerText");
+        StringBuilder nameOn = new StringBuilder();
+        List <WebElement> names = driver.findElements(By.xpath("//p[contains(@class,'game-score_multiset__team-name-text')]"));
+        if (names.size()==2){
+//    nameOn.append(names.get(0).getAttribute("innerText"));
+//    nameOn.append(names.get(1).getAttribute("innerText"));
+            names.forEach(element -> nameOn.append(element.getAttribute("innerText")));
+        }
+        else{
+            driver.findElements(By.xpath("//div[@class='game-score__inner']//p")).forEach(element -> nameOn.append(element.getAttribute("title")));
+        }
+        String nameOnPage = CommonStepDefs.stringParse(nameOn.toString());
         Assert.assertTrue(
                 "В прематче открылась неправильная игра. Открылась игра: "+ nameOnPage + ", а ожидалось " + team1,
                 CommonStepDefs.stringParse(team1).equals(nameOnPage));

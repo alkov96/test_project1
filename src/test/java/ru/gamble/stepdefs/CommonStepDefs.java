@@ -23,6 +23,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -65,6 +66,7 @@ import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
 import static ru.gamble.pages.mainPages.FooterPage.opensNewTabAndChecksPresenceOFElement;
+import static ru.gamble.pages.prematchPages.EventViewerPage.onTriggerPeriod;
 import static ru.gamble.pages.userProfilePages.FavouritePage.clearFavouriteGames;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
@@ -259,6 +261,7 @@ public class CommonStepDefs extends GenericStepDefs {
                     break;
                 case "registr":
                     currentUrl = JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
+                    break;
                 default:
                     currentUrl = siteUrl;
                     break;
@@ -1017,10 +1020,20 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("вернули изначальный пароль " + changeCheck + " для пользователя " + Stash.getValue("currentUser"));
     }
 
-//    @After(value = "@LeftMenuTriggersPrematch_C1057")
-//    public void offMultigames(){
-//        EventViewerPage.multiGamesOnOff("выключает");
-//    }
+    @After(value = "@LeftMenuTriggersPrematch_C1057")
+    public void offMultigames(){
+        LOG.info("!!!АФТЕР!!!");
+        EventViewerPage.multiGamesOnOff("выключает");
+    }
+
+    @After(value = "@LandingAppFavourite_C1065,@AddBetToCouponFromFavourite_С1050,@Search_C1053,@TriggerPeriodPrematch_C1057,@LinkGameFromFavourite_C1050")
+    public void offTriggerPeriod(){
+        LOG.info("!!!АФТЕР!!!");
+        PageFactory.getDriver().findElement(By.id("prematch")).click();
+        workWithPreloader();
+        onTriggerPeriod("Выберите время");
+    }
+
 
     @Когда("^получаем и сохраняем в память код подтверждения \"([^\"]*)\" телефона \"([^\"]*)\" \"([^\"]*)\"$")
     public static void confirmPhone(String keyCode, String keyPhone, String type) {
