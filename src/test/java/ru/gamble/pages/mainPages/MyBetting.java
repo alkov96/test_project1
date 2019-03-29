@@ -397,6 +397,9 @@ public class MyBetting extends AbstractPage {
         List<String> data = dataTable.asList(String.class);
         for (String state : data){
             selectReseltsBet(state);
+            if (driver.findElements(By.xpath("//*[contains(#class,'showBetInfo table__row')]")).isEmpty()){
+                continue;
+            }
             id = driver.findElement(By.xpath("//*[contains(@class,'howBetInfo table__row')]/td")).getAttribute("innerText"); //у первой записи запоминаем id
             bets.put(state,id);
         }

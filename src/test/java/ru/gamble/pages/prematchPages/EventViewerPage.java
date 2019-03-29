@@ -946,6 +946,28 @@ public class EventViewerPage extends AbstractPage {
         }
     }
 
+    @ActionTitle("проверяет нулевую маржу")
+    public void checkZeroMargin(){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
+        String by_games = "//div[contains(@class, 'bets-block__header bets-block__header_prematch')]";
+        By by_competitions = xpath("//li[@id='sport--14']/ul[@class='left-menu__submenu']//div[contains(@class,'left-menu__list-item-region-compitition')]");
+        closeSports();
+        wait.until(CommonStepDefs.elementIsOnPage(By.id("sport--14"),"Нет нулевой маржи!"));
+        driver.findElement(By.id("sport--14")).click();
+        List<WebElement> competitions =driver.findElements(by_competitions);
+        for (int i = 0; i < competitions.size(); i++) {
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by_competitions, competitions.size()-1));
+            wait.until(CommonStepDefs.elementIsOnPage((By.xpath(by_games)),"Не прогрузились игры"));
+            driver.findElements(by_competitions).get(i).click();
+            int size_games = driver.findElements(By.xpath(by_games)).size();
+            int by_size_zero_margin = driver.findElements(xpath(by_games + "/div[contains(@class, 'bets-block__header-inner bets-block__header-inner_right')]/i[@title='Нулевая маржа']")).size();
+            wait.withMessage("Количество игр и количество значков нулевой маржи не совпадают:" + by_size_zero_margin + " и " + size_games);
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(xpath(by_games + "/div[contains(@class, 'bets-block__header-inner bets-block__header-inner_right')]/i[@title='Нулевая маржа']"),size_games-1));
+            LOG.info("В разделе Нулевая маржа у каждой игры есть значок нулевой маржи");
+        }
+    }
+
     @ActionTitle("добавляем рандомное событие из Нулевой маржи")
     public void addZeroMarginToCoupon(){
         WebDriver driver = PageFactory.getDriver();

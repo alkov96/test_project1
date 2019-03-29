@@ -2754,6 +2754,8 @@ public class CommonStepDefs extends GenericStepDefs {
         WebDriver driver = PageFactory.getWebDriver();
         goToMainPage("site");
         driver.findElement(By.id("prematch")).click(); //переходим в прематч
+        driver.navigate().refresh();
+        workWithPreloader();
         Thread.sleep(5000);
         LOG.info("Перешли в прематч и сейчас будет чистить купон");
         AbstractPage.clearCoupon();

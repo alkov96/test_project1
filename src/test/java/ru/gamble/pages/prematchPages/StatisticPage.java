@@ -21,7 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 public class StatisticPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(StatisticPage.class);
 
-    @FindBy(xpath = "//div[@class='large-12 iblock columns']")
+    @FindBy(xpath = "//li[normalize-space(@class)='menuitem' and normalize-space(text())='Домашняя']")
     private WebElement iblock;
 
     public StatisticPage() {

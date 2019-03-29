@@ -260,17 +260,27 @@ public class RefillAccountsPage extends AbstractPage{
         WebDriver driver = PageFactory.getDriver();
         fillField(inputAmount,summ);
         BigDecimal amountEntered,maxAmount;
-
+        String methodName, exeptedMaxLimit;
+        String methodsKey = "DEPOSIT_METHODS_JSON";
+        String keyJsonByWSS = "JSON_LIMITS_BY_WSS";
+        BigDecimal maxLimitInDB,maxLimitByWSS;
+        Map<String,String> methodsInBD = Stash.getValue(methodsKey);
+        String checkValueByNull;
+        Object jsonByWSS =  JSONValue.parse(Stash.getValue(keyJsonByWSS).toString());
         amountEntered = new BigDecimal(inputAmount.getAttribute("value").replaceAll("\\s",""));
         LOG.info("Ввели в поле 'Сумма' [" + inputAmount.getAttribute("value") + "]");
         List<WebElement> partners = driver.findElements(By.xpath("//div[contains(@class,'payPartner')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         for(WebElement partner: partners) {
             partner.click();
             LOG.info("Нажали [" + partner.getAttribute("class") + "]");
-            WebElement lastAmount = driver.findElements(By.xpath("//span[contains(@class,'jsLink smallJsLink')]")).stream().filter(WebElement::isDisplayed).reduce((first, second) -> second).orElse(null);
-            maxAmount = new BigDecimal(lastAmount.getAttribute("innerText").replaceAll("\\s", ""));
-            LOG.info("Максимальная сумма [" + maxAmount + "]");
-
+            LOG.info("Сравниваем максимальный лимит из базы с суммой на web-странице");
+            methodName = partner.getAttribute("class").replaceAll("payPartner ","");
+            checkValueByNull = methodsInBD.get(methodName.replaceAll("_","").toUpperCase());
+            maxLimitInDB = new BigDecimal(checkValueByNull == null ? "0" : String.valueOf(checkValueByNull)).divide( new BigDecimal("100"));
+            maxLimitByWSS = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByWSS,"data"),"limits"),methodName),"max_deposit").toString()).divide( new BigDecimal("100"));
+            exeptedMaxLimit = (maxLimitInDB.compareTo(maxLimitByWSS) > 0) ? maxLimitByWSS.toString() : maxLimitInDB.toString();
+            exeptedMaxLimit = exeptedMaxLimit.split("[.]")[0];//на тот случай, если лимиты с копейками - убираем копейки, оставляем только целую часть
+            maxAmount = new BigDecimal(exeptedMaxLimit);
             if(amountEntered.compareTo(maxAmount) < 1){
                 assertThat(buttonRefill.isEnabled())
                         .as("Ошибка! При сумме [" + amountEntered + "], при пополнении через [" + partner.getAttribute("class") + "] кнопка 'ПОПОЛНИТЬ' оказалась недоступна.").isTrue();

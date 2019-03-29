@@ -76,6 +76,13 @@ public class ProfilePage extends AbstractPage {
     public void changePassword(String currentPass, String newPass) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         CommonStepDefs.workWithPreloader();
+        if (currentPass.matches("[A-Z]*")){
+            currentPass = Stash.getValue(currentPass).toString();
+        }
+        if (newPass.matches("[A-Z]*")){
+            newPass = Stash.getValue(newPass).toString();
+        }
+
         changePassword.click();
         oldPassword.clear();
         oldPassword.sendKeys(currentPass);

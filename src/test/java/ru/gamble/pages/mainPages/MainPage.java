@@ -285,12 +285,12 @@ public class MainPage extends AbstractPage {
         LOG.info("переходит в настройки и меняет коэффицент");
         preferences.click();
         String previous;
-        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
+        List<WebElement> list = driver.findElements(By.xpath("//li[contains(@class,'prefs__li_opt')]/span[contains(@class,'prefs__val')]/preceding-sibling::span[contains(@class,'prefs__key')]"));
         WebElement coeff = Stash.getValue("coeffKey");
-        for (int i = 1; i < 6; i++) {
+        for (int i = list.size()-1; i >0; i--) {
             previous = coeff.getAttribute("innerText");
-            LOG.info("Переключаемся на '" + list.get((i*3)%7-1).getAttribute("innerText") + "' формат отображения"); // рандомно берёт 1 тип из 6
-            list.get((i*3)%7-1).click();
+            LOG.info("Переключаемся на '" + list.get(i).getAttribute("innerText") + "' формат отображения"); // рандомно берёт 1 тип из 6
+            list.get(i).click();
             LOG.info("Текущее значение коэффициента : " + coeff.getAttribute("innerText"));
             Thread.sleep(350);
             if (previous.equals(coeff.getAttribute("innerText"))){
@@ -298,7 +298,7 @@ public class MainPage extends AbstractPage {
                 Assertions.fail("Формат отображения коэффициентов не изменился: " + previous +" " + coeff.getAttribute("innerText"));
             }
         }
-        list.get(0).click();
+       // list.get(0).click();
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
 
