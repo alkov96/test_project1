@@ -222,11 +222,15 @@ public class OperationHistoryPage extends AbstractPage {
 
             resultOneBet = entry.getKey();
             id = bets.get(resultOneBet); // достаем из параметров результат ставки и ищем id для этого результата в bets
-            LOG.info("Вводим в поле поиска id = " + id.toString().replace("\n",""));
+            if (id==null){
+                LOG.info("В Моих пари на выбранные даты не было ставок с исходом = '" + resultOneBet + "'. Првоерки совпадени id не будет. \nИдем дальше");
+                continue;
+            }
+            LOG.info("Вводим в поле поиска id = " + id.replace("\n",""));
             searchInput.clear();
             searchInput.sendKeys(id.toString().replace("\n",""));
             Thread.sleep(1500);
-            expectedBet = resultOneBet.equals("Проигрыш")|| resultOneBet.equals("Ожидается")? "Ставка": resultOneBet;
+            expectedBet = resultOneBet.equals("Проигрыш")|| resultOneBet.equals("Ожидается")? "Заключение пари": resultOneBet;
             lineInContainer = driver.findElements(By.xpath("//tr[contains(@class,'repeated-item')]"));
             for (WebElement line:lineInContainer){
                 if (line.getAttribute("innerText").contains(expectedBet)){

@@ -158,7 +158,7 @@ public class MainPage extends AbstractPage {
             games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[position()=1 and @ng-click]"));
             haveButton = !haveButton;
         }else {
-            LOG.info("Игра " + param + " найдена ");
+            LOG.info("Игра " + param + " найдена: " + games.get(0).getAttribute("innerText") + games.get(0).findElement(By.xpath("ancestor::tr")).getAttribute("inenrText"));
         }
         Stash.put("gameBT",games.get(0).findElement(By.xpath("ancestor::tr")));
         Stash.put("haveButtonKey",haveButton);

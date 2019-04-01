@@ -493,7 +493,7 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             LOG.info("У игры, у которой на виджете БТ есть кнопка Смотреть действительно есть видео. Проверка Успешна");
         } else {
-            String gameName = driver.findElement(By.xpath("//div[contains(@class,'live-container')]//span[contains(@class,'game-center-container__inner-text')]")).getAttribute("title");
+            String gameName = driver.findElement(By.xpath("//div[contains(@class,'game-center-container__prematch-title')]")).getAttribute("innerText");
             LOG.info("Перешли на игру. Ее название в линии: " + gameName);
             if (!stringParse(gameName).equals(stringParse(team1 + team2))) {
                 Assertions.fail("Из виджета переход на неправильную игру. Вместо " + stringParse(team1 + team2) + "перешли на " + stringParse(gameName));
@@ -2713,6 +2713,9 @@ public class CommonStepDefs extends GenericStepDefs {
         List<String> coefsOnPage =
                 driver.findElements(By.xpath("//div[contains(@class,'game-center-container__live')]//div[contains(@class,'bets-block__bet-cell_active')]/..//span[contains(@class,'bets-block__bet-cell-content-price')]"))
                         .stream().map(el -> el.getAttribute("innerText") + "%").collect(Collectors.toList());
+        if (coefsOnPage.size()==2){
+            coefsOnPage.add(1,"—%");
+        }
         LOG.info(coefsOnPage + "\n% - это просто разделитель. все норм");
         LOG.info("Теперь сравним этот список,с тем что было на баннере");
         List<String> coefsOnBanners = Stash.getValue(keyCoefs);
