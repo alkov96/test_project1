@@ -81,7 +81,7 @@
     },
 
   "TEST-FUNC": {
-    "MAIN_URL": "https://test-func.gamebet.ru",
+    "MAIN_URL": "https://test-func-bet-site.tsed.orglot.office",
     "MOBILE_URL": "https://test-func-mobile.gamebet.ru",
     "ESB_URL": "http://test-func-bet-dbproca.tsed.orglot.office:8660",
     "ADMIN_URL": "http://test-func-bet-dbproca.tsed.orglot.office/admin",

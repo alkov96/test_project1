@@ -131,8 +131,15 @@ public class LiveCalendarPage extends AbstractPage {
         LOG.info("Нажимаем на выпадающее меню видов спорта");
         waitingForPreloaderToDisappear(30);
         menuForSelectingSports.click();
+        WebElement selectSport;
         LOG.info("Выбираем вид спорта::" + sport);
-        WebElement selectSport = menuForSelectingSports.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
+        if (sport.equals("Футбол")){
+            selectSport = menuForSelectingSports.findElement(By.xpath("//li/label[contains(.,'" + sport + "') or contains(.,'Соккер')]"));
+            LOG.info(":" + menuForSelectingSports.findElements(By.xpath("//li/label[contains(.,'Соккер')]")).size());
+        }
+        else {
+            selectSport = menuForSelectingSports.findElement(By.xpath("//li/label[contains(.,'" + sport + "')]"));
+        }
         selectSport.click();
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOf(menuForSelectingSports));
         try {

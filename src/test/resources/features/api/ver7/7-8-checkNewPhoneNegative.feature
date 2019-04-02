@@ -115,22 +115,22 @@
 
     * ждем некоторое время "1"
 
-  Сценарий: Проверка checkNewPhone при невалидном номере телефона(буквы в номере телефона)
-
-    * добавляем данные в JSON объект "DATA" сохраняем в память:
-      | phone                       | 7dasd256818     |
-      | updateToken                 | UPDATETOKEN   |
-
-    * запрос к API "api/mobile/v7/checkNewPhone" и сохраняем в "RESPONCE_API":
-      | devId                       | DEVID         |
-      | authToken                   | AUTHTOKEN     |
-      | source                      | SOURCE        |
-      | data                        | DATA          |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted                     | "code":5      |
-
-    * ждем некоторое время "1"
+#  Сценарий: Проверка checkNewPhone при невалидном номере телефона(буквы в номере телефона)
+#
+#    * добавляем данные в JSON объект "DATA" сохраняем в память:
+#      | phone                       | 7dasd256818     |
+#      | updateToken                 | UPDATETOKEN   |
+#
+#    * запрос к API "api/mobile/v7/checkNewPhone" и сохраняем в "RESPONCE_API":
+#      | devId                       | DEVID         |
+#      | authToken                   | AUTHTOKEN     |
+#      | source                      | SOURCE        |
+#      | data                        | DATA          |
+#
+#    * проверка ответа API из "RESPONCE_API":
+#      | exepted                     | "code":5      |
+#
+#    * ждем некоторое время "1"
 
   Сценарий: Проверка checkNewPhone при невалидном authToken
     * сохраняем в память

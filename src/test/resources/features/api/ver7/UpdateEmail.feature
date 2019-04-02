@@ -75,7 +75,7 @@
       | exepted                     | "code":0      |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted                     | "remainingSeconds": 60 |
+      | exepted                     | "remainingSeconds":59 |
 
     #теперь собственно подтверждение аккаунта
 
@@ -176,7 +176,7 @@
       | exepted                     | "code":0      |
 
     * проверка ответа API из "RESPONCE_API":
-      | exepted                     | "remainingSeconds": 120 |
+      | exepted                     | "remainingSeconds":119 |
 
     #теперь собственно подтверждение аккаунта
 

@@ -61,6 +61,7 @@ public class VewingEventsPage extends AbstractPage {
 
     public void gameLiveVideo(boolean withVideo, boolean adding){
         WebDriver driver = PageFactory.getDriver();
+        int sizeFavourite = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']/li")).size();
         LOG.info("Переходим в лайв");
         driver.findElement(By.id("live")).click();
         CommonStepDefs.workWithPreloader();
@@ -111,6 +112,9 @@ public class VewingEventsPage extends AbstractPage {
                         driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).findElement(By.xpath("./ancestor::div[contains(@class,'poup-sports')]/preceding-sibling::h4")).click();
                     }
                     driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).click();
+                    new WebDriverWait(driver,10)
+                            .withMessage("Игра в избранное не добавилась!!")
+                            .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__favorite-list']/li"),sizeFavourite));
                 }
                 gameIsAdding = true;
             }
