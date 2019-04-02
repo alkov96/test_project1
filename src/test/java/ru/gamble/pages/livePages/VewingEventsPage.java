@@ -104,6 +104,9 @@ public class VewingEventsPage extends AbstractPage {
             //если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
             if (gameNumber != -1 && !gameIsAdding) {
                 String nameGamefull = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).get(gameNumber).getAttribute("innerText");
+                if (nameGamefull.equals("") || nameGamefull==null){
+                    continue; //игра надена, но она без названия. как ее потом првоерять? такая игра нам не нужна, идем дальше
+                }
                 CommonStepDefs.addStash("nameGameKey",nameGamefull);
                 CommonStepDefs.addStash("typeGameKey",typeGame);
                 if (adding) {
