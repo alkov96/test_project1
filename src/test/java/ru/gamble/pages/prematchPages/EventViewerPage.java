@@ -302,6 +302,7 @@ public class EventViewerPage extends AbstractPage {
     public void gamePrematchAtPeriod(String period, boolean inPeriod, boolean adding) throws Exception {
         WebDriver driver = PageFactory.getDriver();
         String nameGamefull;
+        int sizeFavourite = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']/li")).size();
         boolean gameIsAdding = false;
         int count;
         String typeGame;
@@ -386,6 +387,9 @@ public class EventViewerPage extends AbstractPage {
                             if (adding) {
                                 LOG.info("Нужную игру нашли. Добавляем ее в Избранное");
                                 allGames.get(GameInTour).findElement(By.xpath(".//i[contains(@class,'bets-block__header-icon_star')]")).click();
+                                new WebDriverWait(driver,10)
+                                        .withMessage("Игра в избранное не добавилась!!")
+                                        .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__favorite-list']/li"),sizeFavourite));
                             }
                             gameIsAdding = true;
                         }

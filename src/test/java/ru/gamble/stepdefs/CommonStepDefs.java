@@ -205,6 +205,9 @@ public class CommonStepDefs extends GenericStepDefs {
             new WebDriverWait(driver, 15)
                     .withMessage("Разлогинивали-разлогинивали, да не ралогинили. На сайте все еще кто-то авторизован")
                     .until(ExpectedConditions.not(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon"))));
+            new WebDriverWait(driver,15)
+                    .withMessage("Не удалось разлогиниться, виден баланс пользователя: " + driver.findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"))
+                    .until(ExpectedConditions.numberOfElementsToBe(By.id("topPanelWalletBalance"),0));
         } catch (Exception e) {
             LOG.info("На сайте никто не авторизован");
         }

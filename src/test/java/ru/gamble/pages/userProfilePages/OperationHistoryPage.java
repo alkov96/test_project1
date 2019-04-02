@@ -60,8 +60,10 @@ public class OperationHistoryPage extends AbstractPage {
         WebDriver driver = PageFactory.getDriver();
         Thread.sleep(1000);
         List<WebElement> newList = driver.findElements(By.xpath("//span[@class='history__id']")).stream()
-                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут")).collect(Collectors.toList());
-        //этот фильтр убирает операции кэшаута из списка. потмоу что у ставки и кэшаута будут одинаковые id. поэтому кэшаут будеим просто не учитывать
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут"))
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Выигрыш пари"))
+                .collect(Collectors.toList());
+        //этот фильтр убирает операции кэшаута и выигрыша из списка. потмоу что у ставки и кэшаута/выигрыша будут одинаковые id. поэтому будем их просто не учитывать
         newList.forEach(element -> {
             if (id.contains(element.getAttribute("innerText"))) {
                 id.add("idbad");
@@ -82,9 +84,11 @@ public class OperationHistoryPage extends AbstractPage {
 
         id.clear();
 
-//этот фильтр убирает операции кэшаута из списка. потмоу что у ставки и кэшаута будут одинаковые id. поэтому кэшаут будеим просто не учитывать
+//этот фильтр убирает операции кэшаута и выигрыша из списка. потмоу что у ставки и кэшаута/выигрыша будут одинаковые id. поэтому будем их просто не учитывать
         operationsId = driver.findElements(By.xpath("//span[@class='history__id']")).stream()
-                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут")).collect(Collectors.toList());
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут"))
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Выигрыш пари"))
+                .collect(Collectors.toList());
         operationsId.forEach(element -> id.add(element.getAttribute("innerText")));
 
         currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
