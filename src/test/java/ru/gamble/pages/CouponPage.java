@@ -547,19 +547,24 @@ public class CouponPage extends AbstractPage {
     public void checkCountExpress() {
         WebDriver driver = PageFactory.getDriver();
         WebElement dropdownOpt = driver.findElement(xpath("//div[contains(@class,'coupon__system-select')]"));
-        List<WebElement> systemTypes = dropdownOpt.findElements(xpath("div//li[contains(@clas,'coupon__dropdown-item')]"));
+        List<WebElement> systemTypes = dropdownOpt.findElements(xpath("div//li[contains(@class,'coupon__dropdown-item')]"));
         WebElement openList = dropdownOpt.findElement(xpath("div/div[contains(@class,'custom-select__placeholder')]"));
         int countExp = Integer.valueOf(current_type_of_system.getAttribute("innerText").replaceAll("[^0-9?!]", ""));
-        int count;
+        int count=0;
+        boolean flag = false;//флаг, который говорит есть ли разное разбиение системы. если да - то тру. по умолчанию - фолс
         for (WebElement type : systemTypes) {
             openList.click();
             type.click();
             count = Integer.valueOf(current_type_of_system.getAttribute("innerText").replaceAll("[^0-9?!]", ""));
-            assertFalse(
-                    "При переключении разбиения системы не меняется общее количество экспрессов. Было " + countExp + ", стало " + count,
-                    count == countExp);
+
+            if (count!=countExp){
+                flag=true;
+            }
             countExp = count;
         }
+                    assertTrue(
+                    "При переключении разбиения системы не меняется общее количество экспрессов. Для всех разбиений количество экспрессов = " + count,
+                    flag);
     }
 
 
@@ -581,7 +586,7 @@ public class CouponPage extends AbstractPage {
         gear.click();
 
         LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
-        driver.findElement(xpath("//span[text()='Выберите время']")).click();
+        driver.findElement(xpath("//span[text()='Всегда']")).click();
         LOG.info("Возвращаемся к списку событий в купоне");
         driver.findElement(xpath("//span[text()='Купон']")).click();
         if (buttonBet.isEnabled()!=disabled){
@@ -880,7 +885,7 @@ public class CouponPage extends AbstractPage {
         gear.click();
 
         LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
-        driver.findElement(xpath("//span[text()='Любые коэффициенты']")).click();
+        driver.findElement(xpath("//span[text()='Всегда']")).click();
         LOG.info("Возвращаемся к списку событий в купоне");
         driver.findElement(xpath("//span[text()='Купон']")).click();
     }

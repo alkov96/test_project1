@@ -2789,7 +2789,11 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @After(value = "@coupon")
-    public void clearCouponAfter() throws InterruptedException {
+    public void clearCouponAfter(Scenario scenario) throws InterruptedException {
+        if (scenario.isFailed()) {
+            final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
+            scenario.embed(screenshot, "image/jpeg");
+        }
         WebDriver driver = PageFactory.getWebDriver();
         goToMainPage("site");
         driver.findElement(By.id("prematch")).click(); //переходим в прематч
@@ -2798,8 +2802,7 @@ public class CommonStepDefs extends GenericStepDefs {
         Thread.sleep(5000);
         LOG.info("Перешли в прематч и сейчас будет чистить купон");
         AbstractPage.clearCoupon();
-        LOG.info("Отчистили купон");
-
+        LOG.info("Очистили купон");
     }
 
     public static ExpectedCondition<Boolean> elementIsOnPage(final By locator, final String messages) {
