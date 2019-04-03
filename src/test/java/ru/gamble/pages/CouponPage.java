@@ -2,6 +2,7 @@ package ru.gamble.pages;
 
 
 import cucumber.api.java.bs.A;
+import org.apache.poi.ss.formula.functions.T;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
@@ -471,9 +472,12 @@ public class CouponPage extends AbstractPage {
         LOG.info("Ищем и нажимаем на шестерёнку в Купоне [" + i + "]");
         WebElement gear = driver.findElement(xpath("//span[contains(@class,'coupon-tabs__item-link')]/i"));
         gear.click();
-
-        LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
-        driver.findElement(xpath("//span[text()='Любые коэффициенты']")).click();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        driver.findElement(By.xpath("//li[@class='coupon-settings__item'  and position()=4]//span")).click();
         LOG.info("Возвращаемся к списку событий в купоне");
         driver.findElement(xpath("//span[text()='Купон']")).click();
 
@@ -577,7 +581,7 @@ public class CouponPage extends AbstractPage {
         gear.click();
 
         LOG.info("Ищем и выбираем 'Любые коэффициенты' [" + i + "]");
-        driver.findElement(xpath("//span[text()='Любые коэффициенты']")).click();
+        driver.findElement(xpath("//span[text()='Выберите время']")).click();
         LOG.info("Возвращаемся к списку событий в купоне");
         driver.findElement(xpath("//span[text()='Купон']")).click();
         if (buttonBet.isEnabled()!=disabled){
@@ -839,7 +843,7 @@ public class CouponPage extends AbstractPage {
         for(int i=0; i<listOne.size(); i++){
             listOne.get(i).normalizationBet();
             listTwo.get(i).normalizationBet();
-            Assert.assertTrue("Запись под номером " + (i+1) + " не совпадает в 'Моих Пари' и в 'Истории пари' в купоне:",
+            Assert.assertTrue("Запись под номером " + (i+1) + " не совпадает в 'Моих Пари' и в 'Истории пари' в купоне:" + listOne.get(i) + "  " + listTwo.get(i),
                     listOne.get(i).equals(listTwo.get(i)));
             LOG.info("Проверили одну строчку");
         }

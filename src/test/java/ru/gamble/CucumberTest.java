@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
+import java.util.logging.FileHandler;
+
 //del /q C:\Workspace\autotests-888-m\allure-results
 @RunWith(Cucumber.class)
 @CucumberOptions(
@@ -19,7 +21,7 @@ import ru.sbtqa.tag.pagefactory.PageFactory;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm","pretty"},
-        tags = {"@regress"})
+        tags = {"@smoke"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
@@ -48,6 +50,11 @@ public class CucumberTest {
     @AfterClass
     public static void afterScenario(){
         PageFactory.dispose();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
 

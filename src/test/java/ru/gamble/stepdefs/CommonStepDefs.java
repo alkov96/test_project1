@@ -16,6 +16,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -190,30 +191,62 @@ public class CommonStepDefs extends GenericStepDefs {
         goToMainPage("site");
         cleanCookies();
         descktopSiteLogOut(driver);
+
     }
 
 
-    private void descktopSiteLogOut(WebDriver driver) {
-        try {
-            LOG.info("Ищем наличие кнопки с силуетом пользователя.");
-            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon")));
+    private void descktopSiteLogOut(WebDriver driver){
+        WebDriverWait wait = new WebDriverWait(driver,20);
+        LOG.info("Ищем наличие кнопки с силуетом пользователя.");
+        List<WebElement> userMan = driver.findElements(By.id("user-icon"));
+        List<WebElement> continueRegistartion = driver.findElements(By.id("continue-registration"));//возможно на сате залогинен пользователь , не окончивший регистрацию. тогда балнса и икони у него не будет,  абудт кнопка "продолжить регу"
+        if (!userMan.isEmpty()){
             LOG.info("Нажимаем на кнопку с силуетом пользователя.");
-            driver.findElement(By.id("user-icon")).click();
-            Thread.sleep(1000);
+            userMan.get(0).click();
+            wait
+                    .withMessage("Нажали на значок пользователя, но не появилась кнопка для выхода")
+                    .until(ExpectedConditions.attributeContains(By.xpath("//div[contains(@class,'subMenuArea user-menu')]"),"class","active"));
             LOG.info("Ищем кнопку 'Выход' и нажимаем");
-            driver.findElement(By.id("log-out-button")).click();
-            new WebDriverWait(driver, 15)
+            int indexX = driver.findElement(By.id("log-out-button")).getLocation().getX() + driver.findElement(By.id("log-out-button")).getSize().getWidth()/2;
+            int indexY = driver.findElement(By.id("log-out-button")).getLocation().getY() + driver.findElement(By.id("log-out-button")).getSize().getHeight()/2;
+//            new Actions(driver).moveByOffset(indexX,indexY).click().build().perform();
+            try {
+                Robot r = new Robot();
+                r.mouseMove(indexX,indexY);
+                r.mousePress(InputEvent.BUTTON1_MASK);
+                r.mouseRelease(InputEvent.BUTTON1_MASK);
+            } catch (AWTException e) {
+                e.printStackTrace();
+            }
+
+
+           // LOG.info("COORDINATE:" + MouseInfo.getPointerInfo().getLocation() + driver.findElement(By.id("log-out-button")).getLocation());
+         //   new Actions(driver).moveToElement(driver.findElement(By.id("log-out-button")),10,0).click().build().perform();
+
+//            driver.findElement(By.id("log-out-button")).click();
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            driver.navigate().refresh();
+        LOG.info("Обновили страницу на всякий случай");
+            wait
                     .withMessage("Разлогинивали-разлогинивали, да не ралогинили. На сайте все еще кто-то авторизован")
-                    .until(ExpectedConditions.not(ExpectedConditions.visibilityOfElementLocated(By.id("user-icon"))));
-            new WebDriverWait(driver,15)
-                    .withMessage("Не удалось разлогиниться, виден баланс пользователя: " + driver.findElement(By.id("topPanelWalletBalance")).getAttribute("innerText"))
+                    .until(ExpectedConditions.numberOfElementsToBe(By.id("user-icon"),0));
+            wait
+                    .withMessage("Разлогинивали-разлогинивали, да не ралогинили. На сайте все еще отображается баланс")
                     .until(ExpectedConditions.numberOfElementsToBe(By.id("topPanelWalletBalance"),0));
-        } catch (Exception e) {
+        }
+        else if (!continueRegistartion.isEmpty()){
+            driver.findElement(By.id("terminate-registration-logout-button")).click();
+            wait
+                    .withMessage("Разлогинивали-разлогинивали, да не ралогинили. На сайте все еще кто-то авторизован")
+                    .until(ExpectedConditions.numberOfElementsToBe(By.id("continue-registration"),0));
+        }
+        else{
             LOG.info("На сайте никто не авторизован");
         }
-
-        driver.navigate().refresh();
-        LOG.info("Обновили страницу на всякий случай");
     }
 
     private void mobileSiteLogOut(WebDriver driver) {

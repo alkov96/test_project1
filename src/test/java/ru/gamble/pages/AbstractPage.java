@@ -28,7 +28,9 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.logging.FileHandler;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -343,7 +345,8 @@ public abstract class AbstractPage extends Page{
         MatcherAssert.assertThat(false, equalTo(checkCloseServiceMessage(closeServiceMessage)));
     }
 
-    public void fillCouponFinal(int count, String ifForExperss, String findCoeffs) throws InterruptedException {
+    public void fillCouponFinal(int count, String ifForExperss) throws InterruptedException {
+        String findCoeffs = "//div[contains(@class,'livecal-table__coefficient') and not(contains(@class,'no-link'))]";
         if (ifForExperss.equals("correct")) {
             List<WebElement> eventsInCoupon;
             List<WebElement> correctMarkets;
@@ -760,7 +763,7 @@ public abstract class AbstractPage extends Page{
             phone = browserName.contains("chrome") ?
                     JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue() :
                     JsonLoader.getData().get(STARTING_URL).get("PHONE_FIREFOX").getValue();
-            password = JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue();
+            password = JsonLoader.getData().get(STARTING_URL).get("PASSWORD_TSUPIS").getValue();
 
             LOG.info("Пытаемся найти поле для ввода номера телефона по id[form_login_phone]");
             new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("form_login_phone")));
@@ -854,8 +857,8 @@ public abstract class AbstractPage extends Page{
         driver.findElement(By.xpath("//*[contains(@value,'"+table.get("button")+"')]")).click();
         value = table.get("textis");
         new WebDriverWait(driver,10).until(attributeContains(By.xpath("//body"),"innerText",value));
-        driver.close();
-        driver.quit();
+//        driver.close();
+//        driver.quit();
     }
 
 
