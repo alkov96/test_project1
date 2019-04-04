@@ -366,8 +366,8 @@ public class MainPage extends AbstractPage {
     @ActionTitle("ищет подходящий спорт в Горячих ставках")
     public void findSportHB(){
         WebDriver driver = PageFactory.getDriver();
-        WebDriverWait wait = new WebDriverWait(driver,10);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        WebDriverWait wait = new WebDriverWait(driver,15);
+        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
         List<String> sportsLanding = new ArrayList<>();
         driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).forEach(element->
@@ -378,7 +378,7 @@ public class MainPage extends AbstractPage {
         int index = -1;
         for (WebElement sport : allSport){
             //index = sportsLanding.indexOf(sport.getAttribute("title").toLowerCase().trim());
-            for (String subSportName: allSport.get(0).getAttribute("title").toLowerCase().trim().split(" ")){
+            for (String subSportName: sport.getAttribute("title").toLowerCase().trim().split(" ")){
                 index = sportsLanding.indexOf(subSportName);
                 if (index!=-1) break;
             }

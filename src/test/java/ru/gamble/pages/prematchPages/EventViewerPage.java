@@ -418,17 +418,17 @@ public class EventViewerPage extends AbstractPage {
     public static void onTriggerPeriod(String period){
         WebDriver driver = PageFactory.getDriver();
         //если меню свернуто - разворачиваем
-        WebElement menu = driver.findElement(By.id("menu-toggler"));
-        if (!menu.getAttribute("class").contains("collapsed")) {
-            menu.click();
-            CommonStepDefs.workWithPreloader();
-        }
+        setExpandCollapseMenusButton(true);
         driver.findElement(By.xpath("//div[@class='periods']//div[contains(@class,'periods__input')]")).click();
         //включает фильтр по времени
         driver.findElement(By.xpath("//div[@class='periods']//ul[@class='periods__list']/li[contains(text(),'"+period+"')]")).click();
         CommonStepDefs.workWithPreloader();
         Stash.put("keyPeriod",period);
+        setExpandCollapseMenusButton(true);
     }
+
+
+
 
     /**
      * проверка что страница Прметач соответсвует ожиданиям (открыта нужная игра и триггер по времени в правильном состоянии
@@ -550,9 +550,6 @@ public class EventViewerPage extends AbstractPage {
         WebDriverWait wait =  new WebDriverWait(driver,10);
         boolean turnOn = onOrOff.equalsIgnoreCase("включает")?true:false;
         By xpathMultiviewButton = By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]");
-
-
-
 
         if (!driver.findElements(preloaderOnPage).isEmpty()){
             LOG.info("Страница не прогрузилась. Обновим её");
