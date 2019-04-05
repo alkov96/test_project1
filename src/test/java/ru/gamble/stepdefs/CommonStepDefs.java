@@ -8,6 +8,8 @@ import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
+import io.qameta.allure.Allure;
+import io.qameta.allure.Attachment;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
@@ -23,6 +25,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.CucumberTest;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.utility.DBUtils;
@@ -49,6 +52,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -2788,12 +2793,33 @@ public class CommonStepDefs extends GenericStepDefs {
         CommonStepDefs.workWithPreloader();
     }
 
+
+    private void getScreenshot(Scenario scenario){
+        LOG.info("fail? " + scenario.isFailed());
+        if (scenario.isFailed()) {
+            LOG.info("screenshot!!! ");
+            final byte[] screenshotCoupon = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
+            InputStream targetStream = new ByteArrayInputStream(screenshotCoupon);
+            Allure.addAttachment("Результат",targetStream);
+        }
+    }
+
+    @After(value = "@Multimarkets")
+    public void offMultimarket(Scenario scenario) throws InterruptedException {
+        getScreenshot(scenario);
+        WebDriver driver = PageFactory.getWebDriver();
+        goToMainPage("site");
+        driver.findElement(By.id("prematch")).click(); //переходим в прематч
+        driver.navigate().refresh();
+        workWithPreloader();
+        Thread.sleep(5000);
+        LOG.info("Перешли в прематч и сейчас отключим режим мультирынков");
+        new EventViewerPage().onOffMultimarkets("выключает");
+    }
+
     @After(value = "@coupon")
     public void clearCouponAfter(Scenario scenario) throws InterruptedException {
-        if (scenario.isFailed()) {
-            final byte[] screenshot = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
-            scenario.embed(screenshot, "image/jpeg");
-        }
+        getScreenshot(scenario);
         WebDriver driver = PageFactory.getWebDriver();
         goToMainPage("site");
         driver.findElement(By.id("prematch")).click(); //переходим в прематч
@@ -2852,6 +2878,14 @@ public class CommonStepDefs extends GenericStepDefs {
                 value = String.valueOf(dateNow.getTime());
                 Stash.put(bodyRequest.get(param),value);
         }
+    }
+
+    @Когда("^добавляем ссылку главного меню \"([^\"]*)\"$")
+    public void onmenuLink(String namePage) {
+        String sqlRequest = "UPDATE gamebet.`mainmenulink` SET active = 1 WHERE name='" + namePage + "'";
+        workWithDB(sqlRequest);
+        LOG.info("Включили отображение ссылки главного меню: " + namePage);
+
     }
 }
 

@@ -1,6 +1,7 @@
 package ru.gamble;
 
 import cucumber.api.CucumberOptions;
+import cucumber.api.Scenario;
 import cucumber.api.junit.Cucumber;
 import io.qameta.allure.Attachment;
 import org.junit.AfterClass;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
+import javax.mail.Session;
 import java.util.logging.FileHandler;
 
 //del /q C:\Workspace\autotests-888-m\allure-results
@@ -21,15 +23,13 @@ import java.util.logging.FileHandler;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm","pretty"},
-        tags = {"@smoke,@regress"})
+        tags = {"@regress"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
 
     @Rule
     public TestWatcher watchman = new TestWatcher() {
-        String fileName;
-
         @Override
         protected void failed(Throwable e, Description description) {
             screenshot();
