@@ -2772,6 +2772,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^отматывает дату начала на самую раннюю$")
     public void datapickerOnBegin() {
         WebDriver driver = PageFactory.getWebDriver();
+        new WebDriverWait(driver,15).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"),0));
         WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
         if (!datapickerBegin.getAttribute("class").contains("active")) {
             datapickerBegin.click();

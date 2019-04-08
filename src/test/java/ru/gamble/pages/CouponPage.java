@@ -813,7 +813,7 @@ public class CouponPage extends AbstractPage {
        // helpString.append(sumElement.findElement(By.xpath("span")).getAttribute("class"));
         helpString.append(element.findElement(By.xpath("div[contains(@class,'coupon-bet')]//*[normalize-space(text())='Ставка']/following-sibling::span/span")).getAttribute("class"));
         sumBet.append(helpString.toString().contains("rur") ? " Р" : " Б");
-        bet.setSum(sumBet.toString());
+        bet.setSum(sumBet.toString().replace(".00","").replace(".0",""));
 
 
         //запоминаем названия ставок (или одно название, если ординар)
@@ -823,7 +823,7 @@ public class CouponPage extends AbstractPage {
 
         //запоминаем коэффициенты ставок (или один кэф, если ординар)
         element.findElements(By.xpath("div[contains(@class,'coupon-bet')]/ul/li[3]/span[contains(@class,'coupon-bet__sum')]"))
-                .forEach(el -> coefs.add(el.getAttribute("title").trim()));
+                .forEach(el -> coefs.add(el.getAttribute("title").trim().replace(".00","").replace(".0","")));
         bet.setCoefs(coefs);
 
         //запоминаем даты игр
@@ -848,7 +848,7 @@ public class CouponPage extends AbstractPage {
         for(int i=0; i<listOne.size(); i++){
             listOne.get(i).normalizationBet();
             listTwo.get(i).normalizationBet();
-            Assert.assertTrue("Запись под номером " + (i+1) + " не совпадает в 'Моих Пари' и в 'Истории пари' в купоне:" + listOne.get(i) + "  " + listTwo.get(i),
+            Assert.assertTrue("Запись под номером " + (i+1) + " не совпадает в 'Моих Пари' и в 'Истории пари' в купоне:" + listOne.get(i).getNames() + "  " + listTwo.get(i).getNames(),
                     listOne.get(i).equals(listTwo.get(i)));
             LOG.info("Проверили одну строчку");
         }

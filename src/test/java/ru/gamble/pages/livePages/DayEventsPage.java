@@ -147,7 +147,7 @@ public class DayEventsPage extends AbstractPage {
     public static void addEventsToCouponF (int countBet) throws InterruptedException {
         WebDriver driver = PageFactory.getDriver();
         int counter = 0;
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         List<WebElement> allEvents = driver.findElements(xpath("//div[@class='bets-widget bets-widget_wide liveNow']//table[@class='full_width bets-widget-table']//tr/td[5]/div/span")).
                 stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         if(allEvents.size() > 0){
