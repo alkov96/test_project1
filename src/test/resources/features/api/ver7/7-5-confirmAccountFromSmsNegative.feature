@@ -80,6 +80,7 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "code":15      |
+    * ждем некоторое время "1"
 
   Сценарий: Проверка confirmAccountFromSMS при невалидном accountToken
     * сохраняем в память
@@ -100,6 +101,7 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "message":"invalid account token" |
+    * ждем некоторое время "1"
 
   Сценарий: Проверка confirmAccountFromSMS при неправильном коде
 
@@ -118,3 +120,4 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "message":"code incorrect" |
+    * ждем некоторое время "1"

@@ -129,3 +129,4 @@
       | exepted                     | "code":9          |
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "message":"code incorrect" |
+    * ждем некоторое время "1"

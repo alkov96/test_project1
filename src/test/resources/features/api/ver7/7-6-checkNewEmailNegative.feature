@@ -161,3 +161,4 @@
       | exepted                     | "code":101     |
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "message":"invalid update token" |
+    * ждем некоторое время "1"

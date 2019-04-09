@@ -2805,6 +2805,11 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    @After(value = "@AzbukaBettingaLinks_C76652")
+    public void closeSecondWindow(Scenario scenario) throws InterruptedException {
+        ((JavascriptExecutor) PageFactory.getWebDriver()).executeScript("second_window.close()");
+    }
+
     @After(value = "@Multimarkets")
     public void offMultimarket(Scenario scenario) throws InterruptedException {
         getScreenshot(scenario);

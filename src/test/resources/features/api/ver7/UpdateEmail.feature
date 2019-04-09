@@ -124,7 +124,7 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "code":0      |
-
+    * ждем некоторое время "1"
 
   @api
   @changePassword
@@ -225,5 +225,5 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "code":0      |
 
-
+    * ждем некоторое время "1"
 

@@ -80,6 +80,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "code":15         |
 
+    * ждем некоторое время "1"
 
   Сценарий: Проверка confirmAccountFromEmail при неправильном коде
 
@@ -98,3 +99,4 @@
       | exepted                     | "code":9         |
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "message":"code incorrect" |
+    * ждем некоторое время "1"

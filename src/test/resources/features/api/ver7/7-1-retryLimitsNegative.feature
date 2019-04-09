@@ -37,6 +37,7 @@
       | exepted | "remainingAttempts":0      |
     * проверка ответа API из "RESPONCE_API":
       | exepted | "exceededLimitType":2      |
+    * ждем некоторое время "1"
 
   Сценарий: ПРОВЕРКА ЗАПРОСА retryLimits ПРИ ЗАКОНЧИВШИХСЯ ПОПЫТКАХ СМЕНЫ БАЗОВЫХ ПАРАМЕТРОВ ЗА СУТКИ
 
@@ -63,6 +64,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "exceededLimitType":1      |
 
+    * ждем некоторое время "1"
 
   Сценарий: ПРОВЕРКА ЗАПРОСА retryLimits ПРИ НЕПРАВИЛЬНОМ authtoken
 
@@ -88,3 +90,4 @@
       | exepted | "code":15      |
     * проверка ответа API из "RESPONCE_API":
       | exepted | "message":"invalid auth token"      |
+    * ждем некоторое время "1"
