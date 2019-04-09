@@ -68,7 +68,7 @@
         | exepted                     | "code":100      |
       * проверка ответа API из "RESPONCE_API":
         | exepted                     | "message":"invalid account token" |
-
+      * ждем некоторое время "1"
 
   Сценарий: Проверка chooseMethod при невалидном authToken
 
@@ -88,3 +88,4 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted                     | "code":15      |
+    * ждем некоторое время "1"

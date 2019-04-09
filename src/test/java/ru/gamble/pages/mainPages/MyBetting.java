@@ -358,10 +358,9 @@ public class MyBetting extends AbstractPage {
         }
         bet.setTimeBet(timeBet.toString());
 
-
         element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-kef')]/div"))
                 .stream()
-                .forEach(el -> coefs.add(el.getAttribute("innerText")));
+                .forEach(el -> coefs.add(el.getAttribute("innerText").replace(".00","").replace(".0","")));
 
         element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=1]"))
                 .stream()
@@ -383,7 +382,7 @@ public class MyBetting extends AbstractPage {
 
         sum.append(helpString.toString().contains("hide") ? "Б" : "Р");
         sum.insert(0, element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[1]")).getAttribute("innerText") + " ");
-        bet.setSum(sum.toString());
+        bet.setSum(sum.toString().replace(".00","").replace(".0",""));
 
         return bet;
     }

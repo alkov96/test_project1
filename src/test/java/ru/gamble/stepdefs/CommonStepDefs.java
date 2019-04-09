@@ -2774,6 +2774,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^отматывает дату начала на самую раннюю$")
     public void datapickerOnBegin() {
         WebDriver driver = PageFactory.getWebDriver();
+        new WebDriverWait(driver,15).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"),0));
         WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
         if (!datapickerBegin.getAttribute("class").contains("active")) {
             datapickerBegin.click();
@@ -2804,6 +2805,11 @@ public class CommonStepDefs extends GenericStepDefs {
             InputStream targetStream = new ByteArrayInputStream(screenshotCoupon);
             Allure.addAttachment("Результат",targetStream);
         }
+    }
+
+    @After(value = "@AzbukaBettingaLinks_C76652")
+    public void closeSecondWindow(Scenario scenario) throws InterruptedException {
+        ((JavascriptExecutor) PageFactory.getWebDriver()).executeScript("second_window.close()");
     }
 
     @After(value = "@Multimarkets")
