@@ -36,6 +36,7 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
+import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
@@ -82,7 +83,7 @@ import static ru.gamble.utility.Generators.generateDateForGard;
 public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
     private static final String sep = File.separator;
-
+//private static StringBuilder tmp=new StringBuilder();
 
     public static String getSMSCode(String phone){
         WebDriver driver = PageFactory.getWebDriver();
@@ -2337,44 +2338,44 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Сохранили в память key [" + KeyInStash + "] <== value [" + result + "]");
     }
 
-//    @Когда("^запрос к тест-WSS \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
-//    public void requestByWSSAndSaveTest(String wSSPath, String KeyInStash, DataTable dataTable) {
-//        requestToWSSTest(Stash.getValue(wSSPath), KeyInStash, dataTable);
-//    }
-//
-//    private void requestToWSSTest(String requestFull, String keyStash, DataTable dataTable) {
-//        if (!(null == dataTable)) {
-//            Map<String, String> table = dataTable.asMap(String.class, String.class);
-//        }
-//        Object params = null;
-//
-//        LOG.info("Собираем параметы в JSON строку");
-//        JSONObject jsonObject = new JSONObject();
-//        if (!(null == dataTable)) {
-//            params = collectParametersInJSONString(dataTable);
-//        }
-//        String therdRequest = "{\"command\":\"get\",\"params\":{\"source\": \"betting\"\n\"subscribe\": \"true\"},\"rid\":\"" + Stash.getValue("RID") + "\"}";
-//
-//        StringBuilder builder = new StringBuilder();
-//
-//        try {
-//            WebSocket ws = connect(builder, requestFull);
-//            ws.sendText(JSONValue.toJSONString(params));
-//            Thread.sleep(2000);
-//            ws.sendText(therdRequest);
-//            Thread.sleep(2000);
-//        } catch (IOException | WebSocketException | InterruptedException | NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//            throw new AutotestError("Ошибка! Проблемы с WebSocket.");
-//        }
-//        String limits = builder.toString();
-//
-//        if (!limits.isEmpty()) {
-//            Stash.put(keyStash, limits);
-//        } else {
-//            throw new AutotestError("Ошибка! По WSS получили[" + limits + "]");
-//        }
-//    }
+    @Когда("^запрос к WSS для нулевой маржи \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestByWSSAndSaveTest(String wSSPath, String KeyInStash) {
+        requestToWSSTest(Stash.getValue(wSSPath), KeyInStash);
+    }
+
+    private void requestToWSSTest(String requestFull, String keyStash) {
+
+
+        StringBuilder res = new StringBuilder();
+        String therdRequest = "{\"command\":\"get\",\"params\":{\"source\":\"betting\",\"what\":{\"sport\":[\"id\",\"name\"],\"competition\":[\"id\",\"name\"],\"region\":[\"id\",\"name\"],\"game\":[\"id\",\"native_id\",\"start_ts\",\"team1_name\",\"team2_name\",\"team1_id\",\"team1_native_id\",\"team2_id\",\"team2_native_id\",\"type\",\"show_type\",\"info\",\"events_count\",\"markets_count\",\"is_blocked\",\"is_stat_available\",\"is_live\",\"zero_margin\"],\"event\":[\"id\",\"price\",\"type\",\"name\",\"order\",\"base\"],\"market\":[\"type\",\"express_id\",\"name\",\"base\"]},\"where\":{\"sport\":{\"id\":1},\"competition\":{\"id\":567},\"game\":{\"type\":{\"@in\":[0,2]},\"zero_margin\":true,\"is_blocked\":false},\"market\":{\"type\":{\"@include\":[\"MatchResult\",\"MatchResult\",\"OverUnder\",\"DoubleChance\",\"HalfTimeOverUnder\",\"2ndHalfTotalOver/Under\",\"AsianHandicap\"]}}},\"subscribe\":true},\"rid\":\"42-44-330-1554802387010-22\"}";
+
+        try {
+            WebSocket ws = connect(res, requestFull);
+            ws.sendText(therdRequest);
+            Thread.sleep(2000);
+        } catch (IOException | WebSocketException | InterruptedException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new AutotestError("Ошибка! Проблемы с WebSocket.");
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        String result  = res.toString();
+        LOG.info(result);
+        if (!result.isEmpty()) {
+            Stash.put(keyStash, result);
+            Integer size_res = result.split("sport").length;
+            Stash.put("key_size", size_res);
+
+        } else {
+            throw new AutotestError("Ошибка! По WSS получили[" + result + "]");
+        }
+
+    }
+
+
 
 
     @Когда("^запрос к WSS \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
@@ -2432,10 +2433,11 @@ public class CommonStepDefs extends GenericStepDefs {
                 .addListener(new WebSocketAdapter() {
                     // A text message arrived from the server.
                     public void onTextMessage(WebSocket websocket, String message) {
-                        if (message.contains("deposit")) {
-                            tmp.append(message);
-                            LOG.info("Получили ответ::" + tmp.toString());
-                        }
+//                        if (message.contains("deposit")) {
+//                            tmp.append(message);
+//                            LOG.info("Получили ответ::" + tmp.toString());
+//                        }
+                        tmp.append(message);
                     }
                 })
                 .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)

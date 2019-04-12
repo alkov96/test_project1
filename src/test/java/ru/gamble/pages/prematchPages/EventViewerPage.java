@@ -946,6 +946,13 @@ public class EventViewerPage extends AbstractPage {
             LOG.info("клик");
         }
     }
+    @ActionTitle("сравниваем количество игр по wss и в Прематче")
+    public void compareSizeOfZeroMargin(){
+        Integer games_in_prematch = Stash.getValue("by_size_zero_margin_key");
+        Integer games_wss = Stash.getValue("key_size");
+        Assert.assertTrue("Значения не совпадают! Количество игр по wss:" + games_wss + " Количество игр в Прематче: " + games_in_prematch,games_in_prematch.equals(games_wss));
+
+    }
 
     @ActionTitle("проверяет нулевую маржу")
     public void checkZeroMargin(){
@@ -966,6 +973,7 @@ public class EventViewerPage extends AbstractPage {
             wait.withMessage("Количество игр и количество значков нулевой маржи не совпадают:" + by_size_zero_margin + " и " + size_games);
             wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(xpath(by_games + "/div[contains(@class, 'bets-block__header-inner bets-block__header-inner_right')]/i[@title='Нулевая маржа']"),size_games-1));
             LOG.info("В разделе Нулевая маржа у каждой игры есть значок нулевой маржи");
+            Stash.put("by_size_zero_margin_key", by_size_zero_margin);
         }
     }
 
@@ -975,7 +983,7 @@ public class EventViewerPage extends AbstractPage {
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
         Random random = new Random();
         List<WebElement> competitions =driver.findElements(xpath("//li[@id='sport--14']/ul[@class='left-menu__submenu']//div[contains(@class,'left-menu__list-item-region-compitition')]"));
-        competitions.get(1).click();
+        competitions.get(0).click();
         wait.until(CommonStepDefs.elementIsOnPage((By.xpath( "//div[contains(@class, 'bets-block__header bets-block__header_prematch')]")),"Не прогрузились игры"));
         List<WebElement> coeffs = driver.findElements(xpath("//div[@class='bets-block prematch-competition-games__item']/div[contains(@class,'bets-block__body')]/div[contains(@class,'bets-block__bet-cell')]"));
         int num = random.nextInt(Math.abs(coeffs.size()-1));
