@@ -62,6 +62,10 @@ public class ProfilePage extends AbstractPage {
     @FindBy(xpath = "//button[@ng-click='updatePassword()']")
     protected WebElement savePassword;
 
+    @ElementTitle("Изменить email")
+    @FindBy(xpath = "//div[normalize-space(text())='Электронная почта']/following-sibling::div/span")
+    protected WebElement editEmail;
+
 
 
     public ProfilePage() {
@@ -168,8 +172,35 @@ public class ProfilePage extends AbstractPage {
                     valueInMemory.toLowerCase().equals(valueLine.toLowerCase()));
             LOG.info(line + " совпадает с ожидаемым значением");
         }
+    }
 
+    @ActionTitle("подтверждает пароль")
+    public void acceptPassword(String keyPassword){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        wait
+                .withMessage("После нажатия на кнопку 'изменить' не появилось предложение подтвердить пароль")
+                .until(ExpectedConditions.numberOfElementsToBe(By.id("auth_password"),1));
+        String password = Stash.getValue(keyPassword);
+        LOG.info("Заполняем поле 'пароль' значением " + password);
+        driver.findElement(By.id("auth_password")).clear();
+        driver.findElement(By.id("auth_password")).sendKeys(password);
+        wait
+                .withMessage("Поле 'пароль' заполнено, но кнопка 'ОК' не стала активной")
+                .until(ExpectedConditions.not(ExpectedConditions.attributeContains(By.id("log-in-button"),"disabled","disabled")));
+        LOG.info("Нажимаем на кнопку 'ОК'");
+        driver.findElement(By.id("log-in-button")).click();
+    }
 
+    @ActionTitle("проверяет что поле содержит значение")
+    public void checkValueInField(String field, String value){
+        WebDriver driver = PageFactory.getDriver();
+        if (value.matches("[A-Z]*")){
+            value = Stash.getValue(value);
+        }
+        String actualvalue = driver.findElement(By.xpath("//*[@class='user-profile__label']/following-sibling::*[contains(@class,'user-profile__text')]")).getAttribute("innerText");
+        Assert.assertTrue("Значение поля " + field + ":'" + actualvalue + "' не соответствует ожидаемому '" + value + "'",
+                actualvalue.replace("Изменить","").trim().equals(value));
 
     }
 }

@@ -90,6 +90,7 @@
   @before
   @after
   @smoke
+  @rega
   @NewUserRegistration_C36189_Skype
   Сценарий: Регистрация нового пользователя через Skype
 

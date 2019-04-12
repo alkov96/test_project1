@@ -93,6 +93,7 @@
   @before
   @after
   @smoke
+    @rega
   @NewUserRegistration_C36189_Euroset
   Сценарий: Регистрация нового пользователя через Евросеть
 

@@ -205,7 +205,7 @@ public abstract class AbstractPage extends Page{
      * @param key - ключ по которому получаем е-mail из памяти.
      */
     @ActionTitle("завершает регистрацию перейдя по ссылке в")
-    public void endRegistrationByEmailLink(String key) throws InterruptedException {
+    public static void endRegistrationByEmailLink(String key) throws InterruptedException {
         WebDriver driver = getWebDriver();
         String email = Stash.getValue(key);
         String link = "";
@@ -226,6 +226,7 @@ public abstract class AbstractPage extends Page{
             new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
         }
         LOG.info("Переходим по ссылке из e-mail");
+        LOG.info("GO TO LINK");
         driver.get(url + "/registration/email/verify?" + link);
 
         if(url.contains("mobile")){
@@ -598,74 +599,21 @@ public abstract class AbstractPage extends Page{
         } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
 
         LOG.info("Копируем смс-код для подтверждения телефона");
-
-        //Начало кода для получения СМС
-        String currentHandle = driver.getWindowHandle();
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-
-        String registrationUrl = "";
+        String code = CommonStepDefs.getSMSCode(phone);
 
         try {
-            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
-        } catch (DataException e) {
-            LOG.error(e.getMessage());
+            new WebDriverWait(driver, 70).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
+        }catch (Exception e){
+            e.getMessage();
+            throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
         }
 
-        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+        LOG.info("Вводим SMS-код::" + code);
+        fillField(cellFoneConformationInput,code);
 
-        Set<String> windows = driver.getWindowHandles();
-        windows.remove(currentHandle);
-        String newWindow = windows.toArray()[0].toString();
-
-        driver.switchTo().window(newWindow);
-
-        String xpath = "//li/a[contains(text(),'" + phone + "')]";
-        WebElement numberSring = null;
-        int x = 0;
-
-        LOG.info("Пытаемся найти код подтверждения телефона");
-        for(int y = 0; y < 5; y++) {
-
-            try {
-                LOG.info("Ожидаем 2 сек. для сервера TEST_INT");
-                Thread.sleep(2000);
-                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
-                if (driver.findElements(By.xpath(xpath)).isEmpty()){
-                    driver.navigate().refresh();
-                }
-                else {
-                    numberSring = driver.findElements(By.xpath(xpath)).get(0);
-                    break;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            x++;
-        }
-
-        if(numberSring != null && !numberSring.getAttribute("innerText").isEmpty()) {
-            String code = numberSring.getAttribute("innerText").split(" - ")[1];
-            driver.switchTo().window(currentHandle);
-            js.executeScript("registration_window.close()");
-
-            try {
-                new WebDriverWait(driver, 70).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
-            }catch (Exception e){
-                e.getMessage();
-                throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
-            }
-
-            LOG.info("Вводим SMS-код::" + code);
-            fillField(cellFoneConformationInput,code);
-
-            Stash.put("PHONE_NUMBER",phone ) ;
-            LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
-        }else {
-            throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
-        }
-
+        Stash.put("PHONE_NUMBER",phone ) ;
+        LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
     }
-
 
     @ActionTitle("нажимает в поле ввода")
     public void clickInputField(String inputFieldName) {

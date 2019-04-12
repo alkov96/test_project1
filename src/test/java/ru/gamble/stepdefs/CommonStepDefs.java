@@ -45,6 +45,7 @@ import javax.net.ssl.*;
 import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -83,6 +84,61 @@ public class CommonStepDefs extends GenericStepDefs {
     private static final String sep = File.separator;
 
 
+    public static String getSMSCode(String phone){
+        WebDriver driver = PageFactory.getWebDriver();
+        String currentHandle = driver.getWindowHandle();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        String registrationUrl = "";
+
+        try {
+            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
+        } catch (DataException e) {
+            LOG.error(e.getMessage());
+        }
+
+        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+
+        Set<String> windows = driver.getWindowHandles();
+        windows.remove(currentHandle);
+        String newWindow = windows.toArray()[0].toString();
+
+        driver.switchTo().window(newWindow);
+
+        String xpath = "//li/a[contains(text(),'" + phone + "')]";
+        WebElement numberSring = null;
+        int x = 0;
+
+        LOG.info("Пытаемся найти код подтверждения телефона");
+        for(int y = 0; y < 5; y++) {
+
+            try {
+                LOG.info("Ожидаем 2 сек. для сервера TEST_INT");
+                Thread.sleep(2000);
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
+                if (driver.findElements(By.xpath(xpath)).isEmpty()){
+                    driver.navigate().refresh();
+                }
+                else {
+                    numberSring = driver.findElements(By.xpath(xpath)).get(0);
+                    break;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            x++;
+        }
+
+        if(numberSring != null && !numberSring.getAttribute("innerText").isEmpty()) {
+            String code = numberSring.getAttribute("innerText").split(" - ")[1];
+            driver.switchTo().window(currentHandle);
+            js.executeScript("registration_window.close()");
+            return code;
+        }else {
+            throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
+        }
+    }
+
     @Когда("^ждем некоторое время \"([^\"]*)\"$")
     public void waiting(String sec) throws InterruptedException {
         int seconds;
@@ -110,7 +166,6 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info(key + "<==[" + date + "]");
         }
     }
-
 
     @Когда("^сохраняем в память$")
     public static void saveValueToKey(DataTable dataTable) {
@@ -190,8 +245,11 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^разлогиниваем пользователя$")
-    public void logOut() {
+    public void logOut() throws AWTException {
         WebDriver driver = PageFactory.getWebDriver();
+
+
+
         LOG.info("Переход на главную страницу");
         goToMainPage("site");
         cleanCookies();
@@ -1429,6 +1487,13 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyCode,code);
     }
 
+
+    @Когда("^запоминаем значение \"([^\"]*)\" для пользователя с \"([^\"]*)\"$")
+    public void rememberPhoneForEmail(String keyPhone,String keyEmail){
+        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE email='" + Stash.getValue(keyEmail) + "'";
+        Stash.put(keyPhone,workWithDBgetResult(sqlRequest));
+    }
+
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {
         //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7333%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
@@ -1438,7 +1503,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта для проверки изменений базовых параметров \"([^\"]*)\"$")
     public void searchUserForEdit(String keyEmail){
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id=2 ORDER BY id DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+%' AND registration_stage_id=2 ORDER BY id DESC";
         List<String> results = workWithDBAndGetFullColumn(sqlRequest);
         int count = 0;
         int count2 = 0;

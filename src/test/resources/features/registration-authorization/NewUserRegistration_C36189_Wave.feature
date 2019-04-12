@@ -89,6 +89,7 @@
   @before
   @after
   @smoke
+  @rega
   @NewUserRegistration_C36189_Wave
   Сценарий: Регистрация нового пользователя через Wave
 
