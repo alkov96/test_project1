@@ -203,4 +203,16 @@ public class ProfilePage extends AbstractPage {
                 actualvalue.replace("Изменить","").trim().equals(value));
 
     }
+
+    @ActionTitle("проверка чекбокса оферты в разделе 'Настройка уведомлений'")
+    public void checkBoxOferta(){
+        WebDriver driver = PageFactory.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        driver.findElement(By.xpath("//*[@href='/private/user/notifications']")).click();
+        By by_email = By.id("not_email");
+        By by_sms = By.id("not_sms");
+        wait.withMessage("Не отмечен чекбокс емэйла").until(ExpectedConditions.attributeContains(by_email,"class","ng-valid-required"));
+        wait.withMessage("Не отмечен чекбокс смс").until(ExpectedConditions.attributeContains(by_sms,"class","ng-valid-required"));
+
+    }
 }
