@@ -1,6 +1,8 @@
 package ru.gamble.pages.registrationPages;
 
 import cucumber.api.DataTable;
+import org.junit.Assert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -297,5 +299,13 @@ public class UserAccountPage extends AbstractPage{
         }
         fillField(passwordInput, password);
         fillField(confirmPasswordInput, password);
+    }
+
+    @ActionTitle("проверяет, кто кнопка 'Отправить' не активна")
+    public void sendDataWithoutOferta(){
+        WebDriver driver = PageFactory.getWebDriver();
+        By by = By.xpath("//*[@ng-disabled='regForm.$invalid']");
+        new WebDriverWait(driver, 10).withMessage("Несмотря на то, что признак оферты не был отмечен, мы смогли продолжить регистрацию.").until(ExpectedConditions.attributeContains(by, "disabled","true"));
+
     }
 }
