@@ -57,10 +57,8 @@ public class EnterPage extends AbstractPage {
 
         for(int j = 0; j < 10; j++) {
             try {
-                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(inputLogin));
-                if (enterButton.isDisplayed()) {
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(enterButton));
                     break;
-                }
             } catch (Exception e){
                 driver.navigate().refresh();
                 try {
@@ -76,10 +74,33 @@ public class EnterPage extends AbstractPage {
         }
     }
 
+    private void chooseMethodAutorization(String method){
+        WebDriver driver = PageFactory.getWebDriver();
+        LOG.info("Будем логиниться через method. Для этого выбираем соответсвующую вкладку на попапе авторизации");
+        driver.findElement(By.xpath("//div[@class='modal__tabs']/div[contains(.,'" + method + "')]")).click();
+        new WebDriverWait(driver,10)
+                .withMessage("Попытались переключиться на авторизацию по email, но не получилось")
+                .until(ExpectedConditions.attributeContains(By.xpath("//div[@class='modal__tabs']/div[contains(.,'" + method + "')]"),"class","active"));
+        LOG.info("Выбрали авторизацию через method");
+    }
+
+    /**
+     * Авторизация на сайте. в зависимости от того, чму равен епрвый параметр (телефон или нет) выбирается аворизация по теелфону или по email
+     * @param dataTable - данные с которыми логинимся. телеон+пароль или логин+пароль
+     * @throws DataException
+     */
     @ActionTitle("логинится с")
     public void logIn(DataTable dataTable) throws DataException {
         WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
+
+//        if (data.keySet().toArray()[0].toString().toLowerCase().equals("телефон")){
+//            chooseMethodAutorization("телефон");
+//        }
+//        else {
+//            chooseMethodAutorization("email");
+//        }
+
         String login, password;
         switch (data.get(LOGIN)) {
             case Constants.DEFAULT:

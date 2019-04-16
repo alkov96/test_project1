@@ -1279,12 +1279,18 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^определяем незанятый номер телефона и сохраняем в \"([^\"]*)\"$")
-    public static void confirmEmail(String keyPhone) {
-        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone";
-        String phoneLast = workWithDBgetResult(sqlRequest, "phone");
+    public static void confirmEmail(String keyPhone) throws IOException {
+        FileReader file = new FileReader("src" + sep + "test" + sep + "resources" + sep + "maxphone.txt");
+        Scanner scan = new Scanner(file);
+
+        String phoneLast = scan.nextLine();
         String phone = "7333001" + String.format("%4s", Integer.valueOf(phoneLast.substring(7)) + 1).replace(' ', '0');
         Stash.put(keyPhone, phone);
-        LOG.info("Вычислили подходящий номер телефона::" + phone);
+        LOG.info(phone);
+        FileWriter nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "maxphone.txt", false);
+        nfile.write(phone);
+        nfile.close();
+        file.close();
     }
 
     @Когда("^определяем занятый номер телефона и сохраняем в \"([^\"]*)\"$")
@@ -1494,6 +1500,16 @@ public class CommonStepDefs extends GenericStepDefs {
         String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE email='" + Stash.getValue(keyEmail) + "'";
         Stash.put(keyPhone,workWithDBgetResult(sqlRequest));
     }
+
+    @Когда("^генерим новый номер телефона \"([^\"]*)\" на основе \"([^\"]*)\"$")
+    public void generateNewPhoneBasisOldPhone(String keyMewPhone,String keyOldPhone){
+        String phone = Stash.getValue(keyOldPhone);
+        String newPhone = phone.replace("7333","7222");
+        Stash.put(keyMewPhone,newPhone);
+    }
+
+
+
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {

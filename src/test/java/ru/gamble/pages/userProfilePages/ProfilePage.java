@@ -63,8 +63,12 @@ public class ProfilePage extends AbstractPage {
     protected WebElement savePassword;
 
     @ElementTitle("Изменить email")
-    @FindBy(xpath = "//div[normalize-space(text())='Электронная почта']/following-sibling::div/span")
+    @FindBy(xpath = "//div[normalize-space(text())='Электронная почта']/following-sibling::div/span[contains(@class,'user-profile__link')]")
     protected WebElement editEmail;
+
+    @ElementTitle("Изменить phone")
+    @FindBy(xpath = "//div[normalize-space(text())='Телефон']/following-sibling::div/span[contains(@class,'user-profile__link')]")
+    protected WebElement editPhone;
 
 
 
@@ -196,11 +200,11 @@ public class ProfilePage extends AbstractPage {
     public void checkValueInField(String field, String value){
         WebDriver driver = PageFactory.getDriver();
         if (value.matches("[A-Z]*")){
-            value = Stash.getValue(value);
+            value = Stash.getValue(value).toString().replace("+","");
         }
-        String actualvalue = driver.findElement(By.xpath("//*[@class='user-profile__label']/following-sibling::*[contains(@class,'user-profile__text')]")).getAttribute("innerText");
+        String actualvalue = driver.findElement(By.xpath("//*[@class='user-profile__label' and normalize-space(text())='" + field + "']/following-sibling::*[contains(@class,'user-profile__text')]")).getAttribute("innerText");
         Assert.assertTrue("Значение поля " + field + ":'" + actualvalue + "' не соответствует ожидаемому '" + value + "'",
-                actualvalue.replace("Изменить","").trim().equals(value));
+                actualvalue.replace("Изменить","").replaceAll("[ +-]*","").trim().equals(value));
 
     }
 }

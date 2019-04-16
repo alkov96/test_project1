@@ -138,6 +138,16 @@ public class BasicWizard extends AbstractPage {
         driver.findElement(By.xpath("//div[@class='bw-pane__controls']/button")).click();
     }
 
+
+    @ActionTitle("вводит в поле телефон")
+    public void inputNewPhone(String keyPone){
+        String phone = Stash.getValue(keyPone);
+        WebElement inputPhone = driver.findElement(By.id("newPhone"));
+        inputPhone.clear();
+        inputPhone.sendKeys(phone.substring(1));//вводим без семёрки
+        driver.findElement(By.xpath("//div[@class='bw-pane__controls']/button")).click();
+    }
+
     @ActionTitle("проверяет есть ли сообщение об ошибке")
     public void checkErrorMessage(String hasError){
         Boolean has = hasError.equalsIgnoreCase("да");
@@ -158,11 +168,11 @@ public class BasicWizard extends AbstractPage {
     @ActionTitle("проверяет на странице наличие текста")
     public void checkTextOnPage(String text){
         if (text.matches("[A-Z]*")){
-            text = Stash.getValue(text);
+            text = Stash.getValue(text).toString().replace("+","");
         }
         new WebDriverWait(driver,10)
                 .withMessage("На странице нет искомого текста : " + text)
-                .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//*[contains(text(),'" + text + "')]"),0));
+                .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//*[contains(translate(text(),'[ -+]*',''),'" + text + "')]"),0));
     }
 
     @ActionTitle("жмёт важную розово-голубую кнопку")
