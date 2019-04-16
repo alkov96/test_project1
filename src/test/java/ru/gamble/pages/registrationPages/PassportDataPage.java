@@ -31,6 +31,7 @@ import static ru.gamble.utility.Constants.*;
 @PageEntry(title = "Паспортные данные")
 public class PassportDataPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(PassportDataPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//*[text()='Паспортные данные']")
     private WebElement pageTitle;
@@ -94,7 +95,6 @@ public class PassportDataPage extends AbstractPage {
 
 
     public PassportDataPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
     }

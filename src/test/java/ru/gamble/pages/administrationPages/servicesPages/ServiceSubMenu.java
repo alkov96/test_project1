@@ -21,6 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "подменю Сервисы")
 public class ServiceSubMenu extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(ServiceSubMenu.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@id='tabbar-1381-innerCt']")
     private WebElement subMenu;
@@ -30,7 +31,6 @@ public class ServiceSubMenu extends AbstractPage{
     private WebElement serviceMessages;
 
     public ServiceSubMenu() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(subMenu));
     }

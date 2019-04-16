@@ -33,14 +33,13 @@ import static org.openqa.selenium.By.xpath;
 @PageEntry(title = "Избранное")
 public class FavouritePage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FavouritePage.class);
-
+    static WebDriver driver = PageFactory.getDriver();
     //@FindBy(id = "elected")
     @FindBy(xpath = "//div[contains(@class,'subMenuArea_fullwidth') and contains(@class,'active')]")
     private WebElement pageTitle;
 
 
     public FavouritePage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -50,7 +49,6 @@ public class FavouritePage extends AbstractPage {
      * @throws Exception
      */
     public static void clearFavouriteGames() throws Exception {
-        WebDriver driver = PageFactory.getDriver();
         int x = driver.findElement(By.xpath("//*[@id='elected']")).getLocation().getX() - 50;
         int y = driver.findElement(By.xpath("//*[@id='elected']")).getLocation().getY() - 50;
         ((JavascriptExecutor) driver).executeScript("window.scroll(" + x + ","
@@ -77,7 +75,6 @@ public class FavouritePage extends AbstractPage {
 
     @ActionTitle("сравнивает названия событий на странице и в избранном")
     public void compareEventsAndFav(){
-        WebDriver driver = PageFactory.getDriver();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")));
         String electedGame = driver.findElement(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")).getAttribute("title");  //игра в избранном
         String team1name = Stash.getValue("team1nameKey");
@@ -91,7 +88,6 @@ public class FavouritePage extends AbstractPage {
 
     @ActionTitle("проверяет что переходы с игр из Избранного работают верно")
     public void goFromFavourite(){
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
         String period = Stash.getValue("keyPeriod");
         List<WebElement> allMyGames = driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']"));
@@ -145,7 +141,6 @@ public class FavouritePage extends AbstractPage {
 
     @ActionTitle("запоминаем название команд в избранном")
     public void rememberTeamsName(String team1key, String team2key){
-        WebDriver driver = PageFactory.getDriver();
         WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
         String nameFavour = game.findElement(xpath("div//div[contains(@class,'elected__teams')]")).getAttribute("title");
         String team1Name = nameFavour.split(" - ")[0].trim();
@@ -157,7 +152,6 @@ public class FavouritePage extends AbstractPage {
 
     @ActionTitle("запоминаем значение коэффициента")
     public void rememberCoef(String coefKey){
-        WebDriver driver = PageFactory.getDriver();
         WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
         float coefFavour = Float.valueOf(game.findElement(xpath("div//div[contains(@class,'elected-data__event-price')]")).getAttribute("innerText"));
         LOG.info("Значение коэффициента выбранного исхода = " + coefKey);
@@ -167,7 +161,6 @@ public class FavouritePage extends AbstractPage {
 
     @ActionTitle("запоминаем название маркета")
     public void rememberMarket(String ishodKey){
-        WebDriver driver = PageFactory.getDriver();
         WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
         String ishod = game.findElement(xpath("div//div[contains(@class,'elected-data__event-content')]")).getAttribute("title").trim();
         LOG.info("Название исхода: " + ishod);
@@ -177,7 +170,6 @@ public class FavouritePage extends AbstractPage {
 
     @ActionTitle("добавляет ставку в купон")
     public void addToCoupon(){
-        WebDriver driver = PageFactory.getDriver();
         WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
         LOG.info("Добавляем в купон ставку из Избранного");
         game.findElement(xpath("//div[contains(@class,'elected-data__event-price')]")).click();
@@ -187,7 +179,6 @@ public class FavouritePage extends AbstractPage {
 
     @ActionTitle("проверяет что в избранном все нужные игры")
     public void checkFavourite(){
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> allMyGames =  driver.findElements(By.xpath("//*[@id='elected']/..//div[contains(@class,'elected-box ng-scope')]/div"));
         List<String> names = Stash.getValue("nameGameKey");
         List<String> teams = new ArrayList<>();
@@ -212,7 +203,6 @@ public class FavouritePage extends AbstractPage {
 
     @ActionTitle("переходит в настройки и меняет коэффицент в избранном")
     public void changePreferencesCoeff() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
         LOG.info("Нажимаем на кнопку с шетсерёнкой");

@@ -32,7 +32,7 @@ import static ru.gamble.utility.Constants.STARTING_URL;
 public class TestingServicePage extends AbstractPage{
 
     private static final Logger LOG = LoggerFactory.getLogger(TestingServicePage.class);
-
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='logo' and contains(text(),'Тестовый сервис')]")
     private WebElement pageTitle;
@@ -60,7 +60,6 @@ public class TestingServicePage extends AbstractPage{
 
 
     public TestingServicePage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
         LOG.info("Сейчас мы на странице [" + driver.getCurrentUrl() + "]");

@@ -17,13 +17,13 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "PopUp Заключить Пари")
 public class PopUpBettingPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(PopUpBettingPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @ElementTitle("Заключить пари")
     @FindBy(xpath = "//a[contains(text(),'Заключить пари')]")
     private WebElement bettingButton;
 
     public PopUpBettingPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(bettingButton));
     }

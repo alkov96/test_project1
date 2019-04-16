@@ -22,6 +22,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Логин в админку")
 public class LoginPage extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(LoginPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='x-panel x-panel-default-framed x-box-item']")
     private WebElement authForm;
@@ -48,7 +49,6 @@ public class LoginPage extends AbstractPage{
     }
 
     public LoginPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(authForm));
     }

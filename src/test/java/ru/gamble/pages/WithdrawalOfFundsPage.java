@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @PageEntry(title = "Вывод средств")
 public class WithdrawalOfFundsPage extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(WithdrawalOfFundsPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[contains(@class,'modal__title') and contains(.,'Вывод средств')]")
     private WebElement pageTitle;
@@ -37,7 +38,6 @@ public class WithdrawalOfFundsPage extends AbstractPage{
     private WebElement withdrawButton;
 
     public WithdrawalOfFundsPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -45,7 +45,6 @@ public class WithdrawalOfFundsPage extends AbstractPage{
     @ActionTitle("вводит минимальную сумму вывода для карт и сохраняет в")
     public void inputMinSum(String keyMinSumm) throws InterruptedException {
         checkForErrorLoadingPaymentSystems();
-        WebDriver driver = PageFactory.getWebDriver();
         Pattern pattern = Pattern.compile("(?u)[^0-9]");
         List<WebElement> allWayWithdraw = driver.findElements(By.xpath("//table[@class='moneyInOutTable']/tbody[contains(@class,'methods-group')]/tr/td/div[contains(@class,'moneyChnl') and not(contains(@class,'not-available'))]"));
         String min = allWayWithdraw.get(0).findElement(By.xpath("//div/span[@ng-if='method.limit.min']")).getAttribute("innerText");
@@ -75,7 +74,6 @@ public class WithdrawalOfFundsPage extends AbstractPage{
     }
 
     private void checkForErrorLoadingPaymentSystems(){
-        WebDriver driver = PageFactory.getWebDriver();
         if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).size() > 0){
             throw new AutotestError("Ошибка при загрузке платежных систем!");
         }

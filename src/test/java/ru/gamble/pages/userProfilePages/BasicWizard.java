@@ -29,7 +29,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "Подтверждение прав пользователя")
 public class BasicWizard extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(BonusesPage.class);
-    WebDriver driver = PageFactory.getDriver();
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//basics-wizard")
     private WebElement areaBasicWizard;

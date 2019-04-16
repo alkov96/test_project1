@@ -29,6 +29,7 @@ import java.util.Map;
 @PageEntry(title = "Новое сервисное сообщение")
 public class NewMessage extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(NewMessage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//span[contains(text(),'Редактирование сервисного сообщения')]")
     private WebElement message;
@@ -42,7 +43,6 @@ public class NewMessage extends AbstractPage{
     private WebElement saveBotton;
 
     public NewMessage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 20).until(ExpectedConditions.visibilityOf(message));
     }

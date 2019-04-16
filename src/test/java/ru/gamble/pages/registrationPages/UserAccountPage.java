@@ -33,6 +33,7 @@ import static ru.gamble.utility.Constants.*;
 @PageEntry(title = "Учетная запись")
 public class UserAccountPage extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(UserAccountPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//*[text()='Учетная запись']")
     private WebElement pageTitle;
@@ -82,7 +83,6 @@ public class UserAccountPage extends AbstractPage{
     private WebElement okButton;
 
     public UserAccountPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
     }
@@ -303,7 +303,6 @@ public class UserAccountPage extends AbstractPage{
 
     @ActionTitle("проверяет, кто кнопка 'Отправить' не активна")
     public void sendDataWithoutOferta(){
-        WebDriver driver = PageFactory.getWebDriver();
         By by = By.xpath("//*[@ng-disabled='regForm.$invalid']");
         new WebDriverWait(driver, 10).withMessage("Несмотря на то, что признак оферты не был отмечен, мы смогли продолжить регистрацию.").until(ExpectedConditions.attributeContains(by, "disabled","true"));
 

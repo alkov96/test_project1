@@ -35,6 +35,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "История операций")
 public class OperationHistoryPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(OperationHistoryPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='history__table']")
     private WebElement historyTable;
@@ -44,7 +45,6 @@ public class OperationHistoryPage extends AbstractPage {
     private WebElement searchInput;
 
     public OperationHistoryPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(historyTable));
@@ -57,7 +57,6 @@ public class OperationHistoryPage extends AbstractPage {
      * @return
      */
     private boolean pageUpdate(List<String> id) throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         Thread.sleep(1000);
         List<WebElement> newList = driver.findElements(By.xpath("//span[@class='history__id']")).stream()
                 .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут"))
@@ -74,7 +73,6 @@ public class OperationHistoryPage extends AbstractPage {
     }
 
     private boolean changePage(WebElement page) throws Exception {
-        WebDriver driver = PageFactory.getDriver();
         Integer currentPage;
         Integer newPage;
         boolean result;
@@ -106,8 +104,6 @@ public class OperationHistoryPage extends AbstractPage {
 
     @ActionTitle("проверяет пролистывание страниц")
     public void pagesCheck() throws Exception {
-        WebDriver driver = PageFactory.getDriver();
-
         List<WebElement> pages = driver.findElements(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and not(contains(@class,'active'))]"));//неактивные стрницы(без стрелок)
         LOG.info("Листаем на последнюю из видимых страниц");
         assertTrue(changePage(pages.get(pages.size() - 1)));
@@ -120,7 +116,6 @@ public class OperationHistoryPage extends AbstractPage {
 
     @ActionTitle("проверяет сортировку по дате")
     public void sortDate() throws ParseException, InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         boolean sortList;
 
         Locale local = new Locale("ru", "RU");
@@ -151,7 +146,6 @@ public class OperationHistoryPage extends AbstractPage {
 
     @ActionTitle("проверяет сортировку по балансу")
     public void sortBal() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         boolean sortList;
 
         String xpath = "//td[contains(@class,'history__cell-balance table__body-cell')]"; //путь до суммы баланса
@@ -174,7 +168,6 @@ public class OperationHistoryPage extends AbstractPage {
 
     @ActionTitle("проверяет поиск")
     public void checkSearch(){
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
 //        WebElement search = driver.findElement(By.xpath("//div[contains(@class,'input-search__wrapper_history')]/input")); //поле поиска
         searchInput.clear();
@@ -214,7 +207,6 @@ public class OperationHistoryPage extends AbstractPage {
     @ActionTitle("вводит в поиск ID ставки и проверяет что баланс после нее изменился правильно")
     public void searchIdAndCheckBalance(String keyListBet, DataTable dataTable) throws InterruptedException {
         LOG.info("Достаем из памяти список ставок с разными результатами");
-        WebDriver driver = PageFactory.getDriver();
         Map<String,String> bets = Stash.getValue(keyListBet);
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         String id;

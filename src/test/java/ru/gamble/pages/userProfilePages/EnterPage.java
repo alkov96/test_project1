@@ -35,6 +35,7 @@ import static ru.gamble.utility.Constants.*;
 @PageEntry(title = "Вход")
 public class EnterPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(EnterPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='modal__title' and contains(text(),'Вход')]")
     private WebElement pageTitle;
@@ -52,7 +53,6 @@ public class EnterPage extends AbstractPage {
     private WebElement enterButton;
 
     public EnterPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
 
         for(int j = 0; j < 10; j++) {
@@ -75,7 +75,6 @@ public class EnterPage extends AbstractPage {
     }
 
     private void chooseMethodAutorization(String method){
-        WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Будем логиниться через method. Для этого выбираем соответсвующую вкладку на попапе авторизации");
         driver.findElement(By.xpath("//div[@class='modal__tabs']/div[contains(.,'" + method + "')]")).click();
         new WebDriverWait(driver,10)
@@ -91,7 +90,6 @@ public class EnterPage extends AbstractPage {
      */
     @ActionTitle("логинится с")
     public void logIn(DataTable dataTable) throws DataException {
-        WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
 
 //        if (data.keySet().toArray()[0].toString().toLowerCase().equals("телефон")){

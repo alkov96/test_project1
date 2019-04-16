@@ -20,12 +20,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Мультимонитор")
 public class MultimonitorPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MultimonitorPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class=' multiview-wrapper']")
     private WebElement multiviewWrapper;
 
     public MultimonitorPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(multiviewWrapper));
     }

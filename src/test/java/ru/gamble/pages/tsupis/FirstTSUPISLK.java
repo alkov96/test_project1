@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 @PageEntry(title = "Первый ЦУПИС ЛК")
 public class FirstTSUPISLK extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FirstTSUPISLK.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='contract-details-content']")
     private WebElement pageTitle;
@@ -61,7 +62,6 @@ public class FirstTSUPISLK extends AbstractPage {
     private WebElement inputSMSCode;
 
     public FirstTSUPISLK() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -80,7 +80,6 @@ public class FirstTSUPISLK extends AbstractPage {
 
     @ActionTitle("нажимает кнопку 'Вернуться к букмекеру'")
     public void pressKeyBackToBookie(){
-        WebDriver driver = PageFactory.getWebDriver();
         new WebDriverWait(driver,60).until(ExpectedConditions.visibilityOfElementLocated(By.id("success")));
         driver.findElement(By.id("success")).click();
         LOG.info("Нажали на кнопку 'Вернуться к букмекеру'");
@@ -109,7 +108,6 @@ public class FirstTSUPISLK extends AbstractPage {
 
     @ActionTitle("заполняем форму банковской карты")
     public void fillOutBankCardForm(DataTable dataTable) {
-        WebDriver driver = PageFactory.getWebDriver();
         if(!driver.findElements(By.name("number")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).isEmpty()) {
             Map<String, String> data = dataTable.asMap(String.class, String.class);
             String key = "", value = "";
