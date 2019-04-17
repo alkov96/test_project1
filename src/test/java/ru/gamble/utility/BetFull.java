@@ -66,35 +66,34 @@ public class BetFull {
         names.forEach(el->newNames.add(CommonStepDefs.stringParse(el)));
         setNames(newNames);
 
-        setSum(sum.replace(",",".").replace(".00",""));
+        setSum(sum.replace(",",".").replace(".00","").replaceAll(" ",""));
 
         setType(type.toLowerCase());
     }
 
-
     public boolean equals(BetFull betFull) {
         if (!this.getNames().equals(betFull.getNames())){
-            System.out.println("Несовпадение: " + this.getNames() + " и " + betFull.getNames());
+            System.out.println("Несовпадение имен: " + this.getNames() + " и " + betFull.getNames());
             return false;
         }
         if (!this.getCoefs().equals(betFull.getCoefs())){
-            System.out.println("Несовпадение: " + this.getCoefs() + " и " + betFull.getCoefs());
+            System.out.println("Несовпадение коэффициентов: " + this.getCoefs() + " и " + betFull.getCoefs());
             return false;
         }
         if (!this.getDates().equals(betFull.getDates())){
-            System.out.println("Несовпадение: " + this.getDates() + " и " + betFull.getDates());
+            System.out.println("Несовпадение дат: " + this.getDates() + " и " + betFull.getDates());
             return false;
         }
         if (!this.getType().equals(betFull.getType())){
-            System.out.println("Несовпадение: " + this.getType() + " и " + betFull.getType());
+            System.out.println("Несовпадение типов: " + this.getType() + " и " + betFull.getType());
             return false;
         }
         if (!this.getTimeBet().equals(betFull.getTimeBet())){
-            System.out.println("Несовпадение: " + this.getTimeBet() + " и " + betFull.getTimeBet());
+            System.out.println("Несовпадение времени: " + this.getTimeBet() + " и " + betFull.getTimeBet());
             return false;
         }
         if (!this.getSum().equals(betFull.getSum())){
-            System.out.println("Несовпадение: " + this.getSum() + " и " + betFull.getSum());
+            System.out.println("Несовпадение суммы: " + this.getSum() + " и " + betFull.getSum());
             return false;
         }
         return true;

@@ -22,12 +22,11 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "Сообщения")
 public class MessagesPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MessagesPage.class);
-
+    static WebDriver driver = PageFactory.getDriver();
     @FindBy(xpath = "//div[@class='g-row message-page message-page_show']")
     private WebElement messagePage;
 
     public MessagesPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(messagePage));

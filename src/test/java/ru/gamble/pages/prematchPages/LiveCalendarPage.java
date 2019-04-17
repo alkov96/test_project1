@@ -30,6 +30,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "Лайв-календарь")
 public class LiveCalendarPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(LiveCalendarPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='livecal-calendar-wrapper']")
     private WebElement centralMarkets;
@@ -39,7 +40,6 @@ public class LiveCalendarPage extends AbstractPage {
 
 
     public LiveCalendarPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(centralMarkets));
         tryingLoadPage(menuForSelectingSports, 5, 10);
@@ -95,7 +95,6 @@ public class LiveCalendarPage extends AbstractPage {
     @ActionTitle("добавляет ставки из разных событий в количестве")
     public void addToCouponDifferentBets(String param) {
         String xpathCoefficient = "./preceding-sibling::td[contains(@class,'livecal-table__col_event')]";
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> coefficients = driver.findElements(By.xpath("//td[contains(@class,'livecal-table__col_1')]//span[@class='ng-hide']/ancestor::td[contains(@class,'livecal-table__col_1')and not(contains(@class,'empty'))]"));
         int count = 0;
         int number = (Integer.valueOf(param)) - 1;
@@ -127,7 +126,6 @@ public class LiveCalendarPage extends AbstractPage {
 
     @ActionTitle("в меню выбора видов спорта выбирает")
     public void inSportsSelectionMenuSelect(String sport) {
-        WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Нажимаем на выпадающее меню видов спорта");
         waitingForPreloaderToDisappear(30);
         menuForSelectingSports.click();
@@ -176,7 +174,6 @@ public class LiveCalendarPage extends AbstractPage {
 
     @ActionTitle("переходит на игру с активной ставкой")
     public void goToGameWithBets() {
-        WebDriver driver = PageFactory.getWebDriver();
         WebElement actualEvent = driver.findElement(By.xpath("//td[contains(@class,'livecal-table__col_1') and not(contains(@class,'empty'))]/preceding-sibling::td[contains(@class,'livecal-table__col_event')]/span"));
         actualEvent.click();
         CommonStepDefs.workWithPreloader();

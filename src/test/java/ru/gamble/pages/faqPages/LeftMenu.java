@@ -21,6 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Левое меню в часто задаваемых вопросах")
 public class LeftMenu extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(ru.gamble.pages.rulesPages.LeftMenu.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='text-page-sidebar__body']")
     private WebElement menu;
@@ -34,7 +35,6 @@ public class LeftMenu extends AbstractPage{
     private WebElement slovar;
 
     public LeftMenu() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(menu));
     }

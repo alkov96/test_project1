@@ -37,6 +37,7 @@ import static ru.gamble.utility.Constants.PAYMENT_METHOD;
 @PageEntry(title = "Пополнение счёта")
 public class RefillAccountsPage extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(RefillAccountsPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[contains(@class,'modal__title') and contains(text(),'Пополнение счёта')]")
     private WebElement pageTitle;
@@ -57,7 +58,6 @@ public class RefillAccountsPage extends AbstractPage{
     private WebElement cupis_deposit;
 
     public RefillAccountsPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -65,7 +65,6 @@ public class RefillAccountsPage extends AbstractPage{
 
     @ActionTitle("проверяет, что на попапе пополнения есть кнопки-ссылки сумм")
     public void sposobSumm() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> summList = driver.findElements(By.xpath("//span[contains(@class,'jsLink smallJsLink')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         Stash.put("summListKey", summList);
         Thread.sleep(1000);
@@ -87,7 +86,7 @@ public class RefillAccountsPage extends AbstractPage{
         Map<String,String> methodsInBD = Stash.getValue(methodsKey);
         String checkValueByNull;
         Object jsonByWSS =  JSONValue.parse(Stash.getValue(keyJsonByWSS).toString());
-        List<WebElement> methodsOfRefill = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'moneyChnl')]//label/div")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+        List<WebElement> methodsOfRefill = driver.findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'moneyChnl')]//label/div")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         LOG.info("Нашли на странице [" + methodsOfRefill.size() + "] элементов способов пополенния");
 
         LOG.info("Сравниваем максимальный лимит из базы с суммой на web-странице");
@@ -102,7 +101,7 @@ public class RefillAccountsPage extends AbstractPage{
             LOG.info("Достали из [" + methodsKey + "] по имени способа[" + methodName + "] максимальный лимит[" + maxLimitInDB.toString() + "]");
             maxLimitByWSS = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByWSS,"data"),"limits"),methodName),"max_deposit").toString()).divide( new BigDecimal("100"));
             LOG.info("Достали из [" + keyJsonByWSS + "] по имени способа[" + methodName + "] максимальный лимит[" + maxLimitByWSS.toString() + "]");
-            List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'smallJsLink')]/span"));
+            List<WebElement> list = driver.findElements(By.xpath("//div[contains(@class,'active')]//div[contains(@class,'smallJsLink')]/span"));
             if(list.isEmpty()){
                 throw new AutotestError("Ошибка! Нет предложений номиналов сумм.");
             }
@@ -121,7 +120,6 @@ public class RefillAccountsPage extends AbstractPage{
     @ActionTitle("вводит сумму и выбирает способ пополнения c")
     public void enterAmountAndSelectDepositMethod(DataTable dataTable)  {
         checkForErrorLoadingPaymentSystems();
-        WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String amount, depositMethod;
         amount = data.get(AMOUNT);
@@ -153,7 +151,6 @@ public class RefillAccountsPage extends AbstractPage{
      * проверка появления окна "Ошибка при загрузке платежных систем"
      */
     private void checkForErrorLoadingPaymentSystems(){
-        WebDriver driver = PageFactory.getWebDriver();
         if(driver.findElements(By.xpath("//div[contains(.,'Ошибка при загрузке платежных систем')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).size() > 0){
             throw new AutotestError("Ошибка при загрузке платежных систем!");
         }
@@ -182,7 +179,6 @@ public class RefillAccountsPage extends AbstractPage{
 
     @ActionTitle("проверяет, что при выборе суммы с помощью кнопок эта сумма правильно отображается на кнопке и в поле ввода")
     public void checkLinkSumm() {
-        WebDriver driver = PageFactory.getDriver();
         BigDecimal actualAmount, expectedAmount;
         LOG.info("Последовательно нажимаем на каждый способ попопления");
         List<WebElement> partners = driver.findElements(By.xpath("//div[contains(@class,'payPartner')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
@@ -212,7 +208,6 @@ public class RefillAccountsPage extends AbstractPage{
 
     @ActionTitle("проверяет поведение попапа пополнения при вводе суммы меньше минимально допустимой")
     public void checkPopapWithMinSumm() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         WebElement field = driver.findElement(By.id("money_in_amount1"));
         Stash.put("fieldKey", field);
         LOG.info("Очищаем поле с суммой и затем вводим туда 1");
@@ -234,7 +229,6 @@ public class RefillAccountsPage extends AbstractPage{
 
     @ActionTitle("проверяет поведение попапа пополнения при вводе суммы больше максимально допустимой")
     public void checkPopapWithMaxSumm() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         LOG.info("Проверим поведение попапа при вводе суммы будльше максимума");
         LOG.info("Очищаем поле с суммой и затем вводим туда 600 000");
         WebElement field = Stash.getValue("fieldKey");
@@ -257,7 +251,6 @@ public class RefillAccountsPage extends AbstractPage{
 
     @ActionTitle("проверяет, что для разных способов пополнения, кнопка будет то активна, то заблокирована для суммы")
     public void checkDiffSumms(String summ) {
-        WebDriver driver = PageFactory.getDriver();
         fillField(inputAmount,summ);
         BigDecimal amountEntered,maxAmount;
         String methodName, exeptedMaxLimit;

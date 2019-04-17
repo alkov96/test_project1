@@ -16,8 +16,8 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 @PageEntry(title = "Поздравляем!")
 public class CongratulationPage extends AbstractPage{
-
     private static final Logger LOG = LoggerFactory.getLogger(CongratulationPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='modal__title' and text()='Поздравляем!']")
     private WebElement pageTitle;
@@ -27,7 +27,6 @@ public class CongratulationPage extends AbstractPage{
     private WebElement oKButton;
 
     public CongratulationPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }

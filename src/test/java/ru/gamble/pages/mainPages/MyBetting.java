@@ -35,6 +35,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "Мои пари")
 public class MyBetting extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MyBetting.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//*[contains(@class,'subMenuArea')]//h4[contains(.,'Мои пари')]")
     private WebElement pageTitle;
@@ -51,7 +52,6 @@ public class MyBetting extends AbstractPage {
     private WebElement buttonFilterByTypeOfBid;
 
     public MyBetting() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -104,7 +104,6 @@ public class MyBetting extends AbstractPage {
 
 
     public String rememberId() throws InterruptedException {
-        WebDriver driver = PageFactory.getWebDriver();
         List<WebElement> all_id = driver.findElements(xpath("//div[@ng-bind-html='bet.id | formatText:search']"));
         int value = new Random().nextInt(all_id.size());
         Thread.sleep(5000);
@@ -140,7 +139,6 @@ public class MyBetting extends AbstractPage {
 
     @ActionTitle("проверяет сортировку по сумме")
     public void sortSumm() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         boolean sort_list_summ;
 
         By button = xpath("//tr[@class='table__row table__row_head']/th[3]");
@@ -166,7 +164,6 @@ public class MyBetting extends AbstractPage {
 
     @ActionTitle("проверяет фильтр по типу исхода ставки")
     public void checkFilterInMyBetting(DataTable dataTable) throws InterruptedException {
-        WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String outcomeOfBet, selectedOutcomeOfBet, outcomeOfBetWeChoose;
         for (Map<String, String> aTable : table) {
@@ -200,7 +197,6 @@ public class MyBetting extends AbstractPage {
 
     @ActionTitle("проверяет фильтр по типу ставки")
     public void checksTypeOfOutcomeWithBetTypeWith(DataTable dataTable){
-        WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String typeOfOutcome, betType, selectedOutcome;
         for (Map<String, String> aTable : table) {
@@ -261,7 +257,6 @@ public class MyBetting extends AbstractPage {
 ////выставление даты начала ставок в МОИХ ПАРИ на самую раннюю из возможных
 //    @ActionTitle("отматывает дату начала МОИХ ПАРИ на самую раннюю")
 //    public void datapickerOnBegin(){
-//        WebDriver driver = PageFactory.getWebDriver();
 //        WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
 //        if (!datapickerBegin.getAttribute("class").contains("active")){
 //            datapickerBegin.click();
@@ -285,7 +280,6 @@ public class MyBetting extends AbstractPage {
 
     @ActionTitle("ищет и запоминает ожидаемые события по фильтру")
     public void remeberMyBets(String filter, String nameList) {
-        WebDriver driver = PageFactory.getWebDriver();
         int  cou = 3;
         LOG.info("Сначала включаем фильтр 'Ожидается'");
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
@@ -382,7 +376,7 @@ public class MyBetting extends AbstractPage {
 
         sum.append(helpString.toString().contains("hide") ? "Б" : "Р");
         sum.insert(0, element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[1]")).getAttribute("innerText") + " ");
-        bet.setSum(sum.toString().replace(".00","").replace(".0",""));
+        bet.setSum(sum.toString().replace(".00","").replace(".0","").replaceAll(" ",""));
 
         return bet;
     }
@@ -390,7 +384,6 @@ public class MyBetting extends AbstractPage {
 
     @ActionTitle("запоминает ID ставки и ее исход")
     public void rememberIDandResultBet(String keyMap,DataTable dataTable){
-        WebDriver driver = PageFactory.getWebDriver();
         Map<String,String> bets = new HashMap<>();
         String id;
         List<String> data = dataTable.asList(String.class);
@@ -407,7 +400,6 @@ public class MyBetting extends AbstractPage {
 
     @ActionTitle("выставляет фильтр исхода пари на")
     public void selectReseltsBet(String result){
-        WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Сначала включаем фильтр '" + result + "'");
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
         driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();

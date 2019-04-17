@@ -38,6 +38,7 @@ import static ru.gamble.utility.Constants.DIRECTION;
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MainPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[contains(@class,'main-slider__wrapper')]")
     private WebElement slider;
@@ -76,7 +77,6 @@ public class MainPage extends AbstractPage {
     private WebElement announceButton;
 
     public MainPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(By.xpath("//div[contains(@class,'main-slider__wrapper')]"),3, 5);
         workWithPreloader();
@@ -94,7 +94,6 @@ public class MainPage extends AbstractPage {
                 break;
         }
 
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         CommonStepDefs.waitOfPreloader();
@@ -124,7 +123,6 @@ public class MainPage extends AbstractPage {
      */
     @ActionTitle("ищет игру на БТ")
     public  void searchVideoGameBT(String param){
-        WebDriver driver = PageFactory.getDriver();
         boolean haveButton = param.equals("с кнопкой Смотреть");
         String ngclick;
         List<WebElement> games;
@@ -167,7 +165,6 @@ public class MainPage extends AbstractPage {
     //переходит на игру нажатием на название первой команды в виджете
     @ActionTitle("переходит на игру из виджета БТ")
     public void lala(){
-        WebDriver driver = PageFactory.getDriver();
         WebElement selectGame = Stash.getValue("gameBT");
         //запоминаем названия команд
         String team1 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).getAttribute("title").trim();
@@ -204,7 +201,6 @@ public class MainPage extends AbstractPage {
                 path = "//div[contains(@class,'nearestBroadcasts')]";
                 break;
         }
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> games;
         List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете
         int number = 0;
@@ -242,7 +238,6 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("осуществляет переход на страницу, проверяет, что открылась нужная страница")
     public void widgetsOnMain(){
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> attr = driver.findElements(By.xpath("//div[@class='benef__item']/a"));
         for (WebElement element : attr) {
             String link = element.getAttribute("href");
@@ -264,7 +259,6 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("ищет доступные коэффиценты на Главной")
     public void findAvailableCoef() {
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> coeff = driver.findElements(By.cssSelector("div.bets-widget-table__link"));
             if (coeff.size() == 0) {
                 LOG.error("Нет доступных коэффициентов в разделе 'Горячие ставки'");
@@ -281,7 +275,6 @@ public class MainPage extends AbstractPage {
     }
     @ActionTitle("переходит в настройки и меняет коэффицент на Главной")
     public void changePreferencesCoeff() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         preferences.click();
         String previous;
@@ -304,7 +297,6 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("проверяет смену цвета точек при нажатии на кнопку c")
     public void checksChangeColorDotsWhenButtonPressed(DataTable dataTable){
-        WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String direction, buttonName;
 
@@ -365,7 +357,6 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("ищет подходящий спорт в Горячих ставках")
     public void findSportHB(){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,15);
         driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
@@ -399,7 +390,6 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("переходит на лендинг вида спорта")
     public void openLandingSport(){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         int index=0;
@@ -420,9 +410,7 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("переходит на игру из Горячих ставок со ставкой Исход и запоминает id игры")
     public void goToGameFromHBandRememberID(String keyGameId){
-
         String path = "//div[contains(@class,'lastMinutesBets')]";
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> games;
         List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете
         int number = 0;

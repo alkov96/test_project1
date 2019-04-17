@@ -20,6 +20,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Онлайн-чат")
 public class OnlineChat extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(OnlineChat.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@id='chat-links']")
     private WebElement header;
@@ -29,7 +30,6 @@ public class OnlineChat extends AbstractPage {
     private WebElement closeChat;
 
     public OnlineChat() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
     }

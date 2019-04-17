@@ -22,6 +22,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Верхнее меню")
 public class TopMenu extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(TopMenu.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@id='tabbar-1012-innerCt']")
     private WebElement topMenu;
@@ -39,7 +40,6 @@ public class TopMenu extends AbstractPage {
     private WebElement exitBottonAccept;
 
     public TopMenu() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(topMenu));
     }

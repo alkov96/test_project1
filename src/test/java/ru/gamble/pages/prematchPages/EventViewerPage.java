@@ -39,6 +39,7 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 @PageEntry(title = "Просмотр событий")
 public class EventViewerPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(EventViewerPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[contains(@class,'menu-toggler')]")
     private WebElement expandCollapseMenusButton;
@@ -60,7 +61,6 @@ public class EventViewerPage extends AbstractPage {
 
 
     public EventViewerPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandCollapseMenusButton));
         checkMenuIsOpen();
@@ -300,7 +300,6 @@ public class EventViewerPage extends AbstractPage {
     }
 
     public void gamePrematchAtPeriod(String period, boolean inPeriod, boolean adding) throws Exception {
-        WebDriver driver = PageFactory.getDriver();
         String nameGamefull;
         int sizeFavourite = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']/li")).size();
         boolean gameIsAdding = false;
@@ -416,7 +415,6 @@ public class EventViewerPage extends AbstractPage {
     }
     @ActionTitle("включает фильтр по времени")
     public static void onTriggerPeriod(String period){
-        WebDriver driver = PageFactory.getDriver();
         //если меню свернуто - разворачиваем
         setExpandCollapseMenusButton(true);
         driver.findElement(By.xpath("//div[@class='periods']//div[contains(@class,'periods__input')]")).click();
@@ -434,7 +432,6 @@ public class EventViewerPage extends AbstractPage {
      * проверка что страница Прметач соответсвует ожиданиям (открыта нужная игра и триггер по времени в правильном состоянии
      */
     public static boolean pagePrematch(String team1, String expectedPeriod, boolean isFavorit) {
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
         //если меню свернуто - разворачиваем
         WebElement menu = driver.findElement(By.id("menu-toggler"));
@@ -480,7 +477,6 @@ public class EventViewerPage extends AbstractPage {
      * Проверка что нужная игра есть в Избранном в левом меню и выделена там желтым
      */
     public static boolean inLeftMenuGameYellow(String team1){
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
         LOG.info("Проверяем что нужная игра активна и выделена желтым в левом меню в Моих Пари");
         List<WebElement> leftSidePage = driver.findElements(By.xpath("//div[@class='prematch-competition ng-scope']/div/div[1]/div[1]"));
@@ -501,8 +497,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("очищает избранное через левое меню")
     public void clearFavouritePrematch(){
-        WebDriver driver = PageFactory.getDriver();
-
 //если меню свернуто - разворачиваем
         WebElement menu = driver.findElement(By.id("menu-toggler"));
         if (!menu.getAttribute("class").contains("collapsed"))
@@ -546,7 +540,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("многовыборный режим")
     public static void multiGamesOnOff(String onOrOff){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait =  new WebDriverWait(driver,10);
         boolean turnOn = onOrOff.equalsIgnoreCase("включает")?true:false;
         By xpathMultiviewButton = By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]");
@@ -591,8 +584,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("очищает список многовыборного режима")
     public void clearMultiviewContainer(){
-        WebDriver driver = PageFactory.getDriver();
-
         setExpandCollapseMenusButton(false);
         List<WebElement> innerHeader = driver.findElements(By.xpath("//div[contains(@class,'game-center-container__inner-header')]/div[contains(@class,'title-box')]"));
         LOG.info("Очищаем список в многовыборном режиме через кнопку #Очистить все#");
@@ -610,7 +601,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("добавляет в многовыборный режим целое соревнование из вида спорта номер")
     public void addCompetitionInMultiviewList(String numberSportOnLM, String keyNameTour){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait =  new WebDriverWait(driver,10);
 
         int index = Integer.valueOf(numberSportOnLM);
@@ -647,7 +637,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("добавляет в многовыборный режим одну игру из спорта номер")
     public void addOneGameToMultiview(String numberSport, String keyNameGame){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait =  new WebDriverWait(driver,10);
 
         int index = Integer.valueOf(numberSport);
@@ -697,7 +686,6 @@ public class EventViewerPage extends AbstractPage {
 
     public void checkListMultiview(String counterComp, String keyNameTour, String keyNameGame){
         //т.к. добавляем из разных спортов, то точно долждно быть 2 разных турнира в контейнере. поэтому можно смотрить количетсво prematch-competition-nme
-        WebDriver driver = PageFactory.getDriver();
         String nameGame = Stash.getValue(keyNameGame);
         String nameTour = Stash.getValue(keyNameTour);
         int countCompetition = Integer.valueOf(counterComp);
@@ -738,7 +726,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("убирает одну игру из многовыборного режиме через Левое Меню")
     public void deleteOneGameMultiview(String numberSport,String keyNameDelettingGame){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         LOG.info("Убираем одну игру из контейнера");
         setExpandCollapseMenusButton(true);
@@ -780,7 +767,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("проеряет что удаленная игра не осталась в списке многовыборного режима")
     public void checkMultiviewHaveNotTheGame(String keyNameDeletingGame){
-        WebDriver driver = PageFactory.getDriver();
         String nameGame = Stash.getValue(keyNameDeletingGame);
         setExpandCollapseMenusButton(false);
         LOG.info("Проверяем не осталась ли удаленая игра в контейнере.");
@@ -795,7 +781,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("очищает контейнер через кнопку 'очистить все'")
     public void cleanMultiview(){
-        WebDriver driver = PageFactory.getDriver();
         LOG.info("Проверка очистки контейнера многовыборного режима");
         setExpandCollapseMenusButton(false);
         LOG.info("Нажимаем на кнопку #очистить все#");
@@ -812,7 +797,6 @@ public class EventViewerPage extends AbstractPage {
     @ActionTitle("режим мультирынков")
     public void onOffMultimarkets(String onOrOff){
         boolean needOn = onOrOff.contains("включает")?true:false;
-        WebDriver driver = PageFactory.getDriver();
         WebElement multiMarkets = driver.findElement(By.id("multiMarkets"));
         LOG.info("Нажимаем на тумблер перехода в режим Мультирынков");
         if (multiMarkets.getAttribute("class").contains("not-empty")!=needOn){
@@ -828,7 +812,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("проверяет совпадение названия маркета и размера коэффициента в центральной области и в контейнере мультирынка для активной игры")
     public void checkMarktandCoef(){
-        WebDriver driver = PageFactory.getDriver();
         String nameMarketMulti;
         String marketis;
         String coefOnPage;
@@ -880,7 +863,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("ищет ставку с маленьким значением maxbet")
     public void searchBetFromSuperbet(String betOk){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         Actions actions = new Actions(driver);
         int has = 0;
@@ -956,7 +938,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("проверяет нулевую маржу")
     public void checkZeroMargin(){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
         String by_games = "//div[contains(@class, 'bets-block__header bets-block__header_prematch')]";
         By by_competitions = xpath("//li[@id='sport--14']/ul[@class='left-menu__submenu']//div[contains(@class,'left-menu__list-item-region-compitition')]");
@@ -979,7 +960,6 @@ public class EventViewerPage extends AbstractPage {
 
     @ActionTitle("добавляем рандомное событие из Нулевой маржи")
     public void addZeroMarginToCoupon(){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(PageFactory.getWebDriver(),10);
         Random random = new Random();
         List<WebElement> competitions =driver.findElements(xpath("//li[@id='sport--14']/ul[@class='left-menu__submenu']//div[contains(@class,'left-menu__list-item-region-compitition')]"));

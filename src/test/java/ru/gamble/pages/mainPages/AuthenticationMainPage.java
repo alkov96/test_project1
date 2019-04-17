@@ -28,6 +28,7 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 @PageEntry(title = "Авторизованная Главная страница")
 public class AuthenticationMainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationMainPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(id = "topPanelWalletBalance")
     private WebElement pageTitle;
@@ -42,7 +43,6 @@ public class AuthenticationMainPage extends AbstractPage {
 
 
     public AuthenticationMainPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(pageTitle,10, 10);
     }

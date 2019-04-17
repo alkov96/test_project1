@@ -17,6 +17,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Учётная запись подтверждена")
 public class AccountConfirmedPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(AccountConfirmedPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//*[contains(text(),'Чтобы начать заключать пари, введите')]")
     private WebElement pageTitle;
@@ -26,7 +27,6 @@ public class AccountConfirmedPage extends AbstractPage {
     private WebElement continueButton;
 
     public AccountConfirmedPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }

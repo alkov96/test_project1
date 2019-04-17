@@ -82,11 +82,11 @@ import static ru.gamble.utility.Generators.generateDateForGard;
 
 public class CommonStepDefs extends GenericStepDefs {
     private static final Logger LOG = LoggerFactory.getLogger(CommonStepDefs.class);
+    static WebDriver driver = PageFactory.getDriver();
     private static final String sep = File.separator;
 //private static StringBuilder tmp=new StringBuilder();
 
     public static String getSMSCode(String phone){
-        WebDriver driver = PageFactory.getWebDriver();
         String currentHandle = driver.getWindowHandle();
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
@@ -233,7 +233,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     // Ожидание появления элемента на странице
     public static void waitShowElement(By by) {
-        WebDriver driver = PageFactory.getWebDriver();
         WebDriverWait driverWait = new WebDriverWait(driver, 6, 500);
         try {
             driverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
@@ -247,10 +246,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^разлогиниваем пользователя$")
     public void logOut() throws AWTException {
-        WebDriver driver = PageFactory.getWebDriver();
-
-
-
         LOG.info("Переход на главную страницу");
         goToMainPage("site");
         cleanCookies();
@@ -366,7 +361,7 @@ public class CommonStepDefs extends GenericStepDefs {
                     currentUrl = siteUrl;
                     break;
             }
-            PageFactory.getWebDriver().get(currentUrl);
+            driver.get(currentUrl);
             LOG.info("Перешли на страницу [" + currentUrl + "]");
         } catch (DataException e) {
             LOG.error(e.getMessage());
@@ -437,8 +432,8 @@ public class CommonStepDefs extends GenericStepDefs {
      * @throws PageInitializationException при неудачной инициализации страницы
      */
     public void openPage(String title) throws PageInitializationException {
-        for (String windowHandle : PageFactory.getWebDriver().getWindowHandles()) {
-            PageFactory.getWebDriver().switchTo().window(windowHandle);
+        for (String windowHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(windowHandle);
         }
         PageFactory.getInstance().getPage(title);
     }
@@ -496,7 +491,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     public static void waitOfPreloader(int num) {
         LOG.debug("Проверка на наличие бесконечных прелоадеров");
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> list = driver.findElements(By.cssSelector("div.preloader__container"));
         int count = num;
         try {
@@ -541,7 +535,6 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param y прокрутка по вертикали
      */
     public static void scrollPage(int x, int y) {
-        WebDriver driver = PageFactory.getDriver();
         ((JavascriptExecutor) driver).executeScript("window.scroll(" + x + ","
                 + y + ");");
     }
@@ -567,7 +560,6 @@ public class CommonStepDefs extends GenericStepDefs {
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      */
     public void checkLinkToGame() {
-        WebDriver driver = PageFactory.getDriver();
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         workWithPreloader();
         boolean flag = true;
@@ -629,7 +621,6 @@ public class CommonStepDefs extends GenericStepDefs {
      */
 
     public static boolean goLink(WebElement element, String pattern) {
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
         LOG.info("Проверяем что откроется правильная ссылка " + pattern);
         pattern = stringParse(pattern);
@@ -660,9 +651,9 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^(пользователь |он) очищает cookies$")
     public static void cleanCookies() {
         try {
-            if (PageFactory.getWebDriver().manage().getCookies().size() > 0) {
+            if (driver.manage().getCookies().size() > 0) {
                 LOG.info("Удаляем Cookies");
-                PageFactory.getWebDriver().manage().deleteAllCookies();
+                driver.manage().deleteAllCookies();
             }
         } catch (Exception e) {
             LOG.error("Cookies не было!");
@@ -674,7 +665,6 @@ public class CommonStepDefs extends GenericStepDefs {
      * но чтобы был не бесконечен
      */
     public static void waitToPreloader() {
-        WebDriver driver = PageFactory.getDriver();
         int count = 20;
         try {
             while (count > 0) {
@@ -699,7 +689,6 @@ public class CommonStepDefs extends GenericStepDefs {
      * @param newUrl - URl, который нужноввести в этой новой вкладке
      */
     public static void newWindow(String newUrl) {
-        WebDriver driver = PageFactory.getDriver();
         Set<String> currentHandles = driver.getWindowHandles();
         ((ChromeDriver) driver).executeScript("window.open()");
         Set<String> windows = driver.getWindowHandles();
@@ -1095,7 +1084,6 @@ public class CommonStepDefs extends GenericStepDefs {
     @Before(value = "@ChangePassword_C1043")
     public void saveCurrentPassword() throws DataException {
         String email = null;
-        WebDriver driver = PageFactory.getWebDriver();
         Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
         String browserName = caps.getBrowserName();
         if (browserName.contains("chrome")) {
@@ -1279,12 +1267,18 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^определяем незанятый номер телефона и сохраняем в \"([^\"]*)\"$")
-    public static void confirmEmail(String keyPhone) {
-        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone";
-        String phoneLast = workWithDBgetResult(sqlRequest, "phone");
+    public static void confirmEmail(String keyPhone) throws IOException {
+        FileReader file = new FileReader("src" + sep + "test" + sep + "resources" + sep + "maxphone.txt");
+        Scanner scan = new Scanner(file);
+
+        String phoneLast = scan.nextLine();
         String phone = "7333001" + String.format("%4s", Integer.valueOf(phoneLast.substring(7)) + 1).replace(' ', '0');
         Stash.put(keyPhone, phone);
-        LOG.info("Вычислили подходящий номер телефона::" + phone);
+        LOG.info(phone);
+        FileWriter nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "maxphone.txt", false);
+        nfile.write(phone);
+        nfile.close();
+        file.close();
     }
 
     @Когда("^определяем занятый номер телефона и сохраняем в \"([^\"]*)\"$")
@@ -1306,7 +1300,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^подтверждаем скайп через админку \"([^\"]*)\"$")
     public void skypeConfirm(String keyPhone) throws Exception {
-        WebDriver driver = PageFactory.getDriver();
         String registrationUrl = "https://test-int-bet-dbproca.tsed.orglot.office/admin/";
         String currentHandle = driver.getWindowHandle();
         JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -1351,7 +1344,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^в админке смотрим id пользователя \"([^\"]*)\" \"([^\"]*)\"$")
     public void getIDFromAdmin(String keyPhone, String keyId) throws Exception {
-        WebDriver driver = PageFactory.getDriver();
         String registrationUrl = "https://test-int-bet-dbproca.tsed.orglot.office/admin/";
         String currentHandle = driver.getWindowHandle();
         JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -1494,6 +1486,16 @@ public class CommonStepDefs extends GenericStepDefs {
         String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE email='" + Stash.getValue(keyEmail) + "'";
         Stash.put(keyPhone,workWithDBgetResult(sqlRequest));
     }
+
+    @Когда("^генерим новый номер телефона \"([^\"]*)\" на основе \"([^\"]*)\"$")
+    public void generateNewPhoneBasisOldPhone(String keyMewPhone,String keyOldPhone){
+        String phone = Stash.getValue(keyOldPhone);
+        String newPhone = phone.replace("7333","7222");
+        Stash.put(keyMewPhone,newPhone);
+    }
+
+
+
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {
@@ -2063,7 +2065,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^пользователь открывает новый url \"([^\"]*)\"$")
     public void userOpenNewUrl(String url) {
-        WebDriver driver = PageFactory.getDriver();
 //        Set<String> handles = driver.getWindowHandles();
 //        Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
 //        String browserName = caps.getBrowserName();
@@ -2234,7 +2235,6 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     @After(value = "@ChangeTypeOfCoefficientOnMain_C1066 or @ChangeTypeOfCoefficientCoupon_C1066 or @ChangeTypeOfCoefficientFav_C1066")
     public void returnDecTypeCoef() {
-        WebDriver driver = PageFactory.getDriver();
         WebElement preferences = driver.findElement(By.id("preferences"));
         LOG.info("переходит в настройки и меняет коэффицент");
         String previous;
@@ -2279,7 +2279,6 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^закрываем текущее окно и возвращаемся на \"([^\"]*)\"$")
     public void closingCurrentWinAndReturnTo(String keyPage) {
         try {
-            WebDriver driver = PageFactory.getWebDriver();
             driver.close();
             driver.switchTo().window(Stash.getValue(keyPage));
             LOG.info("Вернулись на ранее запомненую страницу");
@@ -2590,7 +2589,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверяем ТЕКСТ при переходе по ссылке с$")
     public static void checkTextWhenClickingOnLinkWith(DataTable dataTable) {
-        WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, expectedText;
         String link = ""; //а это тут зачем?))
@@ -2618,7 +2616,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверяем ТЕКСТ при переходе по ссылкам из футера$")
     public static void checkTextWhenClickingOnLinkWithFromFooter(DataTable dataTable) throws InterruptedException, PageException {
-        WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String linkTitle, expectedText;
 
@@ -2658,7 +2655,6 @@ public class CommonStepDefs extends GenericStepDefs {
      * Метод меняет активную вкладку. Если требуется не только сменить активность, но и закрыть - передаём true.
      */
     public static void switchHandle(Boolean needClose) {
-        WebDriver driver = PageFactory.getWebDriver();
         ArrayList<String> multipleTabs = new ArrayList<String>(driver.getWindowHandles());
         String currentHandle = driver.getWindowHandle();
         String finalCurrentHandle = currentHandle;
@@ -2692,7 +2688,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^нажимает кнопку НАЗАД$")
     public void backToPage() {
-        WebDriver driver = PageFactory.getWebDriver();
         driver.navigate().back();
     }
 
@@ -2779,7 +2774,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверяем, совпадает ли дата и время игры с ожидаемыми \"([^\"]*)\" \"([^\"]*)\"$")
     public void checkDateTimeGame(String keyData, String typeGame) {
-        WebDriver driver = PageFactory.getWebDriver();
         String fullDateTime = Stash.getValue(keyData).toString().replace("\n", " ");
 
         switch (typeGame) {
@@ -2816,7 +2810,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверяем, совпадают ли коэффициенты на странице с теми, что на баннере \"([^\"]*)\"$")
     public void checkAllCoefs(String keyCoefs) {
-        WebDriver driver = PageFactory.getWebDriver();
         LOG.info("Формируем список коэффициентов для маркета ИСход на странице игры");
         List<String> coefsOnPage =
                 driver.findElements(By.xpath("//div[contains(@class,'game-center-container__live')]//div[contains(@class,'bets-block__bet-cell_active')]/..//span[contains(@class,'bets-block__bet-cell-content-price')]"))
@@ -2838,7 +2831,6 @@ public class CommonStepDefs extends GenericStepDefs {
     //выставление даты начала (например в истории операций или в моих пари) на самую раннюю из возможных
     @Когда("^отматывает дату начала на самую раннюю$")
     public void datapickerOnBegin() {
-        WebDriver driver = PageFactory.getWebDriver();
         new WebDriverWait(driver,15).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"),0));
         WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
         if (!datapickerBegin.getAttribute("class").contains("active")) {
@@ -2880,7 +2872,6 @@ public class CommonStepDefs extends GenericStepDefs {
     @After(value = "@Multimarkets")
     public void offMultimarket(Scenario scenario) throws InterruptedException {
         getScreenshot(scenario);
-        WebDriver driver = PageFactory.getWebDriver();
         goToMainPage("site");
         driver.findElement(By.id("prematch")).click(); //переходим в прематч
         driver.navigate().refresh();
@@ -2893,7 +2884,6 @@ public class CommonStepDefs extends GenericStepDefs {
     @After(value = "@coupon")
     public void clearCouponAfter(Scenario scenario) throws InterruptedException {
         getScreenshot(scenario);
-        WebDriver driver = PageFactory.getWebDriver();
         goToMainPage("site");
         driver.findElement(By.id("prematch")).click(); //переходим в прематч
         driver.navigate().refresh();

@@ -29,6 +29,7 @@ import static org.openqa.selenium.By.xpath;
 @PageEntry(title = "Лайв просмотр событий")
 public class VewingEventsPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(VewingEventsPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//a[@class='ulTransBorder__link active']")
     private WebElement pageTitle;
@@ -36,7 +37,6 @@ public class VewingEventsPage extends AbstractPage {
     private static By xpathForSports = By.xpath("//li[contains(@id,'sport-') and not(contains(@class,'hide')) and not(contains(@id,'sport--'))]");
 
     public VewingEventsPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -60,7 +60,6 @@ public class VewingEventsPage extends AbstractPage {
     }
 
     public void gameLiveVideo(boolean withVideo, boolean adding){
-        WebDriver driver = PageFactory.getDriver();
         int sizeFavourite = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']/li")).size();
         LOG.info("Переходим в лайв");
         driver.findElement(By.id("live")).click();
@@ -144,7 +143,6 @@ public class VewingEventsPage extends AbstractPage {
      * @return метод возвращает либо номер игры, для которой выполняется условие withVideo, либо -1 - если игры удовлетворяющих условию не найдено
      */
     public int hasVideo(int sportNumber, int gameNumber, boolean withVideo) {
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> allGameInSport = driver.findElements(xpathForSports).get(sportNumber).findElements(By.xpath(".//div[contains(@class,'icon-video')]"));
         for (int count = 0; count < gameNumber; count++) {
             if (allGameInSport.get(count).getAttribute("class").contains("hide")!=withVideo) {
@@ -160,7 +158,6 @@ public class VewingEventsPage extends AbstractPage {
      */
     @ActionTitle("выставляет фильтр по видео на")
     public void onTriggerVideo(String onoff){
-        WebDriver driver = PageFactory.getDriver();
         String active = driver.findElement(By.xpath("//div[contains(@class,'left-menu-filters__item_video')]")).getAttribute("class");
         if (onoff.equals("включен")!=active.contains("active")) {
             driver.findElement(By.id("video-filter-toggler")).click();
@@ -177,7 +174,6 @@ public class VewingEventsPage extends AbstractPage {
      * @param team1Name   - название игры, на которую перешли
      */
     public static boolean pageLive(String team1Name, boolean filterVideo, boolean isFavorit) {
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
 
         //если меню свернуто - разворачиваем
@@ -220,8 +216,6 @@ public class VewingEventsPage extends AbstractPage {
      * Проверка что нужная игра есть в Избранном в левом меню и выделена там желтым
      */
     public static boolean inLeftMenuGameSelected(String team1Name){
-
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
         LOG.info("Смотрим что нужная игра выделена желтым в левом меню в Моих Играх (если эта игра есть в Избранном)");
         List<WebElement> favouriteGames = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")); // избранные игры, отображаемые в левом меню
@@ -254,7 +248,6 @@ public class VewingEventsPage extends AbstractPage {
      */
     @ActionTitle("проверяет в свёрнутом левом меню иконок видов спорта больше")
     public void checksMinimizedLeftMenuPresenceIconsSports (String number){
-        WebDriver driver = PageFactory.getWebDriver();
         String xpathLeftMenu = "//div[contains(@class,'menu-toggler')]";
         String xpathTypeOfSports = "//a[contains(@class,'list-item-sport-link')]";
         WebElement leftMenu = driver.findElement(By.xpath(xpathLeftMenu));
@@ -277,7 +270,6 @@ public class VewingEventsPage extends AbstractPage {
      */
     @ActionTitle("проверяет, что при развёрнутом левом меню есть элементы с")
     public void checksThatWhenLeftMenuIsExpandedThereAreItemsWith (DataTable listItems){
-        WebDriver driver = PageFactory.getWebDriver();
         WebElement menuToggler = driver.findElement(By.id("menu-toggler"));
         if(menuToggler.getAttribute("title").contains("Показать всё")){
             LOG.info("Левое меню оказалось свёрнутым. Разворачиваем.");
@@ -348,7 +340,6 @@ public class VewingEventsPage extends AbstractPage {
 //        }else {
 //            LOG.info("Нет ни одной строки с видом спорта!");
 //        }
-        WebDriver driver =  PageFactory.getWebDriver();
         LOG.info("Сначала убедимся что в Лайве вообще есть игры");
         List<WebElement> games = driver.findElements(By.xpath("//div[@class='left-menu__list-item-games-row']"));
         Assert.assertFalse("Нет игр в ЛАЙВЕ", games.isEmpty());
@@ -390,7 +381,6 @@ public class VewingEventsPage extends AbstractPage {
 
     @ActionTitle("проверяет что при активном фильтре 'С видео' у игр есть иконка в виде монитора со треугольником внутри")
     public void checkWorkFilterWithVideo(){
-        WebDriver driver = PageFactory.getWebDriver();
         String xpathFilter = "//div[contains(@class,'left-menu-filters__item_video')]";
         String xpathMainCategoriesOfEvents = "//li[contains (@id,'sport')]";
         String xpathGamesWithVideo = "//li[contains(@class,'left-menu__list-item-games')]";

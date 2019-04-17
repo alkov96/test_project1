@@ -35,6 +35,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "Профиль")
 public class ProfilePage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(ProfilePage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='user-profile__tab-wraper']")
     private WebElement tabWraper;
@@ -63,13 +64,16 @@ public class ProfilePage extends AbstractPage {
     protected WebElement savePassword;
 
     @ElementTitle("Изменить email")
-    @FindBy(xpath = "//div[normalize-space(text())='Электронная почта']/following-sibling::div/span")
+    @FindBy(xpath = "//div[normalize-space(text())='Электронная почта']/following-sibling::div/span[contains(@class,'user-profile__link')]")
     protected WebElement editEmail;
+
+    @ElementTitle("Изменить phone")
+    @FindBy(xpath = "//div[normalize-space(text())='Телефон']/following-sibling::div/span[contains(@class,'user-profile__link')]")
+    protected WebElement editPhone;
 
 
 
     public ProfilePage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(tabWraper));
@@ -78,7 +82,6 @@ public class ProfilePage extends AbstractPage {
 
     @ActionTitle("меняет пароль в Личном кабинете")
     public void changePassword(String currentPass, String newPass) throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         CommonStepDefs.workWithPreloader();
         if (currentPass.matches("[A-Z]*")){
             currentPass = Stash.getValue(currentPass).toString();
@@ -134,7 +137,6 @@ public class ProfilePage extends AbstractPage {
 
     @ActionTitle("сравнивает значения в ЛК с тем, с которыми пользователь регистрировался")
     public void checkPDinPrivite(DataTable dataTable){
-        WebDriver driver = PageFactory.getDriver();
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         LOG.info("Раскрываем список Персональных данных если он закрыт");
         if (PDeye.getAttribute("class").contains("hide")){
@@ -176,7 +178,6 @@ public class ProfilePage extends AbstractPage {
 
     @ActionTitle("подтверждает пароль")
     public void acceptPassword(String keyPassword){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         wait
                 .withMessage("После нажатия на кнопку 'изменить' не появилось предложение подтвердить пароль")
@@ -194,19 +195,17 @@ public class ProfilePage extends AbstractPage {
 
     @ActionTitle("проверяет что поле содержит значение")
     public void checkValueInField(String field, String value){
-        WebDriver driver = PageFactory.getDriver();
         if (value.matches("[A-Z]*")){
-            value = Stash.getValue(value);
+            value = Stash.getValue(value).toString().replace("+","");
         }
-        String actualvalue = driver.findElement(By.xpath("//*[@class='user-profile__label']/following-sibling::*[contains(@class,'user-profile__text')]")).getAttribute("innerText");
+        String actualvalue = driver.findElement(By.xpath("//*[@class='user-profile__label' and normalize-space(text())='" + field + "']/following-sibling::*[contains(@class,'user-profile__text')]")).getAttribute("innerText");
         Assert.assertTrue("Значение поля " + field + ":'" + actualvalue + "' не соответствует ожидаемому '" + value + "'",
-                actualvalue.replace("Изменить","").trim().equals(value));
+                actualvalue.replace("Изменить","").replaceAll("[ +-]*","").trim().equals(value));
 
     }
 
     @ActionTitle("проверка чекбокса оферты в разделе 'Настройка уведомлений'")
     public void checkBoxOferta(){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.findElement(By.xpath("//*[@href='/private/user/notifications']")).click();
         By by_email = By.id("not_email");

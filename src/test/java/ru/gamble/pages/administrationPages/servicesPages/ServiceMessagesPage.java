@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 @PageEntry(title = "Сервисные сообщения")
 public class ServiceMessagesPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceMessagesPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//tbody[@id='gridview-1472-body']")
     private WebElement table;
@@ -48,14 +49,12 @@ public class ServiceMessagesPage extends AbstractPage {
     private WebElement newMessageBotton;
 
     public ServiceMessagesPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(table));
     }
 
     @ActionTitle("очищает все активные сообщения")
     public void clearActives() {
-        WebDriver driver = PageFactory.getWebDriver();
         String xpathActiveBox = "//td[contains (@class,'x-grid-cell-checkcolumn-1468')]";
         if (lastPage.isDisplayed()) {
             lastPage.click();

@@ -11,6 +11,7 @@ import java.io.*;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static ru.gamble.utility.EmailParameters.*;
 
@@ -137,12 +138,19 @@ public class MailSearcher {
         InputStreamReader streamReader = new InputStreamReader(bis);
         BufferedReader buffer = new BufferedReader(streamReader);
 
-        String line;
+        String line = new String();
 
-        while ((line = buffer.readLine()) != null) {
+
+        while (!buffer.ready()){
+            line = buffer.readLine();
+            LOG.info(line.substring(0,10));
             if (line.contains("confirm") || line.contains("verify"))
                 break;
         }
+//        while ((line = buffer.readLine()) != null ) {
+//            if (line.contains("confirm") || line.contains("verify"))
+//                break;
+//        }
         if (line == null) {
             LOG.error("Line is null");
             throw new IllegalArgumentException("Line is null");
