@@ -309,7 +309,7 @@ public class EventViewerPage extends AbstractPage {
         Date dateGame;
         int hour = Integer.valueOf(period.substring(0, period.indexOf("час") - 1));
         Date Period = new Date(System.currentTimeMillis() + hour * 3600 * 1000);
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm - dd MMM yyyy", new Locale("ru"));
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", new Locale("ru"));
 
 
         WebElement menu = driver.findElement(By.id("menu-toggler"));
@@ -371,29 +371,31 @@ public class EventViewerPage extends AbstractPage {
                     if (!menu.getAttribute("class").contains("collapsed")) menu.click();
                     driver.findElements(xpathForsportsPrematch).get(sportN).findElements(By.xpath(pathToTours)).get(tour).findElement(By.xpath("./h4[1]")).click();
                     CommonStepDefs.workWithPreloader();
-                    //все игры в этом соревновании
-                    List<WebElement> allGames = driver.findElements(By.xpath("//div[contains(@class,'bets-block__header-bet-name')]"));
+                    //все даты в этом соревновании
+                    List<WebElement> allDates = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition__header-date')]"));
                     LOG.info("Смотрим все игры в спорте, в соответствующем соревновании. Ищем игру подходящую по фильтру времени " + hour + inPeriod);
-                    for (int GameInTour = 0; GameInTour < allGames.size(); GameInTour++) {
-                        dateGame = formatter.parse(allGames.get(GameInTour).getAttribute("innerText"));
-
-                        if (!gameIsAdding && (dateGame.getTime() <= Period.getTime()) == inPeriod) {
-
-                            nameGamefull = allGames.get(GameInTour).findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("title");
-                            CommonStepDefs.addStash("nameGameKey",nameGamefull);
-                            CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
-                            CommonStepDefs.addStash("typeGameKey",typeGame);
-                            if (adding) {
-                                LOG.info("Нужную игру нашли. Добавляем ее в Избранное");
-                                allGames.get(GameInTour).findElement(By.xpath(".//i[contains(@class,'bets-block__header-icon_star')]")).click();
-                                new WebDriverWait(driver,10)
-                                        .withMessage("Игра в избранное не добавилась!!")
-                                        .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__favorite-list']/li"),sizeFavourite));
+                    By byTime = By.xpath("./../following-sibling::div/div[contains(@class,'bets-block_single-row')]//div[contains(@class,'bets-block__header-left-info')]");
+                    for (int index = 0; index < allDates.size(); index++) {
+                        WebElement dateInTour = allDates.get(index);
+                        String day = dateInTour.getAttribute("innerText");
+                        for (WebElement game: allDates.get(index).findElements(byTime)){//для каждой даты несколько игр может быть на разное время. вот продемся по каждой из них
+                            dateGame = formatter.parse(day + " " + game.getAttribute("innerText"));
+                            if ((dateGame.getTime() <= Period.getTime()) == inPeriod) {//если игра подходит
+                                nameGamefull = game.findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("innerText");
+                                CommonStepDefs.addStash("nameGameKey",nameGamefull);
+                                CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
+                                CommonStepDefs.addStash("typeGameKey",typeGame);
+                                if (adding) {
+                                    LOG.info("Нужную игру нашли. Добавляем ее в Избранное");
+                                    game.findElement(By.xpath("./i")).click();//добавление в избранное
+                                    new WebDriverWait(driver,10)
+                                            .withMessage("Игра в избранное не добавилась!!")
+                                            .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[contains(@class,'left-menu__favorite-list')]/li"),sizeFavourite));
+                                }
+                                return;
                             }
-                            gameIsAdding = true;
+                            //если игра не подошла идем дальше
                         }
-
-                        if (gameIsAdding) return;
                     }
                 }
                 if (!menu.getAttribute("class").contains("collapsed")) menu.click();
@@ -479,12 +481,12 @@ public class EventViewerPage extends AbstractPage {
     public static boolean inLeftMenuGameYellow(String team1){
         boolean flag = true;
         LOG.info("Проверяем что нужная игра активна и выделена желтым в левом меню в Моих Пари");
-        List<WebElement> leftSidePage = driver.findElements(By.xpath("//div[@class='prematch-competition ng-scope']/div/div[1]/div[1]"));
-        for (WebElement aLeftSidePage : leftSidePage) {
-            String nameGameOnPage = aLeftSidePage.findElement(By.xpath("div[1]/div[2]")).getAttribute("title");
+        List<WebElement> favouriteGames = driver.findElements(By.xpath("//li[contains(@class,'left-menu__favorite-list-item')]"));
+        for (WebElement favourGame : favouriteGames) {
+            String nameGameOnPage = favourGame.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("title");
             nameGameOnPage = CommonStepDefs.stringParse(nameGameOnPage);
             if (nameGameOnPage.contains(CommonStepDefs.stringParse(team1))) {
-                if (!aLeftSidePage.findElement(By.xpath("../div[1]")).getAttribute("class").contains("active")) {
+                if (!favourGame.getAttribute("class").contains("active")) {
                     flag = false;
                     LOG.error("В прематче открытая игра из Избранного не выделена в левой части меню");
                 }

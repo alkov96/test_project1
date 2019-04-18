@@ -8,10 +8,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.stepdefs.CommonStepDefs;
+import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
+import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.annotations.PageEntry;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author p.sivak.
@@ -28,5 +34,13 @@ public class MultimonitorPage extends AbstractPage {
     public MultimonitorPage() {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(multiviewWrapper));
+    }
+
+    @ActionTitle("добавляет монитор для игры")
+    public void addMonitor(String keyGame){
+        List<String> names = Stash.getValue("nameGameKey");
+        List<String> teams = new ArrayList<>();
+        names.forEach(name -> teams.add(CommonStepDefs.stringParse(name)));
+        List<String> types = Stash.getValue("typeGameKey");
     }
 }
