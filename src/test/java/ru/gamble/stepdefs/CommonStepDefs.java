@@ -560,6 +560,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      */
     public void checkLinkToGame() {
+
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         workWithPreloader();
         boolean flag = true;
