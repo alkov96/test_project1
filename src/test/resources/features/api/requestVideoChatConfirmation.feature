@@ -262,12 +262,6 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    #этот запрос только для версий >=v5. на версии 3 - должна быть ошибка
-    * неудачный запрос к API "api/mobile/v3/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
-      | devId     | DEVID     |
-      | authToken | AUTHTOKEN |
-      | source    | SOURCE    |
-
     * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
@@ -298,7 +292,35 @@
     * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
-      | source    | 42    |
+      | source    | SOURCE    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":44 |
+
+
+  @api
+  @requestVideoChatConfirmation
+  @incorrect
+  Сценарий: Запрос на видеоидентификацию при выключенной настройке2
+
+    * поиск акаунта со статуом регистрации "=17" "EMAIL"
+
+    * редактируем некоторые активные опции сайта
+      |video_identification_in_mobile_app|true|
+      |identification_with_video|false|
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId  | DEVID   |
+      | email  | EMAIL    |
+      | pass   | PASSWORD    |
+      | source | SOURCE  |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+      | devId     | DEVID     |
+      | authToken | AUTHTOKEN |
+      | source    | SOURCE    |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":44 |
@@ -313,6 +335,7 @@
 
     * редактируем некоторые активные опции сайта
       |video_identification_in_mobile_app|true|
+      |identification_with_video|true|
 
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
