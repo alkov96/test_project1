@@ -92,12 +92,12 @@ public class EnterPage extends AbstractPage {
     public void logIn(DataTable dataTable) throws DataException {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
 
-//        if (data.keySet().toArray()[0].toString().toLowerCase().equals("телефон")){
-//            chooseMethodAutorization("телефон");
-//        }
-//        else {
-//            chooseMethodAutorization("email");
-//        }
+        if (data.keySet().toArray()[0].toString().toLowerCase().equals("телефон")){
+            chooseMethodAutorization("телефон");
+        }
+        else {
+            chooseMethodAutorization("email");
+        }
 
         String login, password;
         switch (data.get(LOGIN)) {
