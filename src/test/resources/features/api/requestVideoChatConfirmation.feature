@@ -123,34 +123,6 @@
 
     * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
 
-
-
-    * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
-      | gender                  | GENDER         |
-      | birthplace              | BIRTHPLACE     |
-      | region                  | Москва         |
-      | locality                | CITY           |
-      | street                  | STREET         |
-      | house                   | HOUSE          |
-      | construction            |                |
-      | housing                 |                |
-      | flat                    | FLAT           |
-      | docNum                  | DOCNUM         |
-      | docSeries               | DOCSERIES      |
-      | issueDate               | INVALIDISSUEDATE |
-      | issuePlace              | ISSUEPLACE     |
-      | codePlace               | 123-456        |
-
-    * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
-      | devId                   | DEVID        |
-      | authToken               | AUTHTOKEN    |
-      | source                  | SOURCE       |
-      | personalData            | PERSONALDATA |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":27 |
-
-
     * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
       | gender                  | GENDER         |
       | birthplace              | BIRTHPLACE     |
@@ -206,7 +178,24 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * поиск акаунта со статуом регистрации "=17" "EMAIL"
+    * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
+      | authToken               | AUTHTOKEN        |
+      | source                  | 16               |
+      | snilsNumber             | "000-000-000 00" |
+      | innNumber               |                  |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "status":5 |
+
+    * запрос к API "api/mobile/v5/getUserStatus" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * проверка вариантного ответа API из "RESPONCE_API":
+      | exepted     | "status":16 |
 
     * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
@@ -219,6 +208,39 @@
     * проверка полей и типов в ответе "DATA":
       | Параметр      | Тип    |
       | videochatLink | String |
+
+
+  @api
+  @requestVideoChatConfirmation
+  @incorrect
+  Сценарий: Запрос на видеоидентификацию с устаревше версии(v4 и ниже)
+
+    * поиск акаунта со статуом регистрации "=17" "EMAIL"
+
+    * редактируем некоторые активные опции сайта
+      |video_identification_in_mobile_app|true|
+      |identification_with_video|true|
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId  | DEVID   |
+      | email  | EMAIL    |
+      | pass   | PASSWORD    |
+      | source | SOURCE  |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    #этот запрос только для версий >=v5. на версии 3 - должна быть ошибка
+    * неудачный запрос к API "api/mobile/v3/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+      | devId     | DEVID     |
+      | authToken | AUTHTOKEN |
+      | source    | SOURCE    |
+
+    * неудачный запрос к API "api/mobile/v4/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+      | devId     | DEVID     |
+      | authToken | AUTHTOKEN |
+      | source    | SOURCE    |
+
+
 
 
   @api
@@ -240,6 +262,12 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
+    #этот запрос только для версий >=v5. на версии 3 - должна быть ошибка
+    * неудачный запрос к API "api/mobile/v3/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+      | devId     | DEVID     |
+      | authToken | AUTHTOKEN |
+      | source    | SOURCE    |
+
     * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
@@ -247,8 +275,6 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":45 |
-
-
 
   @api
   @requestVideoChatConfirmation
