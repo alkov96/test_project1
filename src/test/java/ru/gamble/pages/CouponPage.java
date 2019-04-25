@@ -253,7 +253,6 @@ public class CouponPage extends AbstractPage {
         if (coef != coefCoupon && coef != oldCoef) {
             Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCoupon + coef);
         } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon + " <=> " + coef);
-
     }
 
     @ActionTitle("устанавливает условие для принятия коэфицентов как 'Никогда'")
@@ -924,5 +923,21 @@ public class CouponPage extends AbstractPage {
         BigDecimal sum = new BigDecimal(Float.toString(superbetValue)).setScale(2, RoundingMode.UP);
         Stash.put("sumKey",sum.toString());
     }
+
+//    @ActionTitle("высчитываем сумму, при которой возможный выигрыш будет равен максимальной сумме выигрыша")
+//    public void summMaxBet(){
+//        WebDriver driver = PageFactory.getDriver();
+//        //float coefCoupon = Float.valueOf(driver.findElement(xpath("//div[@class='coupon-bet__coeffs']/span[2]")).getAttribute("innerText"));//Кэфицент в купоне
+//
+//        float coefCoupon = Float.valueOf(driver.findElement(xpath("//span[contains(@class,'coupon__sum') and not(contains(@class,'orange'))]")).getAttribute("innerText"));
+//        /** метод, который высчитывает сумму, при которой сумма выигрыша будет равна 20 млн.
+//         * Но на сайте нельзя указать более двух цифр посл езапятой, поэтому значение не всегда будет точно равно 20 млн.**/
+//        double sumDouble = (20000000.00) / coefCoupon;
+//        String sum = String.format("%.2f",sumDouble).replace(",",".");
+//        LOG.info(sum);
+//        Stash.put("sumKeyMax", sum);
+//
+//
+//    }
 }
 
