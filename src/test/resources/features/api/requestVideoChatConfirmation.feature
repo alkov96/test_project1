@@ -73,7 +73,7 @@
       | SNILS | 37487545236 |
 
 
-    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/sendPhoneCode" и сохраняем в "RESPONCE_API":
       | devId | DEVID |
       | phone | PHONE |
 
@@ -82,7 +82,7 @@
 
     * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
 
-    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/createUser" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
       |  source                | SOURCE     |
       |  first_name            | FIRSTNAME  |
@@ -99,7 +99,7 @@
 
     * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
 
-    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/confirmEmail" и сохраняем в "RESPONCE_API":
       | code   | CODEEMAIL |
       | source | SOURCE        |
 
@@ -108,7 +108,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":10 |
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID |
       | email  | EMAIL |
       | pass   | PASSWORD  |
@@ -140,7 +140,7 @@
       | issuePlace              | ISSUEPLACE     |
       | codePlace               | 123-456        |
 
-    * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitPersonalData" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | SOURCE       |
@@ -153,7 +153,7 @@
       |video_identification_in_mobile_app|true|
       |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID    |
       | email  | EMAIL    |
       | pass   | PASSWORD |
@@ -161,7 +161,7 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | SOURCE           |
@@ -169,7 +169,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | SOURCE           |
@@ -178,7 +178,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
       | source                  | 16               |
       | snilsNumber             | "000-000-000 00" |
@@ -187,9 +187,9 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
     * проверка ответа API из "RESPONCE_API":
-      | exepted | "status":5 |
+      | exepted | "status":16 |
 
-    * запрос к API "api/mobile/v5/getUserStatus" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getUserStatus" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -197,7 +197,7 @@
     * проверка вариантного ответа API из "RESPONCE_API":
       | exepted     | "status":16 |
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
       | source    | SOURCE    |
@@ -221,7 +221,7 @@
       |video_identification_in_mobile_app|true|
       |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | EMAIL    |
       | pass   | PASSWORD    |
@@ -229,7 +229,7 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    #этот запрос только для версий >=v5. на версии 3 - должна быть ошибка
+    #этот запрос только для версий >=v6. на версии 3 - должна быть ошибка
     * неудачный запрос к API "api/mobile/v3/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
@@ -254,7 +254,7 @@
       |video_identification_in_mobile_app|true|
       |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | EMAIL    |
       | pass   | PASSWORD    |
@@ -262,7 +262,7 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
       | source    | 42    |
@@ -281,7 +281,7 @@
       |video_identification_in_mobile_app|false|
       |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | EMAIL    |
       | pass   | PASSWORD    |
@@ -289,7 +289,7 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
       | source    | SOURCE    |
@@ -309,7 +309,7 @@
       |video_identification_in_mobile_app|true|
       |identification_with_video|false|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | EMAIL    |
       | pass   | PASSWORD    |
@@ -317,7 +317,7 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
       | source    | SOURCE    |
@@ -337,7 +337,7 @@
       |video_identification_in_mobile_app|true|
       |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | EMAIL    |
       | pass   | PASSWORD    |
@@ -345,7 +345,7 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
       | source    | SOURCE    |

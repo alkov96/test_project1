@@ -723,8 +723,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^проверка ответа API из \"([^\"]*)\":$")
     public void checkresponceAPI(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        String expected = table.get("exepted");
+        String actual = JSONValue.toJSONString(Stash.getValue(keyStash)).replaceAll(" ","");
+        String expected = table.get("exepted").replaceAll(" ","");
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
@@ -2878,9 +2878,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^проверяем, совпадает ли дата и время игры с ожидаемыми \"([^\"]*)\" \"([^\"]*)\"$")
-    public void checkDateTimeGame(String keyData, String typeGame) {
+    public void checkDateTimeGame(String keyData, String typeGamekey) {
         String fullDateTime = Stash.getValue(keyData).toString().replace("\n", " ");
-
+        String typeGame = Stash.getValue(typeGamekey);
         switch (typeGame) {
             case "live":
                 LOG.info("Судя по времени, указанному на баннере, игра должна быть лайвовской. Проверять будем только что раздел соответствует ЛАЙВу " + fullDateTime);

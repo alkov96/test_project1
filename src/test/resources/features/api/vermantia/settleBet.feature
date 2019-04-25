@@ -6,6 +6,8 @@
       | transactionId   | TRANSACTIONID |
 
     * сохраняем в память
+      | CURRENCY  | RUB |
+    * сохраняем в память
       | DEVID  | randomNumber 4 |
     * сохраняем в память
       | PASSWORD  | Default |
@@ -18,6 +20,8 @@
       | SHOPCODE  | randomNumber 4|
     * сохраняем в память
       | AMOUNT  | 300|
+    * сохраняем в память
+      | AMOUNTSETTLE  | 300|
 
     * поиск акаунта со статуом регистрации "=2" "ALLROWS"
 
@@ -43,9 +47,6 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
-    * сохраняем в память
-      | CURRENCY  | RUB |
-
     * пополняем пользователю баланс если нужно, судя по ответу "RESPONCE" на сумму, достаточную для "AMOUNT"
       | accountCode   | string        |
       | accountName   | string        |
@@ -57,24 +58,6 @@
       | paymentSystem | cupis_card    |
       | transactionId | TRANSACTIONID |
       | userId        | ID        |
-
-#запоминаем баланс
-    * запрос типа GET, результат сохраняем в "RESPONCE"
-      | data   | ESB_URL              |
-      | string | rest/webuserbalance  |
-      | stash  | GROUPCODE            |
-      | stash  | SHOPCODE             |
-      | stash  | AUTHTOKEN            |
-      | string | 213.92.47.18         |
-
-    * проверка ответа API из "RESPONCE":
-      | exepted | "ret_code":1024 |
-
-    * находим и сохраняем "BALANCE" из "RESPONCE"
-
-    #смотрим сколько сейчас у пользователя захолдировано денег
-    * запрос в swagger для получения getHolds "HOLDRUB" "HOLDBONUS"
-      | userId | ID |
 
     #авторизуемся на вермантии пользаком
     * запрос типа GET, результат сохраняем в "RESPONCE"
@@ -91,7 +74,7 @@
     * находим и сохраняем "SESSION" из "RESPONCE"
 
     #делаем запрос на ставку
-    * запрос по адресу "{ESB_URL}/rest/webreservebet" и сохраняем в "RESPONCE_API":
+    * запрос по адресу "{ESB_URL}/rest/webreservebet" и сохраняем в "RESPONCE":
       | group_code  | GROUPCODE |
       | shop_code   | SHOPCODE  |
       | session     | SESSION   |
@@ -105,26 +88,8 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
-    #проверям баланс пользователя. он должен был измениться
-    * запрос типа GET, результат сохраняем в "RESPONCE"
-      | data   | ESB_URL              |
-      | string | rest/webuserbalance  |
-      | stash  | GROUPCODE            |
-      | stash  | SHOPCODE             |
-      | stash  | AUTHTOKEN            |
-      | string | 213.92.47.18         |
+    * находим и сохраняем "TRANSACTION" из "RESPONCE"
 
-    * проверка ответа API из "RESPONCE":
-      | exepted | "ret_code":1024 |
-
-    * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
-    * проверим что "BALANCE" больше "BALANCE2" на "AMOUNT"
-
-      #проверям что захолдированы рубли на эту ставку
-    * запрос в swagger для получения getHolds "HOLDRUB2" "HOLDBONUS2"
-      | userId | ID |
-
-    * проверим что "HOLDRUB2" больше "HOLDRUB" на "AMOUNT"
 
     #подтверждаем ставку
     * запрос по адресу "{ESB_URL}/rest/webplacebet" и сохраняем в "RESPONCE_API":
@@ -142,16 +107,272 @@
       | exepted | "ret_code":1024 |
 
     * ждем некоторое время "1"
-    #проверям что ставка расхолдировалась
-    * запрос в swagger для получения getHolds "HOLDRUB2" "HOLDBONUS3"
-      | userId | ID |
+    #запоминаем значение баланса
+    * запрос типа GET, результат сохраняем в "RESPONCE"
+      | data   | ESB_URL              |
+      | string | rest/webuserbalance  |
+      | stash  | GROUPCODE            |
+      | stash  | SHOPCODE             |
+      | stash  | AUTHTOKEN            |
+      | string | 213.92.47.18         |
 
-    * проверим что "HOLDRUB2" больше "HOLDRUB" на "0"
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
 
-
+    * находим "balance" и сохраняем "BALANCE" из "RESPONCE"
 
 
   @api
   @vermantia
-  @susessfullbet
-  Сценарий: Успешная ставка vermantia на рубли
+  @settlebet
+  Сценарий: Проверка изменнеия баланся, если ставка выиграла (payment)
+    * запрос по адресу "{ESB_URL}/rest/websettlebet" и сохраняем в "RESPONCE_API":
+      | group_code      | GROUPCODE    |
+      | shop_code       | SHOPCODE     |
+      | ticket_id       | TICKETID     |
+      | game            | qf           |
+      | bonus           | false        |
+      | id_bonus        |              |
+      | currency        | CURRENCY     |
+      | total_amount    | AMOUNTSETTLE |
+      | payment_amount  | AMOUNTSETTLE |
+      | refund_amount   | 0            |
+      | reason          | 1            |
+      | skin            | main         |
+      | user_account    | ID           |
+      | transaction     | TRANSACTION  |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+    * проверка ответа API из "RESPONCE":
+      | exepted | "description":"Success" |
+
+    #проверим что баланс увеличился на значение AMOUNTSETTLE
+    * ждем некоторое время "1"
+
+    * запрос типа GET, результат сохраняем в "RESPONCE"
+      | data   | ESB_URL              |
+      | string | rest/webuserbalance  |
+      | stash  | GROUPCODE            |
+      | stash  | SHOPCODE             |
+      | stash  | AUTHTOKEN            |
+      | string | 213.92.47.18         |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+
+    * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+    * проверим что "BALANCE2" больше "BALANCE" на "AMOUNTSETTLE"
+
+
+  @api
+  @vermantia
+  @settlebet
+  Сценарий: Проверка изменнеия баланся, если ставку отменили (refund)
+    * запрос по адресу "{ESB_URL}/rest/websettlebet" и сохраняем в "RESPONCE_API":
+      | group_code      | GROUPCODE    |
+      | shop_code       | SHOPCODE     |
+      | ticket_id       | TICKETID     |
+      | game            | qf           |
+      | bonus           | false        |
+      | id_bonus        |              |
+      | currency        | CURRENCY     |
+      | total_amount    | AMOUNTSETTLE |
+      | payment_amount  | 0            |
+      | refund_amount   | AMOUNTSETTLE |
+      | reason          | 2            |
+      | skin            | main         |
+      | user_account    | ID           |
+      | transaction     | TRANSACTION  |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+    * проверка ответа API из "RESPONCE":
+      | exepted | "description": "Success" |
+
+    #проверим что баланс увеличился на значение AMOUNTSETTLE
+    * ждем некоторое время "1"
+
+    * запрос типа GET, результат сохраняем в "RESPONCE"
+      | data   | ESB_URL              |
+      | string | rest/webuserbalance  |
+      | stash  | GROUPCODE            |
+      | stash  | SHOPCODE             |
+      | stash  | AUTHTOKEN            |
+      | string | 213.92.47.18         |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+
+    * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+    * проверим что "BALANCE2" больше "BALANCE" на "AMOUNTSETTLE"
+
+
+  @api
+  @vermantia
+  @settlebet
+  Сценарий: Проверка изменнеия баланся, если была отмена пополнения по ставке (cancel payment = отмена выигрыша)
+    * запрос по адресу "{ESB_URL}/rest/websettlebet" и сохраняем в "RESPONCE_API":
+      | group_code      | GROUPCODE    |
+      | shop_code       | SHOPCODE     |
+      | ticket_id       | TICKETID     |
+      | game            | qf           |
+      | bonus           | false        |
+      | id_bonus        |              |
+      | currency        | CURRENCY     |
+      | total_amount    | AMOUNTSETTLE |
+      | payment_amount  | AMOUNTSETTLE |
+      | refund_amount   | 0            |
+      | reason          | 3            |
+      | skin            | main         |
+      | user_account    | ID           |
+      | transaction     | TRANSACTION  |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+    * проверка ответа API из "RESPONCE":
+      | exepted | "description": "Success" |
+
+    #проверим что баланс уменьшился на значение AMOUNTSETTLE
+    * ждем некоторое время "1"
+
+    * запрос типа GET, результат сохраняем в "RESPONCE"
+      | data   | ESB_URL              |
+      | string | rest/webuserbalance  |
+      | stash  | GROUPCODE            |
+      | stash  | SHOPCODE             |
+      | stash  | AUTHTOKEN            |
+      | string | 213.92.47.18         |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+
+    * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+    * проверим что "BALANCE2" больше "BALANCE" на "-AMOUNTSETTLE"
+
+  @api
+  @vermantia
+  @settlebet
+  Сценарий: Проверка изменнеия баланся, если была отмена пополнения по ставке (cancel refund = отмена возврата)
+    * запрос по адресу "{ESB_URL}/rest/websettlebet" и сохраняем в "RESPONCE_API":
+      | group_code      | GROUPCODE    |
+      | shop_code       | SHOPCODE     |
+      | ticket_id       | TICKETID     |
+      | game            | qf           |
+      | bonus           | false        |
+      | id_bonus        |              |
+      | currency        | CURRENCY     |
+      | total_amount    | AMOUNTSETTLE |
+      | payment_amount  | 0            |
+      | refund_amount   | AMOUNTSETTLE |
+      | reason          | 4            |
+      | skin            | main         |
+      | user_account    | ID           |
+      | transaction     | TRANSACTION  |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+    * проверка ответа API из "RESPONCE":
+      | exepted | "description": "Success" |
+
+    #проверим что баланс уменьшился на значение AMOUNTSETTLE
+    * ждем некоторое время "1"
+
+    * запрос типа GET, результат сохраняем в "RESPONCE"
+      | data   | ESB_URL              |
+      | string | rest/webuserbalance  |
+      | stash  | GROUPCODE            |
+      | stash  | SHOPCODE             |
+      | stash  | AUTHTOKEN            |
+      | string | 213.92.47.18         |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+
+    * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+    * проверим что "BALANCE2" больше "BALANCE" на "-AMOUNTSETTLE"
+
+  @api
+  @vermantia
+  @settlebet
+  Сценарий: Проверка изменнеия баланса, если не было запроса в аккаунтинг (loser)
+    * запрос по адресу "{ESB_URL}/rest/websettlebet" и сохраняем в "RESPONCE_API":
+      | group_code      | GROUPCODE    |
+      | shop_code       | SHOPCODE     |
+      | ticket_id       | TICKETID     |
+      | game            | qf           |
+      | bonus           | false        |
+      | id_bonus        |              |
+      | currency        | CURRENCY     |
+      | total_amount    | AMOUNTSETTLE |
+      | payment_amount  | AMOUNTSETTLE |
+      | refund_amount   | 0            |
+      | reason          | 5            |
+      | skin            | main         |
+      | user_account    | ID           |
+      | transaction     | TRANSACTION  |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+    * проверка ответа API из "RESPONCE":
+      | exepted | "description": "Success" |
+
+    #проверим что баланс не изменился
+    * ждем некоторое время "1"
+
+    * запрос типа GET, результат сохраняем в "RESPONCE"
+      | data   | ESB_URL              |
+      | string | rest/webuserbalance  |
+      | stash  | GROUPCODE            |
+      | stash  | SHOPCODE             |
+      | stash  | AUTHTOKEN            |
+      | string | 213.92.47.18         |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+
+    * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+    * проверим что "BALANCE2" больше "BALANCE" на "0"
+
+  @api
+  @vermantia
+  @settlebet
+  Сценарий: Проверка изменнеия баланса, если не было запроса в аккаунтинг ((ticket re opened))
+    * запрос по адресу "{ESB_URL}/rest/websettlebet" и сохраняем в "RESPONCE_API":
+      | group_code      | GROUPCODE    |
+      | shop_code       | SHOPCODE     |
+      | ticket_id       | TICKETID     |
+      | game            | qf           |
+      | bonus           | false        |
+      | id_bonus        |              |
+      | currency        | CURRENCY     |
+      | total_amount    | AMOUNTSETTLE |
+      | payment_amount  | AMOUNTSETTLE |
+      | refund_amount   | 0            |
+      | reason          | 6            |
+      | skin            | main         |
+      | user_account    | ID           |
+      | transaction     | TRANSACTION  |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+    * проверка ответа API из "RESPONCE":
+      | exepted | "description":"Success" |
+
+    #проверим что баланс не изменился
+    * ждем некоторое время "1"
+    * запрос типа GET, результат сохраняем в "RESPONCE"
+      | data   | ESB_URL              |
+      | string | rest/webuserbalance  |
+      | stash  | GROUPCODE            |
+      | stash  | SHOPCODE             |
+      | stash  | AUTHTOKEN            |
+      | string | 213.92.47.18         |
+
+    * проверка ответа API из "RESPONCE":
+      | exepted | "ret_code":1024 |
+
+    * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+    * проверим что "BALANCE2" больше "BALANCE" на "0"
+
+

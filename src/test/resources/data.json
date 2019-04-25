@@ -61,7 +61,7 @@
     "SWAGGER":"http://192.168.14.100"
   },
     "DEV_GAMEBET": {
-      "ESB_URL": "http://dev-bet-esb.dev.bet.orglot.office:8660",
+      "ESB_URL": "http://dev-bet-esb3.dev.bet.orglot.office:8663",
       "MAIN_URL": "https://dev.gamebet.ru",
       "ADMIN_URL": "http://dev-bet-dbproca.dev.bet.orglot.office/admin",
       "MOBILE_URL": "https://dev-mobile.gamebet.ru",

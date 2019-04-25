@@ -57,7 +57,7 @@
   | SNILS | 37487545236 |
 
 
-  * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+  * запрос к API "api/mobile/v6/sendPhoneCode" и сохраняем в "RESPONCE_API":
   | devId | DEVID |
   | phone | PHONE |
 
@@ -66,7 +66,7 @@
 
   * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
 
-  * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+  * запрос к API "api/mobile/v6/createUser" и сохраняем в "RESPONCE_API":
   |  devId                 | DEVID      |
   |  source                | 16         |
   |  first_name            | FIRSTNAME  |
@@ -83,7 +83,7 @@
 
   * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
 
-  * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+  * запрос к API "api/mobile/v6/confirmEmail" и сохраняем в "RESPONCE_API":
   | code   | CODEEMAIL |
   | source | 16        |
 
@@ -92,7 +92,7 @@
   * проверка ответа API из "RESPONCE_API":
   | exepted | "status":10 |
 
-  * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+  * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
   | devId  | DEVID |
   | email  | EMAIL |
   | pass   | PASSWORD  |
@@ -125,7 +125,7 @@
   | issuePlace              | ISSUEPLACE     |
   | codePlace               | 123-456        |
 
-  * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
+  * запрос к API "api/mobile/v6/submitPersonalData" и сохраняем в "RESPONCE_API":
   | devId                   | DEVID        |
   | authToken               | AUTHTOKEN    |
   | source                  | 16           |
@@ -152,7 +152,7 @@
   | issuePlace              | ISSUEPLACE     |
   | codePlace               | 123-456        |
 
-  * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
+  * запрос к API "api/mobile/v6/submitPersonalData" и сохраняем в "RESPONCE_API":
   | devId                   | DEVID        |
   | authToken               | AUTHTOKEN    |
   | source                  | 16           |
@@ -225,21 +225,21 @@
       | exepted     | "state":"ok" |
 
 
-    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getUserStatus" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
 
     * подтверждаем от ЦУПИС "EMAIL"
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID    |
       | email  | EMAIL    |
       | pass   | PASSWORD |
       | source | 16       |
 
 
-    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getUserStatus" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -259,7 +259,7 @@
       |identification_with_wave|true|
 
 
-    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -267,7 +267,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -277,7 +277,7 @@
       | exepted | "code":0 |
 
 
-    * запрос к API "api/mobile/v5/sendEmailInstructions" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/sendEmailInstructions" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -339,21 +339,21 @@
       | exepted     | "state":"ok" |
 
 
-    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getUserStatus" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
 
     * подтверждаем от ЦУПИС "EMAIL"
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID    |
       | email  | EMAIL    |
       | pass   | PASSWORD |
       | source | 16       |
 
 
-    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getUserStatus" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -375,8 +375,9 @@
       |announcements|true|
     * редактируем некоторые активные опции сайта
       |identification_with_video|true|
+      |video_identification_in_mobile_app|false|
 
-    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -384,7 +385,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -393,7 +394,7 @@
 #    * проверка ответа API из "RESPONCE_API":
 #      | exepted | "code":0 |
 
-    * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
       | source                  | 16               |
       | snilsNumber             | "000-000-000 00" |
@@ -404,7 +405,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":5 |
 
-    * запрос к API "api/mobile/v3/requestSkypeCall" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestSkypeCall" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
       | source                  | 16               |
       | skype                   | SKYPELOGIN       |
@@ -416,7 +417,7 @@
 
     * ожидание "2" сек
 
-    * запрос к API "api/mobile/v3/requestSkypeTimeLeft" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestSkypeTimeLeft" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID            |
       | authToken               | AUTHTOKEN        |
       | source                  | 16               |
@@ -438,14 +439,14 @@
 
     * подтверждаем от ЦУПИС "EMAIL"
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID    |
       | email  | EMAIL    |
       | pass   | PASSWORD |
       | source | 16       |
 
 
-    * запрос к API "api/mobile/v3/getUserStatus" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getUserStatus" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -466,7 +467,7 @@
       |identification_with_euroset|true|
       |identification_with_skype_only|false|
 
-    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -474,7 +475,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -483,7 +484,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * запрос к API "api/mobile/v5/sendEmailInstructions" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/sendEmailInstructions" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | 16           |
@@ -502,7 +503,7 @@
 #      |identification_with_skype_only|false|
 #
 #
-#    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+#    * запрос к API "api/mobile/v6/getIdentType" и сохраняем в "RESPONCE_API":
 #      | devId                   | DEVID        |
 #      | authToken               | AUTHTOKEN    |
 #      | source                  | 16           |
@@ -512,7 +513,7 @@
 #    * проверка ответа API из "RESPONCE_API":
 #      | exepted | "code":0 |
 #
-#    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+#    * запрос к API "api/mobile/v6/submitIdentType" и сохраняем в "RESPONCE_API":
 #      | devId                   | DEVID        |
 #      | authToken               | AUTHTOKEN    |
 #      | source                  | 16           |
@@ -536,7 +537,7 @@
 #      | date         | DATE           |
 #      | time         | "10:00 - 17:00"|
 #
-#    * запрос к API "api/mobile/v5/sendIdentificationOrderToDD" и сохраняем в "RESPONCE_API":
+#    * запрос к API "api/mobile/v6/sendIdentificationOrderToDD" и сохраняем в "RESPONCE_API":
 #      | devId       | DEVID    |
 #      | authToken   | AUTHTOKEN|
 #      | source      | 16       |
@@ -552,7 +553,7 @@
 #      | Параметр                         | Тип    |
 #      | courierIdentificationRequestDate | Timestamp   |
 #
-#   * запрос к API "api/mobile/v5/identificationDDStatus" и сохраняем в "RESPONCE_API":
+#   * запрос к API "api/mobile/v6/identificationDDStatus" и сохраняем в "RESPONCE_API":
 #      | devId       | DEVID    |
 #      | authToken   | AUTHTOKEN|
 #      | source      | 16       |
