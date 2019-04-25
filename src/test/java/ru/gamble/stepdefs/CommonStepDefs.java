@@ -3099,6 +3099,7 @@ public class CommonStepDefs extends GenericStepDefs {
          }
          Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
                  firstN-diffLong,secondN);
+         LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
     }
 }
 
