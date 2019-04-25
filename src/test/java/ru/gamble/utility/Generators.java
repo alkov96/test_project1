@@ -51,6 +51,16 @@ public class Generators {
     }
 
     /**
+     * Случайная строка 16-го числа
+     *
+     * @return возвращает получившуюся строку
+     */
+    public static String randomStringHex() {
+
+        return Long.toHexString(Double.doubleToLongBits(Math.random())).substring(0,12);
+    }
+
+    /**
      * @return Возвращает случайно строку с полом Мужским или Женским
      */
     public static String randomSex(){

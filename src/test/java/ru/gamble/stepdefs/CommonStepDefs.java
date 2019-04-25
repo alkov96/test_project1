@@ -190,9 +190,14 @@ public class CommonStepDefs extends GenericStepDefs {
         if (value.equals(RANDOME_EMAIL)) {
             value = "testregistrator+" + Stash.getValue("PHONE") + "@inbox.ru";
         }
-        if (value.equals(RANDOM)) {
-            int count = value.replace(RANDOM, "").length()==2?Integer.valueOf(value.replace(RANDOM, "").trim()):25;
+
+        if (value.split(" ")[0].equals(RANDOM)) {
+            int count = value.contains(" ")?Integer.valueOf(value.replace(RANDOM, "").trim()):25;
             value = Generators.randomString(count);
+        }
+
+        if (value.equals(RANDOMHEX)) {
+            value = Generators.randomStringHex();
         }
 
         if (value.equals(RANDOMDATE)) {
@@ -840,8 +845,21 @@ public class CommonStepDefs extends GenericStepDefs {
                 newTime<oldTime);
     }
 
+    @Когда("^находим \"([^\"]*)\" и сохраняем \"([^\"]*)\" из вложенного \"([^\"]*)\"$")
+    public void fingingAndSave3(String keyWhat,String keyWhere, String sourceString) {
+        fingingAndSave2(keyWhat.split("-")[0],keyWhat,sourceString);
+        List<HashMap> bonusMap = Stash.getValue(keyWhat);
+        String bonuses = bonusMap.get(0).get(keyWhat.split("-")[1]).toString();
+        Stash.put(keyWhere,bonuses);
+    }
+
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
+        fingingAndSave2(keyFingingParams,keyFingingParams,sourceString);
+    }
+
+    @Когда("^находим \"([^\"]*)\" и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
+    public void fingingAndSave2(String param,String keyFingingParams, String sourceString) {
         String tmp;
         Object valueFingingParams, retMap = null;
         ObjectMapper mapper = new ObjectMapper();
@@ -868,8 +886,8 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             e.getMessage();
         }
-        valueFingingParams = JsonLoader.hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память [" + JSONValue.toJSONString(valueFingingParams) + "]");
+        valueFingingParams = JsonLoader.hashMapper(retMap, param);
+        LOG.info("Достаем значение [" + param + "] и записываем в память [" + JSONValue.toJSONString(valueFingingParams) + "]");
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
@@ -1494,7 +1512,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {
         //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7333%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+%' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+%inbox.ru' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
         searchUser(keyEmail, sqlRequest);
     }
 
@@ -1758,6 +1776,15 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^запрос по прямому адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestTo(String fullPath, String keyStash, DataTable dataTable) {
+        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+    }
+
+
+    @Когда("^запрос по адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestTo2(String fullPath, String keyStash, DataTable dataTable) throws DataException {
+        int index = fullPath.indexOf("}");
+        String url = fullPath.substring(1,index);
+        fullPath = JsonLoader.getData().get(STARTING_URL).get(url).getValue() + fullPath.substring(index+1);
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
@@ -3058,6 +3085,20 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlRequest);
         LOG.info("Включили отображение ссылки главного меню: " + namePage);
 
+    }
+    @Когда("^проверим что \"([^\"]*)\" больше \"([^\"]*)\" на \"([^\"]*)\"$")
+    public void checkDifferenceBetweenNumbers(String keyNum1,String keyNum2,String diff){
+         long firstN = Long.parseLong(String.valueOf(Stash.getValue(keyNum1).toString()));
+         long secondN = Long.parseLong(String.valueOf(Stash.getValue(keyNum2).toString()));
+         String difference = diff.replace("-","");
+         long diffLong = diff.matches("-*[A-Z]*")
+                 ?Integer.valueOf(Stash.getValue(diff.replace("-","")))
+                 :Integer.valueOf(diff.replace("-",""));
+         if (diff.contains("-")){
+            diffLong=0-diffLong;
+         }
+         Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
+                 firstN-diffLong,secondN);
     }
 }
 
