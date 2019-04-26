@@ -2974,18 +2974,6 @@ public class CommonStepDefs extends GenericStepDefs {
         ((JavascriptExecutor) PageFactory.getWebDriver()).executeScript("second_window.close()");
     }
 
-    @After(value = "@Multimarkets")
-    public void offMultimarket(Scenario scenario) throws InterruptedException {
-        getScreenshot(scenario);
-        goToMainPage("site");
-        driver.findElement(By.id("prematch")).click(); //переходим в прематч
-        driver.navigate().refresh();
-        workWithPreloader();
-        Thread.sleep(5000);
-        LOG.info("Перешли в прематч и сейчас отключим режим мультирынков");
-        new EventViewerPage().onOffMultimarkets("выключает");
-    }
-
     @After(value = "@coupon")
     public void clearCouponAfter(Scenario scenario) throws InterruptedException {
         getScreenshot(scenario);
