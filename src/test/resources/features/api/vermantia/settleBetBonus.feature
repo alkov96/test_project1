@@ -59,6 +59,8 @@
       | transactionId | TRANSACTIONID |
       | userId        | ID        |
 
+    * ждем некоторое время "1"
+
     #авторизуемся на вермантии пользаком
     * запрос типа GET, результат сохраняем в "RESPONCE"
       | data   | ESB_URL                |
@@ -119,6 +121,7 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
+    * находим "bonus-balance" и сохраняем "BONUSES" из вложенного "RESPONCE"
     * находим "balance" и сохраняем "BALANCE" из "RESPONCE"
 
 
@@ -131,7 +134,7 @@
       | shop_code       | SHOPCODE     |
       | ticket_id       | TICKETID     |
       | game            | qf           |
-      | bonus           | false        |
+      | bonus           | true         |
       | id_bonus        |              |
       | currency        | CURRENCY     |
       | total_amount    | AMOUNTSETTLE |
@@ -161,8 +164,11 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
+    * находим "bonus-balance" и сохраняем "BONUSES2" из вложенного "RESPONCE"
     * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+
     * проверим что "BALANCE2" больше "BALANCE" на "AMOUNTSETTLE"
+    * проверим что "BONUSES2" больше "BONUSES" на "0"
 
 
   @api
@@ -174,7 +180,7 @@
       | shop_code       | SHOPCODE     |
       | ticket_id       | TICKETID     |
       | game            | qf           |
-      | bonus           | false        |
+      | bonus           | true         |
       | id_bonus        |              |
       | currency        | CURRENCY     |
       | total_amount    | AMOUNTSETTLE |
@@ -204,8 +210,11 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
+    * находим "bonus-balance" и сохраняем "BONUSES2" из вложенного "RESPONCE"
     * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
-    * проверим что "BALANCE2" больше "BALANCE" на "AMOUNTSETTLE"
+
+    * проверим что "BONUSES2" больше "BONUSES" на "AMOUNTSETTLE"
+    * проверим что "BALANCE2" больше "BALANCE" на "0"
 
 
   @api
@@ -217,7 +226,7 @@
       | shop_code       | SHOPCODE     |
       | ticket_id       | TICKETID     |
       | game            | qf           |
-      | bonus           | false        |
+      | bonus           | true         |
       | id_bonus        |              |
       | currency        | CURRENCY     |
       | total_amount    | AMOUNTSETTLE |
@@ -247,7 +256,10 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
+    * находим "bonus-balance" и сохраняем "BONUSES2" из вложенного "RESPONCE"
     * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+
+    * проверим что "BONUSES2" больше "BONUSES" на "0"
     * проверим что "BALANCE2" больше "BALANCE" на "-AMOUNTSETTLE"
 
   @api
@@ -259,7 +271,7 @@
       | shop_code       | SHOPCODE     |
       | ticket_id       | TICKETID     |
       | game            | qf           |
-      | bonus           | false        |
+      | bonus           | true         |
       | id_bonus        |              |
       | currency        | CURRENCY     |
       | total_amount    | AMOUNTSETTLE |
@@ -289,8 +301,11 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
+    * находим "bonus-balance" и сохраняем "BONUSES2" из вложенного "RESPONCE"
     * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
-    * проверим что "BALANCE2" больше "BALANCE" на "-AMOUNTSETTLE"
+
+    * проверим что "BONUSES2" больше "BONUSES" на "-AMOUNTSETTLE"
+    * проверим что "BALANCE2" больше "BALANCE" на "0"
 
   @api
   @vermantia
@@ -301,7 +316,7 @@
       | shop_code       | SHOPCODE     |
       | ticket_id       | TICKETID     |
       | game            | qf           |
-      | bonus           | false        |
+      | bonus           | true         |
       | id_bonus        |              |
       | currency        | CURRENCY     |
       | total_amount    | AMOUNTSETTLE |
@@ -331,8 +346,12 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
+    * находим "bonus-balance" и сохраняем "BONUSES2" из вложенного "RESPONCE"
     * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+
+    * проверим что "BONUSES2" больше "BONUSES" на "0"
     * проверим что "BALANCE2" больше "BALANCE" на "0"
+
 
   @api
   @vermantia
@@ -343,7 +362,7 @@
       | shop_code       | SHOPCODE     |
       | ticket_id       | TICKETID     |
       | game            | qf           |
-      | bonus           | false        |
+      | bonus           | true         |
       | id_bonus        |              |
       | currency        | CURRENCY     |
       | total_amount    | AMOUNTSETTLE |
@@ -372,7 +391,11 @@
     * проверка ответа API из "RESPONCE":
       | exepted | "ret_code":1024 |
 
+    * находим "bonus-balance" и сохраняем "BONUSES2" из вложенного "RESPONCE"
     * находим "balance" и сохраняем "BALANCE2" из "RESPONCE"
+
+    * проверим что "BONUSES2" больше "BONUSES" на "0"
     * проверим что "BALANCE2" больше "BALANCE" на "0"
+
 
 

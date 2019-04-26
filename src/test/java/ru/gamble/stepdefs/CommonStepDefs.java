@@ -723,8 +723,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^проверка ответа API из \"([^\"]*)\":$")
     public void checkresponceAPI(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        String expected = table.get("exepted");
+        String actual = JSONValue.toJSONString(Stash.getValue(keyStash)).replaceAll(" ","");
+        String expected = table.get("exepted").replaceAll(" ","");
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
@@ -2878,9 +2878,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^проверяем, совпадает ли дата и время игры с ожидаемыми \"([^\"]*)\" \"([^\"]*)\"$")
-    public void checkDateTimeGame(String keyData, String typeGame) {
+    public void checkDateTimeGame(String keyData, String typeGamekey) {
         String fullDateTime = Stash.getValue(keyData).toString().replace("\n", " ");
-
+        String typeGame = Stash.getValue(typeGamekey);
         switch (typeGame) {
             case "live":
                 LOG.info("Судя по времени, указанному на баннере, игра должна быть лайвовской. Проверять будем только что раздел соответствует ЛАЙВу " + fullDateTime);
@@ -2972,18 +2972,6 @@ public class CommonStepDefs extends GenericStepDefs {
     @After(value = "@AzbukaBettingaLinks_C76652")
     public void closeSecondWindow(Scenario scenario) throws InterruptedException {
         ((JavascriptExecutor) PageFactory.getWebDriver()).executeScript("second_window.close()");
-    }
-
-    @After(value = "@Multimarkets")
-    public void offMultimarket(Scenario scenario) throws InterruptedException {
-        getScreenshot(scenario);
-        goToMainPage("site");
-        driver.findElement(By.id("prematch")).click(); //переходим в прематч
-        driver.navigate().refresh();
-        workWithPreloader();
-        Thread.sleep(5000);
-        LOG.info("Перешли в прематч и сейчас отключим режим мультирынков");
-        new EventViewerPage().onOffMultimarkets("выключает");
     }
 
     @After(value = "@coupon")
@@ -3099,6 +3087,7 @@ public class CommonStepDefs extends GenericStepDefs {
          }
          Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
                  firstN-diffLong,secondN);
+         LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
     }
 }
 
