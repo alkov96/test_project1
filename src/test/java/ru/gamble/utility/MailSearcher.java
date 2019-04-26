@@ -24,7 +24,6 @@ public class MailSearcher {
         String link;
         String linkSpam;
 
-
         for (int i = 1; i >= 0; i--) {
             LOG.info("INBOX");
             link = linkSearcher(mail, properties, "INBOX");
