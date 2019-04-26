@@ -9,7 +9,6 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
 import io.qameta.allure.Allure;
-import io.qameta.allure.Attachment;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
@@ -18,14 +17,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.CucumberTest;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.utility.DBUtils;
@@ -36,17 +33,14 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.*;
-import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -54,8 +48,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -198,8 +190,14 @@ public class CommonStepDefs extends GenericStepDefs {
         if (value.equals(RANDOME_EMAIL)) {
             value = "testregistrator+" + Stash.getValue("PHONE") + "@inbox.ru";
         }
-        if (value.equals(RANDOM)) {
-            value = Generators.randomString(25);
+
+        if (value.split(" ")[0].equals(RANDOM)) {
+            int count = value.contains(" ")?Integer.valueOf(value.replace(RANDOM, "").trim()):25;
+            value = Generators.randomString(count);
+        }
+
+        if (value.equals(RANDOMHEX)) {
+            value = Generators.randomStringHex();
         }
 
         if (value.equals(RANDOMDATE)) {
@@ -560,6 +558,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      */
     public void checkLinkToGame() {
+
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         workWithPreloader();
         boolean flag = true;
@@ -846,8 +845,21 @@ public class CommonStepDefs extends GenericStepDefs {
                 newTime<oldTime);
     }
 
+    @Когда("^находим \"([^\"]*)\" и сохраняем \"([^\"]*)\" из вложенного \"([^\"]*)\"$")
+    public void fingingAndSave3(String keyWhat,String keyWhere, String sourceString) {
+        fingingAndSave2(keyWhat.split("-")[0],keyWhat,sourceString);
+        List<HashMap> bonusMap = Stash.getValue(keyWhat);
+        String bonuses = bonusMap.get(0).get(keyWhat.split("-")[1]).toString();
+        Stash.put(keyWhere,bonuses);
+    }
+
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
+        fingingAndSave2(keyFingingParams,keyFingingParams,sourceString);
+    }
+
+    @Когда("^находим \"([^\"]*)\" и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
+    public void fingingAndSave2(String param,String keyFingingParams, String sourceString) {
         String tmp;
         Object valueFingingParams, retMap = null;
         ObjectMapper mapper = new ObjectMapper();
@@ -874,8 +886,8 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             e.getMessage();
         }
-        valueFingingParams = JsonLoader.hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память [" + JSONValue.toJSONString(valueFingingParams) + "]");
+        valueFingingParams = JsonLoader.hashMapper(retMap, param);
+        LOG.info("Достаем значение [" + param + "] и записываем в память [" + JSONValue.toJSONString(valueFingingParams) + "]");
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
@@ -1500,7 +1512,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {
         //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7333%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+%inbox.ru' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
         searchUser(keyEmail, sqlRequest);
     }
 
@@ -1748,8 +1760,31 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
+
+    @Когда("^неудачный запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestToAPIEr(String path, String keyStash, DataTable dataTable) {
+        String fullPath = collectQueryString(path);
+        try {
+            requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+        }
+        catch (AutotestError e){
+            LOG.info("Ожидали ошибку - получили ошибку:" + e.getMessage());
+            return;
+        }
+        Assert.fail("Ожидали ошибку, но ее не было");
+    }
+
     @Когда("^запрос по прямому адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestTo(String fullPath, String keyStash, DataTable dataTable) {
+        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+    }
+
+
+    @Когда("^запрос по адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestTo2(String fullPath, String keyStash, DataTable dataTable) throws DataException {
+        int index = fullPath.indexOf("}");
+        String url = fullPath.substring(1,index);
+        fullPath = JsonLoader.getData().get(STARTING_URL).get(url).getValue() + fullPath.substring(index+1);
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
@@ -1777,6 +1812,73 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (DataException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * формирование запроса GET.
+     * если ключ = data - значит берем значение из datajson
+     * если ключ = string - значит такое значнеие и используем. это просто строка
+     * если кдюч = stash - значит значение берем из памяти
+     * @param dataTable
+     */
+    @Когда("^запрос типа GET, результат сохраняем в \"([^\"]*)\"$")
+    public void endpointCollect(String keyStash, DataTable dataTable) throws DataException {
+        List<List<String>> table = dataTable.raw();
+        StringBuilder path = new StringBuilder();
+        String value = new String();
+        String key = new String();
+        LOG.info("Сначала формируем строку запроса");
+        for (List<String> entry : table) {
+            key = entry.get(0);
+            value = entry.get(1);
+            switch (key){
+                case "data":
+                    value = JsonLoader.getData().get(STARTING_URL).get(value).getValue();
+                    break;
+                case "stash":
+                    value = Stash.getValue(value);
+                    break;
+            }
+            path.append(value+"/");
+        }
+        LOG.info("Теперь посылаем GET запрос " + path);
+        requestByHTTPGet(path.toString(), keyStash);
+    }
+
+
+    @Когда("^пополняем пользователю баланс если нужно, судя по ответу \"([^\"]*)\" на сумму, достаточную для \"([^\"]*)\"$")
+    public void refillIfNeed(String keyResponce, String keyAmount,DataTable dataTable) throws DataException {
+
+        fingingAndSave("BALANCE",keyResponce);
+        String balance = Stash.getValue("BALANCE").toString();
+        Long amount = Long.valueOf(Stash.getValue(keyAmount));
+        Long br = Long.valueOf(balance);
+        if (br<amount) {
+            LOG.info("Баланс рублей недостаточен для ставки. Пополним баланс");
+            refill("refillResponce", dataTable);
+        }else {
+            LOG.info("Пополнение средств не требуется");
+        }
+
+    }
+
+
+    @Когда("^пополняем пользователю бонусы если нужно, судя по ответу \"([^\"]*)\" на сумму, достаточную для \"([^\"]*)\"$")
+    public void refillIfNeedBonus(String keyResponce, String keyAmount,DataTable dataTable) throws DataException {
+
+        fingingAndSave("BONUS",keyResponce);
+        List<HashMap> bonusMap = Stash.getValue("BONUS");
+        String bonuses = bonusMap.get(0).get("balance").toString();
+        Long amount = Long.valueOf(Stash.getValue(keyAmount));
+        Long bb = Long.valueOf(bonuses);
+        if (bb<amount){
+            LOG.info("Баланс бонусов недостаточен для ставки. Пополним бонусы");
+            refill("refillResponce", dataTable);
+        }else {
+            LOG.info("Пополнение бонусов не требуется");
+        }
+
+
     }
 
     @Когда("^формирум параметры и сохраняем в \"([^\"]*)\"$")
@@ -1927,7 +2029,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
+    protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable){
         if (!(null == dataTable)) {
             Map<String, String> table = dataTable.asMap(String.class, String.class);
         }
@@ -2001,6 +2103,9 @@ public class CommonStepDefs extends GenericStepDefs {
             } else {
                 throw new AutotestError("ОШИБКА! Пустая строка JSON");
             }
+        }
+            catch (IOException e2){
+            throw new AutotestError(e2.getMessage());
         } catch (Exception e1) {
             LOG.error(e1.getMessage(), e1);
         }
@@ -2923,6 +3028,37 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(path,responseKey,"POST",dataTable);
     }
 
+    @Когда("^запрос в swagger для получения getHolds \"([^\"]*)\" \"([^\"]*)\"$")
+    public void getHolds(String HoldKeyRub,String HoldKeyBonus, DataTable dataTable) throws DataException {
+        String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
+        path=path+"/getHolds";
+        LOG.info("path:" + path);
+        requestByHTTPS(path,"RESPONSE_SWAGGER","POST",dataTable);
+        LOG.info("Теперь запоминаем сколько захолдировано средств");
+        fingingAndSave("DATA","RESPONSE_SWAGGER");
+        List<HashMap> dataMap = Stash.getValue("DATA");
+        String amount = new String();
+        long holdRub = 0;
+        long holdBonus = 0;
+        for (HashMap<String,String> mapOne: dataMap){
+            amount = String.valueOf(mapOne.get("amount"));
+            switch (String.valueOf(mapOne.get("currency"))){
+                case "643":
+                    LOG.info("hold рублей " + amount);
+                    holdRub+=Long.valueOf(amount);
+                    break;
+                case "999":
+                    LOG.info("hold бонусов " + amount);
+                    holdBonus+=Long.valueOf(amount);
+                    break;
+            }
+        }
+        LOG.info("Итого захолдировано рублей " + holdRub + " и бонусов " + holdBonus);
+        Stash.put(HoldKeyRub,holdRub);
+        Stash.put(HoldKeyBonus,holdBonus);
+    }
+
+
     @Когда("^запрос в swagger на добавление НДФЛ \"([^\"]*)\"$")
     public void addNDFL(String responseKey,DataTable dataTable) throws DataException {
         String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
@@ -2949,6 +3085,20 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlRequest);
         LOG.info("Включили отображение ссылки главного меню: " + namePage);
 
+    }
+    @Когда("^проверим что \"([^\"]*)\" больше \"([^\"]*)\" на \"([^\"]*)\"$")
+    public void checkDifferenceBetweenNumbers(String keyNum1,String keyNum2,String diff){
+         long firstN = Long.parseLong(String.valueOf(Stash.getValue(keyNum1).toString()));
+         long secondN = Long.parseLong(String.valueOf(Stash.getValue(keyNum2).toString()));
+         String difference = diff.replace("-","");
+         long diffLong = diff.matches("-*[A-Z]*")
+                 ?Integer.valueOf(Stash.getValue(diff.replace("-","")))
+                 :Integer.valueOf(diff.replace("-",""));
+         if (diff.contains("-")){
+            diffLong=0-diffLong;
+         }
+         Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
+                 firstN-diffLong,secondN);
     }
 }
 

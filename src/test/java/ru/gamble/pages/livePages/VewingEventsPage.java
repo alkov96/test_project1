@@ -95,18 +95,18 @@ public class VewingEventsPage extends AbstractPage {
         for (int sportCategory = 0; sportCategory < sportsInLiveCount; sportCategory++) {
             LOG.info("Разворачиваем вид спорта");
             driver.findElements(xpathForSports).get(sportCategory).click();
-            String pathToNameGame = ".//*[contains(@class,'left-menu__list-item-games-teams')]";
+            String pathToNameGame = ".//li[contains(@class,'left-menu__list-item-games')]";
             String pathToStarGame = ".//*[contains(@class,'item-games-fav-game-star')]";
             int gamesInSportCount = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).size();
             LOG.info("Ищем игру у которой видео-трансляция " + withVideo);
             int gameNumber = hasVideo(sportCategory, gamesInSportCount, withVideo);
             //если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
             if (gameNumber != -1 && !gameIsAdding) {
-                String nameGamefull = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).get(gameNumber).getAttribute("innerText");
+                String nameGamefull = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).get(gameNumber).findElement(By.xpath(".//div[contains(@class,'left-menu__list-item-games-names')]")).getAttribute("innerText");
                 if (nameGamefull.equals("") || nameGamefull==null){
                     continue; //игра надена, но она без названия. как ее потом првоерять? такая игра нам не нужна, идем дальше
                 }
-                CommonStepDefs.addStash("nameGameKey",nameGamefull);
+                CommonStepDefs.addStash("nameGameKey",nameGamefull.replaceAll("\n",""));
                 CommonStepDefs.addStash("typeGameKey",typeGame);
                 if (adding) {
                     LOG.info("Нужная игра найдена. Добавляем ее в Избранное.");
