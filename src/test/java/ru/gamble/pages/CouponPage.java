@@ -758,8 +758,8 @@ public class CouponPage extends AbstractPage {
         waitForElementPresent(By.xpath("//div[@class='coupon__outcome-betslip-wrapper']/div[contains(@class,'coupon__bet-block')]"),10);
         WebElement element = driver.findElements(By.xpath("//div[@class='coupon__outcome-betslip-wrapper']/div[contains(@class,'coupon__bet-block')]")).get(ind);
         By xpathTypeBet = By.xpath("div[contains(@class,'coupon__outcome-betslip-title')]");
-        SimpleDateFormat formatNo = new SimpleDateFormat("dd MMMM");
-        SimpleDateFormat formatYes = new SimpleDateFormat("dd.MM");
+        SimpleDateFormat formatNo = new SimpleDateFormat("dd MMMM в hh:mm (МСК)");
+        SimpleDateFormat formatYes = new SimpleDateFormat("dd MMMM в k:mm(МСК)");
         StringBuilder typeBet = new StringBuilder();
         StringBuilder timeBet = new StringBuilder();
         StringBuilder sumBet = new StringBuilder();
@@ -805,7 +805,6 @@ public class CouponPage extends AbstractPage {
         element.findElements(By.xpath("div[contains(@class,'coupon-bet')]/ul/li[2]/*"))
                 .stream()
                 .map(el->el.getAttribute("innerText"))
-                .map(el -> el.substring(0, el.indexOf(":") - 5))
                 .map(el -> CommonStepDefs.newFormatDate(formatNo, formatYes, el))
                 .forEach(el -> dateBets.add(el));
         bet.setDates(dateBets);

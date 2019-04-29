@@ -334,11 +334,11 @@ public class MyBetting extends AbstractPage {
         StringBuilder sum = new StringBuilder();
         BetFull bet = new BetFull();
         SimpleDateFormat formatNo = new SimpleDateFormat("dd.MM, hh:mm");
-        SimpleDateFormat formatYes = new SimpleDateFormat("dd MMMM в hh:mm(МСК)");
+        SimpleDateFormat formatYes = new SimpleDateFormat("dd MMMM в k:mm(МСК)");
 
         helpString.append(element.findElement(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[4]")).getAttribute("innerText"));
         String typeBet = (!helpString.toString().toLowerCase().contains("система") && !helpString.toString().toLowerCase().contains("экспресс")) ?
-                "ординар" : helpString.toString().toLowerCase();
+                "ординар" : helpString.toString().toLowerCase().split(" ")[0];
         bet.setType(typeBet);
 
         helpString.setLength(0);
@@ -352,19 +352,25 @@ public class MyBetting extends AbstractPage {
         }
         bet.setTimeBet(timeBet.toString());
 
+        if (!typeBet.equals("ординар")){
+            element.click(); //для раскрытия системы  и экспресса
+        }
         element.findElements(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[contains(@class,'bets-table__cell bets-table__cell_coefficient')]"))
                 .stream()
                 .forEach(el -> coefs.add(el.getAttribute("innerText").replace(".00","").replace(".0","")));
         if (!typeBet.equals("ординар")){
-            element.click(); //для раскрытия системы  и экспресса
+           coefs.remove(0);
         }
+
 
         element.findElements(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[contains(@class,'bets-table__cell bets-table__cell_event-datetime')]"))
                 .stream()
                 .map(WebElement::getText)
                 .map(el -> CommonStepDefs.newFormatDate(formatNo, formatYes, el))
                 .forEach(el -> dateGames.add(el));
-
+        if (!typeBet.equals("ординар")){
+            dateGames.remove(0);
+        }
         element.findElements(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[@class='bets-table__cell bets-table__cell_fade-overflow bets-table__cell_bet-name']"))
                 .stream()
                 .forEach(el -> nameGames.add(el.getAttribute("innerText")));

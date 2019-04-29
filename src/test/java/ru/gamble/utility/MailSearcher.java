@@ -34,6 +34,7 @@ public class MailSearcher {
                 return link==null?linkSpam:link;
             } else {
                 LOG.info("Connect to email. Remained attempts : " + i);
+
             }
         }
         LOG.error("Время ожидания истекло. Письмо не было доставлено.");

@@ -229,9 +229,6 @@ public abstract class AbstractPage extends Page{
         LOG.info("GO TO LINK");
         driver.get(url + "/registration/email/verify?" + link);
 
-        if(url.contains("mobile")){
-           return;
-        }else {
             LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
             Thread.sleep(5000);
             if (!driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).isDisplayed()) {
@@ -240,7 +237,7 @@ public abstract class AbstractPage extends Page{
             LOG.info("Закрываем уведомление об успешном подтверждении почты");
             driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
         }
-    }
+
 
     /**
      * Открывает выпадающий список и выбирает оттуда пункт случайным образом
