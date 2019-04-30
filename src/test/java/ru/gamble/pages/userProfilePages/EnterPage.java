@@ -160,6 +160,8 @@ public class EnterPage extends AbstractPage {
 
         }while ((!driver.findElements(By.xpath("//div[contains(.,'Ошибка в адресе электронной почты или пароле')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).isEmpty()) && count < 3);
         workWithPreloader();
+
+        closePopUpWindowGoToTSUPISIfOpened();
       //***********************
     }
 }

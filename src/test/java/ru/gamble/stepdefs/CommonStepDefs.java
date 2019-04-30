@@ -1285,7 +1285,7 @@ public class CommonStepDefs extends GenericStepDefs {
         Scanner scan = new Scanner(file);
 
         String phoneLast = scan.nextLine();
-        String phone = "7333001" + String.format("%4s", Integer.valueOf(phoneLast.substring(7)) + 1).replace(' ', '0');
+        String phone = "7933000" + String.format("%4s", Integer.valueOf(phoneLast.substring(7)) + 1).replace(' ', '0');
         Stash.put(keyPhone, phone);
         LOG.info(phone);
         FileWriter nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "maxphone.txt", false);
@@ -1296,7 +1296,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^определяем занятый номер телефона и сохраняем в \"([^\"]*)\"$")
     public static void getPhone(String keyPhone) {
-        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone DESC";
+        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7933000%' ORDER BY phone DESC";
         String phoneLast = workWithDBgetResult(sqlRequest, "phone");
         Stash.put(keyPhone, phoneLast);
         LOG.info("Вычислили подходящий номер телефона::" + phoneLast);
@@ -1304,7 +1304,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^определяем занятый адрес email и сохраняем в \"([^\"]*)\"$")
     public static void getOldEmail(String keyPhone) {
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE phone LIKE '7933000%' ORDER BY phone DESC";
         String emailLast = workWithDBgetResult(sqlRequest, "email");
         Stash.put(keyPhone, emailLast);
         LOG.info("Вычислили подходящий адрес почты::" + emailLast);
@@ -1503,7 +1503,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^генерим новый номер телефона \"([^\"]*)\" на основе \"([^\"]*)\"$")
     public void generateNewPhoneBasisOldPhone(String keyMewPhone,String keyOldPhone){
         String phone = Stash.getValue(keyOldPhone);
-        String newPhone = phone.replace("7333","7222");
+        String newPhone = phone.replace("7933","7222");
         Stash.put(keyMewPhone,newPhone);
     }
 
@@ -1512,14 +1512,14 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {
-        //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7333%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+%inbox.ru' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
+        //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7933%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7933%inbox.ru' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id";
         searchUser(keyEmail, sqlRequest);
     }
 
     @Когда("^поиск акаунта для проверки изменений базовых параметров \"([^\"]*)\"$")
     public void searchUserForEdit(String keyEmail){
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+%' AND registration_stage_id=2 ORDER BY id DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7933%' AND registration_stage_id=2 ORDER BY id DESC";
         List<String> results = workWithDBAndGetFullColumn(sqlRequest);
         int count = 0;
         int count2 = 0;
@@ -1551,7 +1551,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта с закончившимися успешными попытками смены БП \"([^\"]*)\"$")
     public void searchUserWithoutEdit(String keyEmail){
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id=2 ORDER BY id DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7933%' AND registration_stage_id=2 ORDER BY id DESC";
         List<String> results = workWithDBAndGetFullColumn(sqlRequest);
         int count = 0;
 
@@ -1573,7 +1573,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта с закончившимися суточными попытками смены БП \"([^\"]*)\"$")
     public void searchUserWithoutEditOneDay(String keyEmail){
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id=2 ORDER BY id DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7933%' AND registration_stage_id=2 ORDER BY id DESC";
         List<String> results = workWithDBAndGetFullColumn(sqlRequest);
         int count = 0;
 
@@ -1599,10 +1599,10 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^ищем пользователя с ограничениями \"([^\"]*)\"$")
     public void searchUserAlt(String keyEmail) {
         //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
-        // String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND (phone LIKE '7333002%' OR phone LIKE '7111002%') ORDER BY id DESC";
-        //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND phone LIKE '7333%' ORDER BY id DESC";
+        // String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND (phone LIKE '7933002%' OR phone LIKE '7111002%') ORDER BY id DESC";
+        //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND phone LIKE '7933%' ORDER BY id DESC";
 
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND email = '" + Stash.getValue("EMAIL") + "' AND phone LIKE '7333%' ORDER BY id DESC";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND email = '" + Stash.getValue("EMAIL") + "' AND phone LIKE '7933%' ORDER BY id DESC";
         searchUser(keyEmail, sqlRequest);
     }
 
