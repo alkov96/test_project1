@@ -70,6 +70,7 @@ import static ru.gamble.pages.prematchPages.EventViewerPage.onTriggerPeriod;
 import static ru.gamble.pages.userProfilePages.FavouritePage.clearFavouriteGames;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
+import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -2937,13 +2938,18 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^отматывает дату начала на самую раннюю$")
     public void datapickerOnBegin() {
         new WebDriverWait(driver,15).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"),0));
-        WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
-        if (!datapickerBegin.getAttribute("class").contains("active")) {
-            datapickerBegin.click();
-            new WebDriverWait(driver, 10)
-                    .withMessage("Дата начала не раскрылась")
-                    .until(ExpectedConditions.attributeContains(datapickerBegin, "class", "active"));
+        WebElement myBets = driver.findElement(xpath("//div[contains(@class,'subMenuArea subMenuArea_fullwidth subMenuArea_fullheight')]"));
+        if(myBets.getAttribute("class").contains("active")){
+            driver.findElements(By.xpath("//span[contains(@class,'datapicker__form-text')]")).get(0).click();
+        } else {
+            driver.findElements(By.xpath("//span[contains(@class,'datapicker__form-text')]")).get(2).click();
         }
+//        WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form')]"));
+//
+//            new WebDriverWait(driver, 10)
+//                    .withMessage("Дата начала не раскрылась")
+//                    .until(ExpectedConditions.attributeContains(datapickerBegin, "class", "active"));
+
         LOG.info("Если доступно - нажимаем на стрелочку 'год назад'");
         By BYarrowLeft;
         for (int lineNumber = 1; lineNumber <= 2; lineNumber++) {

@@ -413,9 +413,9 @@ public class MyBetting extends AbstractPage {
     @ActionTitle("выставляет фильтр исхода пари на")
     public void selectReseltsBet(String result){
         LOG.info("Сначала включаем фильтр '" + result + "'");
-        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
-        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
-        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + result + "']")).click();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]/span")));
+        driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + result + "']")).click();
         CommonStepDefs.workWithPreloader();
     }
 }
