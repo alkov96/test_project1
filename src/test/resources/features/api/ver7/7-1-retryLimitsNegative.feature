@@ -69,7 +69,7 @@
     * поиск акаунта с закончившимися суточными попытками смены БП "EMAILNOTEDITONEDAY"
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID  |
-      | email  | EMAIL  |
+      | email  | EMAILNOTEDITONEDAY  |
       | pass   | PASSWORD   |
       | source | SOURCE |
 
