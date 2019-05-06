@@ -24,7 +24,6 @@ public class MailSearcher {
         String link;
         String linkSpam;
 
-
         for (int i = 1; i >= 0; i--) {
             LOG.info("INBOX");
             link = linkSearcher(mail, properties, "INBOX");
@@ -35,6 +34,7 @@ public class MailSearcher {
                 return link==null?linkSpam:link;
             } else {
                 LOG.info("Connect to email. Remained attempts : " + i);
+
             }
         }
         LOG.error("Время ожидания истекло. Письмо не было доставлено.");

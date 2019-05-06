@@ -99,7 +99,6 @@ public class PassportDataPage extends AbstractPage {
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
     }
 
-
     @ActionTitle("заполняет паспорт с")
     public void fillsPassportDate(DataTable dataTable){
         List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);

@@ -253,7 +253,6 @@ public class CouponPage extends AbstractPage {
         if (coef != coefCoupon && coef != oldCoef) {
             Assertions.fail("Коэфицент в купоне не совпадает с коэфицентом в событии: " + coefCoupon + coef);
         } else LOG.info("Коэфицент в купоне совпадает с коэфицентом в событии: " + coefCoupon + " <=> " + coef);
-
     }
 
     @ActionTitle("устанавливает условие для принятия коэфицентов как 'Никогда'")
@@ -759,8 +758,8 @@ public class CouponPage extends AbstractPage {
         waitForElementPresent(By.xpath("//div[@class='coupon__outcome-betslip-wrapper']/div[contains(@class,'coupon__bet-block')]"),10);
         WebElement element = driver.findElements(By.xpath("//div[@class='coupon__outcome-betslip-wrapper']/div[contains(@class,'coupon__bet-block')]")).get(ind);
         By xpathTypeBet = By.xpath("div[contains(@class,'coupon__outcome-betslip-title')]");
-        SimpleDateFormat formatNo = new SimpleDateFormat("dd MMMM");
-        SimpleDateFormat formatYes = new SimpleDateFormat("dd.MM");
+        SimpleDateFormat formatNo = new SimpleDateFormat("dd MMMM в hh:mm (МСК)");
+        SimpleDateFormat formatYes = new SimpleDateFormat("dd MMMM в k:mm(МСК)");
         StringBuilder typeBet = new StringBuilder();
         StringBuilder timeBet = new StringBuilder();
         StringBuilder sumBet = new StringBuilder();
@@ -806,7 +805,6 @@ public class CouponPage extends AbstractPage {
         element.findElements(By.xpath("div[contains(@class,'coupon-bet')]/ul/li[2]/*"))
                 .stream()
                 .map(el->el.getAttribute("innerText"))
-                .map(el -> el.substring(0, el.indexOf(":") - 5))
                 .map(el -> CommonStepDefs.newFormatDate(formatNo, formatYes, el))
                 .forEach(el -> dateBets.add(el));
         bet.setDates(dateBets);
@@ -924,5 +922,21 @@ public class CouponPage extends AbstractPage {
         BigDecimal sum = new BigDecimal(Float.toString(superbetValue)).setScale(2, RoundingMode.UP);
         Stash.put("sumKey",sum.toString());
     }
+
+//    @ActionTitle("высчитываем сумму, при которой возможный выигрыш будет равен максимальной сумме выигрыша")
+//    public void summMaxBet(){
+//        WebDriver driver = PageFactory.getDriver();
+//        //float coefCoupon = Float.valueOf(driver.findElement(xpath("//div[@class='coupon-bet__coeffs']/span[2]")).getAttribute("innerText"));//Кэфицент в купоне
+//
+//        float coefCoupon = Float.valueOf(driver.findElement(xpath("//span[contains(@class,'coupon__sum') and not(contains(@class,'orange'))]")).getAttribute("innerText"));
+//        /** метод, который высчитывает сумму, при которой сумма выигрыша будет равна 20 млн.
+//         * Но на сайте нельзя указать более двух цифр посл езапятой, поэтому значение не всегда будет точно равно 20 млн.**/
+//        double sumDouble = (20000000.00) / coefCoupon;
+//        String sum = String.format("%.2f",sumDouble).replace(",",".");
+//        LOG.info(sum);
+//        Stash.put("sumKeyMax", sum);
+//
+//
+//    }
 }
 

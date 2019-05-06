@@ -9,7 +9,6 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
 import io.qameta.allure.Allure;
-import io.qameta.allure.Attachment;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
@@ -18,14 +17,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.CucumberTest;
 import ru.gamble.pages.AbstractPage;
 import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.utility.DBUtils;
@@ -36,17 +33,14 @@ import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
-import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
 import javax.net.ssl.*;
-import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -54,8 +48,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -78,6 +70,7 @@ import static ru.gamble.pages.prematchPages.EventViewerPage.onTriggerPeriod;
 import static ru.gamble.pages.userProfilePages.FavouritePage.clearFavouriteGames;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
+import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -198,8 +191,14 @@ public class CommonStepDefs extends GenericStepDefs {
         if (value.equals(RANDOME_EMAIL)) {
             value = "testregistrator+" + Stash.getValue("PHONE") + "@inbox.ru";
         }
-        if (value.equals(RANDOM)) {
-            value = Generators.randomString(25);
+
+        if (value.split(" ")[0].equals(RANDOM)) {
+            int count = value.contains(" ")?Integer.valueOf(value.replace(RANDOM, "").trim()):25;
+            value = Generators.randomString(count);
+        }
+
+        if (value.equals(RANDOMHEX)) {
+            value = Generators.randomStringHex();
         }
 
         if (value.equals(RANDOMDATE)) {
@@ -560,6 +559,7 @@ public class CommonStepDefs extends GenericStepDefs {
      * @return - возвращет true если все ОК, и false если что-то не совпадает с ожиданиями
      */
     public void checkLinkToGame() {
+
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
         workWithPreloader();
         boolean flag = true;
@@ -724,8 +724,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^проверка ответа API из \"([^\"]*)\":$")
     public void checkresponceAPI(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        String expected = table.get("exepted");
+        String actual = JSONValue.toJSONString(Stash.getValue(keyStash)).replaceAll(" ","");
+        String expected = table.get("exepted").replaceAll(" ","");
         assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
@@ -846,8 +846,21 @@ public class CommonStepDefs extends GenericStepDefs {
                 newTime<oldTime);
     }
 
+    @Когда("^находим \"([^\"]*)\" и сохраняем \"([^\"]*)\" из вложенного \"([^\"]*)\"$")
+    public void fingingAndSave3(String keyWhat,String keyWhere, String sourceString) {
+        fingingAndSave2(keyWhat.split("-")[0],keyWhat,sourceString);
+        List<HashMap> bonusMap = Stash.getValue(keyWhat);
+        String bonuses = bonusMap.get(0).get(keyWhat.split("-")[1]).toString();
+        Stash.put(keyWhere,bonuses);
+    }
+
     @Когда("^находим и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
     public void fingingAndSave(String keyFingingParams, String sourceString) {
+        fingingAndSave2(keyFingingParams,keyFingingParams,sourceString);
+    }
+
+    @Когда("^находим \"([^\"]*)\" и сохраняем \"([^\"]*)\" из \"([^\"]*)\"$")
+    public void fingingAndSave2(String param,String keyFingingParams, String sourceString) {
         String tmp;
         Object valueFingingParams, retMap = null;
         ObjectMapper mapper = new ObjectMapper();
@@ -874,8 +887,8 @@ public class CommonStepDefs extends GenericStepDefs {
             }
             e.getMessage();
         }
-        valueFingingParams = JsonLoader.hashMapper(retMap, keyFingingParams);
-        LOG.info("Достаем значение [" + keyFingingParams + "] и записываем в память [" + JSONValue.toJSONString(valueFingingParams) + "]");
+        valueFingingParams = JsonLoader.hashMapper(retMap, param);
+        LOG.info("Достаем значение [" + param + "] и записываем в память [" + JSONValue.toJSONString(valueFingingParams) + "]");
         Stash.put(keyFingingParams, valueFingingParams);
     }
 
@@ -1272,7 +1285,7 @@ public class CommonStepDefs extends GenericStepDefs {
         Scanner scan = new Scanner(file);
 
         String phoneLast = scan.nextLine();
-        String phone = "7333001" + String.format("%4s", Integer.valueOf(phoneLast.substring(7)) + 1).replace(' ', '0');
+        String phone = "7933000" + String.format("%4s", Integer.valueOf(phoneLast.substring(7)) + 1).replace(' ', '0');
         Stash.put(keyPhone, phone);
         LOG.info(phone);
         FileWriter nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "maxphone.txt", false);
@@ -1283,7 +1296,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^определяем занятый номер телефона и сохраняем в \"([^\"]*)\"$")
     public static void getPhone(String keyPhone) {
-        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone DESC";
+        String sqlRequest = "SELECT phone FROM gamebet.`user` WHERE phone LIKE '7933000%' ORDER BY phone DESC";
         String phoneLast = workWithDBgetResult(sqlRequest, "phone");
         Stash.put(keyPhone, phoneLast);
         LOG.info("Вычислили подходящий номер телефона::" + phoneLast);
@@ -1291,7 +1304,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^определяем занятый адрес email и сохраняем в \"([^\"]*)\"$")
     public static void getOldEmail(String keyPhone) {
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE phone LIKE '7333001%' ORDER BY phone DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE phone LIKE '7933000%' ORDER BY phone DESC";
         String emailLast = workWithDBgetResult(sqlRequest, "email");
         Stash.put(keyPhone, emailLast);
         LOG.info("Вычислили подходящий адрес почты::" + emailLast);
@@ -1490,7 +1503,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^генерим новый номер телефона \"([^\"]*)\" на основе \"([^\"]*)\"$")
     public void generateNewPhoneBasisOldPhone(String keyMewPhone,String keyOldPhone){
         String phone = Stash.getValue(keyOldPhone);
-        String newPhone = phone.replace("7333","7222");
+        String newPhone = phone.replace("7933","7222");
         Stash.put(keyMewPhone,newPhone);
     }
 
@@ -1499,14 +1512,14 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {
-        //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7333%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
+        //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7933%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7933%inbox.ru' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id";
         searchUser(keyEmail, sqlRequest);
     }
 
     @Когда("^поиск акаунта для проверки изменений базовых параметров \"([^\"]*)\"$")
     public void searchUserForEdit(String keyEmail){
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+%' AND registration_stage_id=2 ORDER BY id DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7933%' AND registration_stage_id=2 ORDER BY id DESC";
         List<String> results = workWithDBAndGetFullColumn(sqlRequest);
         int count = 0;
         int count2 = 0;
@@ -1538,7 +1551,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта с закончившимися успешными попытками смены БП \"([^\"]*)\"$")
     public void searchUserWithoutEdit(String keyEmail){
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id=2 ORDER BY id DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7933%' AND registration_stage_id=2 ORDER BY id DESC";
         List<String> results = workWithDBAndGetFullColumn(sqlRequest);
         int count = 0;
 
@@ -1560,7 +1573,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^поиск акаунта с закончившимися суточными попытками смены БП \"([^\"]*)\"$")
     public void searchUserWithoutEditOneDay(String keyEmail){
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7333%' AND registration_stage_id=2 ORDER BY id DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator+7933%' AND registration_stage_id=2 ORDER BY id DESC";
         List<String> results = workWithDBAndGetFullColumn(sqlRequest);
         int count = 0;
 
@@ -1586,10 +1599,10 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^ищем пользователя с ограничениями \"([^\"]*)\"$")
     public void searchUserAlt(String keyEmail) {
         //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator+7111%' AND registration_stage_id"+status + " AND tsupis_status=3 and personal_data_state=3 AND offer_state=3";
-        // String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND (phone LIKE '7333002%' OR phone LIKE '7111002%') ORDER BY id DESC";
-        //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND phone LIKE '7333%' ORDER BY id DESC";
+        // String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND (phone LIKE '7933002%' OR phone LIKE '7111002%') ORDER BY id DESC";
+        //String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND phone LIKE '7933%' ORDER BY id DESC";
 
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND email = '" + Stash.getValue("EMAIL") + "' AND phone LIKE '7333%' ORDER BY id DESC";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE identState=1 AND registration_stage_id=2 AND email = '" + Stash.getValue("EMAIL") + "' AND phone LIKE '7933%' ORDER BY id DESC";
         searchUser(keyEmail, sqlRequest);
     }
 
@@ -1748,8 +1761,31 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
+
+    @Когда("^неудачный запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestToAPIEr(String path, String keyStash, DataTable dataTable) {
+        String fullPath = collectQueryString(path);
+        try {
+            requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+        }
+        catch (AutotestError e){
+            LOG.info("Ожидали ошибку - получили ошибку:" + e.getMessage());
+            return;
+        }
+        Assert.fail("Ожидали ошибку, но ее не было");
+    }
+
     @Когда("^запрос по прямому адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestTo(String fullPath, String keyStash, DataTable dataTable) {
+        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+    }
+
+
+    @Когда("^запрос по адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+    public void requestTo2(String fullPath, String keyStash, DataTable dataTable) throws DataException {
+        int index = fullPath.indexOf("}");
+        String url = fullPath.substring(1,index);
+        fullPath = JsonLoader.getData().get(STARTING_URL).get(url).getValue() + fullPath.substring(index+1);
         requestByHTTPS(fullPath, keyStash, "POST", dataTable);
     }
 
@@ -1777,6 +1813,73 @@ public class CommonStepDefs extends GenericStepDefs {
         } catch (DataException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * формирование запроса GET.
+     * если ключ = data - значит берем значение из datajson
+     * если ключ = string - значит такое значнеие и используем. это просто строка
+     * если кдюч = stash - значит значение берем из памяти
+     * @param dataTable
+     */
+    @Когда("^запрос типа GET, результат сохраняем в \"([^\"]*)\"$")
+    public void endpointCollect(String keyStash, DataTable dataTable) throws DataException {
+        List<List<String>> table = dataTable.raw();
+        StringBuilder path = new StringBuilder();
+        String value = new String();
+        String key = new String();
+        LOG.info("Сначала формируем строку запроса");
+        for (List<String> entry : table) {
+            key = entry.get(0);
+            value = entry.get(1);
+            switch (key){
+                case "data":
+                    value = JsonLoader.getData().get(STARTING_URL).get(value).getValue();
+                    break;
+                case "stash":
+                    value = Stash.getValue(value);
+                    break;
+            }
+            path.append(value+"/");
+        }
+        LOG.info("Теперь посылаем GET запрос " + path);
+        requestByHTTPGet(path.toString(), keyStash);
+    }
+
+
+    @Когда("^пополняем пользователю баланс если нужно, судя по ответу \"([^\"]*)\" на сумму, достаточную для \"([^\"]*)\"$")
+    public void refillIfNeed(String keyResponce, String keyAmount,DataTable dataTable) throws DataException {
+
+        fingingAndSave("BALANCE",keyResponce);
+        String balance = Stash.getValue("BALANCE").toString();
+        Long amount = Long.valueOf(Stash.getValue(keyAmount));
+        Long br = Long.valueOf(balance);
+        if (br<amount) {
+            LOG.info("Баланс рублей недостаточен для ставки. Пополним баланс");
+            refill("refillResponce", dataTable);
+        }else {
+            LOG.info("Пополнение средств не требуется");
+        }
+
+    }
+
+
+    @Когда("^пополняем пользователю бонусы если нужно, судя по ответу \"([^\"]*)\" на сумму, достаточную для \"([^\"]*)\"$")
+    public void refillIfNeedBonus(String keyResponce, String keyAmount,DataTable dataTable) throws DataException {
+
+        fingingAndSave("BONUS",keyResponce);
+        List<HashMap> bonusMap = Stash.getValue("BONUS");
+        String bonuses = bonusMap.get(0).get("balance").toString();
+        Long amount = Long.valueOf(Stash.getValue(keyAmount));
+        Long bb = Long.valueOf(bonuses);
+        if (bb<amount){
+            LOG.info("Баланс бонусов недостаточен для ставки. Пополним бонусы");
+            refill("refillResponce", dataTable);
+        }else {
+            LOG.info("Пополнение бонусов не требуется");
+        }
+
+
     }
 
     @Когда("^формирум параметры и сохраняем в \"([^\"]*)\"$")
@@ -1927,7 +2030,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable) {
+    protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable){
         if (!(null == dataTable)) {
             Map<String, String> table = dataTable.asMap(String.class, String.class);
         }
@@ -2001,6 +2104,9 @@ public class CommonStepDefs extends GenericStepDefs {
             } else {
                 throw new AutotestError("ОШИБКА! Пустая строка JSON");
             }
+        }
+            catch (IOException e2){
+            throw new AutotestError(e2.getMessage());
         } catch (Exception e1) {
             LOG.error(e1.getMessage(), e1);
         }
@@ -2773,9 +2879,9 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^проверяем, совпадает ли дата и время игры с ожидаемыми \"([^\"]*)\" \"([^\"]*)\"$")
-    public void checkDateTimeGame(String keyData, String typeGame) {
+    public void checkDateTimeGame(String keyData, String typeGamekey) {
         String fullDateTime = Stash.getValue(keyData).toString().replace("\n", " ");
-
+        String typeGame = Stash.getValue(typeGamekey);
         switch (typeGame) {
             case "live":
                 LOG.info("Судя по времени, указанному на баннере, игра должна быть лайвовской. Проверять будем только что раздел соответствует ЛАЙВу " + fullDateTime);
@@ -2832,13 +2938,18 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^отматывает дату начала на самую раннюю$")
     public void datapickerOnBegin() {
         new WebDriverWait(driver,15).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"),0));
-        WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form') and position()=1]"));
-        if (!datapickerBegin.getAttribute("class").contains("active")) {
-            datapickerBegin.click();
-            new WebDriverWait(driver, 10)
-                    .withMessage("Дата начала не раскрылась")
-                    .until(ExpectedConditions.attributeContains(datapickerBegin, "class", "active"));
+        WebElement myBets = driver.findElement(xpath("//div[contains(@class,'subMenuArea subMenuArea_fullwidth subMenuArea_fullheight')]"));
+        if(myBets.getAttribute("class").contains("active")){
+            driver.findElements(By.xpath("//span[contains(@class,'datapicker__form-text')]")).get(0).click();
+        } else {
+            driver.findElements(By.xpath("//span[contains(@class,'datapicker__form-text')]")).get(2).click();
         }
+//        WebElement datapickerBegin = driver.findElement(By.xpath("//div[contains(@class,'datepicker__form')]"));
+//
+//            new WebDriverWait(driver, 10)
+//                    .withMessage("Дата начала не раскрылась")
+//                    .until(ExpectedConditions.attributeContains(datapickerBegin, "class", "active"));
+
         LOG.info("Если доступно - нажимаем на стрелочку 'год назад'");
         By BYarrowLeft;
         for (int lineNumber = 1; lineNumber <= 2; lineNumber++) {
@@ -2867,18 +2978,6 @@ public class CommonStepDefs extends GenericStepDefs {
     @After(value = "@AzbukaBettingaLinks_C76652")
     public void closeSecondWindow(Scenario scenario) throws InterruptedException {
         ((JavascriptExecutor) PageFactory.getWebDriver()).executeScript("second_window.close()");
-    }
-
-    @After(value = "@Multimarkets")
-    public void offMultimarket(Scenario scenario) throws InterruptedException {
-        getScreenshot(scenario);
-        goToMainPage("site");
-        driver.findElement(By.id("prematch")).click(); //переходим в прематч
-        driver.navigate().refresh();
-        workWithPreloader();
-        Thread.sleep(5000);
-        LOG.info("Перешли в прематч и сейчас отключим режим мультирынков");
-        new EventViewerPage().onOffMultimarkets("выключает");
     }
 
     @After(value = "@coupon")
@@ -2923,6 +3022,37 @@ public class CommonStepDefs extends GenericStepDefs {
         requestByHTTPS(path,responseKey,"POST",dataTable);
     }
 
+    @Когда("^запрос в swagger для получения getHolds \"([^\"]*)\" \"([^\"]*)\"$")
+    public void getHolds(String HoldKeyRub,String HoldKeyBonus, DataTable dataTable) throws DataException {
+        String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
+        path=path+"/getHolds";
+        LOG.info("path:" + path);
+        requestByHTTPS(path,"RESPONSE_SWAGGER","POST",dataTable);
+        LOG.info("Теперь запоминаем сколько захолдировано средств");
+        fingingAndSave("DATA","RESPONSE_SWAGGER");
+        List<HashMap> dataMap = Stash.getValue("DATA");
+        String amount = new String();
+        long holdRub = 0;
+        long holdBonus = 0;
+        for (HashMap<String,String> mapOne: dataMap){
+            amount = String.valueOf(mapOne.get("amount"));
+            switch (String.valueOf(mapOne.get("currency"))){
+                case "643":
+                    LOG.info("hold рублей " + amount);
+                    holdRub+=Long.valueOf(amount);
+                    break;
+                case "999":
+                    LOG.info("hold бонусов " + amount);
+                    holdBonus+=Long.valueOf(amount);
+                    break;
+            }
+        }
+        LOG.info("Итого захолдировано рублей " + holdRub + " и бонусов " + holdBonus);
+        Stash.put(HoldKeyRub,holdRub);
+        Stash.put(HoldKeyBonus,holdBonus);
+    }
+
+
     @Когда("^запрос в swagger на добавление НДФЛ \"([^\"]*)\"$")
     public void addNDFL(String responseKey,DataTable dataTable) throws DataException {
         String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
@@ -2949,6 +3079,21 @@ public class CommonStepDefs extends GenericStepDefs {
         workWithDB(sqlRequest);
         LOG.info("Включили отображение ссылки главного меню: " + namePage);
 
+    }
+    @Когда("^проверим что \"([^\"]*)\" больше \"([^\"]*)\" на \"([^\"]*)\"$")
+    public void checkDifferenceBetweenNumbers(String keyNum1,String keyNum2,String diff){
+         long firstN = Long.parseLong(String.valueOf(Stash.getValue(keyNum1).toString()));
+         long secondN = Long.parseLong(String.valueOf(Stash.getValue(keyNum2).toString()));
+         String difference = diff.replace("-","");
+         long diffLong = diff.matches("-*[A-Z]*")
+                 ?Integer.valueOf(Stash.getValue(diff.replace("-","")))
+                 :Integer.valueOf(diff.replace("-",""));
+         if (diff.contains("-")){
+            diffLong=0-diffLong;
+         }
+         Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
+                 firstN-diffLong,secondN);
+         LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
     }
 }
 

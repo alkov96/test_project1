@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -114,6 +115,9 @@ public abstract class AbstractPage extends Page{
     @ElementTitle("Подвал")
     @FindBy (xpath = "//div[@class='footer__pin']")
     private WebElement podval;
+
+    @FindBy(xpath = "//div[contains(@class,'menu-toggler')]")
+    private WebElement expandCollapseMenusButton;
 
 
     @ActionTitle("открывает Избранное")
@@ -225,9 +229,6 @@ public abstract class AbstractPage extends Page{
         LOG.info("GO TO LINK");
         driver.get(url + "/registration/email/verify?" + link);
 
-        if(url.contains("mobile")){
-           return;
-        }else {
             LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
             Thread.sleep(5000);
             if (!driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).isDisplayed()) {
@@ -236,7 +237,7 @@ public abstract class AbstractPage extends Page{
             LOG.info("Закрываем уведомление об успешном подтверждении почты");
             driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
         }
-    }
+
 
     /**
      * Открывает выпадающий список и выбирает оттуда пункт случайным образом
@@ -660,10 +661,25 @@ public abstract class AbstractPage extends Page{
      */
     public void closeSports(){
         WebDriver driver = PageFactory.getDriver();
-        if (driver.findElement(By.id("sports-toggler-opened")).isDisplayed()){
-            driver.findElement(By.id("sports-toggler-opened")).click();
-        }else if (driver.findElement(By.id("sports-toggler")).isDisplayed()){
-            driver.findElement(By.id("sports-toggler")).click();
+        clickIfVisible(driver.findElement(By.id("sports-toggler")));
+    }
+
+    public void clickIfVisible(WebElement element){
+        checkMenuIsOpen(true);
+        new WebDriverWait(PageFactory.getDriver(),10)
+                .withMessage("Левое меню не развернулось")
+                .until(ExpectedConditions.attributeContains(expandCollapseMenusButton,"class","collapsed"));
+        element.click();
+    }
+
+    /**
+     * открытие/закрытие левого меню
+     * @param openorclose = true - если нужно открыть. false - если нужно закрыть
+     */
+    public void checkMenuIsOpen(boolean openorclose){
+        if(expandCollapseMenusButton.getAttribute("class").contains("collapsed")!=openorclose){
+            expandCollapseMenusButton.click();
+            workWithPreloader();
         }
     }
 

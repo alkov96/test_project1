@@ -282,25 +282,25 @@ public class MyBetting extends AbstractPage {
     public void remeberMyBets(String filter, String nameList) {
         int  cou = 3;
         LOG.info("Сначала включаем фильтр 'Ожидается'");
-        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
-        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
-        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]/span")));
+        driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
         CommonStepDefs.workWithPreloader();
 
 //        LOG.info("Отматываем дату начала на самую раннюю");
 //        datapickerOnBegin();
 
         LOG.info("Теперь включаем фильтр по типу ставки " + filter);
-        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
-        driver.findElement(xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
-        driver.findElement(xpath("//div[@class='my-stakes__filter-grid_M']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + filter + "']")).click();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//div[@class='my-bets__filter']//div[contains(@class,'custom-select__placeholder option')]/span")));
+        driver.findElement(xpath("//div[@class='my-bets__filter']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(xpath("//div[@class='my-bets__filter']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + filter + "']")).click();
         CommonStepDefs.workWithPreloader();
 
 //        WebDriverWait wait = new WebDriverWait(driver,10);
 //        wait.withMessage("Нет записей в истории ожидаемых пари в купоне");
 //        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//tr[contains(@class,'showBetInfo table__row')]"),0));
 
-        List<WebElement> allBetsOnPage = driver.findElements(xpath("//tr[contains(@class,'showBetInfo table__row')]"));
+        List<WebElement> allBetsOnPage = driver.findElements(xpath("//tbody[contains(@class,'bets-table__bet')]"));
 
         if (allBetsOnPage.size()<cou){
             cou=allBetsOnPage.size();
@@ -333,16 +333,16 @@ public class MyBetting extends AbstractPage {
         List<String> nameGames = new ArrayList<>();
         StringBuilder sum = new StringBuilder();
         BetFull bet = new BetFull();
-        SimpleDateFormat formatNo = new SimpleDateFormat("dd.MM.yy");
-        SimpleDateFormat formatYes = new SimpleDateFormat("dd.MM");
+        SimpleDateFormat formatNo = new SimpleDateFormat("dd.MM, hh:mm");
+        SimpleDateFormat formatYes = new SimpleDateFormat("dd MMMM в k:mm(МСК)");
 
-        helpString.append(element.findElement(xpath(".//tr[contains(@class,'table')]/td[2]")).getAttribute("innerText"));
+        helpString.append(element.findElement(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[4]")).getAttribute("innerText"));
         String typeBet = (!helpString.toString().toLowerCase().contains("система") && !helpString.toString().toLowerCase().contains("экспресс")) ?
-                "ординар" : helpString.toString().toLowerCase();
+                "ординар" : helpString.toString().toLowerCase().split(" ")[0];
         bet.setType(typeBet);
 
         helpString.setLength(0);
-        helpString.append(element.findElement(xpath("td[2]/div")).getAttribute("innerText"));
+        helpString.append(element.findElement(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[3]")).getAttribute("innerText"));
         index = helpString.indexOf(":");
         try {
             timeBet.append(helpString.substring(index - 2, index + 3));
@@ -352,17 +352,26 @@ public class MyBetting extends AbstractPage {
         }
         bet.setTimeBet(timeBet.toString());
 
-        element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-kef')]/div"))
+        if (!typeBet.equals("ординар")){
+            element.click(); //для раскрытия системы  и экспресса
+        }
+        element.findElements(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[contains(@class,'bets-table__cell bets-table__cell_coefficient')]"))
                 .stream()
                 .forEach(el -> coefs.add(el.getAttribute("innerText").replace(".00","").replace(".0","")));
+        if (!typeBet.equals("ординар")){
+           coefs.remove(0);
+        }
 
-        element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=1]"))
+
+        element.findElements(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[contains(@class,'bets-table__cell bets-table__cell_event-datetime')]"))
                 .stream()
                 .map(WebElement::getText)
                 .map(el -> CommonStepDefs.newFormatDate(formatNo, formatYes, el))
                 .forEach(el -> dateGames.add(el));
-
-        element.findElements(xpath(".//td[contains(@class,'table__head-cell_my-stakes-event')]/span[position()=2]"))
+        if (!typeBet.equals("ординар")){
+            dateGames.remove(0);
+        }
+        element.findElements(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[@class='bets-table__cell bets-table__cell_fade-overflow bets-table__cell_bet-name']"))
                 .stream()
                 .forEach(el -> nameGames.add(el.getAttribute("innerText")));
 
@@ -372,11 +381,14 @@ public class MyBetting extends AbstractPage {
 
 
         helpString.setLength(0);
-        helpString.append(element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[2]")).getAttribute("class"));
 
-        sum.append(helpString.toString().contains("hide") ? "Б" : "Р");
-        sum.insert(0, element.findElement(xpath(".//div[contains(@class,'showBetInfo__money-str')]/span[1]")).getAttribute("innerText") + " ");
+//        sum.insert(0,  element.findElement(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[@class='bets-table__cell bets-table__cell_sum']/span")).getAttribute("innerText") + " ");
+        sum.insert(0,  element.findElement(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[@class='bets-table__cell bets-table__cell_sum']/span")).getAttribute("innerText").trim());
+        if (!sum.toString().contains("Б")) {sum.append(" Р");}
         bet.setSum(sum.toString().replace(".00","").replace(".0","").replaceAll(" ",""));
+        if (!typeBet.equals("ординар")){
+            element.findElement(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[4]")).click();
+        }
 
         return bet;
     }
@@ -401,9 +413,9 @@ public class MyBetting extends AbstractPage {
     @ActionTitle("выставляет фильтр исхода пари на")
     public void selectReseltsBet(String result){
         LOG.info("Сначала включаем фильтр '" + result + "'");
-        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")));
-        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
-        driver.findElement(xpath("//table[@class='table-inner']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + result + "']")).click();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]/span")));
+        driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='" + result + "']")).click();
         CommonStepDefs.workWithPreloader();
     }
 }

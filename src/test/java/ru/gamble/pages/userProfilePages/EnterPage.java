@@ -91,12 +91,12 @@ public class EnterPage extends AbstractPage {
     public void logIn(DataTable dataTable) throws DataException {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
 
-//        if (data.keySet().toArray()[0].toString().toLowerCase().equals("телефон")){
-//            chooseMethodAutorization("телефон");
-//        }
-//        else {
-//            chooseMethodAutorization("email");
-//        }
+        if (data.keySet().toArray()[0].toString().toLowerCase().equals("телефон")){
+            chooseMethodAutorization("телефон");
+        }
+        else {
+            chooseMethodAutorization("email");
+        }
 
         chooseMethodAutorization("email");
         String login, password;
@@ -160,6 +160,8 @@ public class EnterPage extends AbstractPage {
 
         }while ((!driver.findElements(By.xpath("//div[contains(.,'Ошибка в адресе электронной почты или пароле')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).isEmpty()) && count < 3);
         workWithPreloader();
+
+        closePopUpWindowGoToTSUPISIfOpened();
       //***********************
     }
 }

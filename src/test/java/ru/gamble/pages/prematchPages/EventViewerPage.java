@@ -1,5 +1,6 @@
 package ru.gamble.pages.prematchPages;
 
+import org.apache.xmlbeans.impl.xb.xsdschema.FieldDocument;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
@@ -23,12 +24,12 @@ import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
 import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathException;
+import javax.xml.xpath.XPathExpression;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
@@ -40,9 +41,6 @@ import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 public class EventViewerPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(EventViewerPage.class);
     static WebDriver driver = PageFactory.getDriver();
-
-    @FindBy(xpath = "//div[contains(@class,'menu-toggler')]")
-    private WebElement expandCollapseMenusButton;
 
     @ElementTitle("Период времени")
     @FindBy(xpath = "//div[contains(@class,'periods__input')]")
@@ -58,20 +56,18 @@ public class EventViewerPage extends AbstractPage {
 
 
     private static By xpathForsportsPrematch = By.xpath("//*[@id='sports-list-container']//li[contains(@id,'sport') and not(contains(@id,'sport--'))]");
+    private static By xpathSport = By.xpath("//li[contains(@class,'left-menu__list-item-sport') and not(contains(@id,'sport--')) and not(contains(@class,'favorite'))]");
+    private static By xpathRegion = By.xpath(".//li[contains(@class,'left-menu__list-item-region')]");//путь, начиная от спорта. т.е. от li
+    private static By xpathCompetition = By.xpath(".//div[contains(@class,'left-menu__list-item-region-compitition')]");//путь, начиная от спорта. т.е. от li
 
 
     public EventViewerPage() {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(expandCollapseMenusButton));
-        checkMenuIsOpen();
+        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[contains(@class,'menu-toggler')]"))));
+        checkMenuIsOpen(true);
     }
 
-    private void checkMenuIsOpen(){
-        if(expandCollapseMenusButton.getAttribute("title").contains("Показать всё")){
-            expandCollapseMenusButton.click();
-            workWithPreloader();
-        }
-    }
+
 
     @ActionTitle("выбирает время")
     public void chooseTime(String key){
@@ -86,8 +82,120 @@ public class EventViewerPage extends AbstractPage {
 
     }
 
+    /**
+     * провекра что игры в первых 5 спортах удовлетворяют фильтру по времени
+     * @param period
+     */
     @ActionTitle("проверяет время игр")
-    public void checkGamesWithPeriod(String period, String limit){
+    public void checkGamesWithPeriod(String period){
+        String valuePeriod;
+        WebElement sport;
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        if(period.equals(PERIOD)){
+            valuePeriod = Stash.getValue(period);
+        }else{
+            valuePeriod = period;
+        }
+        int countSports = driver.findElements(xpathSport).size(); //количество видов спорта
+        countSports = Math.min(countSports,5);
+
+        for (int i=0; i<countSports;i++){
+            LOG.info("сворачиваем все виды спорта");
+            closeSports();
+            sport=driver.findElements(xpathSport).get(i);
+            LOG.info("разворачиваем нужный спорт");
+            clickIfVisible(sport);
+            wait
+                .withMessage("Спорт " + sport.getAttribute("innerText").split("\n")[0] + " не раскрылся")
+                .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath(xpathRegion.toString().split(" ")[1].replace(".","")),0));
+            checkRegionsInSport(i,valuePeriod);
+        }
+    }
+
+    /**
+     * проверка что все игры в первых 5 регионах спорта sport удовлетворяют периоду времени
+     * @param sport
+     * @param valuePeriod
+     */
+    private void checkRegionsInSport(int sport,String valuePeriod){
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        int countRegions = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).size(); //количество регионов
+        countRegions = Math.min(countRegions,5);//будем смотреть толкьо первые 5 регионов
+        WebElement region;
+        for (int i=0;i<countRegions;i++){
+            region = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).get(i);
+            if (!region.getAttribute("class").contains("active")) {
+                LOG.info("разворачиваем регион " + region.getAttribute("innerText").split("\n")[0]);
+                clickIfVisible(region);
+                wait
+                        .withMessage("Регион не раскрылся")
+                        .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath(xpathCompetition.toString().split(" ")[1].replace(".","")),0));
+            }
+
+            checkCompetitionsInRegion(sport,i,valuePeriod);
+            checkMenuIsOpen(true);
+            region = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).get(i);
+            if (region.getAttribute("class").contains("active")) {
+                LOG.info("сворачиваем регион " + region.getAttribute("innerText").split("\n")[0]);
+                clickIfVisible(region);
+            }
+        }
+    }
+
+    /**
+     * проверка что все игры в первых 5 соревнованиях выбранного региона удовлетворяют периоду времени
+     * @param region
+     * @param valuePeriod
+     */
+    private void checkCompetitionsInRegion(int sport, int region,String valuePeriod){
+        WebElement competition;
+        int countCompetit = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).get(region).findElements(xpathCompetition).size(); //количество соревновани в выбранном регионе
+        countCompetit = Math.min(countCompetit,5);
+        for (int i=0;i<countCompetit;i++){
+            checkMenuIsOpen(true);
+            competition = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).get(region).findElements(xpathCompetition).get(i);
+            clickIfVisible(competition);//кликнули на выбранное сорвенование в регионе. теперь в центральной части страниыв отображаются игры только этого соревнования
+            setExpandCollapseMenusButton(false); //сворачиваем левое меню.чтобы ЦО была полностью видна
+            checkGameOnCenter(valuePeriod);
+        }
+    }
+
+    private void checkGameOnCenter(String valuePeriod){
+        By xpathToDate = By.xpath("../preceding-sibling::div[contains(@class,'prematch-competition__header')]/div[contains(@class,'prematch-competition__header-date')]");
+        By xpathToTime = By.xpath(".//div[contains(@class,'bets-block__header-left-info')]");
+//        LOG.info("Закроем ЛМ чтобы не мешалось");
+//        checkMenuIsOpen(false);
+        List <WebElement> games = driver.findElements(By.xpath("//div[@class='prematch-competition__games']/div[contains(@class,'bets-block_single-row')]"));
+        LOG.info("В Центральной области страницы " + games.size() + " игр");
+        List <String> dateGamesString = new ArrayList<>();
+        List <String> nameGames = driver.findElements(By.xpath("//div[@class='bets-block__header-teams']")).stream().map(el->el.getAttribute("innerText")).collect(Collectors.toList());
+        games.forEach(el->dateGamesString.add(
+                el.findElement(xpathToDate).getAttribute("innerText")+
+                " " + el.findElement(xpathToTime).getAttribute("innerText")));
+        Calendar period = Calendar.getInstance();
+        Calendar dateOneGame = Calendar.getInstance();
+        int hoursPeriod = 0;
+        if (!valuePeriod.equals("Выберите время")) {
+            hoursPeriod = valuePeriod.contains("час") ? Integer.valueOf(valuePeriod.split(" ")[0]) : Integer.valueOf(valuePeriod.split(" ")[0]) * 24;
+        }
+        SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy k:mm");
+        period.add(Calendar.HOUR,hoursPeriod);
+        for (int i=0;i<dateGamesString.size();i++){
+            LOG.info("Проверяем игру " + nameGames.get(i));
+            try {
+                dateOneGame.setTime(format.parse(dateGamesString.get(i)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Assert.assertTrue("Игра не соответсвтует выбранному периоду " + valuePeriod + ":: время игры " + dateGamesString.get(i),
+                    dateOneGame.before(period));
+            LOG.info("Игра соответсвует выбранному периоду");
+            i++;
+        }
+    }
+
+    @ActionTitle("проверяет время игр2")
+    public void checkGamesWithPeriod2(String period, String limit){
         String valuePeriod;
         if(period.equals(PERIOD)){
             valuePeriod = Stash.getValue(period);
@@ -204,7 +312,7 @@ public class EventViewerPage extends AbstractPage {
     }
 
     private void checkGames(WebElement country, String valuePeriod, int valueLimit){
-        String xpathDateTimeGames = "//div[@class='prematch-competition-games__item-date ng-binding']";
+        String xpathDateTimeGames = "//div[contains(@class,'left-menu__list-item-region-compitition')]";
         String rowDateTime;
         // Ожидание появения хотя-бы одной игры в меню стран
         new WebDriverWait(getWebDriver(), 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathDateTimeGames)));
@@ -309,7 +417,7 @@ public class EventViewerPage extends AbstractPage {
         Date dateGame;
         int hour = Integer.valueOf(period.substring(0, period.indexOf("час") - 1));
         Date Period = new Date(System.currentTimeMillis() + hour * 3600 * 1000);
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm - dd MMM yyyy", new Locale("ru"));
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", new Locale("ru"));
 
 
         WebElement menu = driver.findElement(By.id("menu-toggler"));
@@ -371,29 +479,31 @@ public class EventViewerPage extends AbstractPage {
                     if (!menu.getAttribute("class").contains("collapsed")) menu.click();
                     driver.findElements(xpathForsportsPrematch).get(sportN).findElements(By.xpath(pathToTours)).get(tour).findElement(By.xpath("./h4[1]")).click();
                     CommonStepDefs.workWithPreloader();
-                    //все игры в этом соревновании
-                    List<WebElement> allGames = driver.findElements(By.xpath("//div[contains(@class,'bets-block__header-bet-name')]"));
+                    //все даты в этом соревновании
+                    List<WebElement> allDates = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition__header-date')]"));
                     LOG.info("Смотрим все игры в спорте, в соответствующем соревновании. Ищем игру подходящую по фильтру времени " + hour + inPeriod);
-                    for (int GameInTour = 0; GameInTour < allGames.size(); GameInTour++) {
-                        dateGame = formatter.parse(allGames.get(GameInTour).getAttribute("innerText"));
-
-                        if (!gameIsAdding && (dateGame.getTime() <= Period.getTime()) == inPeriod) {
-
-                            nameGamefull = allGames.get(GameInTour).findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("title");
-                            CommonStepDefs.addStash("nameGameKey",nameGamefull);
-                            CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
-                            CommonStepDefs.addStash("typeGameKey",typeGame);
-                            if (adding) {
-                                LOG.info("Нужную игру нашли. Добавляем ее в Избранное");
-                                allGames.get(GameInTour).findElement(By.xpath(".//i[contains(@class,'bets-block__header-icon_star')]")).click();
-                                new WebDriverWait(driver,10)
-                                        .withMessage("Игра в избранное не добавилась!!")
-                                        .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__favorite-list']/li"),sizeFavourite));
+                    By byTime = By.xpath("./../following-sibling::div/div[contains(@class,'bets-block_single-row')]//div[contains(@class,'bets-block__header-left-info')]");
+                    for (int index = 0; index < allDates.size(); index++) {
+                        WebElement dateInTour = allDates.get(index);
+                        String day = dateInTour.getAttribute("innerText");
+                        for (WebElement game: allDates.get(index).findElements(byTime)){//для каждой даты несколько игр может быть на разное время. вот продемся по каждой из них
+                            dateGame = formatter.parse(day + " " + game.getAttribute("innerText"));
+                            if ((dateGame.getTime() <= Period.getTime()) == inPeriod) {//если игра подходит
+                                nameGamefull = game.findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("innerText");
+                                CommonStepDefs.addStash("nameGameKey",nameGamefull);
+                                CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
+                                CommonStepDefs.addStash("typeGameKey",typeGame);
+                                if (adding) {
+                                    LOG.info("Нужную игру нашли. Добавляем ее в Избранное");
+                                    game.findElement(By.xpath("./i")).click();//добавление в избранное
+                                    new WebDriverWait(driver,10)
+                                            .withMessage("Игра в избранное не добавилась!!")
+                                            .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[contains(@class,'left-menu__favorite-list')]/li"),sizeFavourite));
+                                }
+                                return;
                             }
-                            gameIsAdding = true;
+                            //если игра не подошла идем дальше
                         }
-
-                        if (gameIsAdding) return;
                     }
                 }
                 if (!menu.getAttribute("class").contains("collapsed")) menu.click();
@@ -479,12 +589,12 @@ public class EventViewerPage extends AbstractPage {
     public static boolean inLeftMenuGameYellow(String team1){
         boolean flag = true;
         LOG.info("Проверяем что нужная игра активна и выделена желтым в левом меню в Моих Пари");
-        List<WebElement> leftSidePage = driver.findElements(By.xpath("//div[@class='prematch-competition ng-scope']/div/div[1]/div[1]"));
-        for (WebElement aLeftSidePage : leftSidePage) {
-            String nameGameOnPage = aLeftSidePage.findElement(By.xpath("div[1]/div[2]")).getAttribute("title");
+        List<WebElement> favouriteGames = driver.findElements(By.xpath("//li[contains(@class,'left-menu__favorite-list-item')]"));
+        for (WebElement favourGame : favouriteGames) {
+            String nameGameOnPage = favourGame.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("title");
             nameGameOnPage = CommonStepDefs.stringParse(nameGameOnPage);
             if (nameGameOnPage.contains(CommonStepDefs.stringParse(team1))) {
-                if (!aLeftSidePage.findElement(By.xpath("../div[1]")).getAttribute("class").contains("active")) {
+                if (!favourGame.getAttribute("class").contains("active")) {
                     flag = false;
                     LOG.error("В прематче открытая игра из Избранного не выделена в левой части меню");
                 }
@@ -797,14 +907,16 @@ public class EventViewerPage extends AbstractPage {
     @ActionTitle("режим мультирынков")
     public void onOffMultimarkets(String onOrOff){
         boolean needOn = onOrOff.contains("включает")?true:false;
-        WebElement multiMarkets = driver.findElement(By.id("multiMarkets"));
-        LOG.info("Нажимаем на тумблер перехода в режим Мультирынков");
-        if (multiMarkets.getAttribute("class").contains("not-empty")!=needOn){
-            multiMarkets.findElement(By.xpath("following-sibling::label[contains(@class,'jumper__body')]")).click();
+        String filter = needOn?"Мультирынки":"Результат матча";
+        WebElement filterHeader = driver.findElement(By.xpath("//div[contains(@class,'game-center-container__inner-header-filter-selected')]"));
+        LOG.info("Если режим мультирынков не нужен, то включим вместо него 'Результат матча'");
+        if (filterHeader.getAttribute("innerText").contains("Мультирынки")!=needOn){
+            filterHeader.click();
+            filterHeader.findElement(By.xpath("following-sibling::*/div[contains(@class,'inner-header-filter-list-item') and contains(text(),'" + filter + "')]"));
             CommonStepDefs.workWithPreloader();
             Assert.assertTrue(
                     "Режим мультирынков is " + !needOn + ", хотя на тумблер нажали",
-                    multiMarkets.getAttribute("class").contains("not-empty")==needOn);
+                    filterHeader.getAttribute("innerText").contains("Мультирынки")==needOn);
         }
         LOG.info("Режим мультирынков is " + needOn);
     }
@@ -817,18 +929,18 @@ public class EventViewerPage extends AbstractPage {
         String coefOnPage;
         WebElement activeGameOnPage;
 
-        WebElement activeGameMulti = driver.findElement(By.xpath("//div[contains(@class,'bets-block__header_multimarket') and contains(@class,'prematch-active')]"));
-        List<WebElement> coefsInMulti = activeGameMulti.findElements(By.xpath("./following-sibling::div[@class='bets-block__multimarket-wrapper']//div[contains(@class,'bet-cell_multimarket')]//span[contains(@class,'cell-content-price')]"));
-        List<String> listMarketsInMulti = driver.findElements(By.xpath("//div[contains(@class,'multimarket-market-title')]")).stream()
+        WebElement activeGameMulti = driver.findElement(By.xpath("//div[contains(@class,'bets-block bets-block_single-row') and contains(@class,'bets-block_active')]"));
+        List<WebElement> coefsInMulti = activeGameMulti.findElements(By.xpath(".//div[contains(@class,'bets-block__body_single-row')]/div[1]/div"));
+        List<String> listMarketsInMulti = driver.findElements(By.xpath("//div[contains(@class,'header-event-narrow')]")).stream()
                 .map(element->element.getAttribute("innerText").trim()).collect(Collectors.toList());
-        listMarketsInMulti.add(listMarketsInMulti.size(),listMarketsInMulti.get(listMarketsInMulti.size()-1) + " 2");
+        //listMarketsInMulti.add(listMarketsInMulti.size(),listMarketsInMulti.get(listMarketsInMulti.size()-1) + " 2");
         for (int i=0; i<coefsInMulti.size();i++) {
             LOG.info("Проверка доабвлени ставки в купон из мультимаркета. Ставка " + listMarketsInMulti.get(i) + " " + coefsInMulti.get(i).getAttribute("innerText"));
             coefsInMulti.get(i).click();
-            activeGameOnPage = driver.findElement(By.xpath("//div[contains(@class,'bets-block__bet-cell_active') and not(contains(@class,'multimarket'))]"));
-            //activeGameOnPage.findElement(By.xpath(".//span[contains(@class,'bets-block__bet-cell-content-name')]")).getAttribute("innerText");
-            coefOnPage = activeGameOnPage.findElement(By.xpath(".//span[contains(@class,'bets-block__bet-cell-content-ratio')]")).getAttribute("innerText");
-            marketis = activeGameOnPage.findElement(By.xpath("./ancestor-or-self::div[contains(@class,'bets-block__body')]/preceding-sibling::div[@class='bets-block__header']")).getAttribute("innerText");
+//            activeGameOnPage = driver.findElement(By.xpath("//div[contains(@class,'inner game-center-container__live')]"));
+            activeGameOnPage=driver.findElement(By.xpath("//div[contains(@class,'live-container')]//div[contains(@class,'bets-block__bet-cell_active')]"));
+            coefOnPage = activeGameOnPage.findElement(By.xpath(".//span[contains(@class,'bet-cell-content-ratio')]")).getAttribute("innerText");
+            marketis = activeGameOnPage.findElement(By.xpath("./ancestor-or-self::div[contains(@class,'bets-block__body')]/preceding-sibling::div[contains(@class,'bets-block__header')]")).getAttribute("innerText");
 
             switch (listMarketsInMulti.get(i).replaceAll("[^а-яА-Я]", "")) {
                 case "П":
