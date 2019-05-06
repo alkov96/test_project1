@@ -6,7 +6,6 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -99,6 +98,7 @@ public class EnterPage extends AbstractPage {
             chooseMethodAutorization("email");
         }
 
+        chooseMethodAutorization("email");
         String login, password;
         switch (data.get(LOGIN)) {
             case Constants.DEFAULT:

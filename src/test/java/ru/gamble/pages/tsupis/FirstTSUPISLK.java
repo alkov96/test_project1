@@ -30,7 +30,7 @@ public class FirstTSUPISLK extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FirstTSUPISLK.class);
     static WebDriver driver = PageFactory.getDriver();
 
-    @FindBy(xpath = "//img[contains(@src,'https://23bet.itasystems.ru')]")
+    @FindBy(xpath = "//*[@class='panel__header' and contains(.,'БК Фаворит')]")
     private WebElement pageTitle;
 
     @ElementTitle("Номер карты")
