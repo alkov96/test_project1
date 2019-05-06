@@ -2389,7 +2389,7 @@ public class CommonStepDefs extends GenericStepDefs {
             driver.switchTo().window(Stash.getValue(keyPage));
             LOG.info("Вернулись на ранее запомненую страницу");
         } catch (Exception e) {
-            throw new AutotestError("Ошибка! Не смогли вернуться на страницу.");
+            throw new AutotestError("Ошибка! Не смогли вернуться на страницу." + Stash.getValue(keyPage));
         }
     }
 
