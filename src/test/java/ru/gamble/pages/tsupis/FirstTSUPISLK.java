@@ -30,7 +30,7 @@ public class FirstTSUPISLK extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FirstTSUPISLK.class);
     static WebDriver driver = PageFactory.getDriver();
 
-    @FindBy(xpath = "//div[@class='contract-details-content']")
+    @FindBy(xpath = "//*[@class='panel__header' and contains(.,'БК Фаворит')]")
     private WebElement pageTitle;
 
     @ElementTitle("Номер карты")
@@ -50,7 +50,7 @@ public class FirstTSUPISLK extends AbstractPage {
     private WebElement nameFamilyLatinInput;
 
     @ElementTitle("Продолжить")
-    @FindBy(xpath = "//input[contains(@value,'Продолжить')]")
+    @FindBy(xpath = "//*[@type='submit']")
     private WebElement buttonContinue;
 
     @ElementTitle("Подтвердить")
@@ -135,5 +135,4 @@ public class FirstTSUPISLK extends AbstractPage {
             }
         }
     }
-
 }
