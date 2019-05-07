@@ -2563,6 +2563,10 @@ public class CommonStepDefs extends GenericStepDefs {
                 break;
             }
         }
+        if (Stash.getValue(keySearch)==null){
+            LOG.info("Название игры не содержит слова, длиной больше 3 символов. значит будем пытаться искать по полному названию " + names.get(index));
+            Stash.put(keySearch, names.get(index));
+        }
     }
 
     @Когда("^генерируем дату рождения от 18 до 50 лет и сохраняем в \"([^\"]*)\"$")

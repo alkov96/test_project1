@@ -189,16 +189,15 @@ public class VewingEventsPage extends AbstractPage {
         }
         else {
             String nameOnLeftMenu =
-                    driver.findElement(xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]" +
-                            "//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");
+                    driver.findElement(xpath("//li[contains(@class,'left-menu__list-item-games')]/div[contains(@class,'active')]//div[@class='left-menu__list-item-games-names']")).getAttribute("innerText");
             Assert.assertTrue(
                     "В левом меню выделена желтым неправильная игра. Вместо " + team1Name + " выделена " +nameOnLeftMenu,
                     CommonStepDefs.stringParse(nameOnLeftMenu).equals(team1Name));
         }
 
         LOG.info("Проверка что в центральной части окна открыта нужная игра");
-        List<WebElement> team = driver.findElements(By.xpath("//div[@class='live-game-summary__game-content']/div[1]/ng-include[1]/div[1]/div/div/p"));
-        String nameOnPage = CommonStepDefs.stringParse(team.get(0).getAttribute("title").trim() + " - " + team.get(1).getAttribute("title").trim());
+        String[] team = driver.findElements(By.xpath("//div[contains(@class,'game-score')]")).get(0).getAttribute("innerText").split("\n\n");//не спрашивай...
+        String nameOnPage = team.length==1?team[0]:CommonStepDefs.stringParse(team[0].trim() + " - " + team[2].trim());
         if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameOnPage))) {
             flag=false;
             LOG.error("В лайв открылась неправильная игра. " + nameOnPage + " вместо " + team1Name);

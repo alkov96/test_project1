@@ -300,7 +300,7 @@ public class EventViewerPage extends AbstractPage {
                             dateGame = formatter.parse(day + " " + game.getAttribute("innerText"));
                             if ((dateGame.getTime() <= Period.getTime()) == inPeriod) {//если игра подходит
                                 nameGamefull = game.findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("innerText");
-                                CommonStepDefs.addStash("nameGameKey",nameGamefull);
+                                CommonStepDefs.addStash("nameGameKey",nameGamefull.replaceAll("\n"," "));
                                 CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
                                 CommonStepDefs.addStash("typeGameKey",typeGame);
                                 if (adding) {
