@@ -259,7 +259,7 @@ public class RefillAccountsPage extends AbstractPage{
         BigDecimal maxLimitInDB,maxLimitByWSS;
         Map<String,String> methodsInBD = Stash.getValue(methodsKey);
         String checkValueByNull;
-        Object jsonByWSS =  JSONValue.parse(Stash.getValue(keyJsonByWSS).toString());
+        Object jsonByWSS =  JSONValue.parse(Stash.getValue(keyJsonByWSS).toString().split("limits" + "\":")[1]);
         amountEntered = new BigDecimal(inputAmount.getAttribute("value").replaceAll("\\s",""));
         LOG.info("Ввели в поле 'Сумма' [" + inputAmount.getAttribute("value") + "]");
         List<WebElement> partners = driver.findElements(By.xpath("//div[contains(@class,'payPartner')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
@@ -270,7 +270,7 @@ public class RefillAccountsPage extends AbstractPage{
             methodName = partner.getAttribute("class").replaceAll("payPartner ","");
             checkValueByNull = methodsInBD.get(methodName.replaceAll("_","").toUpperCase());
             maxLimitInDB = new BigDecimal(checkValueByNull == null ? "0" : String.valueOf(checkValueByNull)).divide( new BigDecimal("100"));
-            maxLimitByWSS = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByWSS,"data"),"limits"),methodName),"max_deposit").toString()).divide( new BigDecimal("100"));
+            maxLimitByWSS = new BigDecimal(JsonLoader.hashMapper(JsonLoader.hashMapper(jsonByWSS,methodName),"max_deposit").toString()).divide( new BigDecimal("100"));
             exeptedMaxLimit = (maxLimitInDB.compareTo(maxLimitByWSS) > 0) ? maxLimitByWSS.toString() : maxLimitInDB.toString();
             exeptedMaxLimit = exeptedMaxLimit.split("[.]")[0];//на тот случай, если лимиты с копейками - убираем копейки, оставляем только целую часть
             maxAmount = new BigDecimal(exeptedMaxLimit);
