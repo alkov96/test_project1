@@ -1179,6 +1179,7 @@ public class CommonStepDefs extends GenericStepDefs {
         sqlRequest = "SELECT code FROM gamebet.`useremailconfirmationcode`  WHERE user_id=" + userId;
         String code = workWithDBgetResult(sqlRequest, "code");
         Stash.put(keyEmailCode, code);
+        Stash.put("userIdKey", userId);
         LOG.info("Получили код подтверждения почты: " + code);
     }
 

@@ -51,6 +51,8 @@ public abstract class AbstractPage extends Page{
     public static By xpathListBets = xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul");
 
     public static By preloaderOnPage = By.xpath("//div[contains(@class,'preloader__container')]");
+    static WebDriver driver = PageFactory.getDriver();
+
 
     @ElementTitle("Вход")
     @FindBy(id = "log-in")
@@ -242,7 +244,16 @@ public abstract class AbstractPage extends Page{
             driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
         }
 
+    @ActionTitle("завершает регистрацию перейдя по ссылке для БД")
+    public static void endRegistrationByEmailLinkDB(){
 
+        String url = Stash.getValue("MAIN_URL");
+        String code = Stash.getValue("CODEEMAIL");
+        String userId = Stash.getValue("userIdKey");
+        driver.get(url + "/registration/email/verify?code=" + code + "_" + userId);
+        LOG.info("Закрываем уведомление об успешном подтверждении почты");
+        driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
+    }
     /**
      * Открывает выпадающий список и выбирает оттуда пункт случайным образом
      *
