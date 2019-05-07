@@ -749,7 +749,7 @@ public abstract class AbstractPage extends Page{
         LOG.info("Перешли на страницу [" + driver.getCurrentUrl() + "]");
 
         WebElement inputPhone = driver.findElement(By.id("form_login_phone"));
-        WebElement inputPassword = driver.findElement(By.id("form_login_password"));
+        WebElement inputPassword = driver.findElement(By.name("password"));
 
         slowFillField(inputPhone, phone, 250);
         String actual = inputPhone.getAttribute("value").replaceAll("\\D","");

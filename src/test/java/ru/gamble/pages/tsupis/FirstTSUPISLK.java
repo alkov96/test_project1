@@ -30,28 +30,28 @@ public class FirstTSUPISLK extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FirstTSUPISLK.class);
     static WebDriver driver = PageFactory.getDriver();
 
-    @FindBy(xpath = "//div[@class='contract-details-content']")
+    @FindBy(xpath = "//img[contains(@src,'https://23bet.itasystems.ru')]")
     private WebElement pageTitle;
 
     @ElementTitle("Номер карты")
     @FindBy(name = "number")
     private WebElement numberCardInput;
 
-    @ElementTitle("ММ")
-    @FindBy(name = "month")
-    private WebElement monthInput;
-
-    @ElementTitle("YY")
-    @FindBy(name = "year")
-    private WebElement yearInput;
+    @ElementTitle("ММ/YY")
+    @FindBy(name = "expirationDate")
+    private WebElement dateInput;
 
     @ElementTitle("Имя и фамилия латиницей")
     @FindBy(name = "name")
     private WebElement nameFamilyLatinInput;
 
     @ElementTitle("Продолжить")
-    @FindBy(xpath = "//input[contains(@value,'Продолжить')]")
+    @FindBy(xpath = "//button[contains(text(),'Продолжить')]")
     private WebElement buttonContinue;
+
+    @ElementTitle("Продолжить и перейти на сайт")
+    @FindBy(xpath = "//*[@id='result-move-start']")
+    private WebElement buttonAndGoContinue;
 
     @ElementTitle("Подтвердить")
     @FindBy(xpath = "//input[contains(@value,'Подтвердить')]")
@@ -123,11 +123,9 @@ public class FirstTSUPISLK extends AbstractPage {
                     fillField(numberCardInput, value);
                     LOG.info("Ввели номер карты [" + numberCardInput.getAttribute("value") + "]");
                 } else if (key.equals("ММ/YY")) {
-                    String[] tmp = value.split("/");
-                    fillField(monthInput, tmp[0]);
-                    LOG.info("Ввели в дате месяц [" + monthInput.getAttribute("value") + "]");
-                    fillField(yearInput, tmp[1]);
-                    LOG.info("Ввели в дате год [" + yearInput.getAttribute("value") + "]");
+                    String tmp = value.replace("/","");
+                    fillField(dateInput, tmp);
+                    LOG.info("Ввели в дате год [" + dateInput.getAttribute("value") + "]");
                 } else if (key.equals("Имя и фамилия латиницей")) {
                     fillField(nameFamilyLatinInput, value);
                     LOG.info("Ввели Имя и фамилию латиницей [" + nameFamilyLatinInput.getAttribute("value") + "]");
