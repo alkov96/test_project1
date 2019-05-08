@@ -580,7 +580,10 @@ public class CommonStepDefs extends GenericStepDefs {
             if (!(sportName.toLowerCase()).equals(sportis.toLowerCase())) {
                 Assertions.fail("Из Ближайших трансляций переход на неправильный спорт. Игра " + stringParse(team1 + team2) + "Вместо " + sportName.toLowerCase() + " перешли в " + sportis.toLowerCase());
             }
-            if (driver.findElement(By.xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
+            if (driver.findElements(By.xpath("//div[contains(@class,'left-menu__list-item-games-row') and contains(@class,'active')]")).isEmpty()){
+                Assertions.fail("страница открылась, но никака игра не выделена активной в ЛМ!");
+            }
+            if (driver.findElement(By.xpath("//div[contains(@class,'left-menu__list-item-games-row') and contains(@class,'active')]//div[contains(@class,'icon icon-video-tv')]")).getAttribute("class").contains("js-hide")) {
                 Assertions.fail("Для игры, у который в виджете Блжайшие трансляции есть кнопка %смотреть% не оказалось видео. Игра " + stringParse(team1 + team2));
             }
             LOG.info("У игры, у которой на виджете БТ есть кнопка Смотреть действительно есть видео. Проверка Успешна");
