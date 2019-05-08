@@ -45,7 +45,7 @@ public class MyBetting extends AbstractPage {
     private WebElement filterByTypeOfBid;
 
     @ElementTitle("поисковая строка")
-    @FindBy(xpath = "//input[contains(@class, 'input-search')]")
+    @FindBy(xpath = "//input[contains(@class,'input-search')]")
     private WebElement search_line;
 
     @FindBy(xpath = "//div[contains(@class,'input888wrpr')]")
@@ -130,15 +130,19 @@ public class MyBetting extends AbstractPage {
         pattern = pattern.replace("ID ","").trim();
 //        ((JavascriptExecutor) driver).executeScript("arguments[0].value = "+pattern+"", search_line);
         search_line.clear();
-        Thread.sleep(2000);
+        search_line.click();
         search_line.sendKeys(pattern);
+        Thread.sleep(1000);
+        search_line.sendKeys((Keys.BACK_SPACE));
+        search_line.sendKeys(pattern.substring(pattern.length()-1));
+
 //        driver.findElement(By.xpath("//input[contains(@class, 'input-search')]")).sendKeys(pattern);
         LOG.info("В строку поиска ввели: " + pattern);
 
         By by = xpath("//tr[contains(@class,'showBetInfo')]");
 
         if (param.equals("id")) {
-            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(by, 0));
+            wait.until(ExpectedConditions.numberOfElementsToBe(by, 1));
             LOG.info("Ввели " + pattern + ". Результат: элемент найден" );
         } else {
             wait.until(ExpectedConditions.numberOfElementsToBeLessThan(by,1));
