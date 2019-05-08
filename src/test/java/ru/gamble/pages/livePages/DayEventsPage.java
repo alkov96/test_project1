@@ -125,14 +125,19 @@ public class DayEventsPage extends AbstractPage {
 
     @ActionTitle("проверяет, добавилось ли событие в избранное")
     public void checkIsEventAddToFav() throws Exception {
-        driver.findElement(By.id("elected")).click();
-        Thread.sleep(5000);
-        if (!driver.findElement(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")).isDisplayed()){
+        driver.findElement(By.id("elected")).click();//нажали на избранное
+
+        try {
+            new WebDriverWait(driver, 10)
+                    .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]"), 0));
+            LOG.info("События добавились в Избранное");
+            driver.findElement(By.id("elected")).click();
+        }
+        catch (Exception e){
             LOG.info("Событие не добавилось в избранное, попробуем ещё раз.");
             addEventToFavourite();
         }
-        else LOG.info("События добавились в Избранное");
-        driver.findElement(By.id("elected")).click();
+
     }
 
 
