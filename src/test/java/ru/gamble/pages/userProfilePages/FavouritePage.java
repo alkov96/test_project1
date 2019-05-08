@@ -144,7 +144,7 @@ public class FavouritePage extends AbstractPage {
         WebElement game = driver.findElement(xpath("//div[@ng-repeat='game in games']//div[contains(@class,'elected__block_data')]/div[not(contains(@class,'blocked'))]/ancestor::div[@class='elected__game']"));//первая игра в списоке игр в избранном
         String nameFavour = game.findElement(xpath("div//div[contains(@class,'elected__teams')]")).getAttribute("title");
         String team1Name = nameFavour.split(" - ")[0].trim();
-        String team2Name = nameFavour.split(" - ")[1].trim();
+        String team2Name = nameFavour.split(" - ").length==1?"":nameFavour.split(" - ")[1].trim();
         LOG.info("Название игры: " + team1Name + " - " + team2Name);
         Stash.put(team1key,team1Name);
         Stash.put(team2key,team2Name);

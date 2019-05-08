@@ -171,7 +171,7 @@ public class MainPage extends AbstractPage {
         String team2 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div[1]")).getAttribute("title").trim();
         String sportName = selectGame.findElement(By.xpath("ancestor::div[contains(@class,'bets-widget-table__inner active')]")).getAttribute("class").split("active-")[1].toLowerCase();
         LOG.info("Игра, на которой будем проверять переход из виджета БТ: " + team1 + " - " + team2 + ". Спорт - " + sportName);
-        selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).click();
+        selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]")).click();
         Stash.put("team1BTkey",team1);
         Stash.put("team2BTkey",team2);
         Stash.put("sportKey",sportName);
