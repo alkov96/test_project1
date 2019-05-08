@@ -90,13 +90,15 @@ public class FavouritePage extends AbstractPage {
     public void goFromFavourite(){
         boolean flag = true;
         String period = Stash.getValue("keyPeriod");
+        By xpathMyGames = By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']");
         List<WebElement> allMyGames = driver.findElements(By.xpath("//div[contains(@class,'elected-box-scroll')]//div[@game='game']"));
         List<String> names = Stash.getValue("nameGameKey");
         List<String> teams = new ArrayList<>();
         names.forEach(name -> teams.add(CommonStepDefs.stringParse(name)));
         List<String> types = Stash.getValue("typeGameKey");
         LOG.info("Переход из избранного на игры");
-        for (int MyGameN = 0; MyGameN < allMyGames.size(); MyGameN++) {
+        int MyGameN = 0;
+        while (MyGameN<driver.findElements(xpathMyGames).size()) {
             String nameMyGame = allMyGames.get(MyGameN).findElement(By.xpath("div[1]//div[contains(@class,'elected__teams')]")).getAttribute("title");
             int index;
             index = teams.indexOf(CommonStepDefs.stringParse(nameMyGame));
@@ -134,6 +136,7 @@ public class FavouritePage extends AbstractPage {
             }
             driver.findElement(By.xpath("//*[@id='elected']")).click();
             CommonStepDefs.workWithPreloader();
+            MyGameN++;
         }
     }
 

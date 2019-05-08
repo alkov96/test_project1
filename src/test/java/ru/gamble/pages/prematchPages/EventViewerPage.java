@@ -362,7 +362,7 @@ public class EventViewerPage extends AbstractPage {
 
         LOG.info("Проверка страницы прематч при включенном фильтре = " + expectedPeriod);
 
-        String selectPeriod = driver.findElement(By.xpath("//div[@class = 'left-menu__search left-menu-filters']/ng-include[1]/div[1]/div[2]/div[1]/div[1]")).getAttribute("innerText");
+        String selectPeriod = driver.findElement(By.xpath("//div[@class = 'left-menu__search left-menu-filters']//div[contains(@class,'periods__input')]")).getAttribute("innerText");
         LOG.info("Теперь проверим что фильтр в нужном состоянии "+expectedPeriod);
         if (!selectPeriod.equals(expectedPeriod)) {
             flag=false;
