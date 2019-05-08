@@ -130,6 +130,7 @@ public class MyBetting extends AbstractPage {
         pattern = pattern.replace("ID ","").trim();
 //        ((JavascriptExecutor) driver).executeScript("arguments[0].value = "+pattern+"", search_line);
         search_line.clear();
+        Thread.sleep(1000);
         search_line.click();
         search_line.sendKeys(pattern);
         Thread.sleep(1000);
@@ -402,7 +403,7 @@ public class MyBetting extends AbstractPage {
         helpString.setLength(0);
 
 //        sum.insert(0,  element.findElement(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[@class='bets-table__cell bets-table__cell_sum']/span")).getAttribute("innerText") + " ");
-        sum.insert(0,  element.findElement(xpath(".//tr[contains(@class,'showBetInfo bets-table__row')]/td[@class='bets-table__cell bets-table__cell_sum']/span")).getAttribute("innerText").trim());
+        sum.insert(0,  element.findElement(xpath(".//tr[contains(@class,'showBetInfo')]/td[contains(@class,'bets-table__cell bets-table__cell_sum')]/span")).getAttribute("innerText").trim());
         if (!sum.toString().contains("Б")) {sum.append(" Р");}
         bet.setSum(sum.toString().replace(".00","").replace(".0","").replaceAll(" ",""));
         if (!typeBet.equals("ординар")){
