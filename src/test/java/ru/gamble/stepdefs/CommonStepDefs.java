@@ -375,7 +375,7 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     @Когда("^генерим email в \"([^\"]*)\"$")
     public static void generateEmailAndSave(String key) {
-        String value = "testregistrator+" + System.currentTimeMillis() + "@inbox.ru";
+        String value = "testregistrator" + System.currentTimeMillis() + "@mailinator.com";
         LOG.info("Сохраняем в память key[" + key + "] <== value[" + value + "]");
         Stash.put(key, value);
     }
