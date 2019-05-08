@@ -300,7 +300,7 @@ public class EventViewerPage extends AbstractPage {
                             dateGame = formatter.parse(day + " " + game.getAttribute("innerText"));
                             if ((dateGame.getTime() <= Period.getTime()) == inPeriod) {//если игра подходит
                                 nameGamefull = game.findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("innerText");
-                                CommonStepDefs.addStash("nameGameKey",nameGamefull);
+                                CommonStepDefs.addStash("nameGameKey",nameGamefull.replaceAll("\n"," "));
                                 CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
                                 CommonStepDefs.addStash("typeGameKey",typeGame);
                                 if (adding) {
@@ -429,32 +429,18 @@ public class EventViewerPage extends AbstractPage {
         driver.findElement(By.id("sports-toggler")).click();
         driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]")).click();
         CommonStepDefs.workWithPreloader();
-        int myGamesCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
+        String xpathFavouriteGames = "//*[@id='sports-list-container']//li[contains(@class,'left-menu__favorite-list-item')]";
+        int myGamesCount = driver.findElements(By.xpath(xpathFavouriteGames)).size();
 
         int sizeFavouriteUpdate;
 
         for (int count = myGamesCount; count >0; count--) {
-            driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li[1]/div[1]/div[1]/div[2]")).click();//убираем игру из избранного в премтче
+            driver.findElement(By.xpath(xpathFavouriteGames + "//div[contains(@class,'fav-game-star')]")).click();//убираем игру из избранного в премтче
+            new WebDriverWait(driver,10)
+                    .withMessage("Игра не удалилась из избранного. в Избранном в ЛМ количество игр = " + driver.findElements(By.xpath("//*[@id='sports-list-container']//li[contains(@class,'left-menu__favorite-list-item')]")).size())
+                    .until(ExpectedConditions.numberOfElementsToBeLessThan(By.xpath(xpathFavouriteGames),myGamesCount));
 
-            int countSec=0;
-            while (countSec<5)
-            {
-                sizeFavouriteUpdate = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
-                if (sizeFavouriteUpdate < myGamesCount) {
-                    break;
-                }
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                countSec++;
-                if (countSec==5){
-                    Assertions.fail("Не удалилась игра из избранного через левое меню. Было игр " + myGamesCount + ",осталось " + sizeFavouriteUpdate);
-                }
-            }
-
-            myGamesCount = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")).size();
+            myGamesCount = driver.findElements(By.xpath(xpathFavouriteGames)).size();
         }
     }
 

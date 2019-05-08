@@ -189,16 +189,15 @@ public class VewingEventsPage extends AbstractPage {
         }
         else {
             String nameOnLeftMenu =
-                    driver.findElement(xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]" +
-                            "//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");
+                    driver.findElement(xpath("//li[contains(@class,'left-menu__list-item-games')]/div[contains(@class,'active')]//div[@class='left-menu__list-item-games-names']")).getAttribute("innerText");
             Assert.assertTrue(
                     "В левом меню выделена желтым неправильная игра. Вместо " + team1Name + " выделена " +nameOnLeftMenu,
                     CommonStepDefs.stringParse(nameOnLeftMenu).equals(team1Name));
         }
 
         LOG.info("Проверка что в центральной части окна открыта нужная игра");
-        List<WebElement> team = driver.findElements(By.xpath("//div[@class='live-game-summary__game-content']/div[1]/ng-include[1]/div[1]/div/div/p"));
-        String nameOnPage = CommonStepDefs.stringParse(team.get(0).getAttribute("title").trim() + " - " + team.get(1).getAttribute("title").trim());
+        String[] team = driver.findElements(By.xpath("//div[contains(@class,'game-score')]")).get(0).getAttribute("innerText").split("\n\n");//не спрашивай...
+        String nameOnPage = team.length==1?team[0]:CommonStepDefs.stringParse(team[0].trim() + " - " + team[2].trim());
         if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameOnPage))) {
             flag=false;
             LOG.error("В лайв открылась неправильная игра. " + nameOnPage + " вместо " + team1Name);
@@ -217,14 +216,15 @@ public class VewingEventsPage extends AbstractPage {
      */
     public static boolean inLeftMenuGameSelected(String team1Name){
         boolean flag = true;
+        StringBuilder nameActiveGame = new StringBuilder();
         LOG.info("Смотрим что нужная игра выделена желтым в левом меню в Моих Играх (если эта игра есть в Избранном)");
-        List<WebElement> favouriteGames = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")); // избранные игры, отображаемые в левом меню
+        List<WebElement> favouriteGames = driver.findElements(By.xpath("//*[@id='sports-list-container']//li[contains(@class,'left-menu__favorite-list-item')]")); // избранные игры, отображаемые в левом меню
         for (int count = 0; count < favouriteGames.size(); count++) {
-            String nameFavouriteGame = favouriteGames.get(count).findElement(By.xpath("div[1]/div[1]/p[1]")).getAttribute("title");
+            String nameFavouriteGame = favouriteGames.get(count).findElement(By.xpath(".//div[@class='left-menu__list-item-games-names']")).getAttribute("innerText");
             nameFavouriteGame = CommonStepDefs.stringParse(nameFavouriteGame);
             if (team1Name.equals(nameFavouriteGame)) {
                 LOG.info("В лайве открыта игра " + nameFavouriteGame);
-                if (!driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li[" + (count + 1) + "]")).getAttribute("class").contains("active")) {
+                if (!driver.findElement(By.xpath("//*[@id='sports-list-container']//li[contains(@class,'left-menu__favorite-list-item') and position()=" + (count +1) + "]")).getAttribute("class").contains("active")) {
                     flag=false;
                     LOG.error("В лайв открытая игра из Избранного не выделена активной в левом меню");
                 }
@@ -232,10 +232,12 @@ public class VewingEventsPage extends AbstractPage {
             }
         }
         LOG.info("Смотрим что нужная игра выделена желтым в левом меню в общем списке игр");
-        String nameActiveGame = driver.findElement(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");////название активной игр
-        if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameActiveGame))){
+        //String nameActiveGame = driver.findElement(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");////название активной игр
+        nameActiveGame.setLength(0);
+        driver.findElements(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).forEach(el->nameActiveGame.append(el.getAttribute("innerText")));
+        if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameActiveGame.toString()))){
             flag=false;
-            LOG.error("В ЛАЙВе игра на которую перешли не выделена активной в левом меню. Название активной игры:" + CommonStepDefs.stringParse(nameActiveGame) + ", а ожидалось" + CommonStepDefs.stringParse(team1Name));
+            LOG.error("В ЛАЙВе игра на которую перешли не выделена активной в левом меню. Название активной игры:" + CommonStepDefs.stringParse(nameActiveGame.toString()) + ", а ожидалось" + CommonStepDefs.stringParse(team1Name));
         }
         return flag;
     }
