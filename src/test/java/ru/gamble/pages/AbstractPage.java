@@ -672,7 +672,10 @@ public abstract class AbstractPage extends Page{
      */
     public void closeSports(){
         WebDriver driver = PageFactory.getDriver();
-        clickIfVisible(driver.findElement(By.id("sports-toggler")));
+        if (!driver.findElement(By.id("sports-toggler")).getAttribute("class").contains("hide")){
+            clickIfVisible(driver.findElement(By.id("sports-toggler")));
+        }
+
     }
 
     public void clickIfVisible(WebElement element){

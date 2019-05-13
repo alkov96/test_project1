@@ -59,7 +59,7 @@ public class MultimonitorPage extends AbstractPage {
         String name = names.get(index);
         LOG.info("В ЛМ в МОИХ ИГРАХ будем выбирать игру с названием " + name);
         Stash.put(keyName,name);
-        List<WebElement> listInMyGames = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']//p[contains(@class,'left-menu__list-item-games-teams')]"));
+        List<WebElement> listInMyGames = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']//div[contains(@class,'left-menu__list-item-games-names')]"));
         listInMyGames.forEach(str -> teams.add(CommonStepDefs.stringParse(str.getAttribute("innerText"))));
         index = teams.indexOf(CommonStepDefs.stringParse(name));
         Assert.assertFalse("Игры с таким названием в Избранном нет",index==-1);
@@ -87,7 +87,8 @@ public class MultimonitorPage extends AbstractPage {
         nameInMemory = CommonStepDefs.stringParse(nameInMemory);
         for (WebElement monitor : allMonitors){
             nameOnMonitor.setLength(0);
-            monitor.findElements(By.xpath(".//*[contains(@class,'game-score__box-team-name')]")).forEach(el->nameOnMonitor.append(el.getAttribute("innerText")));
+            String[] nameM = monitor.findElement(By.xpath(".//*[contains(@class,'game-score__inner')]")).getAttribute("innerText").split("\n\n");
+            nameOnMonitor.append(nameM.length==1?nameM[0]:nameM[0] + " - " + nameM[2]);
             LOG.info("На одном из мониторов игра:" + nameOnMonitor.toString());
             if (CommonStepDefs.stringParse(nameOnMonitor.toString()).equals(nameInMemory)){
                 LOG.info("Нашлась нужная игра на мониторах. Проверка прошла успешно");
