@@ -11,10 +11,13 @@ import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
 import javax.mail.Session;
 import java.util.logging.FileHandler;
+
+import static java.rmi.server.RemoteServer.getLog;
 
 //del /q C:\Workspace\autotests-888-m\allure-results
 @RunWith(Cucumber.class)
@@ -23,7 +26,7 @@ import java.util.logging.FileHandler;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm","pretty"},
-        tags = {"@smoke"})
+        tags = {"@smoke,@regress"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);

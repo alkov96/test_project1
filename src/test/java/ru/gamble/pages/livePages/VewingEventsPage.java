@@ -197,7 +197,8 @@ public class VewingEventsPage extends AbstractPage {
 
         LOG.info("Проверка что в центральной части окна открыта нужная игра");
         String[] team = driver.findElements(By.xpath("//div[contains(@class,'game-score')]")).get(0).getAttribute("innerText").split("\n\n");//не спрашивай...
-        String nameOnPage = team.length==1?team[0]:CommonStepDefs.stringParse(team[0].trim() + " - " + team[2].trim());
+        String nameOnPage = team.length==1?team[0]:team[0].trim() + " - " + team[2].trim();
+        LOG.info("На странице открыта игра " + nameOnPage);
         if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameOnPage))) {
             flag=false;
             LOG.error("В лайв открылась неправильная игра. " + nameOnPage + " вместо " + team1Name);

@@ -219,6 +219,7 @@ public class EventViewerPage extends AbstractPage {
 
     public void gamePrematchAtPeriod(String period, boolean inPeriod, boolean adding) throws Exception {
         String nameGamefull;
+        LOG.info("period: " + period + "\ninPeriod: " + inPeriod + "\nadding: " + adding);
         int sizeFavourite = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']/li")).size();
         boolean gameIsAdding = false;
         int count;
