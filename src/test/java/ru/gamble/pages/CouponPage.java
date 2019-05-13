@@ -472,6 +472,9 @@ public class CouponPage extends AbstractPage {
 
         LOG.info("Жмём 'Заключить пари'");
         buttonBet.click();
+        if (!driver.findElements(By.xpath("//div[contains(@class,'coupon__message_error')]/div")).isEmpty()){
+            Assert.fail("В купоне есть ошибка: " + driver.findElement(By.xpath("//div[contains(@class,'coupon__message_error')]/div")).getAttribute("innerText"));
+        }
         LOG.info("Ждём пока прогресс-бар принятия ставки заполнится на 100%");
         new WebDriverWait(driver,30)
                 .withMessage("За 30 секунд прогресс-бар не стал равен 100%, значит ставка не принялась")
