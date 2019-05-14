@@ -303,7 +303,7 @@ public class MyBetting extends AbstractPage {
         int  cou = 3;
         LOG.info("Сначала включаем фильтр 'Ожидается'");
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]/span")));
-        driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]/span")).click();
+        driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select__placeholder option')]")).click();
         driver.findElement(xpath("//table[@class='bets-table__table']//div[contains(@class,'custom-select-der')]//span[normalize-space(text())='Ожидается']")).click();
         CommonStepDefs.workWithPreloader();
 
