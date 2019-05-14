@@ -111,6 +111,31 @@ public class MultimonitorPage extends AbstractPage {
         driver.findElement(byError).findElement(By.xpath(".//div[@class='modal__closeBtn closeBtn']")).click();
     }
 
+
+
+    @ActionTitle("добавляет на монитор игру")
+    public void addGameWithVideo(String hasVideo, String keyName){
+        boolean withVideo = hasVideo.equals("с видео");
+      //  Stash.put("nameGameKey","");
+        try {
+            new VewingEventsPage().gameLiveVideo(withVideo, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<String> names = Stash.getValue("nameGameKey");
+        String name = names.get(0).trim();
+        String team1Split = name.split(" ")[0];
+        String team2Split = name.split(" ")[(name.split(" ").length)-1];
+        LOG.info("Игру нашли: " + name);
+
+//        driver.findElement(By.id("multimonitor")).click();
+//        CommonStepDefs.workWithPreloader();
+//        driver.findElement(By.xpath("//div[@class='left-menu__list-item-games-names' and contains(text(),'" + name + "')]")).click();
+        driver.findElement(By.xpath("//div[@class='left-menu__list-item-games-names']/*[contains(text(),'" + team1Split + "')]/following-sibling::*[contains(text(),'" + team2Split + "')]")).click();
+        Stash.put("nameGameKey","");
+    }
+
     @ActionTitle("добавляет на монитор игры, пока их не станет")
     public void addMonitorWithCheck(String howmuch,String keyListGames){
         int count = Integer.valueOf(howmuch);

@@ -783,6 +783,9 @@ public class EventViewerPage extends AbstractPage {
         wait.withMessage("Футбол не развернулся спустя 10 секунд");
         wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__submenu']/li"),0));
         List<WebElement> regions = football.findElements(By.xpath(".//ul[@class='left-menu__submenu']/li"));
+        if (regions.size()>3){//все регионы пролистывать - это очень долго. пусть будет всего 3 региона
+            regions=regions.subList(0,3);
+        }
         LOG.info("Ищем игру со ставкой Точный счёт, чей коэф > 50.0. Потмоуч о у ставок с меньшим коэффициентом вероятен большой максимум");
         for (WebElement region : regions){
             if(!region.getAttribute("class").contains("active")){
@@ -794,9 +797,9 @@ public class EventViewerPage extends AbstractPage {
                 for (WebElement competition:comps){
                     competition.click();
                     workWithPreloader();
-                    List<WebElement> games = driver.findElements(By.xpath("//div[contains(@class,'bets-block prematch-competition-games__item')]"));
+                    List<WebElement> games = driver.findElements(By.xpath("//div[contains(@class,'bets-block_single-row')]"));
                     for (WebElement game : games){
-                        game.findElement(By.xpath(".//div[contains(@class,'bets-block__header-inner_left')]")).click();
+                        game.findElement(By.xpath(".//div[contains(@class,'bets-block__header-teams')]")).click();
                         workWithPreloader();
                         has = driver.findElements(By.xpath("//div[@class='game-container__bets-area-wrpr']//div[contains(@class,'bets-block')]//span[@class='bets-block__header-bet-name' and contains(@title,'Точный счет')]")).size();
                         if (has==0){

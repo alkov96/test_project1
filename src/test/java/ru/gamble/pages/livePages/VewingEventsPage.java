@@ -61,9 +61,9 @@ public class VewingEventsPage extends AbstractPage {
 
     public void gameLiveVideo(boolean withVideo, boolean adding){
         int sizeFavourite = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']/li")).size();
-        LOG.info("Переходим в лайв");
-        driver.findElement(By.id("live")).click();
-        CommonStepDefs.workWithPreloader();
+//        LOG.info("Переходим в лайв");
+//        driver.findElement(By.id("live")).click();
+//        CommonStepDefs.workWithPreloader();
 
 //если меню свернуто - разворачиваем
 
@@ -108,11 +108,12 @@ public class VewingEventsPage extends AbstractPage {
                 }
                 CommonStepDefs.addStash("nameGameKey",nameGamefull.replaceAll("\n",""));
                 CommonStepDefs.addStash("typeGameKey",typeGame);
+                LOG.info("разворачиваем регион, чтобы было видно игру");
+                if (!driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).isDisplayed()){
+                    driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).findElement(By.xpath("./ancestor::div[contains(@class,'poup-sports')]/preceding-sibling::h4")).click();
+                }
                 if (adding) {
                     LOG.info("Нужная игра найдена. Добавляем ее в Избранное.");
-                    if (!driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).isDisplayed()){
-                        driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).findElement(By.xpath("./ancestor::div[contains(@class,'poup-sports')]/preceding-sibling::h4")).click();
-                    }
                     driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).click();
                     new WebDriverWait(driver,10)
                             .withMessage("Игра в избранное не добавилась!!")
@@ -120,19 +121,19 @@ public class VewingEventsPage extends AbstractPage {
                 }
                 gameIsAdding = true;
             }
+            if (gameIsAdding) break;
             //сворачиваем снова все виды спорта, чтобы все они помещались на экран. иначе, если не видно элемента (не помещается) на странице он не найдется
             LOG.info("Сворачиваем все виды спорта.");
             if (!menu.getAttribute("class").contains("collapsed")) menu.click();
             closeSports();
-            if (gameIsAdding) break;
+
 
         }
         if (!menu.getAttribute("class").contains("collapsed")) menu.click();
         if (driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).getAttribute("class").contains("active")) { //прежде чем выйти из это функции вернем все к первоналчальному стостоянию
-            driver.findElement(By.xpath("//div[@id='video-filter-toggler']/i")).click();//т.е. выключим на всякий лучай ильтр по видео
+            driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).click();//т.е. выключим на всякий лучай ильтр по видео
             CommonStepDefs.workWithPreloader();
         }
-
     }
 
     /**
