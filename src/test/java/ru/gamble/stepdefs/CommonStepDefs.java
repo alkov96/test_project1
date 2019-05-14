@@ -2996,16 +2996,29 @@ public class CommonStepDefs extends GenericStepDefs {
     public static void getLogg(Scenario scenario){
         LOG.info("fail? " + scenario.isFailed());
         LOG.info("АФТЕРРР");
+        File file = new File("src" + sep + "test" + sep + "resources" + sep + "logger.txt");
         if (scenario.isFailed()) {
             try (InputStream is = Files.newInputStream(Paths.get("src" + sep + "test" + sep + "resources" + sep + "logger.txt"))) {
                 Allure.addAttachment("LOG", is);
-                new File("src" + sep + "test" + sep + "resources" + sep + "logger.txt").delete();
+                FileWriter nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "logger.txt", false);
+                nfile.write("");
+                nfile.close();
+                file.delete();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         else {
-            new File("src" + sep + "test" + sep + "resources" + sep + "logger.txt").delete();
+            FileWriter nfile = null;
+            try {
+                nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "logger.txt", false);
+                nfile.write("");
+                nfile.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            file.delete();
         }
     }
 
@@ -3128,11 +3141,6 @@ public class CommonStepDefs extends GenericStepDefs {
          Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
                  firstN-diffLong,secondN);
          LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
-    }
-
-    @Когда("^лала$")
-    public void lala(){
-        System.out.toString();
     }
 }
 
