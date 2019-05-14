@@ -39,7 +39,7 @@ public class MainBannerPage extends AbstractPage{
 
     public MainBannerPage() {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(dotsOnBanner,5, 10);
+        tryingLoadPage(top_banner,5, 10);
     }
 
 @ActionTitle("запоминает состояние главного баннера")

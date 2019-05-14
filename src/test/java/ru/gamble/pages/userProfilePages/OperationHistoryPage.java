@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -91,6 +92,7 @@ public class OperationHistoryPage extends AbstractPage {
 
         currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         page.click();
+        CommonStepDefs.workWithPreloader();
 
         newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         LOG.info("Перешли на страницу  [" + newPage + "]");

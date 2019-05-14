@@ -81,7 +81,7 @@ public class Generators {
      */
     @ActionTitle("генерит email в")
     public void generateEmailAndSave(String key){
-        String value = "testregistrator" + System.currentTimeMillis() + "@inbox.ru";
+        String value = "testregistrator" + System.currentTimeMillis() + "@mailinator.com";
         LOG.info("Сохраняем в память (ключ):" + key + ":(значение)::" + value);
         Stash.put(key,value);
     }

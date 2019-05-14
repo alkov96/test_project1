@@ -49,6 +49,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.*;
@@ -1116,6 +1118,11 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Записали хэш текущего пароля " + currentPassword + " для пользователя " + email);
     }
 
+    @After()
+    public void getLoglal(Scenario scenario) {
+        getLogg(scenario);
+    }
+
     @After(value = "@ChangePassword_C1043")
     public void revertCurrentPassword() {
         String sqlRequest = "update gamebet.`user` set password = '" + Stash.getValue("currentPassword") + "' WHERE `email` = '" + Stash.getValue("currentUser") + "'";
@@ -1518,13 +1525,13 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
     public void searchUserStatus2(String status, String keyEmail) {
         //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7933%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
-        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator7933%inbox.ru' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id";
+        String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator%mailinator.com' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id";
         searchUser(keyEmail, sqlRequest);
     }
 
     @Когда("^поиск акаунта для проверки изменений базовых параметров \"([^\"]*)\"$")
     public void searchUserForEdit(String keyEmail){
-        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator7933%' AND registration_stage_id=2 ORDER BY id DESC";
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE email LIKE 'testregistrator%mailinator.com' AND registration_stage_id=2 ORDER BY id DESC";
         List<String> results = workWithDBAndGetFullColumn(sqlRequest);
         int count = 0;
         int count2 = 0;
@@ -2906,7 +2913,9 @@ public class CommonStepDefs extends GenericStepDefs {
                 Assert.assertTrue(
                         "Раздел ПРЕМАТЧ не активен",
                         driver.findElement(By.xpath("//*[@id='prematch']/..")).getAttribute("class").contains("active"));
-                String dateTimeGameOnP = driver.findElement(By.xpath("//div[contains(@class,'prematch-competition-games_active')]//*[contains(@class,'prematch-competition-games__item-date')]")).getAttribute("innerText");
+                String timeGameOnP = driver.findElement(By.xpath("//div[contains(@class,'bets-block_single-row') and contains(@class,'active')]//*[contains(@class,'bets-block__header-left-info')]")).getAttribute("innerText");
+                String dateGameOnP = driver.findElement(By.xpath("//div[contains(@class,'bets-block_single-row') and contains(@class,'active')]/ancestor-or-self::div[contains(@class,'prematch-competition')]//div[contains(@class,'prematch-competition__header-date')]")).getAttribute("innerText");
+                String dateTimeGameOnP = timeGameOnP + " - " + dateGameOnP;
                 SimpleDateFormat formatPrematch = new SimpleDateFormat("hh:mm - dd MMM yyyy");
                 Calendar datePrematch = Calendar.getInstance();
                 Calendar dateTimeGame = Stash.getValue(keyData);
@@ -2984,6 +2993,36 @@ public class CommonStepDefs extends GenericStepDefs {
             final byte[] screenshotCoupon = ((TakesScreenshot) PageFactory.getWebDriver()).getScreenshotAs(OutputType.BYTES);
             InputStream targetStream = new ByteArrayInputStream(screenshotCoupon);
             Allure.addAttachment("Результат",targetStream);
+        }
+    }
+
+
+    public static void getLogg(Scenario scenario){
+        LOG.info("fail? " + scenario.isFailed());
+        LOG.info("АФТЕРРР");
+        File file = new File("src" + sep + "test" + sep + "resources" + sep + "logger.txt");
+        if (scenario.isFailed()) {
+            try (InputStream is = Files.newInputStream(Paths.get("src" + sep + "test" + sep + "resources" + sep + "logger.txt"))) {
+                Allure.addAttachment("LOG", is);
+                FileWriter nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "logger.txt", false);
+                nfile.write("");
+                nfile.close();
+                file.delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            FileWriter nfile = null;
+            try {
+                nfile = new FileWriter("src" + sep + "test" + sep + "resources" + sep + "logger.txt", false);
+                nfile.write("");
+                nfile.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            file.delete();
         }
     }
 
