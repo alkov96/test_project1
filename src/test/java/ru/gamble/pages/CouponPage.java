@@ -719,11 +719,11 @@ public class CouponPage extends AbstractPage {
     @ActionTitle("включает фильтр в заключённых пари")
     public void filterForHitoryInCoupon(String filter) {
         CommonStepDefs.workWithPreloader();
-        By filtrHeadXpath = By.xpath("//div[contains(@class,'custom-select__placeholder_small option')]");
+        By filtrHeadXpath = By.xpath("//div[contains(@class,'custom-select__placeholder_small option')]/span");
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(filtrHeadXpath));
         driver.findElement(filtrHeadXpath).click();
         tryToClick(driver.findElement(filtrHeadXpath).
-                findElement(By.xpath("following-sibling::div[contains(@class,'scroll-contain')]//span[normalize-space(text())='" + filter + "']")));
+                findElement(By.xpath("./../following-sibling::div[contains(@class,'scroll-contain')]//span[normalize-space(text())='" + filter + "']")));
         String currentFilter = driver.findElement(filtrHeadXpath).getAttribute("innerText");
         Assert.assertTrue(
                 "Не сработал фильтр для истории заключенных пари в купоне. вместо " + filter + ", включен " + currentFilter,
