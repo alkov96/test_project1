@@ -12,6 +12,7 @@ import io.qameta.allure.Allure;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+import net.minidev.json.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -2448,11 +2449,11 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^запрос к WSS для нулевой маржи \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
-    public void requestByWSSAndSaveTest(String wSSPath, String KeyInStash) {
+    public void requestByWSSAndSaveTest(String wSSPath, String KeyInStash) throws net.minidev.json.parser.ParseException {
         requestToWSSTest(Stash.getValue(wSSPath), KeyInStash);
     }
 
-    private void requestToWSSTest(String requestFull, String keyStash) {
+    private void requestToWSSTest(String requestFull, String keyStash) throws net.minidev.json.parser.ParseException {
 
 
         StringBuilder res = new StringBuilder();
@@ -2473,16 +2474,19 @@ public class CommonStepDefs extends GenericStepDefs {
         }
         String result  = res.toString();
         LOG.info(result);
-        if (!result.isEmpty()) {
+        JSONParser parser = new JSONParser();
+        JSONObject jsonObject =  (JSONObject) parser.parse(result);
+        jsonObject = (JSONObject) jsonObject.get("data");
+        jsonObject = (JSONObject) jsonObject.get("data");
+        if (jsonObject.get("sport").toString().equals("{}")){
+            throw new AutotestError("Ошибка! По WSS получили[" + jsonObject.get("sport").toString() + "]");
+        }
             Stash.put(keyStash, result);
             Integer size_res = result.split("sport").length;
             Stash.put("key_size", size_res);
-
-        } else {
-            throw new AutotestError("Ошибка! По WSS получили[" + result + "]");
         }
 
-    }
+
 
 
 
