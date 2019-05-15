@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.stepdefs.CommonStepDefs.switchHandle;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.PERIOD;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
@@ -103,7 +104,7 @@ public class EventViewerPage extends AbstractPage {
             LOG.info("сворачиваем все виды спорта");
             closeSports();
             sport=driver.findElements(xpathSport).get(i);
-            LOG.info("разворачиваем нужный спорт");
+            LOG.info("разворачиваем нужный спорт " + sport.getAttribute("innerText").split("\n")[0]);
             clickIfVisible(sport);
             wait
                 .withMessage("Спорт " + sport.getAttribute("innerText").split("\n")[0] + " не раскрылся")
@@ -137,7 +138,7 @@ public class EventViewerPage extends AbstractPage {
             region = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).get(i);
             if (region.getAttribute("class").contains("active")) {
                 LOG.info("сворачиваем регион " + region.getAttribute("innerText").split("\n")[0]);
-                clickIfVisible(region);
+                clickIfVisible(region.findElement(By.xpath(".//div[contains(@class,'icon-arrow')]")));
             }
         }
     }
@@ -154,6 +155,7 @@ public class EventViewerPage extends AbstractPage {
         for (int i=0;i<countCompetit;i++){
             checkMenuIsOpen(true);
             competition = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).get(region).findElements(xpathCompetition).get(i);
+            LOG.info("Выбираем сорвенование в этом регионе");
             clickIfVisible(competition);//кликнули на выбранное сорвенование в регионе. теперь в центральной части страниыв отображаются игры только этого соревнования
             setExpandCollapseMenusButton(false); //сворачиваем левое меню.чтобы ЦО была полностью видна
             checkGameOnCenter(valuePeriod);
@@ -161,6 +163,13 @@ public class EventViewerPage extends AbstractPage {
     }
 
     private void checkGameOnCenter(String valuePeriod){
+        SimpleDateFormat formatterOnlyDate = new SimpleDateFormat("dd MMM yyyy", new Locale("ru"));
+        Calendar today = Calendar.getInstance();
+        String segodnya = formatterOnlyDate.format(today.getTime());
+        today.add(Calendar.DAY_OF_YEAR,1);
+        String zavtra = formatterOnlyDate.format(today.getTime());
+        today.add(Calendar.DAY_OF_YEAR,1);
+        String poslezavtra = formatterOnlyDate.format(today.getTime());
         By xpathToDate = By.xpath("../preceding-sibling::div[contains(@class,'prematch-competition__header')]/div[contains(@class,'prematch-competition__header-date')]");
         By xpathToTime = By.xpath(".//div[contains(@class,'bets-block__header-left-info')]");
 //        LOG.info("Закроем ЛМ чтобы не мешалось");
@@ -180,14 +189,32 @@ public class EventViewerPage extends AbstractPage {
         }
         SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy k:mm");
         period.add(Calendar.HOUR,hoursPeriod);
+        String dateGame=new String();
         for (int i=0;i<dateGamesString.size();i++){
             LOG.info("Проверяем игру " + nameGames.get(i));
+            dateGame = dateGamesString.get(i);
+            int ind = dateGame.indexOf(":");
+            dateGame = dateGame.substring(0,ind-3);
+            switch (dateGame){
+                case "Сегодня":
+                    dateGame=segodnya + " " + dateGamesString.get(i).substring(ind-2);
+                    break;
+                case "Завтра":
+                    dateGame=zavtra + " " + dateGamesString.get(i).substring(ind-2);
+                    break;
+                case "Послезавтра":
+                    dateGame=poslezavtra + " " + dateGamesString.get(i).substring(ind-2);
+                    break;
+                default:
+                    dateGame = dateGamesString.get(i);
+                    break;
+            }
             try {
-                dateOneGame.setTime(format.parse(dateGamesString.get(i)));
+                dateOneGame.setTime(format.parse(dateGame));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            Assert.assertTrue("Игра не соответсвтует выбранному периоду " + valuePeriod + ":: время игры " + dateGamesString.get(i),
+            Assert.assertTrue("Игра не соответсвтует выбранному периоду " + valuePeriod + ":: время игры " + dateGame,
                     dateOneGame.before(period));
             LOG.info("Игра соответсвует выбранному периоду");
             i++;
@@ -229,7 +256,13 @@ public class EventViewerPage extends AbstractPage {
         int hour = Integer.valueOf(period.substring(0, period.indexOf("час") - 1));
         Date Period = new Date(System.currentTimeMillis() + hour * 3600 * 1000);
         SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", new Locale("ru"));
-
+        SimpleDateFormat formatterOnlyDate = new SimpleDateFormat("dd MMM yyyy", new Locale("ru"));
+        Calendar today = Calendar.getInstance();
+        String segodnya = formatterOnlyDate.format(today.getTime());
+        today.add(Calendar.DAY_OF_YEAR,1);
+        String zavtra = formatterOnlyDate.format(today.getTime());
+        today.add(Calendar.DAY_OF_YEAR,1);
+        String poslezavtra = formatterOnlyDate.format(today.getTime());
 
         WebElement menu = driver.findElement(By.id("menu-toggler"));
         if (!menu.getAttribute("class").contains("collapsed")) menu.click();
@@ -297,6 +330,18 @@ public class EventViewerPage extends AbstractPage {
                     for (int index = 0; index < allDates.size(); index++) {
                         WebElement dateInTour = allDates.get(index);
                         String day = dateInTour.getAttribute("innerText");
+                        switch (day){
+                            case "Сегодня":
+                                day=segodnya;
+                                break;
+                            case "Завтра":
+                                day=zavtra;
+                                break;
+                            case "Послезавтра":
+                                day=poslezavtra;
+                                break;
+                        }
+
                         for (WebElement game: allDates.get(index).findElements(byTime)){//для каждой даты несколько игр может быть на разное время. вот продемся по каждой из них
                             dateGame = formatter.parse(day + " " + game.getAttribute("innerText"));
                             if ((dateGame.getTime() <= Period.getTime()) == inPeriod) {//если игра подходит
@@ -451,12 +496,12 @@ public class EventViewerPage extends AbstractPage {
         boolean turnOn = onOrOff.equalsIgnoreCase("включает")?true:false;
         By xpathMultiviewButton = By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]");
 
-        if (!driver.findElements(preloaderOnPage).isEmpty()){
-            LOG.info("Страница не прогрузилась. Обновим её");
-            driver.navigate().refresh();
-            CommonStepDefs.workWithPreloader();
-        }
-
+//        if (!driver.findElements(preloaderOnPage).isEmpty()){
+//            LOG.info("Страница не прогрузилась. Обновим её");
+//            driver.navigate().refresh();
+//            CommonStepDefs.workWithPreloader();
+//        }
+        CommonStepDefs.workWithPreloader();
         LOG.info("\nОткроем левое меню");
         setExpandCollapseMenusButton(true);
         try {

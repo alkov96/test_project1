@@ -46,7 +46,7 @@ public abstract class AbstractPage extends Page{
 
     public static By xpathListBets = xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul");
 
-    public static By preloaderOnPage = By.xpath("//div[contains(@class,'preloader__container')]");
+    public static By preloaderOnPage = By.xpath("//div[contains(@class,'preloader__container') and not(contains(@class,'hide'))]");
     static WebDriver driver = PageFactory.getDriver();
 
 
@@ -709,10 +709,10 @@ public abstract class AbstractPage extends Page{
         if (menu.getAttribute("class").contains("collapsed")!=collapsOrNot){
             menu.click();
             CommonStepDefs.workWithPreloader();
-            if (!driver.findElements(preloaderOnPage).isEmpty()){
-                driver.navigate().refresh();
-                CommonStepDefs.workWithPreloader();
-            }
+//            if (!driver.findElements(preloaderOnPage).isEmpty()){
+//                driver.navigate().refresh();
+//                CommonStepDefs.workWithPreloader();
+//            }
         }
 
         if (collapsOrNot) {
