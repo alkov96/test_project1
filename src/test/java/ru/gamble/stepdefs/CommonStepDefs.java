@@ -3035,6 +3035,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void clearCouponAfter(Scenario scenario) throws InterruptedException {
         getScreenshot(scenario);
         goToMainPage("site");
+        workWithPreloader();
         driver.findElement(By.id("prematch")).click(); //переходим в прематч
         driver.navigate().refresh();
         workWithPreloader();

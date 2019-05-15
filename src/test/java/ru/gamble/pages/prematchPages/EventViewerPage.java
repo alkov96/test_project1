@@ -232,13 +232,17 @@ public class EventViewerPage extends AbstractPage {
     @ActionTitle("находит игру по фильтру")
     public void searchGamePrematchAtPeriod(String period, String inPeriod, String adding) {
         boolean add = adding.equals("и добавляет в избранное");
+        List list = Stash.getValue("nameGameKey");
+        int nameInMemory = list==null?0:list.size();
         try {
             gamePrematchAtPeriod(period, inPeriod.equals("раньше"), adding.equals("и добавляет в избранное"));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (Stash.getValue("nameGameKey")==null){
-            Assertions.fail("Игры не найдена");
+        list = Stash.getValue("nameGameKey");
+        int nameInMemory2 = list==null?0:list.size();
+        if (nameInMemory==nameInMemory2){
+            Assertions.fail("Игра не найдена");
         }
         LOG.info("Игра по фильтру времени " + period + " (" + inPeriod + ") найдена: ");
         LOG.info(Stash.getValue("nameGameKey") + " время начала " + Stash.getValue("timeGameKey"));
@@ -341,7 +345,6 @@ public class EventViewerPage extends AbstractPage {
                                 day=poslezavtra;
                                 break;
                         }
-
                         for (WebElement game: allDates.get(index).findElements(byTime)){//для каждой даты несколько игр может быть на разное время. вот продемся по каждой из них
                             dateGame = formatter.parse(day + " " + game.getAttribute("innerText"));
                             if ((dateGame.getTime() <= Period.getTime()) == inPeriod) {//если игра подходит

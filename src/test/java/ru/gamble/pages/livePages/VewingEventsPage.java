@@ -1,6 +1,7 @@
 package ru.gamble.pages.livePages;
 
 import cucumber.api.DataTable;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -50,11 +51,17 @@ public class VewingEventsPage extends AbstractPage {
      */
     @ActionTitle("находит игру по фильтру видео")
     public void searchGameLiveVideo(String video, String adding) {
-        boolean add = adding.equals("и добавляет в избранное");
+        List list = Stash.getValue("nameGameKey");
+        int nameInMemory = list==null?0:list.size();
         try {
             gameLiveVideo(video.equals("с видео"), adding.equals("и добавляет в избранное"));
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        list = Stash.getValue("nameGameKey");
+        int nameInMemory2 = list==null?0:list.size();
+        if (nameInMemory==nameInMemory2){
+            Assertions.fail("Игра не найдена");
         }
         LOG.info("Игра " + video + " найдена: " + Stash.getValue("nameGameKey"));
     }

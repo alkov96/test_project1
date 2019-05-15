@@ -55,7 +55,7 @@ public class MultimonitorPage extends AbstractPage {
 
         List<String> teams = new ArrayList<>();
         int index = types.indexOf(keyGame);
-        Assert.assertFalse("Игры с таким типом в Избранном нет",index==-1);
+        Assert.assertFalse("Игры с таким типом в Избранном нет " + keyGame,index==-1);
         String name = names.get(index);
         LOG.info("В ЛМ в МОИХ ИГРАХ будем выбирать игру с названием " + name);
         Stash.put(keyName,name);
@@ -203,11 +203,10 @@ public class MultimonitorPage extends AbstractPage {
     @ActionTitle("проверяет что все выделенные в ЛМ игры есть на мониторах")
     public void checkMonitorsHaveGames(){
         List<WebElement> allMonitors = driver.findElements(By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]"));
-        StringBuilder nameOnMonitor = new StringBuilder();
         List<WebElement> allActiveGames = driver.findElements(By.xpath("//div[contains(@class,'left-menu__list-item-games-row') and contains(@class,'active')]"));
         String name = new String();
         if (allActiveGames.size()!=allMonitors.size()){
-            Assert.fail("Размер списка со всеми играми, выделенными в ЛМ, и списка вех мониторов - не свопадают!");
+            Assert.fail("Размер списка со всеми играми, выделенными в ЛМ(" + allActiveGames.size() + "), и списка вех мониторов - не свопадают!(" + allMonitors.size() + ")");
         }
         for (WebElement activeGame:allActiveGames){
             name = activeGame.findElement(By.xpath(".//div[contains(@class,'left-menu__list-item-games-names')]")).getAttribute("innerText");
