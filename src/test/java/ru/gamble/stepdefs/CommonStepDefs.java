@@ -548,7 +548,7 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     public static String stringParse(String oldName) {
         String nameGame;
-        Pattern p = Pattern.compile("(?u)[^а-яА-Я0-9a-zA-Z]");
+        Pattern p = Pattern.compile("(?u)[^а-яА-Ясa-zA-Z]");
         Matcher m = p.matcher(oldName);
         nameGame = m.replaceAll("");
         return nameGame;
@@ -2809,6 +2809,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^очищаем избранное$")
     public void clearFavourite() throws Exception {
         clearFavouriteGames();
+        Stash.remove("nameGameKey");
+        Stash.remove("typeGameKey");
     }
 
     @Когда("^нажимает кнопку НАЗАД$")

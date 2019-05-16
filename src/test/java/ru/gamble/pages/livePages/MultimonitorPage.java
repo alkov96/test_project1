@@ -64,7 +64,7 @@ public class MultimonitorPage extends AbstractPage {
         index = teams.indexOf(CommonStepDefs.stringParse(name));
         Assert.assertFalse("Игры с таким названием в Избранном нет",index==-1);
         LOG.info("В ЛМ в МОИ ИГРЫ нужная гра находится под номером " + index);
-        listInMyGames.get(index).click();
+        clickIfVisible(listInMyGames.get(index));
     }
 
     @ActionTitle("проверяет что количество мониторов сейчас равно")
@@ -81,6 +81,7 @@ public class MultimonitorPage extends AbstractPage {
         List<WebElement> allMonitors = driver.findElements(By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]"));
         StringBuilder nameOnMonitor = new StringBuilder();
         String nameInMemory = keyName;
+        StringBuilder monitors = new StringBuilder();
         if (keyName.matches("[A-Z]*")){
             nameInMemory = Stash.getValue(keyName);
         }
@@ -89,12 +90,13 @@ public class MultimonitorPage extends AbstractPage {
             nameOnMonitor.setLength(0);
             String[] nameM = monitor.findElement(By.xpath(".//*[contains(@class,'game-score__inner')]")).getAttribute("innerText").split("\n\n");
             nameOnMonitor.append(nameM.length==1?nameM[0]:nameM[0] + " - " + nameM[2]);
-            LOG.info("На одном из мониторов игра:" + nameOnMonitor.toString());
+            monitors.append(nameOnMonitor.toString() + "\n");
             if (CommonStepDefs.stringParse(nameOnMonitor.toString()).equals(nameInMemory)){
                 LOG.info("Нашлась нужная игра на мониторах. Проверка прошла успешно");
                 return;
             }
         }
+        LOG.info("Игры на мониторах:" + monitors);
         Assert.fail("На мониторах не нашлась игра " + nameInMemory);
     }
 
@@ -122,18 +124,25 @@ public class MultimonitorPage extends AbstractPage {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        int countMonitors = driver.findElements(By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]")).size();
+        LOG.info("Сейчас в мультимониторе " + countMonitors + " игр");
         List<String> names = Stash.getValue("nameGameKey");
-        String name = names.get(0).trim();
+        String name = names.get(countMonitors).trim();
         String team1Split = name.split(" ")[0];
         String team2Split = name.split(" ")[(name.split(" ").length)-1];
         LOG.info("Игру нашли: " + name);
+        String xpGameinLM = "//ul[contains(@class,'left-menu__list-item-games-wrap') and not(contains(@class,'hide'))]//div[@class='left-menu__list-item-games-names']/*[contains(text(),'" + team1Split + "')]/following-sibling::*[contains(text(),'" + team2Split + "')]";
 
-//        driver.findElement(By.id("multimonitor")).click();
-//        CommonStepDefs.workWithPreloader();
-//        driver.findElement(By.xpath("//div[@class='left-menu__list-item-games-names' and contains(text(),'" + name + "')]")).click();
-        driver.findElement(By.xpath("//div[@class='left-menu__list-item-games-names']/*[contains(text(),'" + team1Split + "')]/following-sibling::*[contains(text(),'" + team2Split + "')]")).click();
-        Stash.put("nameGameKey","");
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpGameinLM)));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpGameinLM)));
+
+        driver.findElement(By.xpath(xpGameinLM)).click();
+        wait
+                .withMessage("Не добавился монитор для этой игры")
+                .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]"),countMonitors));
+
+     //   Stash.put("nameGameKey","");
     }
 
     @ActionTitle("добавляет на монитор игры, пока их не станет")
@@ -176,13 +185,13 @@ public class MultimonitorPage extends AbstractPage {
                     name = game.findElement(By.xpath(".//div[@class='left-menu__list-item-games-names']")).getAttribute("innerText");
                     //если регион для это игры свернут - развернем его
                     if (!game.findElement(xpathForRegion).getAttribute("class").contains("competitionInLive")){
-                        game.findElement(xpathForRegion).click();
+                        clickIfVisible(game.findElement(xpathForRegion));
                         new WebDriverWait(driver,10)
                                 .withMessage("Регион для игры " + name + " не развернулся")
                                 .until(ExpectedConditions.attributeContains(game.findElement(xpathForRegion),"class","competitionInLive"));
                     }
                     nameGames.add(name);
-                    game.click();
+                    clickIfVisible(game);
                     countI++;
                 }
                 if (!needCheck && countI==count){
@@ -220,4 +229,18 @@ public class MultimonitorPage extends AbstractPage {
         addGames(Integer.valueOf(count),"GAME",false);
     }
 
+    @ActionTitle("закрываем все мониторы")
+    public void clearMonitors(){
+        By byMonitors = By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]");
+        List<WebElement> allMonitors = driver.findElements(byMonitors);
+        LOG.info("сейчас открыто " + allMonitors.size() + " мониторов");
+        int expCount = allMonitors.size();
+        for (WebElement monitor:allMonitors){
+            expCount--;
+            monitor.findElement(By.xpath(".//i[contains(@class,'icon-cross-close')]")).click();
+            new WebDriverWait(driver,10)
+                    .withMessage("Монитор не закрылся. Их сейчас " + driver.findElements(byMonitors).size())
+                    .until(ExpectedConditions.numberOfElementsToBe(byMonitors,Integer.valueOf(expCount)));
+        }
+    }
 }

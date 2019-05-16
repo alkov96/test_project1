@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.stepdefs.CommonStepDefs.switchHandle;
+import static ru.gamble.stepdefs.CommonStepDefs.waitOfPreloader;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.PERIOD;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
@@ -231,8 +232,8 @@ public class EventViewerPage extends AbstractPage {
      */
     @ActionTitle("находит игру по фильтру")
     public void searchGamePrematchAtPeriod(String period, String inPeriod, String adding) {
-        boolean add = adding.equals("и добавляет в избранное");
         List list = Stash.getValue("nameGameKey");
+        LOG.info("Сейчас запомнено игр " + list);
         int nameInMemory = list==null?0:list.size();
         try {
             gamePrematchAtPeriod(period, inPeriod.equals("раньше"), adding.equals("и добавляет в избранное"));
@@ -258,7 +259,7 @@ public class EventViewerPage extends AbstractPage {
         LOG.info("смотрим какие сейчас дата и время и прибавлем к этому времени период(потом будет учавствовать в Фильтре");
         Date dateGame;
         int hour = Integer.valueOf(period.substring(0, period.indexOf("час") - 1));
-        Date Period = new Date(System.currentTimeMillis() + hour * 3600 * 1000);
+        Date periodDate = new Date(System.currentTimeMillis() + hour * 3600 * 1000);
         SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", new Locale("ru"));
         SimpleDateFormat formatterOnlyDate = new SimpleDateFormat("dd MMM yyyy", new Locale("ru"));
         Calendar today = Calendar.getInstance();
@@ -276,22 +277,32 @@ public class EventViewerPage extends AbstractPage {
             driver.findElement(By.xpath("//div[@class='periods']/div")).click();//включим фильтр по временеи чтоб не мучиться с поисками игры
             driver.findElement(By.xpath("//div[@class='periods']//li[contains(normalize-space(text()),'" + hour + "')]")).click();
             CommonStepDefs.workWithPreloader();
+            if (!menu.getAttribute("class").contains("collapsed")) menu.click();
         } else {
             LOG.info("Выключаем фильтр по времени");
             typeGame = "PrematchVnePeriod";
             driver.findElement(By.xpath("//div[@class='periods']/div")).click();// если ищем игру вне периода то убедимся что фильтр выключен
             driver.findElement(By.xpath("//div[@class='periods']/ul/li[1]")).click();
             CommonStepDefs.workWithPreloader();
+            if (!menu.getAttribute("class").contains("collapsed")) menu.click();
         }
 
         LOG.info("Сворачиваем все виды спорта");
         closeSports();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        By bypopular = By.xpath("//li[contains(@id,'sport--') and contains(@class,'active')]");
         int sportCount = driver.findElements(xpathForsportsPrematch).size();
         for (int sportN = 1; sportN < sportCount; sportN++) {
+            LOG.info("Сначала свернем всякие допспорты(популярные соревнования, нулевая маржа)");
+            if (!driver.findElements(bypopular).isEmpty()){
+                wait.until(ExpectedConditions.presenceOfElementLocated(bypopular));
+                wait.until(ExpectedConditions.visibilityOfElementLocated(bypopular));
+                driver.findElements(bypopular).forEach(element -> element.findElement(By.xpath(".//*[contains(@class,'icon-arrow')]")).click());
+            }
+//популярные соревнования и нулевая маржа могут развернуться сами по себе, даже после того как нажали "свернуть все". поэтому нужные вид спорта уходят вниз за область экрана. потом нчего не рабоатет. чтобы этого избежать - нужно свернуть все эти доп.группы
+            wait.until(ExpectedConditions.numberOfElementsToBe(By.xpath("//li[contains(@id,'sport--') and contains(@class,'active')]"),0));
             //разворачиваем спорт(начнем с тенниса просто потому что не хочу футбол)
             LOG.info("Разворачиваем один спорт");
-            driver.findElements(By.xpath("//li[contains(@id,'sport--') and contains(@class,'active')]")).forEach(element -> element.findElement(By.xpath("./a")).click());
-//популярные соревнования и нулевая маржа могут развернуться сами по себе, даже после того как нажали "свернуть все". поэтому нужные вид спорта уходят вниз за область экрана. потом нчего не рабоатет. чтобы этого избежать - нужно свернуть все эти доп.группы
             driver.findElements(xpathForsportsPrematch).get(sportN).click();
             LOG.info(driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./a")).getAttribute("title"));
             CommonStepDefs.workWithPreloader();
@@ -347,7 +358,7 @@ public class EventViewerPage extends AbstractPage {
                         }
                         for (WebElement game: allDates.get(index).findElements(byTime)){//для каждой даты несколько игр может быть на разное время. вот продемся по каждой из них
                             dateGame = formatter.parse(day + " " + game.getAttribute("innerText"));
-                            if ((dateGame.getTime() <= Period.getTime()) == inPeriod) {//если игра подходит
+                            if ((dateGame.getTime() <= periodDate.getTime()) == inPeriod) {//если игра подходит
                                 nameGamefull = game.findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("innerText");
                                 CommonStepDefs.addStash("nameGameKey",nameGamefull.replaceAll("\n"," "));
                                 CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
