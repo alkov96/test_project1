@@ -926,6 +926,18 @@ public class CouponPage extends AbstractPage {
         Stash.put("sumKey",sum.toString());
     }
 
+    public static void checkVideoIncoupon(String hasVideo){
+        LOG.info("Развернем в купоне ту часть, где бывает видео");
+        if (!driver.findElement(By.xpath("//div[contains(@class,'video-animation-toggle')]")).getAttribute("class").contains("opened")){
+            driver.findElement(By.xpath("//div[contains(@class,'video-animation-toggle')]/i")).click();
+        }
+        By byVideoSwitcher = By.xpath("//div[@class='field-switcher']//div[contains(@class,'field-switcher__item_icon-video')]");
+        int expecto = hasVideo.equalsIgnoreCase("есть")?1:0;
+        new WebDriverWait(driver,10)
+                .withMessage("Ошибка! Ожидалось что в купоне полей с видео будет" + expecto + ", а не " + driver.findElements(byVideoSwitcher).size())
+                .until(ExpectedConditions.numberOfElementsToBe(byVideoSwitcher,expecto));
+    }
+
 //    @ActionTitle("высчитываем сумму, при которой возможный выигрыш будет равен максимальной сумме выигрыша")
 //    public void summMaxBet(){
 //        WebDriver driver = PageFactory.getDriver();

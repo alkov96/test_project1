@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.CouponPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -23,6 +24,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 import javax.xml.ws.Action;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author p.sivak.
@@ -118,7 +120,6 @@ public class MultimonitorPage extends AbstractPage {
     @ActionTitle("добавляет на монитор игру")
     public void addGameWithVideo(String hasVideo, String keyName){
         boolean withVideo = hasVideo.equals("с видео");
-      //  Stash.put("nameGameKey","");
         try {
             new VewingEventsPage().gameLiveVideo(withVideo, false);
         } catch (Exception e) {
@@ -142,7 +143,7 @@ public class MultimonitorPage extends AbstractPage {
                 .withMessage("Не добавился монитор для этой игры")
                 .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]"),countMonitors));
 
-     //   Stash.put("nameGameKey","");
+        Stash.put(keyName,name);
     }
 
     @ActionTitle("добавляет на монитор игры, пока их не станет")
@@ -242,5 +243,31 @@ public class MultimonitorPage extends AbstractPage {
                     .withMessage("Монитор не закрылся. Их сейчас " + driver.findElements(byMonitors).size())
                     .until(ExpectedConditions.numberOfElementsToBe(byMonitors,Integer.valueOf(expCount)));
         }
+    }
+
+    @ActionTitle("щелкает на монитор игры")
+    public void clickOnMonitor(String keyName){
+        List<WebElement> allMonitors = driver.findElements(By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]"));
+        StringBuilder nameOnMonitor = new StringBuilder();
+        String nameInMemory = CommonStepDefs.stringParse(Stash.getValue(keyName));
+        for (WebElement monitor : allMonitors){
+            nameOnMonitor.setLength(0);
+            String[] nameM = monitor.findElement(By.xpath(".//*[contains(@class,'game-score') and contains(@class,'team')]/ancestor-or-self::div[contains(@class,'game-score')]")).getAttribute("innerText").split("\n\n");
+            nameOnMonitor.append(nameM.length==1?nameM[0]:nameM[0] + " - " + nameM[2]);
+            if (CommonStepDefs.stringParse(nameOnMonitor.toString()).equals(nameInMemory)){
+                LOG.info("Кликаем на заголовок нужного монитора");
+                monitor.findElement(By.xpath(".//div[contains(@class,'live-game-summary__sport-title-inner-left')]")).click();
+                new WebDriverWait(driver,10)
+                        .withMessage("Нужный монитор не стал активным")
+                        .until(ExpectedConditions.attributeContains(monitor,"class","active"));
+                return;
+            }
+        }
+        Assert.fail("Монитор с такой игрой не найден: " + nameInMemory);
+    }
+
+    @ActionTitle("проверяет что в купоне вкладка с видео")
+    public void checkVideoForMonitor(String hasVideo){
+        CouponPage.checkVideoIncoupon(hasVideo);
     }
 }

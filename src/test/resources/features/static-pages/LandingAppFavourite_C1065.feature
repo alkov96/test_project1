@@ -1,6 +1,7 @@
 # language: ru
 Функционал: 6_Статические страницы
 
+  @favour
   @regress
   @LandingAppFavourite_C1065
   @multi

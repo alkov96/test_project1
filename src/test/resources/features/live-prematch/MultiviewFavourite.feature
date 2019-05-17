@@ -1,6 +1,7 @@
 # language: ru
 Функционал: 5_Лайв, Прематч и динамическое меню
 
+  @favour
   @regress
   @Multiview-favourite
   @multi
