@@ -848,7 +848,6 @@ public class EventViewerPage extends AbstractPage {
             }
             LOG.info("Разворачиваем " + sport.findElement(By.xpath("./*")).getAttribute("title"));
             sport.click();
-            int has = 0;
 
             List<WebElement> regions = sport.findElements(By.xpath(".//ul[@class='left-menu__submenu']/li"));
             if (regions.size()>3){//все регионы пролистывать - это очень долго. пусть будет всего 3 региона
@@ -872,13 +871,6 @@ public class EventViewerPage extends AbstractPage {
 
                             List<WebElement> betsAllEl = driver.findElements(By.xpath("//div[@class='game-container__bets-area-wrpr']//span[contains(@class,'bets-block__bet-cell-content-price')]"));
 
-//                            List <Float> betsFloat = betsAllEl.stream().map(element -> Float.valueOf(element.getAttribute("innerText"))).collect(Collectors.toList());
-////                            Collections.sort(betsFloat,Collections.reverseOrder());
-////                            betsFloat.get(0);
-////
-////                            WebElement bet
-
-//                            betsAllEl.stream().map(element -> Float.valueOf(element.getAttribute("innerText"))).sorted(Comparator.comparing(Float::floatValue)).collect(Collectors.toList());
                             LOG.info("Найдем элемент с самой большой ставкой");
                             WebElement maxCoefEl = betsAllEl.stream()
                                     .sorted(((o1, o2) ->
