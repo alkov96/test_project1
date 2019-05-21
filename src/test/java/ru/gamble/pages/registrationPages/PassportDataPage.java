@@ -36,6 +36,18 @@ public class PassportDataPage extends AbstractPage {
     @FindBy(xpath = "//*[text()='Паспортные данные']")
     private WebElement pageTitle;
 
+    @ElementTitle("Фамилия")
+    @FindBy(id = "surname")
+    private WebElement inputSurname;
+
+    @ElementTitle("Имя")
+    @FindBy(id = "first_name")
+    private WebElement inputName;
+
+    @ElementTitle("Отчество")
+    @FindBy(id = "middleName")
+    private WebElement inputPatronymic;
+
     @ElementTitle("Серия")
     @FindBy(id = "passpserial")
     private WebElement passpSerialInput;

@@ -126,6 +126,7 @@ public class MultimonitorPage extends AbstractPage {
             e.printStackTrace();
         }
         int countMonitors = driver.findElements(By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]")).size();
+        Assert.assertFalse("Нет игр в ЛМ", countMonitors==0);
         LOG.info("Сейчас в мультимониторе " + countMonitors + " игр");
         List<String> names = Stash.getValue("nameGameKey");
         String name = names.get(countMonitors).trim();

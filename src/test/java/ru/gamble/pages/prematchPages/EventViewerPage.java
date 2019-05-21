@@ -49,13 +49,8 @@ public class EventViewerPage extends AbstractPage {
     private WebElement selectPeriod;
 
     @ElementTitle("Кнопка МАКСБЕТ")
-    @FindBy(xpath = "//i[contains(@class,'icon-maxbet')]")
+    @FindBy(xpath = "//label[contains(@class,'coupon-btn_max-bet')]/i[contains(@class,'icon-maxbet')]")
     private WebElement maxBet;
-
-    @ElementTitle("Инпут размера ставки")
-    @FindBy(xpath = "//i[contains(@class,'icon-maxbet')]")
-    private WebElement input;
-
 
     private static By xpathForsportsPrematch = By.xpath("//*[@id='sports-list-container']//li[contains(@id,'sport') and not(contains(@id,'sport--'))]");
     private static By xpathSport = By.xpath("//li[contains(@class,'left-menu__list-item-sport') and not(contains(@id,'sport--')) and not(contains(@class,'favorite'))]");
@@ -295,12 +290,12 @@ public class EventViewerPage extends AbstractPage {
         for (int sportN = 1; sportN < sportCount; sportN++) {
             LOG.info("Сначала свернем всякие допспорты(популярные соревнования, нулевая маржа)");
             if (!driver.findElements(bypopular).isEmpty()){
-                wait.until(ExpectedConditions.presenceOfElementLocated(bypopular));
-                wait.until(ExpectedConditions.visibilityOfElementLocated(bypopular));
+                wait.withMessage("вэйт1").until(ExpectedConditions.presenceOfElementLocated(bypopular));
+                wait.withMessage("вэйт2").until(ExpectedConditions.visibilityOfElementLocated(bypopular));
                 driver.findElements(bypopular).forEach(element -> element.findElement(By.xpath(".//*[contains(@class,'icon-arrow')]")).click());
             }
 //популярные соревнования и нулевая маржа могут развернуться сами по себе, даже после того как нажали "свернуть все". поэтому нужные вид спорта уходят вниз за область экрана. потом нчего не рабоатет. чтобы этого избежать - нужно свернуть все эти доп.группы
-            wait.until(ExpectedConditions.numberOfElementsToBe(By.xpath("//li[contains(@id,'sport--') and contains(@class,'active')]"),0));
+            wait.withMessage("вэйт3").until(ExpectedConditions.numberOfElementsToBe(bypopular,0));
             //разворачиваем спорт(начнем с тенниса просто потому что не хочу футбол)
             LOG.info("Разворачиваем один спорт");
             driver.findElements(xpathForsportsPrematch).get(sportN).click();
@@ -421,7 +416,7 @@ public class EventViewerPage extends AbstractPage {
         }
 
         LOG.info("Проверка страницы прематч при включенном фильтре = " + expectedPeriod);
-
+        new WebDriverWait(driver,10).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[@class = 'left-menu__search left-menu-filters']"),0));
         String selectPeriod = driver.findElement(By.xpath("//div[@class = 'left-menu__search left-menu-filters']//div[contains(@class,'periods__input')]")).getAttribute("innerText");
         LOG.info("Теперь проверим что фильтр в нужном состоянии "+expectedPeriod);
         if (!selectPeriod.equals(expectedPeriod)) {
@@ -899,6 +894,100 @@ public class EventViewerPage extends AbstractPage {
             LOG.info("клик");
         }
     }
+
+
+    @ActionTitle("ищет ставку с маленьким значением maxbet2")
+    public void searchBetFromSuperbet2(String betOk){
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        Actions actions = new Actions(driver);
+        LOG.info("Для супербета нужна ставка с маленьким значением max. Вероятность этого маленькая, поэтому нет смысла првоерять все виды спорта и все ставки. будем смотреть только футбол и специальные ставки");
+        List<WebElement> sports = new ArrayList<>();
+        String sportByTitle = "//li[contains(@class,'left-menu__list-item-sport')]/*[contains(@title,'%s')]/..";
+        try {
+            sports.add(driver.findElement(By.xpath(String.format(sportByTitle,"Специальные ставки"))));
+            sports.add(driver.findElement(By.xpath(String.format(sportByTitle,"Футбол"))));
+        }
+        catch (NoSuchElementException e){
+            LOG.info("Нет одного из спортов");
+        }
+        for (WebElement sport:sports){
+            LOG.info("разворачиваем ЛМ и сворачиваем все виды спорта");
+            setExpandCollapseMenusButton(true);
+            closeSports();
+            if (sport.getAttribute("class").contains("hide")){
+                driver.findElement(By.id("sport--10")).click();
+                wait.until(ExpectedConditions.not(ExpectedConditions.attributeContains(sport,"class","hide")));
+            }
+            LOG.info("Разворачиваем " + sport.findElement(By.xpath("./*")).getAttribute("title"));
+            sport.click();
+            int has = 0;
+
+            List<WebElement> regions = sport.findElements(By.xpath(".//ul[@class='left-menu__submenu']/li"));
+            if (regions.size()>3){//все регионы пролистывать - это очень долго. пусть будет всего 3 региона
+                regions=regions.subList(0,3);
+            }
+            LOG.info("Ищем игру с коэф > 50.0. Потому что у ставок с меньшим коэффициентом вероятен большой максимум");
+            for (WebElement region : regions){
+                if(!region.getAttribute("class").contains("active")){
+                    region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();
+                    LOG.info("регион " + region.getAttribute("innerText"));
+                    wait.withMessage("Регион " + region.getAttribute("innerText") + " не развернулся за 10 секунл");
+                    wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'left-menu__list-item-region-compitition')]"),0));
+                    List<WebElement> comps = region.findElements(By.xpath(".//div[contains(@class,'left-menu__list-item-region-compitition')]"));
+                    for (WebElement competition:comps){
+                        competition.click();
+                        workWithPreloader();
+                        List<WebElement> games = driver.findElements(By.xpath("//div[contains(@class,'bets-block_single-row')]"));
+                        for (WebElement game : games){
+                            game.findElement(By.xpath(".//div[contains(@class,'bets-block__header-teams')]")).click();
+                            workWithPreloader();
+
+                            List<WebElement> betsAllEl = driver.findElements(By.xpath("//div[@class='game-container__bets-area-wrpr']//span[contains(@class,'bets-block__bet-cell-content-price')]"));
+
+//                            List <Float> betsFloat = betsAllEl.stream().map(element -> Float.valueOf(element.getAttribute("innerText"))).collect(Collectors.toList());
+////                            Collections.sort(betsFloat,Collections.reverseOrder());
+////                            betsFloat.get(0);
+////
+////                            WebElement bet
+
+                            betsAllEl.stream().map(element -> Float.valueOf(element.getAttribute("innerText"))).sorted(Comparator.comparing(Float::floatValue)).collect(Collectors.toList());
+
+                            List<WebElement> betsFilter = betsAllEl.stream().filter(e->Float.valueOf(e.getAttribute("innerText"))>50.0).collect(Collectors.toList());
+                            if (betsFilter.size()==0){
+                                LOG.info("У текущей игры нет ставок с коэффициентом больше 50.0, значит и maxBet будет большим, даже проверять не будем. Попрообуем на следующей игре");
+                                continue;
+                            }
+                            LOG.info("Пройдемся по ставкам в этой игре, и поищем ту, у которой maxBet меньше " + betOk);
+                            for (WebElement bet:betsFilter){
+                                bet.click();
+                                new CouponPage().checkListOfCoupon();
+                                maxBet.click();
+                                actions.moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();
+                                wait.withMessage("При нажатии на кнопку МаксБет поле с размером ставки не заполнилось");
+                                wait.until(ExpectedConditions.attributeToBeNotEmpty(CouponPage.couponInputOrdinar,"value"));
+                                String max = CouponPage.couponInputOrdinar.getAttribute("value");
+                                if(Float.valueOf(max)<=Float.valueOf(betOk)){
+                                    LOG.info("Найденная игра и ставка: " + game.getAttribute("innerText").replaceAll("\n"," ") +
+                                            " Ставка на точный счет " + bet.getAttribute("innerText"));
+                                    return;
+                                }
+                                LOG.info("Не подходит: max=" + max);
+                                driver.findElement(By.xpath("//button[@class='btn btn_full-width']")).click();
+                                wait.until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'coupon__bet-block')]/div"),0));
+                            }
+                            LOG.info("" + game.getAttribute("innerText"));
+                            LOG.info("\nbetsFilter.size = " + betsFilter.size());
+                        }
+                    }
+                    region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();//сворачиваем регион
+                }
+            }
+            LOG.info("нет подходящих ставок. Перейдем к следующему спорту");
+        }
+
+
+    }
+
     @ActionTitle("сравниваем количество игр по wss и в Прематче")
     public void compareSizeOfZeroMargin(){
         Integer games_in_prematch = Stash.getValue("by_size_zero_margin_key");
