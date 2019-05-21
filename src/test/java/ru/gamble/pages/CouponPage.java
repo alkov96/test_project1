@@ -837,7 +837,7 @@ public class CouponPage extends AbstractPage {
         WebDriverWait wait = new WebDriverWait(driver,10);
         Actions actions = new Actions(driver);
         LOG.info("Запоминаем максимум для выбранной ставки");
-        driver.findElement(By.xpath("//i[contains(@class,'icon-maxbet')]")).click();
+        driver.findElement(By.xpath("//label[contains(@class,'coupon-btn_max-bet')]/i[contains(@class,'icon-maxbet')]")).click();
         actions.moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();
         wait.withMessage("При нажатии на кнопку МаксБет поле с размером ставки не заполнилось");
         wait.until(ExpectedConditions.attributeToBeNotEmpty(CouponPage.couponInputOrdinar,"value"));

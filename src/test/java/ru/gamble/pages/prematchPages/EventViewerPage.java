@@ -825,78 +825,6 @@ public class EventViewerPage extends AbstractPage {
     }
 
     @ActionTitle("ищет ставку с маленьким значением maxbet")
-    public void searchBetFromSuperbet(String betOk){
-        WebDriverWait wait = new WebDriverWait(driver,10);
-        Actions actions = new Actions(driver);
-        int has = 0;
-        LOG.info("Сворачиваем все виды спорта");
-        closeSports();//свернули все виды спорта
-        LOG.info("Разворачиваем футбол");
-        WebElement football = driver.findElement(By.xpath("//*[@id='sports-list-container']//li[@id='sport-1']"));
-        football.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_sport')]")).click();
-        wait.withMessage("Футбол не развернулся спустя 10 секунд");
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__submenu']/li"),0));
-        List<WebElement> regions = football.findElements(By.xpath(".//ul[@class='left-menu__submenu']/li"));
-        if (regions.size()>3){//все регионы пролистывать - это очень долго. пусть будет всего 3 региона
-            regions=regions.subList(0,3);
-        }
-        LOG.info("Ищем игру со ставкой Точный счёт, чей коэф > 50.0. Потмоуч о у ставок с меньшим коэффициентом вероятен большой максимум");
-        for (WebElement region : regions){
-            if(!region.getAttribute("class").contains("active")){
-                region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();
-                LOG.info("регион " + region.getAttribute("innerText"));
-                wait.withMessage("Регион " + region.getAttribute("innerText") + " не развернулс за 10 секунл");
-                wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'left-menu__list-item-region-compitition')]"),0));
-                List<WebElement> comps = region.findElements(By.xpath(".//div[contains(@class,'left-menu__list-item-region-compitition')]"));
-                for (WebElement competition:comps){
-                    competition.click();
-                    workWithPreloader();
-                    List<WebElement> games = driver.findElements(By.xpath("//div[contains(@class,'bets-block_single-row')]"));
-                    for (WebElement game : games){
-                        game.findElement(By.xpath(".//div[contains(@class,'bets-block__header-teams')]")).click();
-                        workWithPreloader();
-                        has = driver.findElements(By.xpath("//div[@class='game-container__bets-area-wrpr']//div[contains(@class,'bets-block')]//span[@class='bets-block__header-bet-name' and contains(@title,'Точный счет')]")).size();
-                        if (has==0){
-                            continue;
-                        }
-                        WebElement score = driver.findElement(By.xpath("//div[@class='game-container__bets-area-wrpr']//div[contains(@class,'bets-block')]//span[@class='bets-block__header-bet-name' and contains(@title,'Точный счет')]"));
-                        //          List<WebElement> scores = score.findElement(By.xpath("ancestor::div[@class='bets-block__header']/following-sibling::div[contains(@class,'bets-block__body')]")).findElements(By.xpath("./div[contains(@class,'bets-block__bet-cell')]//span[position()=2]"));
-                        List<WebElement> betsAll = score.findElement(By.xpath("ancestor::div[@class='bets-block__header']/following-sibling::div[contains(@class,'bets-block__body')]")).findElements(By.xpath("./div[contains(@class,'bets-block__bet-cell')]//span[position()=2]"));
-                        List<WebElement> betsFilter = betsAll.stream().filter(e->Float.valueOf(e.getAttribute("innerText"))>50.0).collect(Collectors.toList());
-                        if (betsFilter.size()==0){
-                            LOG.info("У текущей игры нет ставок с коэффициентом больше 50.0, значит и maxBet будт большим, даже проверять не будем. Попрообуем на следующей игре");
-                            continue;
-                        }
-                        LOG.info("Пройдемся по ставкам в этой игре, и поищем ту, у которой maxBet меньше " + betOk);
-                        for (WebElement bet:betsFilter){
-                            bet.click();
-                            new CouponPage().checkListOfCoupon();
-                            maxBet.click();
-                            actions.moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();
-                            wait.withMessage("При нажатии на кнопку МаксБет поле с размером ставки не заполнилось");
-                            wait.until(ExpectedConditions.attributeToBeNotEmpty(CouponPage.couponInputOrdinar,"value"));
-                            String max = CouponPage.couponInputOrdinar.getAttribute("value");
-                            if(Float.valueOf(max)<=Float.valueOf(betOk)){
-                                LOG.info("Найденная игра и ставка: " + game.getAttribute("innerText").replaceAll("\n"," ") +
-                                        " Ставка на точный счет " + bet.getAttribute("innerText"));
-                                return;
-                            }
-                            LOG.info("max=" + max);
-                            driver.findElement(By.xpath("//button[@class='btn btn_full-width']")).click();
-                            wait.until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'coupon__bet-block')]/div"),0));
-                        }
-                        LOG.info("" + game.getAttribute("innerText"));
-                        LOG.info("\nbetsFilter.size = " + betsFilter.size());
-                    }
-                }
-                region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();//сворачиваем регион
-            }
-            LOG.info("клик");
-        }
-    }
-
-
-    @ActionTitle("ищет ставку с маленьким значением maxbet2")
     public void searchBetFromSuperbet2(String betOk){
         WebDriverWait wait = new WebDriverWait(driver,10);
         Actions actions = new Actions(driver);
@@ -950,33 +878,35 @@ public class EventViewerPage extends AbstractPage {
 ////
 ////                            WebElement bet
 
-                            betsAllEl.stream().map(element -> Float.valueOf(element.getAttribute("innerText"))).sorted(Comparator.comparing(Float::floatValue)).collect(Collectors.toList());
+//                            betsAllEl.stream().map(element -> Float.valueOf(element.getAttribute("innerText"))).sorted(Comparator.comparing(Float::floatValue)).collect(Collectors.toList());
+                            LOG.info("Найдем элемент с самой большой ставкой");
+                            WebElement maxCoefEl = betsAllEl.stream()
+                                    .sorted(((o1, o2) ->
+                                            -Float.valueOf(o1.getAttribute("innerText"))
+                                                    .compareTo(Float.valueOf(o2.getAttribute("innerText")))))
+                                    .collect(Collectors.toList()).get(0);
 
-                            List<WebElement> betsFilter = betsAllEl.stream().filter(e->Float.valueOf(e.getAttribute("innerText"))>50.0).collect(Collectors.toList());
-                            if (betsFilter.size()==0){
-                                LOG.info("У текущей игры нет ставок с коэффициентом больше 50.0, значит и maxBet будет большим, даже проверять не будем. Попрообуем на следующей игре");
+                            if (Float.valueOf(maxCoefEl.getAttribute("innerText"))<=50.0){
+                                LOG.info("У текущей игры максимальный коэф меньше 50.0" +maxCoefEl.getAttribute("innerText") + " , значит и maxBet будет большим, даже проверять не будем. Попрообуем на следующей игре");
                                 continue;
                             }
-                            LOG.info("Пройдемся по ставкам в этой игре, и поищем ту, у которой maxBet меньше " + betOk);
-                            for (WebElement bet:betsFilter){
-                                bet.click();
-                                new CouponPage().checkListOfCoupon();
-                                maxBet.click();
-                                actions.moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();
-                                wait.withMessage("При нажатии на кнопку МаксБет поле с размером ставки не заполнилось");
-                                wait.until(ExpectedConditions.attributeToBeNotEmpty(CouponPage.couponInputOrdinar,"value"));
-                                String max = CouponPage.couponInputOrdinar.getAttribute("value");
-                                if(Float.valueOf(max)<=Float.valueOf(betOk)){
-                                    LOG.info("Найденная игра и ставка: " + game.getAttribute("innerText").replaceAll("\n"," ") +
-                                            " Ставка на точный счет " + bet.getAttribute("innerText"));
-                                    return;
-                                }
-                                LOG.info("Не подходит: max=" + max);
-                                driver.findElement(By.xpath("//button[@class='btn btn_full-width']")).click();
-                                wait.until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'coupon__bet-block')]/div"),0));
+                            LOG.info("Попробуем эту ставку, может быть её maxBet меньше " + betOk);
+
+                            maxCoefEl.click();
+                            new CouponPage().checkListOfCoupon();
+                            maxBet.click();
+                            actions.moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();
+                            wait.withMessage("При нажатии на кнопку МаксБет поле с размером ставки не заполнилось");
+                            wait.until(ExpectedConditions.attributeToBeNotEmpty(CouponPage.couponInputOrdinar,"value"));
+                            String max = CouponPage.couponInputOrdinar.getAttribute("value");
+                            if(Float.valueOf(max)<=Float.valueOf(betOk)){
+                                LOG.info("Найденная игра и ставка: " + game.getAttribute("innerText").replaceAll("\n"," ") +
+                                        " Ставка на точный счет " + maxCoefEl.getAttribute("innerText"));
+                                return;
                             }
-                            LOG.info("" + game.getAttribute("innerText"));
-                            LOG.info("\nbetsFilter.size = " + betsFilter.size());
+                            LOG.info("Не подходит: max=" + max);
+                            driver.findElement(By.xpath("//button[@class='btn btn_full-width']")).click();
+                            wait.until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'coupon__bet-block')]/div"),0));
                         }
                     }
                     region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();//сворачиваем регион
