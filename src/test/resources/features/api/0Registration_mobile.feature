@@ -204,8 +204,8 @@
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
       | firstname           | FIRSTNAME     |
-      | lastname            | PATRONYMIC    |
-      | paternalname        | PATERNALNAME  |
+      | lastname            | SURNAME       |
+      | paternalname        | PATRONYMIC    |
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
@@ -251,28 +251,24 @@
 
     * ожидание "5" сек
 
-
-
     * проверим что в БД сохранены правильные значения
-      | birth_place              | BIRTHPLACE      |
+      | birth_place             | BIRTHPLACE      |
       | region                  | Москва          |
-      | kladr_code             | 77              |
-      | city                | CITY            |
+      | city                    | CITY            |
       | street                  | STREET          |
-      | house_number                   | HOUSE           |
-      | apartment                    | FLAT            |
-      | passport_number                  | DOCNUM          |
-      | passport_series               | DOCSERIES       |
-      | passport_date               | VALIDISSUEDATE  |
-      | passport_issuer              | ISSUEPLACE      |
-      | passport_issuer_code               | 123-456         |
-      | first_name              | FIRSTNAME   |
+      | house_number            | HOUSE           |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
       | surname                 | SURNAME         |
       | patronymic              | PATRONYMIC      |
-      | birth_date              | BIRTHDATE    |
+      | birth_date              | BIRTHDATE       |
       | phone                   | PHONE           |
       | email                   | EMAIL           |
-
 
   @api
   @Registration_mobile
@@ -340,8 +336,8 @@
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
       | firstname           | FIRSTNAME     |
-      | lastname            | PATRONYMIC    |
-      | paternalname        | PATERNALNAME  |
+      | lastname            | SURNAME       |
+      | paternalname        | PATRONYMIC    |
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
@@ -386,6 +382,25 @@
       | exepted     | "status":8 or "status":7 |
 
     * ожидание "10" сек
+
+    * проверим что в БД сохранены правильные значения
+      | birth_place             | BIRTHPLACE      |
+      | region                  | Москва          |
+      | city                    | CITY            |
+      | street                  | STREET          |
+      | house_number            | HOUSE           |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
 
 
 
@@ -480,7 +495,24 @@
 
     * выставляем обратно старое значение активных опций сайта "ACTIVE_SITE_OPTIONS"
 
-
+    * проверим что в БД сохранены правильные значения
+      | birth_place             | BIRTHPLACE      |
+      | region                  | Москва          |
+      | city                    | CITY            |
+      | street                  | STREET          |
+      | house_number            | HOUSE           |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
 
 
   @api
@@ -515,6 +547,25 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
+
+    * проверим что в БД сохранены правильные значения
+      | birth_place             | BIRTHPLACE      |
+      | region                  | Москва          |
+      | city                    | CITY            |
+      | street                  | STREET          |
+      | house_number            | HOUSE           |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
 #    * проверка ответа API из "RESPONCE_API":
 #      | exepted | "errorMsg":null |
 

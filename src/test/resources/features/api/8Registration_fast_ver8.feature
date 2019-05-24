@@ -64,7 +64,7 @@
     * сохраняем в память
       | EMAIL  | randomEmail |
 
-    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v8/sendPhoneCode" и сохраняем в "RESPONCE_API":
       | devId | DEVID |
       | phone | PHONE |
 
@@ -73,7 +73,7 @@
 
     * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" "лгпго"
 
-    * запрос к API "api/mobile/v3/createUserFast" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v8/createUserFast" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
       |  source                | 16         |
       |  first_name            | FIRSTNAME  |
@@ -90,12 +90,12 @@
 
     * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
 
-    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v8/confirmEmail" и сохраняем в "RESPONCE_API":
       | code   | CODEEMAIL |
       | source | 16        |
 
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v8/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID |
       | email  | EMAIL |
       | pass   | PASSWORD  |
@@ -116,7 +116,7 @@
     * редактируем некоторые активные опции сайта
       |fast_registration  | true  |
 
-    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v8/sendPhoneCode" и сохраняем в "RESPONCE_API":
       | devId | DEVID |
       | phone | PHONE |
 
@@ -125,7 +125,7 @@
 
     * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" "лгпго"
 
-    * запрос к API "api/mobile/v3/createUserFast" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v8/createUserFast" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
       |  source                | 16         |
       |  first_name            | FIRSTNAME  |
@@ -142,12 +142,12 @@
 
     * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
 
-    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v8/confirmEmail" и сохраняем в "RESPONCE_API":
       | code   | CODEEMAIL |
       | source | 16        |
 
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v8/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID |
       | email  | EMAIL |
       | pass   | PASSWORD  |
@@ -199,11 +199,9 @@
       | exepted | "status":11 |
 
     * проверим что в БД сохранены правильные значения
-      | gender                  | GENDER          |
       | birthplace              | BIRTHPLACE      |
       | region                  | Москва          |
-      | regionKLADR             | 77              |
-      | locality                | CITY            |
+      | city                    | CITY            |
       | street                  | STREET          |
       | house                   | HOUSE           |
       | flat                    | FLAT            |
@@ -216,6 +214,5 @@
       | surname                 | SURNAME         |
       | patronymic              | PATRONYMIC      |
       | birth_date              | ONEBIRTHDATE    |
-      | gender                  | GENDER          |
       | phone                   | PHONE           |
       | email                   | EMAIL           |

@@ -3157,15 +3157,21 @@ public class CommonStepDefs extends GenericStepDefs {
         Map <String,String> table = dataTable.asMap(String.class,String.class);
         StringBuilder sqlRequest = new StringBuilder();
         String whereOne = new String();
+        SimpleDateFormat stashFormat = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat DBFormat = new SimpleDateFormat("yyyy-MM-dd");
         sqlRequest.append("SELECT * from gamebet.`user` WHERE ");
         for(Map.Entry<String, String> entry : table.entrySet()){
-            whereOne = entry.getValue().matches("[A-Z]*")?Stash.getValue(entry.getValue()):entry.getValue();
+            whereOne = entry.getValue().matches("[_A-Z]*")?Stash.getValue(entry.getValue()):entry.getValue();
+            if (whereOne.matches("[0-9]+[.]+[0-9]+[.]+[0-9]+")){
+                whereOne = newFormatDate(stashFormat,DBFormat,whereOne);
+            }
             whereOne = entry.getKey() + "='" + whereOne + "' AND ";
             sqlRequest.append(whereOne);
         }
         int i = sqlRequest.toString().lastIndexOf(" AND ");
         sqlRequest.delete(i,sqlRequest.length());
         LOG.info("SQL: \n" + sqlRequest);
+        Assert.assertFalse("В БД сохранены неправильные данные",workWithDBgetResult(sqlRequest.toString()).isEmpty());
     }
 }
 
