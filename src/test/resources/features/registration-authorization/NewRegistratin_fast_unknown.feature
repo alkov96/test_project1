@@ -4,7 +4,7 @@
   Предыстория:
 
     * редактируем некоторые активные опции сайта
-      |fast_registration  | false  |
+      |fast_registration  | true  |
 
     * сохраняем в память
       | INN | 775459885706 |
@@ -29,6 +29,7 @@
 
     * пользователь (заполняет форму с) данными
       | Поле ввода     | Значение   | Переменная сохранения |
+      | Дата рождения  | BIRTH_DATE | BIRTHDATE             |
       | Имя            | random     | FIRSTNAME             |
       | E-mail         | EMAIL      | EMAIL                 |
       | Пароль         | Default    | PASSWORD              |
@@ -56,10 +57,9 @@
     * открывается страница "Паспортные данные"
     * пользователь (заполняет паспорт с) данными
       | Поле ввода        | Значение   | Переменная сохранения |
-      | Дата рождения  | BIRTH_DATE | BIRTHDATE             |
-      | Фамилия        | random     | LASTNAME              |
-      | Имя            | random     | DIFFFIRSTNAME             |
-      | Отчество       | random     | PATERNALNAME          |
+      | Фамилия           | random     | LASTNAME              |
+      | Имя               | FIRSTNAME  | FIRSTNAME             |
+      | Отчество          | random     | PATERNALNAME          |
       | Серия             | random     | SERIES                |
       | Номер             | random     | NUMBER                |
       | Дата выдачи       | ISSUE_DATE | ISSUEDATE             |
@@ -100,32 +100,43 @@
   @enabledFeatures
   @smoke
   @rega
-  @NewUserRegistration_C36189_Euroset
-  Сценарий: Регистрация нового пользователя через Евросеть
+  @NewRegistration_fast_unknown
+  Сценарий: Регистрация нового пользователя через Wave
 
     * редактируем некоторые активные опции сайта
-      |identification_with_euroset|true|
       |identification_with_skype_only|false|
+      |identification_with_wave|true|
 
     * открывается страница "Способ подтверждения личности"
-    * пользователь (нажимает на 'Связной|Евросеть')
+    * пользователь (нажимает кнопку) "Столото"
 
-    * пользователь (отображается текст) "Проверка документов через «Связной | Евросеть»"
-    * запоминаем текущую страницу в "CURRENT_PAGE"
+    * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+      | operationdatetime   | DATE_TIME     |
+      | phone               | PHONE         |
+      | firstname           | FIRSTNAME     |
+      | lastname            | LASTNAME      |
+      | paternalname        | PATERNALNAME  |
+      | sex                 | SEX           |
+      | birthdate           | BIRTHDATE     |
+      | birthlocation       | BIRTHLOCATION |
+      | citizenship         | "RUS"         |
+      | publicperson        | null          |
+      | publicperson        | null          |
+      | address             | ADDRESS       |
+      | documents           | DOCUMENTS     |
+      | operationofficecode | "222"         |
+      | operatorlogin       | "333"         |
+      | inn                 | INN           |
+      | SNILS               | SNILS         |
+      | method              | betshop       |
+      | error               | ""            |
+      | reason              | ""            |
+      | identityState       | "LIMITED"     |
 
-    * пользователь открывает новое окно с url "http://88.198.200.81:27000/testservice/"
-
-    * (завершает регу в Евросети с) данными
-      | Идентификатор мерчанта       |  MERCHANT        |
-      | Код/логин/ид/имя пользователя|  PHONE                |
-      | Способ идентификации         |  betshop (ППС (ЦОК))  |
-      | button                       |  Полная идентификация |
-      | textis                       |  ok                   |
-
-    * открывается страница "Авторизованная Главная страница"
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "state":"ok" |
 
     * (закрываем окно 'Перейти в ЦУПИС' если выскочит)
-
     * пользователь (проверяет присутствие текста) "Вы зарегистрированы"
 
     * пользователь (нажимает кнопку) "Иконка юзера"
@@ -138,7 +149,7 @@
       | Электронная почта | EMAIL         |
       | Телефон           | PHONE         |
       | Фамилия           | LASTNAME      |
-      | Имя               | DIFFFIRSTNAME |
+      | Имя               | FIRSTNAME     |
       | Отчество          | PATERNALNAME  |
       | Дата рождения     | BIRTH_DATE    |
       | Место рождения    | BIRTHLOCATION |
@@ -152,7 +163,6 @@
       | Дата выдачи       | ISSUEDATE     |
       | Кем выдан         | ISSUER        |
       | Код подразд.      | ISSUERCODE    |
-
 
 
 

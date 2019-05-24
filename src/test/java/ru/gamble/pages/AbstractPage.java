@@ -66,17 +66,11 @@ public abstract class AbstractPage extends Page{
     @FindBy(id = "service-list")
     protected WebElement burgerBottom;
 
-    @ElementTitle("День")
-    @FindBy(className = "inpD")
-    protected WebElement fieldDay;
+    protected String fieldDay = "//*[@class='inpD']";
 
-    @ElementTitle("Месяц")
-    @FindBy(xpath = "//div[contains(@class,'dateInput')]/div[@class='inpM']")
-    protected WebElement fieldMonth;
+    protected String fieldMonth = "//div[contains(@class,'dateInput')]/div[@class='inpM']";
 
-    @ElementTitle("Год")
-    @FindBy(className = "inpY")
-    protected WebElement fieldYear;
+    protected String fieldYear = "//*[@class='inpY']";
 
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
@@ -264,25 +258,26 @@ public abstract class AbstractPage extends Page{
         selectMenu(element, 0);
     }
 
-    protected String enterDate(String value) {
+    protected String enterDate(String value,String nameDate) {
         StringBuilder date = new StringBuilder();
         String day, month, year;
             String[] tmp = value.split("-");
             LOG.info("Вводим дату");
-            selectMenu(fieldYear, Integer.parseInt(tmp[0]));
-            selectMenu(fieldMonth, Integer.parseInt(tmp[1]));
-            selectMenu(fieldDay, Integer.parseInt(tmp[2]));
+            selectMenu(driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldYear)), Integer.parseInt(tmp[0]));
+            selectMenu(driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldMonth )), Integer.parseInt(tmp[1]));
+            selectMenu(driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldDay)), Integer.parseInt(tmp[2]));
 
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        day = fieldDay.getAttribute("innerText");
-        month = fieldMonth.getAttribute("innerText");
-        year = fieldYear.getAttribute("innerText");
+        day = driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldDay)).getAttribute("innerText");
+        month = driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldMonth)).getAttribute("innerText");
+        year = driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldYear)).getAttribute("innerText");
         return date.append(year).append("-").append(month).append("-").append(day).toString();
     }
+
 
     /**
      * В выбранном поле вводит один символ и если появляется выпадающий список - выбирает первый пункт из него.

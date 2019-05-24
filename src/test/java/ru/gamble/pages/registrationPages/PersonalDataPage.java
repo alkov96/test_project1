@@ -55,7 +55,7 @@ public class PersonalDataPage extends AbstractPage{
 
     public PersonalDataPage() {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
+        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
     @ActionTitle("заполняет личные данные с")
@@ -75,19 +75,10 @@ public class PersonalDataPage extends AbstractPage{
 
             if (inputField.contains(DATEOFBIRTH)) {
                 date = Stash.getValue(value);
-                enterDate(date);
+                enterDate(date,DATEOFBIRTH);
 
                 Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
-            }
-            if (inputField.contains(LASTNAME)) {
-                if (value.contains(RANDOM)) {
-                    fillField(inputSurname, Generators.randomString(25));
-                } else {
-                    fillField(inputSurname, value);
-                }
-                Stash.put(saveVariable, inputSurname.getAttribute("value"));
-                LOG.info(saveVariable + "<==[" + inputSurname.getAttribute("value") + "]");
             }
             if (inputField.contains(NAME)) {
                 if (value.contains(RANDOM)) {
@@ -97,15 +88,6 @@ public class PersonalDataPage extends AbstractPage{
                 }
                 Stash.put(saveVariable, inputName.getAttribute("value"));
                 LOG.info(saveVariable + "<==[" + inputName.getAttribute("value") + "]");
-            }
-            if (inputField.contains(PATERNALNAME)) {
-                if (value.contains(RANDOM)) {
-                    fillField(inputPatronymic, Generators.randomString(25));
-                } else {
-                    fillField(inputPatronymic, value);
-                }
-                Stash.put(saveVariable, inputPatronymic.getAttribute("value"));
-                LOG.info(saveVariable + "<==[" + inputPatronymic.getAttribute("value") + "]");
             }
         }
     }

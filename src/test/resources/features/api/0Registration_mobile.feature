@@ -1,6 +1,7 @@
 # language: ru
 Функционал: API
   Предыстория:
+
   * сохраняем в память
   | FIRSTNAME | random |
   * сохраняем в память
@@ -54,6 +55,9 @@
   * сохраняем в память
   | SNILS | 37487545236 |
 
+    * редактируем некоторые активные опции сайта
+      |fast_registration  | false  |
+      |identification_with_skype_only| false|
 
   * запрос к API "api/mobile/v6/sendPhoneCode" и сохраняем в "RESPONCE_API":
   | devId | DEVID |
@@ -246,6 +250,28 @@
       | exepted     | "status":8 or "status":7 |
 
     * ожидание "5" сек
+
+
+
+    * проверим что в БД сохранены правильные значения
+      | birth_place              | BIRTHPLACE      |
+      | region                  | Москва          |
+      | kladr_code             | 77              |
+      | city                | CITY            |
+      | street                  | STREET          |
+      | house_number                   | HOUSE           |
+      | apartment                    | FLAT            |
+      | passport_number                  | DOCNUM          |
+      | passport_series               | DOCSERIES       |
+      | passport_date               | VALIDISSUEDATE  |
+      | passport_issuer              | ISSUEPLACE      |
+      | passport_issuer_code               | 123-456         |
+      | first_name              | FIRSTNAME   |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE    |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
 
 
   @api

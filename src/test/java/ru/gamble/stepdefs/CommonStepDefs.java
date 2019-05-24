@@ -192,7 +192,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
 
         if (value.equals(RANDOME_EMAIL)) {
-            value = "testregistrator" + Stash.getValue("PHONE") + "@mailintor.com";
+            value = "testregistrator" + Stash.getValue("PHONE") + "@mailinator.com";
         }
 
         if (value.split(" ")[0].equals(RANDOM)) {
@@ -1523,7 +1523,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
-    public void searchUserStatus2(String status, String keyEmail) {
+    public void searchUserStatus(String status, String keyEmail) {
         //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7933%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator%mailinator.com' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id";
         searchUser(keyEmail, sqlRequest);
@@ -1955,6 +1955,7 @@ public class CommonStepDefs extends GenericStepDefs {
         try {
             connect = (HttpURLConnection) new URL(requestFull).openConnection();
             connect.setRequestMethod("GET");
+            connect.setRequestProperty("mst","edadcc8f-4c06-412e-801a-e574ad33b58f");
             connect.setUseCaches(false);
             connect.setConnectTimeout(500);
             connect.setReadTimeout(500);
@@ -2092,8 +2093,9 @@ public class CommonStepDefs extends GenericStepDefs {
             con.setRequestMethod(method);
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setRequestProperty("mst","edadcc8f-4c06-412e-801a-e574ad33b58f");
 
-            //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
+            //стрчока внизу - это чтоб не было редиректа на мобильную версию (потмоу что при редирексте POST меняеallureтся на GET)
             //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
 
             OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), StandardCharsets.UTF_8);
@@ -2229,7 +2231,7 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * это когда активне опции сайта в отдельной таблице
      */
-    @Before(value = "@before or @api")
+    @Before(value = "@enabledFeatures or @api")
     public void saveRegistrationValue2() {
         rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
@@ -2338,7 +2340,7 @@ public class CommonStepDefs extends GenericStepDefs {
      *
      * @param scenario
      */
-    @After(value = "@after")
+    @After(value = "@enabledFeatures or @api")
     public void returnRegistrationValueWithScreenshot(Scenario scenario) {
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
@@ -3148,6 +3150,22 @@ public class CommonStepDefs extends GenericStepDefs {
          Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
                  firstN-diffLong,secondN);
          LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
+    }
+
+    @Когда("^проверим что в БД сохранены правильные значения$")
+    public void checkDataInDB(DataTable dataTable){
+        Map <String,String> table = dataTable.asMap(String.class,String.class);
+        StringBuilder sqlRequest = new StringBuilder();
+        String whereOne = new String();
+        sqlRequest.append("SELECT * from gamebet.`user` WHERE ");
+        for(Map.Entry<String, String> entry : table.entrySet()){
+            whereOne = entry.getValue().matches("[A-Z]*")?Stash.getValue(entry.getValue()):entry.getValue();
+            whereOne = entry.getKey() + "='" + whereOne + "' AND ";
+            sqlRequest.append(whereOne);
+        }
+        int i = sqlRequest.toString().lastIndexOf(" AND ");
+        sqlRequest.delete(i,sqlRequest.length());
+        LOG.info("SQL: \n" + sqlRequest);
     }
 }
 

@@ -76,7 +76,7 @@ public class UserAccountPage extends AbstractPage{
 
     public UserAccountPage() {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
+        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
     @ActionTitle("заполняет форму с")
@@ -90,8 +90,14 @@ public class UserAccountPage extends AbstractPage{
             value = aTable.get(VALUE);
             saveVariable = aTable.get(SAVE_VALUE);
 
-            if (value.matches("[A-Z]*")){
+            if (value.matches("[_A-Z]*")){
                 value=Stash.getValue(value);
+            }
+            if (inputField.contains(DATEOFBIRTH)) {
+                date = value;
+                enterDate(date,DATEOFBIRTH);
+                Stash.put(saveVariable, date);
+                LOG.info(saveVariable + "<==[" + date + "]");
             }
 
             if (inputField.contains(NAME)) {
@@ -113,8 +119,6 @@ public class UserAccountPage extends AbstractPage{
                 String password = (value.equals(Constants.DEFAULT)) ? JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue() : value;
                 LOG.info("Вводим пароль::" + password);
                 fillField(passwordInput, password);
-//                LOG.info("Подтверждаем::" + password);
-//                fillField(confirmPasswordInput, password);
                 Stash.put(saveVariable, password);
             }
 
@@ -150,13 +154,13 @@ public class UserAccountPage extends AbstractPage{
             value = aTable.get(VALUE);
             saveVariable = aTable.get(SAVE_VALUE);
 
-            if (value.matches("[A-Z]*")){
+            if (value.matches("[_A-Z]*")){
                 value=Stash.getValue(value);
             }
 
             if (inputField.contains(DATEOFBIRTH)) {
                 try {
-                    date = outputFormat.format(inputFormat.parse(enterDate(value)));
+                    date = outputFormat.format(inputFormat.parse(enterDate(value,DATEOFBIRTH)));
                 } catch (ParseException e) {
                     e.getMessage();
                 }
