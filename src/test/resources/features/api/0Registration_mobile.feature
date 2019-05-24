@@ -180,7 +180,7 @@
     * приводим дату к формату год-месяц-день "VALIDISSUEDATE"
 
     * добавляем данные в JSON объект "ADDRESS" сохраняем в память:
-      | regionKLADR       | null          |
+      | regionKLADR       | 77          |
       | region            | Москва        |
       | town              | CITY          |
       | street            | STREET        |
@@ -256,7 +256,6 @@
       | region                  | Москва          |
       | city                    | CITY            |
       | street                  | STREET          |
-      | house_number            | HOUSE           |
       | apartment               | FLAT            |
       | passport_number         | DOCNUM          |
       | passport_series         | DOCSERIES       |
@@ -388,7 +387,6 @@
       | region                  | Москва          |
       | city                    | CITY            |
       | street                  | STREET          |
-      | house_number            | HOUSE           |
       | apartment               | FLAT            |
       | passport_number         | DOCNUM          |
       | passport_series         | DOCSERIES       |
