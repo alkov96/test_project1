@@ -10,7 +10,7 @@
     * сохраняем в память
       | PATRONYMIC | random |
     * сохраняем в память
-      | ONEBIRTHDATE | randomDate |
+      | BIRTHDATE | randomDate |
     * сохраняем в память
       | DIFFBIRTHDATE | randomDate |
     * сохраняем в память
@@ -106,6 +106,12 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":15 |
 
+    * проверим что в БД сохранены правильные значения
+      | first_name              | FIRSTNAME       |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
+
 
   @api
   @Registration_fast_ver8
@@ -135,7 +141,7 @@
       |  pass                  | PASSWORD   |
       |  subscribe_to_sms      | false      |
       |  subscribe_to_email    | false      |
-      |  birth_date            | ONEBIRTHDATE  |
+      |  birth_date            | BIRTHDATE  |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
@@ -199,20 +205,19 @@
       | exepted | "status":11 |
 
     * проверим что в БД сохранены правильные значения
-      | birthplace              | BIRTHPLACE      |
+      | birth_place             | BIRTHPLACE      |
       | region                  | Москва          |
       | city                    | CITY            |
       | street                  | STREET          |
-      | house                   | HOUSE           |
-      | flat                    | FLAT            |
-      | docNum                  | DOCNUM          |
-      | docSeries               | DOCSERIES       |
-      | issueDate               | VALIDISSUEDATE  |
-      | issuePlace              | ISSUEPLACE      |
-      | codePlace               | 123-456         |
-      | first_name              | DIFFFIRSTNAME   |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | DIFFFIRSTNAME       |
       | surname                 | SURNAME         |
       | patronymic              | PATRONYMIC      |
-      | birth_date              | ONEBIRTHDATE    |
+      | birth_date              | BIRTHDATE       |
       | phone                   | PHONE           |
       | email                   | EMAIL           |

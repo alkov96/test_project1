@@ -277,4 +277,23 @@
     * проверка вариантного ответа API из "RESPONCE_API":
       | exepted     | "status":8 or "status":7 |
 
+    * проверим что в БД сохранены правильные значения
+      | birth_place             | BIRTHPLACE      |
+      | region                  | Москва          |
+      | city                    | CITY            |
+      | street                  | STREET          |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
+
+
     * выставляем обратно старое значение активных опций сайта "ACTIVE_SITE_OPTIONS"

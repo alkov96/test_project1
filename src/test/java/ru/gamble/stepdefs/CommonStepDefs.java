@@ -1194,6 +1194,25 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Получили код подтверждения почты: " + code);
     }
 
+
+    @Когда("^проверка что в БД есть код для восстановления пароля \"([^\"]*)\"$")
+    public static void checkCodeFromResetPassword(String keyEmail) {
+        String email = Stash.getValue(keyEmail);
+        String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='" + email + "'";
+        String userId = workWithDBgetResult(sqlRequest, "id");
+        sqlRequest = "SELECT token FROM gamebet.`userpasswordresettoken` WHERE user_id=" + userId;
+        try {
+            String token = workWithDBgetResult(sqlRequest, "token");
+            LOG.info("Раз тест не упал, значит в БД есть токен для смены пароля: " + token);
+        }
+        catch (Exception e)
+        {
+            LOG.info("в БД нет токена дял восстановления пароля");
+            e.printStackTrace();
+        }
+
+    }
+
     @Когда("^определяем валидную и невалидную дату выдачи паспорта \"([^\"]*)\" \"([^\"]*)\"$")
     public void issueDateGenerate(String validKey, String invalidKey) throws ParseException {
         String birthDateString = Stash.getValue("BIRTHDATE");
@@ -1269,17 +1288,18 @@ public class CommonStepDefs extends GenericStepDefs {
             key = entry.getKey();
             if (entry.getValue().matches("^[A-Z_]+$")) {
                 value = Stash.getValue(entry.getValue());
-            } else {
-                value = entry.getValue();
             }
-            if (entry.getValue().matches("^[/(][A-Z]+[/)]")){
-                value = String.valueOf(value).replace("(","").replace(")","");
+            else if (entry.getValue().matches("^[/(][A-Z]+[/)]")){
+                value = String.valueOf(entry.getValue()).replace("(","").replace(")","");
                 JSONObject asd = Stash.getValue( String.valueOf(value));
                 JSONObject[] dfg = {Stash.getValue( String.valueOf(value))};
                 jsonObject.put(key,dfg);
             }
+            else {
+                value = entry.getValue();
+            }
             //Если попадются числовые значения, в JSON объект кладём как строку
-            else if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
+             if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
                 String str = (String) value;
                 jsonObject.put(key, value);
             } else {
