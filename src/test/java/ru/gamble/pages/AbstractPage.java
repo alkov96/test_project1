@@ -251,7 +251,11 @@ public abstract class AbstractPage extends Page{
      * @param select - выбираемый пункт меню.
      */
     protected void selectMenu(WebElement element, int select) {
+        new WebDriverWait(driver,10)
+                .until(ExpectedConditions.elementToBeClickable(element.findElement(By.xpath("custom-select"))));
         element.findElement(By.xpath("custom-select")).click();
+        new WebDriverWait(driver,10)
+                .until(ExpectedConditions.elementToBeClickable(element.findElement(By.xpath("custom-select/div[2]/div[contains(.,'" + select + "')]"))));
         element.findElement(By.xpath("custom-select/div[2]/div[contains(.,'" + select + "')]")).click();
     }
     protected void selectMenu(WebElement element) {

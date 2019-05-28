@@ -165,8 +165,6 @@
       | CURRENCY  | RUB |
 
     * пополняем пользователю бонусы если нужно, судя по ответу "RESPONCE" на сумму, достаточную для "AMOUNT"
-      | accountCode   | string        |
-      | accountName   | string        |
       | amount        | AMOUNT        |
       | currency      | 999           |
       | operationId   | OPERATIONID   |
