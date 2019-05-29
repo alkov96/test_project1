@@ -69,6 +69,26 @@
 
     * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
 
+    * запрос к API "api/mobile/v8/checkPhoneCode" и сохраняем в "RESPONCE_API":
+      |  devId                 | DEVID      |
+      |  source                | 16         |
+      |  phone                 | PHONE      |
+      |  code                  | 0000       |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":9 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "message": "code incorrect" |
+
+    * запрос к API "api/mobile/v8/checkPhoneCode" и сохраняем в "RESPONCE_API":
+      |  devId                 | DEVID      |
+      |  source                | 16         |
+      |  phone                 | PHONE      |
+      |  code                  | CODE       |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
     * запрос к API "api/mobile/v8/createUser" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
       |  source                | 16         |
