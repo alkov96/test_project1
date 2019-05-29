@@ -124,7 +124,7 @@
 
   @api
   @goToStep
-  Сценарий: Возвращение на шаг выбора способа регистрации
+  Сценарий: Возвращение на шаг выбора способа регистрации(wave)
 
     * поиск акаунта со статуом регистрации ">=14" "EMAIL"
     * обновляем поля в БД для пользователя "EMAIL":
@@ -195,4 +195,81 @@
       | source                  | 16           |
 
     * проверка вариантного ответа API из "RESPONCE_API":
-      | exepted     | "status":12 |
+    | exepted     | "status":12 or "status":5 |
+
+
+
+  @api
+  @goToStep
+  Сценарий: Возвращение на шаг выбора способа регистрации (dostavista)
+
+    * поиск акаунта со статуом регистрации ">=14" "EMAIL"
+    * обновляем поля в БД для пользователя "EMAIL":
+      | registration_stage_id           | 20            |
+
+    * запрос к API "api/mobile/v8/login" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | email       | EMAIL |
+      | pass        | PASSWORD  |
+      | source      | 16    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * запрос к API "api/mobile/v8/getIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * запрос к API "api/mobile/v8/submitIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+      | identType               |  6           |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+
+    * ждем пока для пользователя "EMAIL" станет "registration_stage_id=21"
+
+    * запрос к API "api/mobile/v8/login" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | email       | EMAIL |
+      | pass        | PASSWORD  |
+      | source      | 16    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * запрос к API "api/mobile/v8/goToStepSubmitIdentType" и сохраняем в "RESPONCE_API":
+      | devId     | DEVID     |
+      | source    | SOURCE    |
+      | authToken | AUTHTOKEN |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "status":11 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "identType": |
+
+    * запрос к API "api/mobile/v8/submitIdentType" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+      | identType               | 3            |
+
+    * запрос к API "api/mobile/v8/getUserStatus" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * проверка вариантного ответа API из "RESPONCE_API":
+      | exepted     | "status":12 or "status":5 |

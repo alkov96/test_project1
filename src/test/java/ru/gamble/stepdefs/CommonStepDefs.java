@@ -3207,7 +3207,7 @@ public class CommonStepDefs extends GenericStepDefs {
             LOG.info("Пока в БД не то, что ожидали. Повторим запрос");
             count--;
         }
-        String expectField = expectedValue.replaceAll("=*","");
+        String expectField = expectedValue.replaceAll("=[0-9]*","");
         Assert.fail("не дождались за 10 секунд: " + expectField + " = " + workWithDBgetResult("SELECT " + expectField + " FROM gamebet.`user` WHERE email='" + email + "'"));
     }
 }
