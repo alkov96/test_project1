@@ -3193,5 +3193,22 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("SQL: \n" + sqlRequest);
         Assert.assertFalse("В БД сохранены неправильные данные",workWithDBgetResult(sqlRequest.toString()).isEmpty());
     }
+
+    @Когда("^ждем пока для пользователя \"([^\"]*)\" станет \"([^\"]*)\"$")
+    public void waitDB(String email,String expectedValue) throws InterruptedException {
+        if (email.matches("[A-Z]*")){
+            email=Stash.getValue(email).toString();
+        }
+        String sql = "SELECT id FROM gamebet.`user` WHERE email='" + email + "' AND " + expectedValue;
+        int count = 20;
+        while(count>0){
+            if (!workWithDBgetResult(sql).isEmpty()) return;
+            Thread.sleep(500);
+            LOG.info("Пока в БД не то, что ожидали. Повторим запрос");
+            count--;
+        }
+        String expectField = expectedValue.replaceAll("=*","");
+        Assert.fail("не дождались за 10 секунд: " + expectField + " = " + workWithDBgetResult("SELECT " + expectField + " FROM gamebet.`user` WHERE email='" + email + "'"));
+    }
 }
 
