@@ -9,6 +9,7 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
 import io.qameta.allure.Allure;
+import io.restassured.response.Response;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
@@ -497,7 +498,6 @@ public class CommonStepDefs extends GenericStepDefs {
         int count = num;
         try {
             do {
-                //todo del . soup
                 System.out.println(count);
                 LOG.debug("List size is " + list.size());
                 for (WebElement preloader : list) {
@@ -727,22 +727,46 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+//    @Когда("^проверка ответа API из \"([^\"]*)\":$")
+//    public void checkresponceAPI(String keyStash, DataTable dataTable) {
+//        Map<String, String> table = dataTable.asMap(String.class, String.class);
+//        String actual = JSONValue.toJSONString(Stash.getValue(keyStash)).replaceAll(" ","");
+//        String expected = table.get("exepted").replaceAll(" ","");
+//        assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
+//        LOG.info("|" + expected + "| содержится в |" + actual + "|");
+//    }
+
+
     @Когда("^проверка ответа API из \"([^\"]*)\":$")
-    public void checkresponceAPI(String keyStash, DataTable dataTable) {
+    public void checkresponceAPI22(String keyStash, DataTable dataTable) {
+//        String actual = JSONValue.toJSONString(Stash.getValue(keyStash)).replaceAll(" ","");
+        RestApi.checkResponse(keyStash,dataTable);
+    }
+
+    @Когда("^проверка вариантного ответа API из \"([^\"]*)\":$")
+    public void checkresponceAPIor(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash)).replaceAll(" ","");
-        String expected = table.get("exepted").replaceAll(" ","");
-        assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
+        Response response = Stash.getValue(keyStash);
+        String actual = response.getBody().asString();
+        String expected = table.get("exepted");
+        boolean actualsOk = actual.contains(expected.split("or")[0].trim()) || actual.contains(expected.split("or")[1].trim());
+        Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|", actualsOk);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 
+
+//    @Когда("^проверка ответа API из \"([^\"]*)\", значение берем из памяти$")
+//    public void checkresponceAPI2(String keyStash, DataTable dataTable) {
+//        Map<String, String> table = dataTable.asMap(String.class, String.class);
+//        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
+//        String expected = Stash.getValue(table.get("exepted"));
+//        assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
+//        LOG.info("|" + expected + "| содержится в |" + actual + "|");
+//    }
+
     @Когда("^проверка ответа API из \"([^\"]*)\", значение берем из памяти$")
     public void checkresponceAPI2(String keyStash, DataTable dataTable) {
-        Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        String expected = Stash.getValue(table.get("exepted"));
-        assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
-        LOG.info("|" + expected + "| содержится в |" + actual + "|");
+        RestApi.checkResponse(keyStash,dataTable,true);
     }
 
 
@@ -833,15 +857,15 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
 
-    @Когда("^проверка вариантного ответа API из \"([^\"]*)\":$")
-    public void checkresponceAPIor(String keyStash, DataTable dataTable) {
-        Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        String expected = table.get("exepted");
-        boolean actualsOk = actual.contains(expected.split("or")[0].trim()) || actual.contains(expected.split("or")[1].trim());
-        Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|", actualsOk);
-        LOG.info("|" + expected + "| содержится в |" + actual + "|");
-    }
+//    @Когда("^проверка вариантного ответа API из \"([^\"]*)\":$")
+//    public void checkresponceAPIor(String keyStash, DataTable dataTable) {
+//        Map<String, String> table = dataTable.asMap(String.class, String.class);
+//        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
+//        String expected = table.get("exepted");
+//        boolean actualsOk = actual.contains(expected.split("or")[0].trim()) || actual.contains(expected.split("or")[1].trim());
+//        Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|", actualsOk);
+//        LOG.info("|" + expected + "| содержится в |" + actual + "|");
+//    }
 
     @Когда("^проверим что время \"([^\"]*)\" уменьшилось в \"([^\"]*)\"$")
     public void checkTimebecomeLes(String keyTime, String keyResponse){
@@ -870,10 +894,12 @@ public class CommonStepDefs extends GenericStepDefs {
         String tmp;
         Object valueFingingParams, retMap = null;
         ObjectMapper mapper = new ObjectMapper();
+        Response response = Stash.getValue(sourceString);
+        Object resp = response.getBody().asString();
 
         //Преобразуем в строку JSON-объект в зависимости от его структуры
-        if (JSONValue.isValidJson(Stash.getValue(sourceString).toString())) {
-            tmp = Stash.getValue(sourceString).toString();
+        if (JSONValue.isValidJson(resp.toString())) {
+            tmp = resp.toString();
         } else {
             tmp = JSONValue.toJSONString(Stash.getValue(sourceString));
         }
@@ -1248,6 +1274,20 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyJSONObject, jSONString);
         LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jSONString) + ")");
 
+    }
+
+    @Когда("^добавляем данные в JSON2 объект \"([^\"]*)\" сохраняем в память:$")
+    public void addDataToJSONObjectStoredInMemory2(String keyJSONObject, DataTable dataTable) {
+        Object params = RestApi.collectParams(dataTable);
+        Stash.put(keyJSONObject,params);
+    }
+
+    @Когда("^добавляем данные в JSON2 массив \"([^\"]*)\" сохраняем в память:$")
+    public void addDataToJSONArrayStoredInMemory2(String keyJSONObject, DataTable dataTable) {
+        Object params = RestApi.collectParams(dataTable);
+        JSONArray authArray = new JSONArray();
+        authArray.add(params);
+        Stash.put(keyJSONObject,authArray);
     }
 
     @Когда("^добавляем данные в JSON массив \"([^\"]*)\" сохраняем в память:$")
@@ -1787,18 +1827,38 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+//    @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+//    public void requestToAPI(String path, String keyStash, DataTable dataTable) {
+//        String fullPath = collectQueryString(path);
+//        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+//    }
+
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
-    public void requestToAPI(String path, String keyStash, DataTable dataTable) {
+    public void requestToAPI2(String path, String keyStash, DataTable dataTable) {
         String fullPath = collectQueryString(path);
-        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+        Response response = RestApi.requestAndResponse("POST",fullPath,dataTable);
+        Stash.put(keyStash, response);
     }
 
+
+//    @Когда("^неудачный запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
+//    public void requestToAPIEr(String path, String keyStash, DataTable dataTable) {
+//        String fullPath = collectQueryString(path);
+//        try {
+//            requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+//        }
+//        catch (AutotestError e){
+//            LOG.info("Ожидали ошибку - получили ошибку:" + e.getMessage());
+//            return;
+//        }
+//        Assert.fail("Ожидали ошибку, но ее не было");
+//    }
 
     @Когда("^неудачный запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestToAPIEr(String path, String keyStash, DataTable dataTable) {
         String fullPath = collectQueryString(path);
         try {
-            requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+            RestApi.requestAndResponse("POST", fullPath,dataTable);
         }
         catch (AutotestError e){
             LOG.info("Ожидали ошибку - получили ошибку:" + e.getMessage());
@@ -1809,7 +1869,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^запрос по прямому адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestTo(String fullPath, String keyStash, DataTable dataTable) {
-        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+        RestApi.requestAndResponse(  "POST", fullPath,dataTable);
     }
 
 
@@ -1854,7 +1914,31 @@ public class CommonStepDefs extends GenericStepDefs {
      * если кдюч = stash - значит значение берем из памяти
      * @param dataTable
      */
-    @Когда("^запрос типа GET, результат сохраняем в \"([^\"]*)\"$")
+//    @Когда("^запрос типа GET, результат сохраняем в \"([^\"]*)\"$")
+//    public void endpointCollect(String keyStash, DataTable dataTable) throws DataException {
+//        List<List<String>> table = dataTable.raw();
+//        StringBuilder path = new StringBuilder();
+//        String value = new String();
+//        String key = new String();
+//        LOG.info("Сначала формируем строку запроса");
+//        for (List<String> entry : table) {
+//            key = entry.get(0);
+//            value = entry.get(1);
+//            switch (key){
+//                case "data":
+//                    value = JsonLoader.getData().get(STARTING_URL).get(value).getValue();
+//                    break;
+//                case "stash":
+//                    value = Stash.getValue(value);
+//                    break;
+//            }
+//            path.append(value+"/");
+//        }
+//        LOG.info("Теперь посылаем GET запрос " + path);
+//        requestByHTTPGet(path.toString(), keyStash);
+//    }
+//
+   @Когда("^запрос типа GET, результат сохраняем в \"([^\"]*)\"$")
     public void endpointCollect(String keyStash, DataTable dataTable) throws DataException {
         List<List<String>> table = dataTable.raw();
         StringBuilder path = new StringBuilder();
@@ -1875,7 +1959,9 @@ public class CommonStepDefs extends GenericStepDefs {
             path.append(value+"/");
         }
         LOG.info("Теперь посылаем GET запрос " + path);
-        requestByHTTPGet(path.toString(), keyStash);
+
+       Response response = RestApi.requestAndResponse("GET",path.toString(),null);
+       Stash.put(keyStash, response);
     }
 
 

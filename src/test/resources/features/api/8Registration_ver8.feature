@@ -78,7 +78,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":9 |
     * проверка ответа API из "RESPONCE_API":
-      | exepted | "message": "code incorrect" |
+      | exepted | "message":"code incorrect" |
 
     * запрос к API "api/mobile/v8/checkPhoneCode" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
@@ -240,7 +240,7 @@
     * запрос к API "api/mobile/v8/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
       | source                  | 16               |
-      | snilsNumber             | "000-000-000 00" |
+      | snilsNumber             | 000-000-000 00 |
       | innNumber               |                  |
 
     * проверка ответа API из "RESPONCE_API":

@@ -212,7 +212,7 @@
     * запрос к API "api/mobile/v3/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
       | source                  | 16               |
-      | snilsNumber             | "000-000-000 00" |
+      | snilsNumber             | 000-000-000 00   |
       | innNumber               |                  |
 
     * проверка ответа API из "RESPONCE_API":

@@ -209,19 +209,19 @@
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
-      | citizenship         | "RUS"         |
+      | citizenship         | rus         |
       | publicperson        | null          |
       | publicperson        | null          |
       | address             | ADDRESS       |
       | documents           | DOCUMENTS     |
-      | operationofficecode | "222"         |
-      | operatorlogin       | "333"         |
+      | operationofficecode | 222         |
+      | operatorlogin       | 333         |
       | inn                 | INN           |
       | SNILS               | SNILS         |
       | method              | betshop       |
-      | error               | ""            |
-      | reason              | ""            |
-      | identityState       | "LIMITED"     |
+      | error               |             |
+      | reason              |              |
+      | identityState       | limited     |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |
@@ -340,19 +340,19 @@
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
-      | citizenship         | "RUS"         |
+      | citizenship         | rus           |
       | publicperson        | null          |
       | publicperson        | null          |
       | address             | ADDRESS       |
       | documents           | DOCUMENTS     |
-      | operationofficecode | "222"         |
-      | operatorlogin       | "333"         |
+      | operationofficecode | 222           |
+      | operatorlogin       | 333           |
       | inn                 | INN           |
       | SNILS               | SNILS         |
       | method              | betshop       |
-      | error               | ""            |
-      | reason              | ""            |
-      | identityState       | "LIMITED"     |
+      | error               |               |
+      | reason              |               |
+      | identityState       | limited       |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |
@@ -434,7 +434,7 @@
     * запрос к API "api/mobile/v6/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
       | source                  | 16               |
-      | snilsNumber             | "000-000-000 00" |
+      | snilsNumber             | 000-000-000 00   |
       | innNumber               |                  |
 
     * проверка ответа API из "RESPONCE_API":

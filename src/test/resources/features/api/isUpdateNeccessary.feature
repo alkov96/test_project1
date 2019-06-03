@@ -13,7 +13,7 @@
     * обновим версию мобильного приложения для "Android" "TYPEOS" до "3.4" "3.0"
     * запрос к API "api/mobile/v3/isUpdateNeccessary" и сохраняем в "RESPONCE_API":
       | typeOS                  | TYPEOS        |
-      | appVersion              | "3.5"         |
+      | appVersion              | 3.5           |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
@@ -47,7 +47,7 @@
     * обновим версию мобильного приложения для "IOS" "TYPEOS" до "3.4" "3.0"
     * запрос к API "api/mobile/v3/isUpdateNeccessary" и сохраняем в "RESPONCE_API":
       | typeOS                  | TYPEOS        |
-      | appVersion              | "3.5"         |
+      | appVersion              | 3.5           |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
