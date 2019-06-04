@@ -36,7 +36,10 @@ public class RestApi {
         RestAssured.useRelaxedHTTPSValidation();
         Object paramValue=new Object();
         for (String name:body.keySet()){
-            paramValue=body.get(name).matches("[A-Z]*")?Stash.getValue(body.get(name)):body.get(name);
+            paramValue=body.get(name).matches("[_A-Z]*")?Stash.getValue(body.get(name)):body.get(name);
+            if (body.get(name).isEmpty()){
+                paramValue="";
+            }
             requestBody.put(name,paramValue);
         }
 
@@ -139,6 +142,9 @@ public class RestApi {
         Map<String,String> table = dataTable.asMap(String.class,String.class);
         for (Map.Entry<String,String> entery:table.entrySet()){
             paramValue=entery.getValue().matches("[A-Z]*")?Stash.getValue(entery.getValue()):entery.getValue();
+            if (entery.getValue().isEmpty()){
+                paramValue="";
+            }
             authparam.put(entery.getKey(),paramValue);
         }
         //authArray.add(authparam);

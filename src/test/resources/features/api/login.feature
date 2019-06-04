@@ -185,7 +185,7 @@
       | 1 | "code":0 |
       | 2 | "fast_registration","state":0 |
 
-    * добавляем данные в JSON2 объект "PERSONALDATA" сохраняем в память:
+    * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
       |  name                   | FIRSTNAME      |
       |  surname                | SURNAME        |
       |  middleName             | PATRONYMIC     |

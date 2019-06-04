@@ -894,12 +894,19 @@ public class CommonStepDefs extends GenericStepDefs {
         String tmp;
         Object valueFingingParams, retMap = null;
         ObjectMapper mapper = new ObjectMapper();
-        Response response = Stash.getValue(sourceString);
-        Object resp = response.getBody().asString();
+        String resp;
+        if (Stash.getValue(sourceString).getClass().getName().contains("List")){
+            List<Object> list = Stash.getValue(sourceString);
+            resp=list.get(list.size()-1).toString();
+        }
+        else {
+            Response response = Stash.getValue(sourceString);
+            resp=response.getBody().asString();
+        }
 
         //Преобразуем в строку JSON-объект в зависимости от его структуры
-        if (JSONValue.isValidJson(resp.toString())) {
-            tmp = resp.toString();
+        if (JSONValue.isValidJson(resp)) {
+            tmp = resp;
         } else {
             tmp = JSONValue.toJSONString(Stash.getValue(sourceString));
         }
@@ -1267,38 +1274,38 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Невалидна дата выдачи паспорта: " + formatDate.format(invalid.getTime()));
     }
 
+//    @Когда("^добавляем данные в JSON объект \"([^\"]*)\" сохраняем в память:$")
+//    public void addDataToJSONObjectStoredInMemory(String keyJSONObject, DataTable dataTable) {
+//
+//        Object jSONString = collectParametersInJSONString(dataTable);
+//        Stash.put(keyJSONObject, jSONString);
+//        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jSONString) + ")");
+//
+//    }
+
     @Когда("^добавляем данные в JSON объект \"([^\"]*)\" сохраняем в память:$")
     public void addDataToJSONObjectStoredInMemory(String keyJSONObject, DataTable dataTable) {
-
-        Object jSONString = collectParametersInJSONString(dataTable);
-        Stash.put(keyJSONObject, jSONString);
-        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jSONString) + ")");
-
-    }
-
-    @Когда("^добавляем данные в JSON2 объект \"([^\"]*)\" сохраняем в память:$")
-    public void addDataToJSONObjectStoredInMemory2(String keyJSONObject, DataTable dataTable) {
         Object params = RestApi.collectParams(dataTable);
         Stash.put(keyJSONObject,params);
     }
 
-    @Когда("^добавляем данные в JSON2 массив \"([^\"]*)\" сохраняем в память:$")
-    public void addDataToJSONArrayStoredInMemory2(String keyJSONObject, DataTable dataTable) {
+    @Когда("^добавляем данные в JSON массив \"([^\"]*)\" сохраняем в память:$")
+    public void addDataToJSONArrayStoredInMemory(String keyJSONObject, DataTable dataTable) {
         Object params = RestApi.collectParams(dataTable);
         JSONArray authArray = new JSONArray();
         authArray.add(params);
         Stash.put(keyJSONObject,authArray);
     }
 
-    @Когда("^добавляем данные в JSON массив \"([^\"]*)\" сохраняем в память:$")
-    public void addDataToJSONArrayStoredInMemory(String keyJSONObject, DataTable dataTable) {
-
-        Object jSONString = collectParametersInJSONString(dataTable);
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.add(jSONString);
-        Stash.put(keyJSONObject, jsonArray);
-        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jsonArray.get(0)) + ")");
-    }
+//    @Когда("^добавляем данные в JSON массив \"([^\"]*)\" сохраняем в память:$")
+//    public void addDataToJSONArrayStoredInMemory(String keyJSONObject, DataTable dataTable) {
+//
+//        Object jSONString = collectParametersInJSONString(dataTable);
+//        JSONArray jsonArray = new JSONArray();
+//        jsonArray.add(jSONString);
+//        Stash.put(keyJSONObject, jsonArray);
+//        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jsonArray.get(0)) + ")");
+//    }
 
     @Когда("^приводим дату к формату год-месяц-день \"([^\"]*)\"$")
     public void dataFormatter(String keyData) {
