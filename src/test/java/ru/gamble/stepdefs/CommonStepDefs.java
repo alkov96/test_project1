@@ -192,7 +192,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
 
         if (value.equals(RANDOME_EMAIL)) {
-            value = "testregistrator" + Stash.getValue("PHONE") + "@mailintor.com";
+            value = "testregistrator" + Stash.getValue("PHONE") + "@mailinator.com";
         }
 
         if (value.split(" ")[0].equals(RANDOM)) {
@@ -548,7 +548,7 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     public static String stringParse(String oldName) {
         String nameGame;
-        Pattern p = Pattern.compile("(?u)[^а-яА-Я0-9a-zA-Z]");
+        Pattern p = Pattern.compile("(?u)[^а-яА-Ясa-zA-Z]");
         Matcher m = p.matcher(oldName);
         nameGame = m.replaceAll("");
         return nameGame;
@@ -1194,6 +1194,25 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("Получили код подтверждения почты: " + code);
     }
 
+
+    @Когда("^проверка что в БД есть код для восстановления пароля \"([^\"]*)\"$")
+    public static void checkCodeFromResetPassword(String keyEmail) {
+        String email = Stash.getValue(keyEmail);
+        String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='" + email + "'";
+        String userId = workWithDBgetResult(sqlRequest, "id");
+        sqlRequest = "SELECT token FROM gamebet.`userpasswordresettoken` WHERE user_id=" + userId;
+        try {
+            String token = workWithDBgetResult(sqlRequest, "token");
+            LOG.info("Раз тест не упал, значит в БД есть токен для смены пароля: " + token);
+        }
+        catch (Exception e)
+        {
+            LOG.info("в БД нет токена дял восстановления пароля");
+            e.printStackTrace();
+        }
+
+    }
+
     @Когда("^определяем валидную и невалидную дату выдачи паспорта \"([^\"]*)\" \"([^\"]*)\"$")
     public void issueDateGenerate(String validKey, String invalidKey) throws ParseException {
         String birthDateString = Stash.getValue("BIRTHDATE");
@@ -1269,17 +1288,18 @@ public class CommonStepDefs extends GenericStepDefs {
             key = entry.getKey();
             if (entry.getValue().matches("^[A-Z_]+$")) {
                 value = Stash.getValue(entry.getValue());
-            } else {
-                value = entry.getValue();
             }
-            if (entry.getValue().matches("^[/(][A-Z]+[/)]")){
-                value = String.valueOf(value).replace("(","").replace(")","");
+            else if (entry.getValue().matches("^[/(][A-Z]+[/)]")){
+                value = String.valueOf(entry.getValue()).replace("(","").replace(")","");
                 JSONObject asd = Stash.getValue( String.valueOf(value));
                 JSONObject[] dfg = {Stash.getValue( String.valueOf(value))};
                 jsonObject.put(key,dfg);
             }
+            else {
+                value = entry.getValue();
+            }
             //Если попадются числовые значения, в JSON объект кладём как строку
-            else if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
+             if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
                 String str = (String) value;
                 jsonObject.put(key, value);
             } else {
@@ -1523,7 +1543,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
-    public void searchUserStatus2(String status, String keyEmail) {
+    public void searchUserStatus(String status, String keyEmail) {
         //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7933%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator%mailinator.com' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id";
         searchUser(keyEmail, sqlRequest);
@@ -1955,6 +1975,7 @@ public class CommonStepDefs extends GenericStepDefs {
         try {
             connect = (HttpURLConnection) new URL(requestFull).openConnection();
             connect.setRequestMethod("GET");
+            connect.setRequestProperty("mst","edadcc8f-4c06-412e-801a-e574ad33b58f");
             connect.setUseCaches(false);
             connect.setConnectTimeout(500);
             connect.setReadTimeout(500);
@@ -2092,8 +2113,9 @@ public class CommonStepDefs extends GenericStepDefs {
             con.setRequestMethod(method);
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setRequestProperty("mst","edadcc8f-4c06-412e-801a-e574ad33b58f");
 
-            //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
+            //стрчока внизу - это чтоб не было редиректа на мобильную версию (потмоу что при редирексте POST меняеallureтся на GET)
             //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
 
             OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), StandardCharsets.UTF_8);
@@ -2229,7 +2251,7 @@ public class CommonStepDefs extends GenericStepDefs {
     /**
      * это когда активне опции сайта в отдельной таблице
      */
-    @Before(value = "@before or @api")
+    @Before(value = "@enabledFeatures or @api")
     public void saveRegistrationValue2() {
         rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
@@ -2338,7 +2360,7 @@ public class CommonStepDefs extends GenericStepDefs {
      *
      * @param scenario
      */
-    @After(value = "@after")
+    @After(value = "@enabledFeatures or @api")
     public void returnRegistrationValueWithScreenshot(Scenario scenario) {
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
@@ -2809,6 +2831,8 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^очищаем избранное$")
     public void clearFavourite() throws Exception {
         clearFavouriteGames();
+        Stash.remove("nameGameKey");
+        Stash.remove("typeGameKey");
     }
 
     @Когда("^нажимает кнопку НАЗАД$")
@@ -3035,6 +3059,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void clearCouponAfter(Scenario scenario) throws InterruptedException {
         getScreenshot(scenario);
         goToMainPage("site");
+        workWithPreloader();
         driver.findElement(By.id("prematch")).click(); //переходим в прематч
         driver.navigate().refresh();
         workWithPreloader();
@@ -3145,6 +3170,45 @@ public class CommonStepDefs extends GenericStepDefs {
          Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
                  firstN-diffLong,secondN);
          LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
+    }
+
+    @Когда("^проверим что в БД сохранены правильные значения$")
+    public void checkDataInDB(DataTable dataTable){
+        Map <String,String> table = dataTable.asMap(String.class,String.class);
+        StringBuilder sqlRequest = new StringBuilder();
+        String whereOne = new String();
+        SimpleDateFormat stashFormat = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat DBFormat = new SimpleDateFormat("yyyy-MM-dd");
+        sqlRequest.append("SELECT * from gamebet.`user` WHERE ");
+        for(Map.Entry<String, String> entry : table.entrySet()){
+            whereOne = entry.getValue().matches("[_A-Z]*")?Stash.getValue(entry.getValue()):entry.getValue();
+            if (whereOne.matches("[0-9]+[.]+[0-9]+[.]+[0-9]+")){
+                whereOne = newFormatDate(stashFormat,DBFormat,whereOne);
+            }
+            whereOne = entry.getKey() + "='" + whereOne + "' AND ";
+            sqlRequest.append(whereOne);
+        }
+        int i = sqlRequest.toString().lastIndexOf(" AND ");
+        sqlRequest.delete(i,sqlRequest.length());
+        LOG.info("SQL: \n" + sqlRequest);
+        Assert.assertFalse("В БД сохранены неправильные данные",workWithDBgetResult(sqlRequest.toString()).isEmpty());
+    }
+
+    @Когда("^ждем пока для пользователя \"([^\"]*)\" станет \"([^\"]*)\"$")
+    public void waitDB(String email,String expectedValue) throws InterruptedException {
+        if (email.matches("[A-Z]*")){
+            email=Stash.getValue(email).toString();
+        }
+        String sql = "SELECT id FROM gamebet.`user` WHERE email='" + email + "' AND " + expectedValue;
+        int count = 20;
+        while(count>0){
+            if (!workWithDBgetResult(sql).isEmpty()) return;
+            Thread.sleep(500);
+            LOG.info("Пока в БД не то, что ожидали. Повторим запрос");
+            count--;
+        }
+        String expectField = expectedValue.replaceAll("=[0-9]*","");
+        Assert.fail("не дождались за 10 секунд: " + expectField + " = " + workWithDBgetResult("SELECT " + expectField + " FROM gamebet.`user` WHERE email='" + email + "'"));
     }
 }
 

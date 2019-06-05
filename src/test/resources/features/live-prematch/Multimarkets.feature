@@ -1,8 +1,7 @@
 # language: ru
 Функционал: 5_Лайв, Прематч и динамическое меню
 
-  @before
-  @after
+  @enabledFeatures
   @coupon
   @regress
   @Multimarkets

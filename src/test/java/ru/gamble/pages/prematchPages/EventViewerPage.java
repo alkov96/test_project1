@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.openqa.selenium.By.xpath;
+import static ru.gamble.stepdefs.CommonStepDefs.switchHandle;
+import static ru.gamble.stepdefs.CommonStepDefs.waitOfPreloader;
 import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 import static ru.gamble.utility.Constants.PERIOD;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
@@ -47,13 +49,8 @@ public class EventViewerPage extends AbstractPage {
     private WebElement selectPeriod;
 
     @ElementTitle("Кнопка МАКСБЕТ")
-    @FindBy(xpath = "//i[contains(@class,'icon-maxbet')]")
+    @FindBy(xpath = "//label[contains(@class,'coupon-btn_max-bet')]/i[contains(@class,'icon-maxbet')]")
     private WebElement maxBet;
-
-    @ElementTitle("Инпут размера ставки")
-    @FindBy(xpath = "//i[contains(@class,'icon-maxbet')]")
-    private WebElement input;
-
 
     private static By xpathForsportsPrematch = By.xpath("//*[@id='sports-list-container']//li[contains(@id,'sport') and not(contains(@id,'sport--'))]");
     private static By xpathSport = By.xpath("//li[contains(@class,'left-menu__list-item-sport') and not(contains(@id,'sport--')) and not(contains(@class,'favorite'))]");
@@ -103,7 +100,7 @@ public class EventViewerPage extends AbstractPage {
             LOG.info("сворачиваем все виды спорта");
             closeSports();
             sport=driver.findElements(xpathSport).get(i);
-            LOG.info("разворачиваем нужный спорт");
+            LOG.info("разворачиваем нужный спорт " + sport.getAttribute("innerText").split("\n")[0]);
             clickIfVisible(sport);
             wait
                 .withMessage("Спорт " + sport.getAttribute("innerText").split("\n")[0] + " не раскрылся")
@@ -137,7 +134,7 @@ public class EventViewerPage extends AbstractPage {
             region = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).get(i);
             if (region.getAttribute("class").contains("active")) {
                 LOG.info("сворачиваем регион " + region.getAttribute("innerText").split("\n")[0]);
-                clickIfVisible(region);
+                clickIfVisible(region.findElement(By.xpath(".//div[contains(@class,'icon-arrow')]")));
             }
         }
     }
@@ -154,6 +151,7 @@ public class EventViewerPage extends AbstractPage {
         for (int i=0;i<countCompetit;i++){
             checkMenuIsOpen(true);
             competition = driver.findElements(xpathSport).get(sport).findElements(xpathRegion).get(region).findElements(xpathCompetition).get(i);
+            LOG.info("Выбираем сорвенование в этом регионе");
             clickIfVisible(competition);//кликнули на выбранное сорвенование в регионе. теперь в центральной части страниыв отображаются игры только этого соревнования
             setExpandCollapseMenusButton(false); //сворачиваем левое меню.чтобы ЦО была полностью видна
             checkGameOnCenter(valuePeriod);
@@ -161,6 +159,13 @@ public class EventViewerPage extends AbstractPage {
     }
 
     private void checkGameOnCenter(String valuePeriod){
+        SimpleDateFormat formatterOnlyDate = new SimpleDateFormat("dd MMM yyyy", new Locale("ru"));
+        Calendar today = Calendar.getInstance();
+        String segodnya = formatterOnlyDate.format(today.getTime());
+        today.add(Calendar.DAY_OF_YEAR,1);
+        String zavtra = formatterOnlyDate.format(today.getTime());
+        today.add(Calendar.DAY_OF_YEAR,1);
+        String poslezavtra = formatterOnlyDate.format(today.getTime());
         By xpathToDate = By.xpath("../preceding-sibling::div[contains(@class,'prematch-competition__header')]/div[contains(@class,'prematch-competition__header-date')]");
         By xpathToTime = By.xpath(".//div[contains(@class,'bets-block__header-left-info')]");
 //        LOG.info("Закроем ЛМ чтобы не мешалось");
@@ -180,14 +185,32 @@ public class EventViewerPage extends AbstractPage {
         }
         SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy k:mm");
         period.add(Calendar.HOUR,hoursPeriod);
+        String dateGame=new String();
         for (int i=0;i<dateGamesString.size();i++){
             LOG.info("Проверяем игру " + nameGames.get(i));
+            dateGame = dateGamesString.get(i);
+            int ind = dateGame.indexOf(":");
+            dateGame = dateGame.substring(0,ind-3);
+            switch (dateGame){
+                case "Сегодня":
+                    dateGame=segodnya + " " + dateGamesString.get(i).substring(ind-2);
+                    break;
+                case "Завтра":
+                    dateGame=zavtra + " " + dateGamesString.get(i).substring(ind-2);
+                    break;
+                case "Послезавтра":
+                    dateGame=poslezavtra + " " + dateGamesString.get(i).substring(ind-2);
+                    break;
+                default:
+                    dateGame = dateGamesString.get(i);
+                    break;
+            }
             try {
-                dateOneGame.setTime(format.parse(dateGamesString.get(i)));
+                dateOneGame.setTime(format.parse(dateGame));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            Assert.assertTrue("Игра не соответсвтует выбранному периоду " + valuePeriod + ":: время игры " + dateGamesString.get(i),
+            Assert.assertTrue("Игра не соответсвтует выбранному периоду " + valuePeriod + ":: время игры " + dateGame,
                     dateOneGame.before(period));
             LOG.info("Игра соответсвует выбранному периоду");
             i++;
@@ -204,14 +227,18 @@ public class EventViewerPage extends AbstractPage {
      */
     @ActionTitle("находит игру по фильтру")
     public void searchGamePrematchAtPeriod(String period, String inPeriod, String adding) {
-        boolean add = adding.equals("и добавляет в избранное");
+        List list = Stash.getValue("nameGameKey");
+        LOG.info("Сейчас запомнено игр " + list);
+        int nameInMemory = list==null?0:list.size();
         try {
             gamePrematchAtPeriod(period, inPeriod.equals("раньше"), adding.equals("и добавляет в избранное"));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (Stash.getValue("nameGameKey")==null){
-            Assertions.fail("Игры не найдена");
+        list = Stash.getValue("nameGameKey");
+        int nameInMemory2 = list==null?0:list.size();
+        if (nameInMemory==nameInMemory2){
+            Assertions.fail("Игра не найдена");
         }
         LOG.info("Игра по фильтру времени " + period + " (" + inPeriod + ") найдена: ");
         LOG.info(Stash.getValue("nameGameKey") + " время начала " + Stash.getValue("timeGameKey"));
@@ -227,9 +254,15 @@ public class EventViewerPage extends AbstractPage {
         LOG.info("смотрим какие сейчас дата и время и прибавлем к этому времени период(потом будет учавствовать в Фильтре");
         Date dateGame;
         int hour = Integer.valueOf(period.substring(0, period.indexOf("час") - 1));
-        Date Period = new Date(System.currentTimeMillis() + hour * 3600 * 1000);
+        Date periodDate = new Date(System.currentTimeMillis() + hour * 3600 * 1000);
         SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", new Locale("ru"));
-
+        SimpleDateFormat formatterOnlyDate = new SimpleDateFormat("dd MMM yyyy", new Locale("ru"));
+        Calendar today = Calendar.getInstance();
+        String segodnya = formatterOnlyDate.format(today.getTime());
+        today.add(Calendar.DAY_OF_YEAR,1);
+        String zavtra = formatterOnlyDate.format(today.getTime());
+        today.add(Calendar.DAY_OF_YEAR,1);
+        String poslezavtra = formatterOnlyDate.format(today.getTime());
 
         WebElement menu = driver.findElement(By.id("menu-toggler"));
         if (!menu.getAttribute("class").contains("collapsed")) menu.click();
@@ -239,22 +272,32 @@ public class EventViewerPage extends AbstractPage {
             driver.findElement(By.xpath("//div[@class='periods']/div")).click();//включим фильтр по временеи чтоб не мучиться с поисками игры
             driver.findElement(By.xpath("//div[@class='periods']//li[contains(normalize-space(text()),'" + hour + "')]")).click();
             CommonStepDefs.workWithPreloader();
+            if (!menu.getAttribute("class").contains("collapsed")) menu.click();
         } else {
             LOG.info("Выключаем фильтр по времени");
             typeGame = "PrematchVnePeriod";
             driver.findElement(By.xpath("//div[@class='periods']/div")).click();// если ищем игру вне периода то убедимся что фильтр выключен
             driver.findElement(By.xpath("//div[@class='periods']/ul/li[1]")).click();
             CommonStepDefs.workWithPreloader();
+            if (!menu.getAttribute("class").contains("collapsed")) menu.click();
         }
 
         LOG.info("Сворачиваем все виды спорта");
         closeSports();
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        By bypopular = By.xpath("//li[contains(@id,'sport--') and contains(@class,'active')]");
         int sportCount = driver.findElements(xpathForsportsPrematch).size();
         for (int sportN = 1; sportN < sportCount; sportN++) {
+            LOG.info("Сначала свернем всякие допспорты(популярные соревнования, нулевая маржа)");
+            if (!driver.findElements(bypopular).isEmpty()){
+                wait.withMessage("вэйт1").until(ExpectedConditions.presenceOfElementLocated(bypopular));
+                wait.withMessage("вэйт2").until(ExpectedConditions.visibilityOfElementLocated(bypopular));
+                driver.findElements(bypopular).forEach(element -> element.findElement(By.xpath(".//*[contains(@class,'icon-arrow')]")).click());
+            }
+//популярные соревнования и нулевая маржа могут развернуться сами по себе, даже после того как нажали "свернуть все". поэтому нужные вид спорта уходят вниз за область экрана. потом нчего не рабоатет. чтобы этого избежать - нужно свернуть все эти доп.группы
+            wait.withMessage("вэйт3").until(ExpectedConditions.numberOfElementsToBe(bypopular,0));
             //разворачиваем спорт(начнем с тенниса просто потому что не хочу футбол)
             LOG.info("Разворачиваем один спорт");
-            driver.findElements(By.xpath("//li[contains(@id,'sport--') and contains(@class,'active')]")).forEach(element -> element.findElement(By.xpath("./a")).click());
-//популярные соревнования и нулевая маржа могут развернуться сами по себе, даже после того как нажали "свернуть все". поэтому нужные вид спорта уходят вниз за область экрана. потом нчего не рабоатет. чтобы этого избежать - нужно свернуть все эти доп.группы
             driver.findElements(xpathForsportsPrematch).get(sportN).click();
             LOG.info(driver.findElements(xpathForsportsPrematch).get(sportN).findElement(By.xpath("./a")).getAttribute("title"));
             CommonStepDefs.workWithPreloader();
@@ -297,9 +340,20 @@ public class EventViewerPage extends AbstractPage {
                     for (int index = 0; index < allDates.size(); index++) {
                         WebElement dateInTour = allDates.get(index);
                         String day = dateInTour.getAttribute("innerText");
+                        switch (day){
+                            case "Сегодня":
+                                day=segodnya;
+                                break;
+                            case "Завтра":
+                                day=zavtra;
+                                break;
+                            case "Послезавтра":
+                                day=poslezavtra;
+                                break;
+                        }
                         for (WebElement game: allDates.get(index).findElements(byTime)){//для каждой даты несколько игр может быть на разное время. вот продемся по каждой из них
                             dateGame = formatter.parse(day + " " + game.getAttribute("innerText"));
-                            if ((dateGame.getTime() <= Period.getTime()) == inPeriod) {//если игра подходит
+                            if ((dateGame.getTime() <= periodDate.getTime()) == inPeriod) {//если игра подходит
                                 nameGamefull = game.findElement(By.xpath("./following-sibling::div[contains(@class,'bets-block__header-teams')]")).getAttribute("innerText");
                                 CommonStepDefs.addStash("nameGameKey",nameGamefull.replaceAll("\n"," "));
                                 CommonStepDefs.addStash("timeGameKey",formatter.format(dateGame));
@@ -362,7 +416,7 @@ public class EventViewerPage extends AbstractPage {
         }
 
         LOG.info("Проверка страницы прематч при включенном фильтре = " + expectedPeriod);
-
+        new WebDriverWait(driver,10).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[@class = 'left-menu__search left-menu-filters']"),0));
         String selectPeriod = driver.findElement(By.xpath("//div[@class = 'left-menu__search left-menu-filters']//div[contains(@class,'periods__input')]")).getAttribute("innerText");
         LOG.info("Теперь проверим что фильтр в нужном состоянии "+expectedPeriod);
         if (!selectPeriod.equals(expectedPeriod)) {
@@ -451,12 +505,12 @@ public class EventViewerPage extends AbstractPage {
         boolean turnOn = onOrOff.equalsIgnoreCase("включает")?true:false;
         By xpathMultiviewButton = By.xpath("//div[contains(@class,'left-menu-filters__item_multiview')]");
 
-        if (!driver.findElements(preloaderOnPage).isEmpty()){
-            LOG.info("Страница не прогрузилась. Обновим её");
-            driver.navigate().refresh();
-            CommonStepDefs.workWithPreloader();
-        }
-
+//        if (!driver.findElements(preloaderOnPage).isEmpty()){
+//            LOG.info("Страница не прогрузилась. Обновим её");
+//            driver.navigate().refresh();
+//            CommonStepDefs.workWithPreloader();
+//        }
+        CommonStepDefs.workWithPreloader();
         LOG.info("\nОткроем левое меню");
         setExpandCollapseMenusButton(true);
         try {
@@ -771,51 +825,66 @@ public class EventViewerPage extends AbstractPage {
     }
 
     @ActionTitle("ищет ставку с маленьким значением maxbet")
-    public void searchBetFromSuperbet(String betOk){
+    public void searchBetFromSuperbet2(String betOk){
         WebDriverWait wait = new WebDriverWait(driver,10);
         Actions actions = new Actions(driver);
-        int has = 0;
-        LOG.info("Сворачиваем все виды спорта");
-        closeSports();//свернули все виды спорта
-        LOG.info("Разворачиваем футбол");
-        WebElement football = driver.findElement(By.xpath("//*[@id='sports-list-container']//li[@id='sport-1']"));
-        football.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_sport')]")).click();
-        wait.withMessage("Футбол не развернулся спустя 10 секунд");
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__submenu']/li"),0));
-        List<WebElement> regions = football.findElements(By.xpath(".//ul[@class='left-menu__submenu']/li"));
-        if (regions.size()>3){//все регионы пролистывать - это очень долго. пусть будет всего 3 региона
-            regions=regions.subList(0,3);
+        LOG.info("Для супербета нужна ставка с маленьким значением max. Вероятность этого маленькая, поэтому нет смысла првоерять все виды спорта и все ставки. будем смотреть только футбол и специальные ставки");
+        List<WebElement> sports = new ArrayList<>();
+        String sportByTitle = "//li[contains(@class,'left-menu__list-item-sport')]/*[contains(@title,'%s')]/..";
+        try {
+            sports.add(driver.findElement(By.xpath(String.format(sportByTitle,"Специальные ставки"))));
+            sports.add(driver.findElement(By.xpath(String.format(sportByTitle,"Футбол"))));
         }
-        LOG.info("Ищем игру со ставкой Точный счёт, чей коэф > 50.0. Потмоуч о у ставок с меньшим коэффициентом вероятен большой максимум");
-        for (WebElement region : regions){
-            if(!region.getAttribute("class").contains("active")){
-                region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();
-                LOG.info("регион " + region.getAttribute("innerText"));
-                wait.withMessage("Регион " + region.getAttribute("innerText") + " не развернулс за 10 секунл");
-                wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'left-menu__list-item-region-compitition')]"),0));
-                List<WebElement> comps = region.findElements(By.xpath(".//div[contains(@class,'left-menu__list-item-region-compitition')]"));
-                for (WebElement competition:comps){
-                    competition.click();
-                    workWithPreloader();
-                    List<WebElement> games = driver.findElements(By.xpath("//div[contains(@class,'bets-block_single-row')]"));
-                    for (WebElement game : games){
-                        game.findElement(By.xpath(".//div[contains(@class,'bets-block__header-teams')]")).click();
+        catch (NoSuchElementException e){
+            LOG.info("Нет одного из спортов");
+        }
+        for (WebElement sport:sports){
+            LOG.info("разворачиваем ЛМ и сворачиваем все виды спорта");
+            setExpandCollapseMenusButton(true);
+            closeSports();
+            if (sport.getAttribute("class").contains("hide")){
+                driver.findElement(By.id("sport--10")).click();
+                wait.until(ExpectedConditions.not(ExpectedConditions.attributeContains(sport,"class","hide")));
+            }
+            LOG.info("Разворачиваем " + sport.findElement(By.xpath("./*")).getAttribute("title"));
+            sport.click();
+
+            List<WebElement> regions = sport.findElements(By.xpath(".//ul[@class='left-menu__submenu']/li"));
+            if (regions.size()>3){//все регионы пролистывать - это очень долго. пусть будет всего 3 региона
+                regions=regions.subList(0,3);
+            }
+            LOG.info("Ищем игру с коэф > 50.0. Потому что у ставок с меньшим коэффициентом вероятен большой максимум");
+            for (WebElement region : regions){
+                if(!region.getAttribute("class").contains("active")){
+                    region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();
+                    LOG.info("регион " + region.getAttribute("innerText"));
+                    wait.withMessage("Регион " + region.getAttribute("innerText") + " не развернулся за 10 секунл");
+                    wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'left-menu__list-item-region-compitition')]"),0));
+                    List<WebElement> comps = region.findElements(By.xpath(".//div[contains(@class,'left-menu__list-item-region-compitition')]"));
+                    for (WebElement competition:comps){
+                        competition.click();
                         workWithPreloader();
-                        has = driver.findElements(By.xpath("//div[@class='game-container__bets-area-wrpr']//div[contains(@class,'bets-block')]//span[@class='bets-block__header-bet-name' and contains(@title,'Точный счет')]")).size();
-                        if (has==0){
-                            continue;
-                        }
-                        WebElement score = driver.findElement(By.xpath("//div[@class='game-container__bets-area-wrpr']//div[contains(@class,'bets-block')]//span[@class='bets-block__header-bet-name' and contains(@title,'Точный счет')]"));
-                        //          List<WebElement> scores = score.findElement(By.xpath("ancestor::div[@class='bets-block__header']/following-sibling::div[contains(@class,'bets-block__body')]")).findElements(By.xpath("./div[contains(@class,'bets-block__bet-cell')]//span[position()=2]"));
-                        List<WebElement> betsAll = score.findElement(By.xpath("ancestor::div[@class='bets-block__header']/following-sibling::div[contains(@class,'bets-block__body')]")).findElements(By.xpath("./div[contains(@class,'bets-block__bet-cell')]//span[position()=2]"));
-                        List<WebElement> betsFilter = betsAll.stream().filter(e->Float.valueOf(e.getAttribute("innerText"))>50.0).collect(Collectors.toList());
-                        if (betsFilter.size()==0){
-                            LOG.info("У текущей игры нет ставок с коэффициентом больше 50.0, значит и maxBet будт большим, даже проверять не будем. Попрообуем на следующей игре");
-                            continue;
-                        }
-                        LOG.info("Пройдемся по ставкам в этой игре, и поищем ту, у которой maxBet меньше " + betOk);
-                        for (WebElement bet:betsFilter){
-                            bet.click();
+                        List<WebElement> games = driver.findElements(By.xpath("//div[contains(@class,'bets-block_single-row')]"));
+                        for (WebElement game : games){
+                            game.findElement(By.xpath(".//div[contains(@class,'bets-block__header-teams')]")).click();
+                            workWithPreloader();
+
+                            List<WebElement> betsAllEl = driver.findElements(By.xpath("//div[@class='game-container__bets-area-wrpr']//span[contains(@class,'bets-block__bet-cell-content-price')]"));
+
+                            LOG.info("Найдем элемент с самой большой ставкой");
+                            WebElement maxCoefEl = betsAllEl.stream()
+                                    .sorted(((o1, o2) ->
+                                            -Float.valueOf(o1.getAttribute("innerText"))
+                                                    .compareTo(Float.valueOf(o2.getAttribute("innerText")))))
+                                    .collect(Collectors.toList()).get(0);
+
+                            if (Float.valueOf(maxCoefEl.getAttribute("innerText"))<=50.0){
+                                LOG.info("У текущей игры максимальный коэф меньше 50.0" +maxCoefEl.getAttribute("innerText") + " , значит и maxBet будет большим, даже проверять не будем. Попрообуем на следующей игре");
+                                continue;
+                            }
+                            LOG.info("Попробуем эту ставку, может быть её maxBet меньше " + betOk);
+
+                            maxCoefEl.click();
                             new CouponPage().checkListOfCoupon();
                             maxBet.click();
                             actions.moveToElement(driver.findElement(By.xpath("//*[@class='btn btn_full-width']")),0,-100).build().perform();
@@ -824,22 +893,23 @@ public class EventViewerPage extends AbstractPage {
                             String max = CouponPage.couponInputOrdinar.getAttribute("value");
                             if(Float.valueOf(max)<=Float.valueOf(betOk)){
                                 LOG.info("Найденная игра и ставка: " + game.getAttribute("innerText").replaceAll("\n"," ") +
-                                        " Ставка на точный счет " + bet.getAttribute("innerText"));
+                                        " Ставка на точный счет " + maxCoefEl.getAttribute("innerText"));
                                 return;
                             }
-                            LOG.info("max=" + max);
+                            LOG.info("Не подходит: max=" + max);
                             driver.findElement(By.xpath("//button[@class='btn btn_full-width']")).click();
                             wait.until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'coupon__bet-block')]/div"),0));
                         }
-                        LOG.info("" + game.getAttribute("innerText"));
-                        LOG.info("\nbetsFilter.size = " + betsFilter.size());
                     }
+                    region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();//сворачиваем регион
                 }
-                region.findElement(By.xpath(".//*[contains(@class,'left-menu__list-item-arrow_region')]")).click();//сворачиваем регион
             }
-            LOG.info("клик");
+            LOG.info("нет подходящих ставок. Перейдем к следующему спорту");
         }
+
+
     }
+
     @ActionTitle("сравниваем количество игр по wss и в Прематче")
     public void compareSizeOfZeroMargin(){
         Integer games_in_prematch = Stash.getValue("by_size_zero_margin_key");

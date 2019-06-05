@@ -101,9 +101,9 @@
         | group_code  | GROUPCODE |
         | shop_code   | SHOPCODE  |
         | session     | SESSION   |
-        | skin        | "MAIN"    |
+        | skin        | "main"    |
         | ticket_id   | TICKETID  |
-        | game        | "QF"      |
+        | game        | "qf"      |
         | currency    | CURRENCY  |
         | amount      | AMOUNT    |
         | bonus       | false     |
@@ -165,8 +165,6 @@
       | CURRENCY  | RUB |
 
     * пополняем пользователю бонусы если нужно, судя по ответу "RESPONCE" на сумму, достаточную для "AMOUNT"
-      | accountCode   | string        |
-      | accountName   | string        |
       | amount        | AMOUNT        |
       | currency      | 999           |
       | operationId   | OPERATIONID   |

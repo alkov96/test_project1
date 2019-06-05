@@ -38,17 +38,9 @@ public class UserAccountPage extends AbstractPage{
     @FindBy(xpath = "//*[text()='Учетная запись']")
     private WebElement pageTitle;
 
-    @ElementTitle("Фамилия")
-    @FindBy(id = "surname")
-    private WebElement inputSurname;
-
     @ElementTitle("Имя")
     @FindBy(id = "first_name")
     private WebElement inputName;
-
-    @ElementTitle("Отчество")
-    @FindBy(id = "patronymic")
-    private WebElement inputPatronymic;
 
     @ElementTitle("Эл.почта")
     @FindBy(id = "email")
@@ -84,7 +76,7 @@ public class UserAccountPage extends AbstractPage{
 
     public UserAccountPage() {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
+        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
     @ActionTitle("заполняет форму с")
@@ -98,26 +90,16 @@ public class UserAccountPage extends AbstractPage{
             value = aTable.get(VALUE);
             saveVariable = aTable.get(SAVE_VALUE);
 
-            if (value.matches("[A-Z]*")){
+            if (value.matches("[_A-Z]*")){
                 value=Stash.getValue(value);
             }
-
             if (inputField.contains(DATEOFBIRTH)) {
-                date = Stash.getValue(value);
-                    enterDate(date);
-
+                date = value;
+                enterDate(date,DATEOFBIRTH);
                 Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
             }
-            if (inputField.contains(LASTNAME)) {
-                if (value.contains(RANDOM)) {
-                    fillField(inputSurname, Generators.randomString(25));
-                } else {
-                    fillField(inputSurname, value);
-                }
-                Stash.put(saveVariable, inputSurname.getAttribute("value"));
-                LOG.info(saveVariable + "<==[" + inputSurname.getAttribute("value") + "]");
-            }
+
             if (inputField.contains(NAME)) {
                 if (value.contains(RANDOM)) {
                     fillField(inputName, Generators.randomString(25));
@@ -127,15 +109,7 @@ public class UserAccountPage extends AbstractPage{
                 Stash.put(saveVariable, inputName.getAttribute("value"));
                 LOG.info(saveVariable + "<==[" + inputName.getAttribute("value") + "]");
             }
-            if (inputField.contains(PATERNALNAME)) {
-                if (value.contains(RANDOM)) {
-                    fillField(inputPatronymic, Generators.randomString(25));
-                } else {
-                    fillField(inputPatronymic, value);
-                }
-                Stash.put(saveVariable, inputPatronymic.getAttribute("value"));
-                LOG.info(saveVariable + "<==[" + inputPatronymic.getAttribute("value") + "]");
-            }
+
             if (inputField.contains(EMAIL)) {
                 String email = Stash.getValue(("EMAIL"));
                 fillField(inputEmail, email);
@@ -145,8 +119,6 @@ public class UserAccountPage extends AbstractPage{
                 String password = (value.equals(Constants.DEFAULT)) ? JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue() : value;
                 LOG.info("Вводим пароль::" + password);
                 fillField(passwordInput, password);
-//                LOG.info("Подтверждаем::" + password);
-//                fillField(confirmPasswordInput, password);
                 Stash.put(saveVariable, password);
             }
 
@@ -182,27 +154,18 @@ public class UserAccountPage extends AbstractPage{
             value = aTable.get(VALUE);
             saveVariable = aTable.get(SAVE_VALUE);
 
-            if (value.matches("[A-Z]*")){
+            if (value.matches("[_A-Z]*")){
                 value=Stash.getValue(value);
             }
 
             if (inputField.contains(DATEOFBIRTH)) {
                 try {
-                    date = outputFormat.format(inputFormat.parse(enterDate(value)));
+                    date = outputFormat.format(inputFormat.parse(enterDate(value,DATEOFBIRTH)));
                 } catch (ParseException e) {
                     e.getMessage();
                 }
                 Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
-            }
-            if (inputField.contains(LASTNAME)) {
-                if (value.contains(RANDOM)) {
-                    fillField(inputSurname, Generators.randomString(25));
-                } else {
-                    fillField(inputSurname, value);
-                }
-                Stash.put(saveVariable, inputSurname.getAttribute("value"));
-                LOG.info(saveVariable + "<==[" + inputSurname.getAttribute("value") + "]");
             }
             if (inputField.contains(NAME)) {
                 if (value.contains(RANDOM)) {
@@ -212,15 +175,6 @@ public class UserAccountPage extends AbstractPage{
                 }
                 Stash.put(saveVariable, inputName.getAttribute("value"));
                 LOG.info(saveVariable + "<==[" + inputName.getAttribute("value") + "]");
-            }
-            if (inputField.contains(PATERNALNAME)) {
-                if (value.contains(RANDOM)) {
-                    fillField(inputPatronymic, Generators.randomString(25));
-                } else {
-                    fillField(inputPatronymic, value);
-                }
-                Stash.put(saveVariable, inputPatronymic.getAttribute("value"));
-                LOG.info(saveVariable + "<==[" + inputPatronymic.getAttribute("value") + "]");
             }
             if (inputField.contains(EMAIL)) {
                 String email = Stash.getValue(("EMAIL"));
@@ -247,30 +201,6 @@ public class UserAccountPage extends AbstractPage{
     }
 
 
-
-
-    /**
-     * Метод ввода ФИО
-     *
-     * @param fio  - строка либо с ФИО формата 'Ф И О', либо 'random'
-     *              случайной генерации даты
-     */
-    @ActionTitle("вводит фио")
-    public void inputFIO(String fio){
-
-        if(fio.contains(RANDOM)){
-            LOG.info("Вводим случайные ФИО");
-            fillField(inputSurname,Generators.randomString(25));
-            fillField(inputName,Generators.randomString(25));
-            fillField(inputPatronymic,Generators.randomString(25));
-        }else{
-            String[] tmp = fio.split("\\s");
-            LOG.info("Вводим ФИО");
-            fillField(inputSurname,tmp[0]);
-            fillField(inputName,tmp[1]);
-            fillField(inputPatronymic,tmp[2]);
-        }
-    }
 
     /**
      * Метод ввода поле email

@@ -1,6 +1,7 @@
 # language: ru
 Функционал: API
   Предыстория:
+
   * сохраняем в память
   | FIRSTNAME | random |
   * сохраняем в память
@@ -54,6 +55,9 @@
   * сохраняем в память
   | SNILS | 37487545236 |
 
+    * редактируем некоторые активные опции сайта
+      |fast_registration  | false  |
+      |identification_with_skype_only| false|
 
   * запрос к API "api/mobile/v6/sendPhoneCode" и сохраняем в "RESPONCE_API":
   | devId | DEVID |
@@ -176,7 +180,7 @@
     * приводим дату к формату год-месяц-день "VALIDISSUEDATE"
 
     * добавляем данные в JSON объект "ADDRESS" сохраняем в память:
-      | regionKLADR       | null          |
+      | regionKLADR       | 77          |
       | region            | Москва        |
       | town              | CITY          |
       | street            | STREET        |
@@ -200,8 +204,8 @@
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
       | firstname           | FIRSTNAME     |
-      | lastname            | PATRONYMIC    |
-      | paternalname        | PATERNALNAME  |
+      | lastname            | SURNAME       |
+      | paternalname        | PATRONYMIC    |
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
@@ -247,6 +251,23 @@
 
     * ожидание "5" сек
 
+    * проверим что в БД сохранены правильные значения
+      | birth_place             | BIRTHPLACE      |
+      | region                  | Москва          |
+      | city                    | CITY            |
+      | street                  | STREET          |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
 
   @api
   @Registration_mobile
@@ -314,8 +335,8 @@
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
       | firstname           | FIRSTNAME     |
-      | lastname            | PATRONYMIC    |
-      | paternalname        | PATERNALNAME  |
+      | lastname            | SURNAME       |
+      | paternalname        | PATRONYMIC    |
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
@@ -360,6 +381,24 @@
       | exepted     | "status":8 or "status":7 |
 
     * ожидание "10" сек
+
+    * проверим что в БД сохранены правильные значения
+      | birth_place             | BIRTHPLACE      |
+      | region                  | Москва          |
+      | city                    | CITY            |
+      | street                  | STREET          |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
 
 
 
@@ -454,7 +493,24 @@
 
     * выставляем обратно старое значение активных опций сайта "ACTIVE_SITE_OPTIONS"
 
-
+    * проверим что в БД сохранены правильные значения
+      | birth_place             | BIRTHPLACE      |
+      | region                  | Москва          |
+      | city                    | CITY            |
+      | street                  | STREET          |
+      | house_number            | HOUSE           |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
 
 
   @api
@@ -489,83 +545,25 @@
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
+
+    * проверим что в БД сохранены правильные значения
+      | birth_place             | BIRTHPLACE      |
+      | region                  | Москва          |
+      | city                    | CITY            |
+      | street                  | STREET          |
+      | house_number            | HOUSE           |
+      | apartment               | FLAT            |
+      | passport_number         | DOCNUM          |
+      | passport_series         | DOCSERIES       |
+      | passport_date           | VALIDISSUEDATE  |
+      | passport_issuer         | ISSUEPLACE      |
+      | passport_issuer_code    | 123-456         |
+      | first_name              | FIRSTNAME       |
+      | surname                 | SURNAME         |
+      | patronymic              | PATRONYMIC      |
+      | birth_date              | BIRTHDATE       |
+      | phone                   | PHONE           |
+      | email                   | EMAIL           |
 #    * проверка ответа API из "RESPONCE_API":
 #      | exepted | "errorMsg":null |
 
-
-#  @Registration_mobile
-#  Сценарий: Мобильная регистрация полная через DD
-#
-#    * редактируем некоторые активные опции сайта
-#      | identification_with_courier |true|
-#      |identification_with_skype_only|false|
-#
-#
-#    * запрос к API "api/mobile/v6/getIdentType" и сохраняем в "RESPONCE_API":
-#      | devId                   | DEVID        |
-#      | authToken               | AUTHTOKEN    |
-#      | source                  | 16           |
-#
-#    * определяем дату завтрашнего дня "DATE"
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#
-#    * запрос к API "api/mobile/v6/submitIdentType" и сохраняем в "RESPONCE_API":
-#      | devId                   | DEVID        |
-#      | authToken               | AUTHTOKEN    |
-#      | source                  | 16           |
-#      | identType               | 6            |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted | "code":0 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "status":21 |
-#
-#    #* находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
-#
-#    * добавляем данные в JSON объект "DATA" сохраняем в память:
-#      | street       | "Тверская ул." |
-#      | house        | HOUSE          |
-#      | building     |                |
-#      | housing      |                |
-#      | flat         | FLAT           |
-#      | phone        | 1110023309     |
-#      | comment      | COMMENT        |
-#      | date         | DATE           |
-#      | time         | "10:00 - 17:00"|
-#
-#    * запрос к API "api/mobile/v6/sendIdentificationOrderToDD" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID    |
-#      | authToken   | AUTHTOKEN|
-#      | source      | 16       |
-#      | data        | DATA     |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "identificationStatus":1 |
-#
-#    * проверка полей и типов в ответе "RESPONCE_API":
-#      | Параметр                         | Тип    |
-#      | courierIdentificationRequestDate | Timestamp   |
-#
-#   * запрос к API "api/mobile/v6/identificationDDStatus" и сохраняем в "RESPONCE_API":
-#      | devId       | DEVID    |
-#      | authToken   | AUTHTOKEN|
-#      | source      | 16       |
-#
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | "code":0 |
-#    * проверка ответа API из "RESPONCE_API":
-#      | exepted     | identificationStatus":1 |
-#
-#
-#
-#
-#
-#
-#
-#
-#

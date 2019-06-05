@@ -3,39 +3,44 @@
 
   Предыстория:
 
+    * редактируем некоторые активные опции сайта
+      |fast_registration  | false  |
+
     * сохраняем в память
       | INN | 775459885706 |
+
+    * сохраняем в память
+      | MERCHANT | Default |
 
     * сохраняем в память
       | SNILS | 37487545236 |
     * генерим email в "EMAIL"
 
     * определяем незанятый номер телефона и сохраняем в "PHONE"
+
     * генерируем дату рождения от 18 до 50 лет и сохраняем в "BIRTH_DATE"
-
     * генерируем дату выдачи паспорта в зависимости от "BIRTH_DATE" и сохраняем в "ISSUE_DATE"
+
     * разлогиниваем пользователя
-
     * открывается страница "Главная страница"
-    * пользователь (нажимает кнопку) "Регистрация"
 
+    * пользователь (нажимает кнопку) "Регистрация"
     * открывается страница "Учетная запись"
 
     * пользователь (заполняет форму с) данными
       | Поле ввода     | Значение   | Переменная сохранения |
-      | Дата рождения  | BIRTH_DATE | BIRTHDATE             |
-      | Фамилия        | random     | LASTNAME              |
       | Имя            | random     | FIRSTNAME             |
-      | Отчество       | random     | PATERNALNAME          |
       | E-mail         | EMAIL      | EMAIL                 |
       | Пароль         | Default    | PASSWORD              |
       | Номер телефона | PHONE      | PHONE                 |
+
     * пользователь (отмечает признак) "Чекбокс оферты"
 
     * пользователь (нажимает кнопку) "Отправить"
     * открывается страница "Поздравляем!"
 
     * пользователь (нажимает кнопку) "Ок"
+
     #* пользователь (завершает регистрацию перейдя по ссылке в) "EMAIL"
     * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
     * (завершает регистрацию перейдя по ссылке для БД)
@@ -51,6 +56,10 @@
     * открывается страница "Паспортные данные"
     * пользователь (заполняет паспорт с) данными
       | Поле ввода        | Значение   | Переменная сохранения |
+      | Дата рождения     | BIRTH_DATE | BIRTHDATE             |
+      | Фамилия           | random     | LASTNAME              |
+      | Имя               | random     | DIFFFIRSTNAME         |
+      | Отчество          | random     | PATERNALNAME          |
       | Серия             | random     | SERIES                |
       | Номер             | random     | NUMBER                |
       | Дата выдачи       | ISSUE_DATE | ISSUEDATE             |
@@ -88,8 +97,7 @@
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
-  @before
-  @after
+  @enabledFeatures
   @smoke
   @rega
   @NewUserRegistration_C36189_Wave
@@ -105,7 +113,7 @@
     * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
     | operationdatetime   | DATE_TIME     |
     | phone               | PHONE         |
-    | firstname           | FIRSTNAME     |
+    | firstname           | DIFFFIRSTNAME |
     | lastname            | LASTNAME      |
     | paternalname        | PATERNALNAME  |
     | sex                 | SEX           |
@@ -141,7 +149,7 @@
       | Электронная почта | EMAIL         |
       | Телефон           | PHONE         |
       | Фамилия           | LASTNAME      |
-      | Имя               | FIRSTNAME     |
+      | Имя               | DIFFFIRSTNAME |
       | Отчество          | PATERNALNAME  |
       | Дата рождения     | BIRTH_DATE    |
       | Место рождения    | BIRTHLOCATION |
