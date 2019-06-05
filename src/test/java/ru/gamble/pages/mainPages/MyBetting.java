@@ -173,7 +173,6 @@ public class MyBetting extends AbstractPage {
 
         sort_list_summ = summList.stream().sorted().collect(Collectors.toList()).equals(summList);
         assertTrue("Список не отсортировался по сумме!",sort_list_summ);
-
     }
 
 
