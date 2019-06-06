@@ -134,7 +134,7 @@ public class RestApi {
         for (Map.Entry<String,String> entery:table.entrySet()){
             paramValue=entery.getValue();
             if (paramValue.matches("[A-Z]+")){
-                if (Stash.getValue(entery.getValue()).getClass().getName().contains("Object")){
+                if (Stash.getValue(entery.getValue())!=null &&  Stash.getValue(entery.getValue()).getClass().getName().contains("Object")){
                     paramValue=Stash.getValue(entery.getValue()).toString();
                 }
                 else {
