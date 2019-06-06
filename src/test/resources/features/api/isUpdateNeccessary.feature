@@ -22,7 +22,7 @@
 
     * запрос к API "api/mobile/v3/isUpdateNeccessary" и сохраняем в "RESPONCE_API":
       | typeOS                  | TYPEOS        |
-      | appVersion              | "3.3"         |
+      | appVersion              | 3.3         |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
@@ -32,7 +32,7 @@
 
     * запрос к API "api/mobile/v3/isUpdateNeccessary" и сохраняем в "RESPONCE_API":
       | typeOS                  | TYPEOS        |
-      | appVersion              | "2.9"         |
+      | appVersion              | 2.9           |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
@@ -56,7 +56,7 @@
 
     * запрос к API "api/mobile/v3/isUpdateNeccessary" и сохраняем в "RESPONCE_API":
       | typeOS                  | TYPEOS        |
-      | appVersion              | "3.3"         |
+      | appVersion              | 3.3           |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
@@ -66,7 +66,7 @@
 
     * запрос к API "api/mobile/v3/isUpdateNeccessary" и сохраняем в "RESPONCE_API":
       | typeOS                  | TYPEOS        |
-      | appVersion              | "2.9"         |
+      | appVersion              | 2.9           |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |

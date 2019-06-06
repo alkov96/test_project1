@@ -10,6 +10,9 @@
     * сохраняем в память
       | PASSWORD  | Default |
 
+    * сохраняем в память
+      | EMAIL  | testregistrator79330000423@mailinator.com |
+
     * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID |
       | email  | EMAIL  |

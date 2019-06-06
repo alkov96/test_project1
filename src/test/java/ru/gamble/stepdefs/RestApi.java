@@ -1,37 +1,28 @@
 package ru.gamble.stepdefs;
 
-import com.google.gson.JsonArray;
 import cucumber.api.DataTable;
 import cucumber.api.java.ru.Когда;
-import net.minidev.json.JSONArray;
+import io.restassured.RestAssured;
+import io.restassured.config.SSLConfig;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
 import org.junit.Assert;
 import org.openqa.selenium.remote.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.utility.JsonLoader;
 import ru.sbtqa.tag.datajack.Stash;
-import ru.sbtqa.tag.datajack.exceptions.DataException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-
-import static ru.gamble.utility.Constants.STARTING_URL;
-
 public class RestApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequest.class);
 
-    public static Response reguestPOST(String path, Map<String,String> body) {
+    private static Response reguestPOST(String path, Map<String,String> body) {
         JSONObject requestBody = new JSONObject();
         RestAssured.useRelaxedHTTPSValidation();
         Object paramValue=new Object();
@@ -40,55 +31,53 @@ public class RestApi {
             if (body.get(name).isEmpty()){
                 paramValue="";
             }
+            if (body.get(name).equals("null")){
+                paramValue=null;
+            }
             requestBody.put(name,paramValue);
         }
 
         LOG.info("отправляем запрос :" + path + "\nтело:\n" + requestBody.toString());
         RequestSpecification request = RestAssured.given();
-        request.header("Content-Type", "application/json");
-        request.header("charset","utf-8");
-        request.body(requestBody.toString());
-        Response response = request.post(path);
-        return response;
-    }
-
-    /**
-     * тот же запрос post, только с указанными header
-     * @param header - собственно все header, записанные в Map
-     * @return
-     */
-    public static Response reguestPOST(String path, Map<String,String> body, Map<String,String> header ){
-        JSONObject requestBody = new JSONObject();
-        // RestAssured.useRelaxedHTTPSValidation();
-
-        for (String name:body.keySet()){
-            requestBody.put(name,body.get(name));
-        }
-
-        RequestSpecification request = RestAssured.given();
-        for (String name : header.keySet()){
-            request.header(name,header.get(name));
+        Map<String,String> headers = Stash.getValue("headers");
+        for (String name : headers.keySet()){
+            LOG.info("Добавляем header " + name);
+            request.header(name,headers.get(name));
         }
         request.body(requestBody.toString());
         Response response = request.post(path);
         return response;
     }
 
-    public static Response reguestGET(String path){
+    private static Response reguestGET(String path){
         //JSONObject requestBody = new JSONObject();
-        RestAssured.useRelaxedHTTPSValidation();
-
-        RequestSpecification request = RestAssured.given();
-        request.header("Content-Type", "application/json");
-        // request.body(requestBody.toString());
+        RestAssured.useRelaxedHTTPSValidation("TLS");
+        RequestSpecification request = RestAssured.given().config(RestAssured.config().sslConfig(new SSLConfig().allowAllHostnames()));
+        request.relaxedHTTPSValidation("TLS");
+        request.log().all();
+        Map<String,String> headers = Stash.getValue("headers");
+        for (String name : headers.keySet()){
+            LOG.info("Добавляем header " + name);
+            request.header(name,headers.get(name));
+        }
         Response response = request.get(path);
+
         return response;
     }
 
     @Когда("^отправляем http-запрос \"([^\"]*)\" \"([^\"]*)\"$")
     public static Response requestAndResponse(String type,String path,DataTable table){
         Response response = null;
-//        Map<String,String> body = table.asMap(String.class,String.class);
+        Map<String,String> headers2 = Stash.getValue("headers");//дополнительные headers
+        Map<String,String> headers1 = new HashMap<>();//стандартные headers
+//        headers1.put("Content-Type", "application/json");
+        headers1.put("Content-Type", "application/json; charset=UTF-8");
+//        headers1.put("charset","utf-8");
+        if (headers2!=null){
+            headers1.putAll(headers2);
+        }
+        Stash.put("headers",headers1);
+
         LOG.info("Отправляем запрос и запоминаем response");
         switch (type.toLowerCase()){
             case "post":
@@ -117,33 +106,46 @@ public class RestApi {
         }
         for (int i=0;i<bodyResponse.size();i++){
             Assert.assertTrue("В теле ответа нет искомой подстроки '" + messages.get(i) + "'. Весь ответ: " + response.getBody().asString(),
-                    response.getBody().asString().replaceAll(" ","").contains(messages.get(i).replaceAll(" ","")));
+                    response.getBody().asString().replaceAll(" ","").toLowerCase().contains(messages.get(i).replaceAll(" ","").toLowerCase()));
             LOG.info("В теле ответа есть подстрока " + messages.get(i));
         }
     }
+
     public static void checkResponse(String keyStash, DataTable table){
         checkResponse(keyStash,table,false);
     }
 
-    public static String createTaskWithParams(String taskName, String params) throws DataException {
-        Map<String,String> bodyRequest = new HashMap<>();
-        bodyRequest.put("tasktype",taskName);
-        bodyRequest.put("param", params);
-        Response response = reguestPOST(JsonLoader.getData().get(STARTING_URL).get("HTTP_URL").getValue()+"/system/create_task",bodyRequest);
-        String id = response.getBody().asString().substring(11,response.getBody().asString().length()-2);
-        return id;
+    public static void checkResponceByEmpty(String keyStash, String isEmpty) throws java.text.ParseException {
+        Response response = Stash.getValue(keyStash);
+        String actual = response.getBody().asString();
+        actual = actual.replace("{\"code\":0,\"data\":", "").replace("}", "");
+        boolean expectedEmpty = isEmpty.equals("пустой");
+        Assert.assertTrue("Ожидалось что результат будет " + isEmpty + ", но это не так.\n" + actual,
+                actual.equals("[]") == expectedEmpty);
+        LOG.info("Да, RESPONCE действительно " + isEmpty);
     }
 
     public static Object collectParams(DataTable dataTable){
-       // JSONArray authArray = new JSONArray();
-       // Object params = new Object();
+        // JSONArray authArray = new JSONArray();
+        // Object params = new Object();
         JSONObject authparam = new JSONObject();
         String paramValue = new String();
         Map<String,String> table = dataTable.asMap(String.class,String.class);
         for (Map.Entry<String,String> entery:table.entrySet()){
-            paramValue=entery.getValue().matches("[A-Z]*")?Stash.getValue(entery.getValue()):entery.getValue();
+            paramValue=entery.getValue();
+            if (paramValue.matches("[A-Z]+")){
+                if (Stash.getValue(entery.getValue()).getClass().getName().contains("Object")){
+                    paramValue=Stash.getValue(entery.getValue()).toString();
+                }
+                else {
+                    paramValue=Stash.getValue(entery.getValue());
+                }
+            }
             if (entery.getValue().isEmpty()){
                 paramValue="";
+            }
+            if (entery.getValue().equals("null")){
+                paramValue=null;
             }
             authparam.put(entery.getKey(),paramValue);
         }

@@ -39,6 +39,9 @@
     * редактируем некоторые активные опции сайта
       |identification_with_skype_only|false|
       |identification_with_wave|true|
+      |identification_with_video|true|
+      |back_call|false|
+      |announcements|true|
 
   @api
   @goToStep

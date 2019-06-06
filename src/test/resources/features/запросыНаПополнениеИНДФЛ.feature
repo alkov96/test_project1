@@ -57,7 +57,7 @@
     * формируем параметры для запроса swagger
       | operationId     | OPERATIONID   |
       | transactionId   | TRANSACTIONID |
-    * добавляем данные в JSON объект "OPERATIONS" сохраняем в память:
+    * добавляем данные в JSON массив "OPERATIONS" сохраняем в память:
       | userId             | USERID          |
       | currency           | 643             |
       | amount             | AMOUNTNDFL      |
@@ -67,6 +67,6 @@
       | relatedOperationId | without         |
     * запрос в swagger на добавление НДФЛ "RESPONCE_API"
       | transactionId      | TRANSACTIONID   |
-      | operations         | (OPERATIONS)      |
+      | operations         | OPERATIONS      |
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |

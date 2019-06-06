@@ -102,6 +102,12 @@
   @rega
   @NewUserRegistration_C36189_Wave
   Сценарий: Регистрация нового пользователя через Wave
+    * сохраняем в память
+      | CITIZENSHIP | RUS |
+    * сохраняем в память
+      | IDENTITYSTATE | LIMITED |
+    * сохраняем в память
+      | GENDER | FEMALE |
 
     * редактируем некоторые активные опции сайта
       |identification_with_skype_only|false|
@@ -110,28 +116,28 @@
     * открывается страница "Способ подтверждения личности"
     * пользователь (нажимает кнопку) "Столото"
 
-    * эмулируем регистрацию через терминал Wave "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
-    | operationdatetime   | DATE_TIME     |
-    | phone               | PHONE         |
-    | firstname           | DIFFFIRSTNAME |
-    | lastname            | LASTNAME      |
-    | paternalname        | PATERNALNAME  |
-    | sex                 | SEX           |
-    | birthdate           | BIRTHDATE     |
-    | birthlocation       | BIRTHLOCATION |
-    | citizenship         | "RUS"         |
-    | publicperson        | null          |
-    | publicperson        | null          |
-    | address             | ADDRESS       |
-    | documents           | DOCUMENTS     |
-    | operationofficecode | "222"         |
-    | operatorlogin       | "333"         |
-    | inn                 | INN           |
-    | SNILS               | SNILS         |
-    | method              | betshop       |
-    | error               | ""            |
-    | reason              | ""            |
-    | identityState       | "LIMITED"     |
+    * запрос к API "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
+      | operationdatetime   | DATE_TIME     |
+      | phone               | PHONE         |
+      | firstname           | FIRSTNAME     |
+      | lastname            | LASTNAME      |
+      | paternalname        | PATERNALNAME  |
+      | sex                 | GENDER        |
+      | birthdate           | BIRTHDATE     |
+      | birthlocation       | BIRTHLOCATION |
+      | citizenship         | CITIZENSHIP   |
+      | publicperson        | null          |
+      | publicperson        | null          |
+      | address             | ADDRESS       |
+      | documents           | DOCUMENTS     |
+      | operationofficecode | 222           |
+      | operatorlogin       | 333           |
+      | inn                 | INN           |
+      | SNILS               | SNILS         |
+      | method              | betshop       |
+      | error               |               |
+      | reason              |               |
+      | identityState       | IDENTITYSTATE |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |

@@ -55,6 +55,11 @@
   * сохраняем в память
   | SNILS | 37487545236 |
 
+  * сохраняем в память
+  | CITIZENSHIP | RUS |
+  * сохраняем в память
+  | IDENTITYSTATE | LIMITED |
+
     * редактируем некоторые активные опции сайта
       |fast_registration  | false  |
       |identification_with_skype_only| false|
@@ -209,7 +214,7 @@
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
-      | citizenship         | rus         |
+      | citizenship         | CITIZENSHIP   |
       | publicperson        | null          |
       | publicperson        | null          |
       | address             | ADDRESS       |
@@ -221,7 +226,7 @@
       | method              | betshop       |
       | error               |             |
       | reason              |              |
-      | identityState       | limited     |
+      | identityState       | IDENTITYSTATE |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |
@@ -311,7 +316,7 @@
     * приводим дату к формату год-месяц-день "VALIDISSUEDATE"
 
     * добавляем данные в JSON объект "ADDRESS" сохраняем в память:
-      | regionKLADR       | null          |
+      | regionKLADR       | 77            |
       | region            | Москва        |
       | town              | CITY          |
       | street            | STREET        |
@@ -331,6 +336,10 @@
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
+
+
+
+
     * запрос к API "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
@@ -340,7 +349,7 @@
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
-      | citizenship         | rus           |
+      | citizenship         | CITIZENSHIP   |
       | publicperson        | null          |
       | publicperson        | null          |
       | address             | ADDRESS       |
@@ -352,7 +361,7 @@
       | method              | betshop       |
       | error               |               |
       | reason              |               |
-      | identityState       | limited       |
+      | identityState       | IDENTITYSTATE |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |
