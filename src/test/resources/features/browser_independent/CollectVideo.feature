@@ -69,7 +69,7 @@
       | ts      | 2018-13-07T11:01:10     |
     * запрос типа COLLECT "api/get_video_ident_data" c параметрами "PARAMS" и сохраняем в "RESPONCE"
     * проверка ответа API из "RESPONCE":
-      | exepted     | Error |
+      | exepted     | error |
 
 
 

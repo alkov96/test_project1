@@ -55,6 +55,11 @@
   * сохраняем в память
   | SNILS | 37487545236 |
 
+  * сохраняем в память
+  | CITIZENSHIP | RUS |
+  * сохраняем в память
+  | IDENTITYSTATE | LIMITED |
+
     * редактируем некоторые активные опции сайта
       |fast_registration  | false  |
       |identification_with_skype_only| false|
@@ -209,19 +214,19 @@
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
-      | citizenship         | "RUS"         |
+      | citizenship         | CITIZENSHIP   |
       | publicperson        | null          |
       | publicperson        | null          |
       | address             | ADDRESS       |
       | documents           | DOCUMENTS     |
-      | operationofficecode | "222"         |
-      | operatorlogin       | "333"         |
+      | operationofficecode | 222         |
+      | operatorlogin       | 333         |
       | inn                 | INN           |
       | SNILS               | SNILS         |
       | method              | betshop       |
-      | error               | ""            |
-      | reason              | ""            |
-      | identityState       | "LIMITED"     |
+      | error               |             |
+      | reason              |              |
+      | identityState       | IDENTITYSTATE |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |
@@ -311,7 +316,7 @@
     * приводим дату к формату год-месяц-день "VALIDISSUEDATE"
 
     * добавляем данные в JSON объект "ADDRESS" сохраняем в память:
-      | regionKLADR       | null          |
+      | regionKLADR       | 77            |
       | region            | Москва        |
       | town              | CITY          |
       | street            | STREET        |
@@ -331,6 +336,10 @@
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
+
+
+
+
     * запрос к API "api/stoloto/identification/approveUserByPhone" и сохраняем в "RESPONCE_API":
       | operationdatetime   | DATE_TIME     |
       | phone               | PHONE         |
@@ -340,19 +349,19 @@
       | sex                 | GENDER        |
       | birthdate           | BIRTHDATE     |
       | birthlocation       | BIRTHPLACE    |
-      | citizenship         | "RUS"         |
+      | citizenship         | CITIZENSHIP   |
       | publicperson        | null          |
       | publicperson        | null          |
       | address             | ADDRESS       |
       | documents           | DOCUMENTS     |
-      | operationofficecode | "222"         |
-      | operatorlogin       | "333"         |
+      | operationofficecode | 222           |
+      | operatorlogin       | 333           |
       | inn                 | INN           |
       | SNILS               | SNILS         |
       | method              | betshop       |
-      | error               | ""            |
-      | reason              | ""            |
-      | identityState       | "LIMITED"     |
+      | error               |               |
+      | reason              |               |
+      | identityState       | IDENTITYSTATE |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "state":"ok" |
@@ -434,7 +443,7 @@
     * запрос к API "api/mobile/v6/submitInnSnils" и сохраняем в "RESPONCE_API":
       | authToken               | AUTHTOKEN        |
       | source                  | 16               |
-      | snilsNumber             | "000-000-000 00" |
+      | snilsNumber             | 000-000-000 00   |
       | innNumber               |                  |
 
     * проверка ответа API из "RESPONCE_API":
