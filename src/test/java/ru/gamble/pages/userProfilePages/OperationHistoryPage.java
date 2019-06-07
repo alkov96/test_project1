@@ -107,6 +107,10 @@ public class OperationHistoryPage extends AbstractPage {
     @ActionTitle("проверяет пролистывание страниц")
     public void pagesCheck() throws Exception {
         List<WebElement> pages = driver.findElements(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and not(contains(@class,'active'))]"));//неактивные стрницы(без стрелок)
+        if (pages.size()<3){
+            LOG.info("Нет страниц вообще, некуда листать.");
+            return;
+        }
         LOG.info("Листаем на последнюю из видимых страниц");
         assertTrue(changePage(pages.get(pages.size() - 1)));
         LOG.info("Листаем влево");
