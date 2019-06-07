@@ -9,6 +9,8 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
 import io.qameta.allure.Allure;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Link;
 import io.restassured.response.Response;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -1073,6 +1075,14 @@ public class CommonStepDefs extends GenericStepDefs {
         return result;
     }
 
+     @Before(value = "@api")
+     public void disposeDriver(){
+        try{
+            driver.close();
+        }
+        catch (Exception e)
+        {e.printStackTrace();}
+     }
 
     @Before(value = "@ChangePassword_C1043")
     public void saveCurrentPassword() throws DataException {
