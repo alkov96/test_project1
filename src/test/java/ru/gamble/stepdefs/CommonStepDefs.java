@@ -1993,7 +1993,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^смотрим какое время обновления баннера \"([^\"]*)\"$")
     public void delayGromBanner(String keyDelay) {
-        String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='index_main_default'";
+        String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='slider_desktop_index_main_default'";
         String delay = workWithDBgetResult(sqlRequest, "delay");
         Stash.put(keyDelay, delay);
     }

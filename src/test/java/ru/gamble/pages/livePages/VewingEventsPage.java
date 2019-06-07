@@ -35,7 +35,7 @@ public class VewingEventsPage extends AbstractPage {
     @FindBy(xpath = "//a[@class='ulTransBorder__link active']")
     private WebElement pageTitle;
 
-    private static By xpathForSports = By.xpath("//li[contains(@id,'sport-') and not(contains(@class,'hide')) and not(contains(@id,'sport--'))]");
+    private static By xpathForSports = By.xpath("//li[contains(@id,'sport-') and not(contains(@class,'hide')) and not(contains(@id,'sport--'))]/a[not(contains(@title,'iiiii'))]/..");
 
     public VewingEventsPage() {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);

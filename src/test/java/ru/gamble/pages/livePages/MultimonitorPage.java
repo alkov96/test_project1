@@ -167,7 +167,7 @@ public class MultimonitorPage extends AbstractPage {
 
         LOG.info("Сворачиваем все виды спорта");
         closeSports();
-        By xpathForSports = By.xpath("//li[contains(@id,'sport-') and not(contains(@class,'hide')) and not(contains(@id,'sport--'))]");
+        By xpathForSports = By.xpath("//li[contains(@id,'sport-') and not(contains(@class,'hide')) and not(contains(@id,'sport--'))]/a[not(contains(@title,'iiiii'))]/..");
         int countNow=0;
         String pathToNameGame = ".//li[contains(@class,'left-menu__list-item-games')]";
         By xpathForRegion = By.xpath("./ancestor-or-self::div[contains(@class,'left-menu__list-item-region-competition')]/h4");
@@ -213,12 +213,15 @@ public class MultimonitorPage extends AbstractPage {
 
     @ActionTitle("проверяет что все выделенные в ЛМ игры есть на мониторах")
     public void checkMonitorsHaveGames(){
+        By byActiveGames = By.xpath("//ul[contains(@class,'left-menu__list-item-games-wrap') and not(contains(@class,'hide'))]//div[contains(@class,'left-menu__list-item-games-row') and contains(@class,'active')]");
+
         List<WebElement> allMonitors = driver.findElements(By.xpath("//div[contains(@class,'multiview-contain') and not(contains(@class,'no-games'))]"));
-        List<WebElement> allActiveGames = driver.findElements(By.xpath("//div[contains(@class,'left-menu__list-item-games-row') and contains(@class,'active')]"));
         String name = new String();
-        if (allActiveGames.size()!=allMonitors.size()){
-            Assert.fail("Размер списка со всеми играми, выделенными в ЛМ(" + allActiveGames.size() + "), и списка вех мониторов - не свопадают!(" + allMonitors.size() + ")");
-        }
+        new WebDriverWait(driver,10)
+                .withMessage("Размер списка со всеми играми, выделенными в ЛМ(" + driver.findElements(byActiveGames).size() + "), и списка вех мониторов - не свопадают!(" + allMonitors.size() + ")")
+                .until(ExpectedConditions.numberOfElementsToBe(byActiveGames,allMonitors.size()));
+
+        List<WebElement> allActiveGames = driver.findElements(byActiveGames);
         for (WebElement activeGame:allActiveGames){
             name = activeGame.findElement(By.xpath(".//div[contains(@class,'left-menu__list-item-games-names')]")).getAttribute("innerText");
             LOG.info("Проверим есть ли на мониторах игра " + name);

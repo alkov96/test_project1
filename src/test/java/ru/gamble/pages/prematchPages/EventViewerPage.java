@@ -661,12 +661,15 @@ public class EventViewerPage extends AbstractPage {
 
         //название турнира в контейнере
         LOG.info("Запоминаем название соревнования, которое в контейнере многовыборного режима");
-        String nameTourInMulti = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-name')]//div[contains(@class,'prematch-competition-name__inner-competition ellipsis-text')]")).get(0).getAttribute("innerText");
+        //String nameTourInMulti = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-name')]//div[contains(@class,'prematch-competition-name__inner-competition ellipsis-text')]")).get(0).getAttribute("innerText");
+        List<String> namesToursInMulti = driver.findElements(By.xpath("//div[contains(@class,'prematch-competitions scroll-contain')]//div[contains(@class,'prematch-competition-name')]//div[contains(@class,'prematch-competition-name__inner-competition ellipsis-text')]")).
+                stream().map(element -> element.getAttribute("innerText").trim()).collect(Collectors.toList());
+
 
         LOG.info("Сравниваем название соревновани в ЛМ и в контейнере");
         Assert.assertTrue(
-                "В контейнере многовыбрного режима ожидались игры из соревнования " + nameTour + ", а вместо него " + nameTourInMulti,
-                nameTourInMulti.trim().equals(nameTour.trim()));
+                "В контейнере многовыбрного режима ожидались игры из соревнования " + nameTour + ", а вместо него " + namesToursInMulti,
+                namesToursInMulti.contains(nameTour.trim()));
 
         if (keyNameGame.isEmpty()) return;
 
