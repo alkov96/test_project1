@@ -14,7 +14,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -50,9 +49,13 @@ public abstract class AbstractPage extends Page{
     static WebDriver driver = PageFactory.getDriver();
 
 
-    @ElementTitle("Вход")
-    @FindBy(id = "log-in")
-    private WebElement enterButton;
+    @ElementTitle("Наборы метатегов")
+    @FindBy(xpath = "//a[@data-id='subMenu_metatagTabUrl']")
+    private WebElement metategs_button_collection;
+
+    @ElementTitle("Метатеги")
+    @FindBy(xpath = "//a[@data-id='topMenu_metatagManagementView']")
+    private WebElement metategs_button;
 
     @ElementTitle("На главную")
     @FindBy(id = "main-logo")
@@ -840,7 +843,6 @@ public abstract class AbstractPage extends Page{
     public void rememberSMSforWithdraw(String keyPhone, String keyCode){
         WebDriver driver = Stash.getValue("driver");
         LOG.info("Ищем и запоминаем смс-код подтверждения вывода");
-        TestingServicePage.userSearchesForLastSentSMSByNumberAndRemembersIn(keyPhone,keyCode,driver);
         driver.close();
         driver.quit();
     }

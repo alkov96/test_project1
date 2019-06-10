@@ -11,7 +11,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.pages.mainPages.AuthenticationMainPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -94,16 +93,7 @@ public class PopUPLCPage extends AbstractPage {
         }
     }
 
-    @ActionTitle("вводит крупную сумму, превышающую текущее значение баланса на 1")
-    public void summWithdraw1() {
-        AuthenticationMainPage.rememberBalnce("рубли");
-        float balance1 = Float.parseFloat(Stash.getValue("balanceKey"));
-        int balance;
-        balance = (int) balance1;
-        withdraw_field.click();
-        withdraw_field.clear();
-        withdraw_field.sendKeys(String.valueOf(balance + 1));
-    }
+
 
     @ActionTitle("вводит сумму меньше минимальной и проверяем для каждого способа")
     public void summMin(){

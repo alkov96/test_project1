@@ -25,7 +25,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
-import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -68,9 +67,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
-import static ru.gamble.pages.mainPages.FooterPage.opensNewTabAndChecksPresenceOFElement;
-import static ru.gamble.pages.prematchPages.EventViewerPage.onTriggerPeriod;
-import static ru.gamble.pages.userProfilePages.FavouritePage.clearFavouriteGames;
+
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
@@ -249,7 +246,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^разлогиниваем пользователя$")
     public void logOut() throws AWTException {
         LOG.info("Переход на главную страницу");
-        goToMainPage("site");
+        goToMainPage("admin");
         cleanCookies();
         descktopSiteLogOut(driver);
 
@@ -310,21 +307,6 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
-    private void mobileSiteLogOut(WebDriver driver) {
-        try {
-            LOG.info("Ищем наличие ссылки депозита.");
-            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/private/balance/deposit']")));
-            WebElement menuSwitchButton = driver.findElement(By.xpath("//label[@class='header__button header__menu-switch']"));
-            LOG.info("Нажимаем на кнопку 'MenuSwitch'");
-            menuSwitchButton.click();
-            Thread.sleep(500);
-            LOG.info("Ищем кнопку 'Выход' нажимаем и обновляем страницу");
-            driver.findElement(By.xpath("//span[contains(.,'Выход')]")).click();
-            driver.navigate().refresh();
-        } catch (Exception e) {
-            LOG.info("На сайте никто не авторизован");
-        }
-    }
 
 
     // Метод перехода на главную страницу
@@ -356,9 +338,6 @@ public class CommonStepDefs extends GenericStepDefs {
                 case "admin":
                     currentUrl = JsonLoader.getData().get(STARTING_URL).get("ADMIN_URL").getValue();
                     break;
-                case "registr":
-                    currentUrl = JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
-                    break;
                 default:
                     currentUrl = siteUrl;
                     break;
@@ -371,41 +350,8 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
-    /**
-     * Генератор e-mail
-     *
-     * @param key - ключ по которому сохраняем е-mail в памяти.
-     */
-    @Когда("^генерим email в \"([^\"]*)\"$")
-    public static void generateEmailAndSave(String key) {
-        String value = "testregistrator" + System.currentTimeMillis() + "@mailinator.com";
-        LOG.info("Сохраняем в память key[" + key + "] <== value[" + value + "]");
-        Stash.put(key, value);
-    }
-
-    @Когда("^определяем \"([^\"]*)\" пользователя \"([^\"]*)\"$")
-    public static void getUserID(String key, String keyEmail) {
-        String sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(keyEmail) + "'";
-        String id = workWithDBgetResult(sqlRequest, "id");
-        Stash.put(key, id);
-    }
 
 
-    @Когда("^подтверждаем видеорегистрацию \"([^\"]*)\"$")
-    public void confirmVidochat(String param) {
-        String sqlRequest = "UPDATE gamebet.`user` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
-        workWithDB(sqlRequest);
-        LOG.info("Подтвердили видеорегистрацию");
-
-    }
-
-    @Когда("^подтверждаем от ЦУПИС \"([^\"]*)\"$")
-    public static void confirmTSUPIS(String param) {
-        String sqlRequest = "UPDATE gamebet.`user` SET registered_in_tsupis = TRUE, identified_in_tsupis = TRUE, identState = 1 WHERE `email` ='" + Stash.getValue(param) + "'";
-        workWithDB(sqlRequest);
-        LOG.info("Подтвердили регистрацию от ЦУПИС");
-
-    }
 
     private static void workWithDB(String sqlRequest) {
         Connection con = DBUtils.getConnection();
@@ -423,6 +369,7 @@ public class CommonStepDefs extends GenericStepDefs {
             DBUtils.closeAll(con, ps, null);
         }
     }
+
 
 
     /**
@@ -1135,7 +1082,6 @@ public class CommonStepDefs extends GenericStepDefs {
     @After(value = "@LeftMenuTriggersPrematch_C1057")
     public void offMultigames(){
         LOG.info("!!!АФТЕР!!!");
-        EventViewerPage.multiGamesOnOff("выключает");
     }
 
     @After(value = "@LandingAppFavourite_C1065,@AddBetToCouponFromFavourite_С1050,@Search_C1053,@TriggerPeriodPrematch_C1057,@LinkGameFromFavourite_C1050")
@@ -1143,7 +1089,6 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("!!!АФТЕР!!!");
         PageFactory.getDriver().findElement(By.id("prematch")).click();
         workWithPreloader();
-        onTriggerPeriod("Выберите время");
     }
 
 
@@ -2725,14 +2670,13 @@ public class CommonStepDefs extends GenericStepDefs {
             String xpath = "//*[contains(text(),'" + expectedText + "')]";
             LOG.info("Переходим по клику на элемент " + linkTitle);
             try {
-                opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
                 Thread.sleep(500);
             } catch (TimeoutException e) {
                 LOG.info("С первого раза ссылка " + linkTitle + " не открылась, попробуем второй раз");
                 driver.close();
                 driver.switchTo().window(currentHandle);
                 driver.navigate().refresh();
-                opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
+
             } catch (InterruptedException e2) {
                 e2.printStackTrace();
             }
@@ -2806,10 +2750,6 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
-    @Когда("^очищаем избранное$")
-    public void clearFavourite() throws Exception {
-        clearFavouriteGames();
-    }
 
     @Когда("^нажимает кнопку НАЗАД$")
     public void backToPage() {
