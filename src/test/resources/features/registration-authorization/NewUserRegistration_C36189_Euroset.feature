@@ -2,6 +2,10 @@
 Функционал: 1_Регистрация и авторизация
 
   Предыстория:
+
+    * редактируем некоторые активные опции сайта
+      |fast_registration  | false  |
+
     * сохраняем в память
       | INN | 775459885706 |
 
@@ -25,10 +29,7 @@
 
     * пользователь (заполняет форму с) данными
       | Поле ввода     | Значение   | Переменная сохранения |
-      | Дата рождения  | BIRTH_DATE | BIRTHDATE             |
-      | Фамилия        | random     | LASTNAME              |
       | Имя            | random     | FIRSTNAME             |
-      | Отчество       | random     | PATERNALNAME          |
       | E-mail         | EMAIL      | EMAIL                 |
       | Пароль         | Default    | PASSWORD              |
       | Номер телефона | PHONE      | PHONE                 |
@@ -55,6 +56,10 @@
     * открывается страница "Паспортные данные"
     * пользователь (заполняет паспорт с) данными
       | Поле ввода        | Значение   | Переменная сохранения |
+      | Дата рождения  | BIRTH_DATE | BIRTHDATE             |
+      | Фамилия        | random     | LASTNAME              |
+      | Имя            | random     | DIFFFIRSTNAME             |
+      | Отчество       | random     | PATERNALNAME          |
       | Серия             | random     | SERIES                |
       | Номер             | random     | NUMBER                |
       | Дата выдачи       | ISSUE_DATE | ISSUEDATE             |
@@ -92,10 +97,9 @@
     * запрашиваем дату-время и сохраняем в память
       | DATE_TIME | Current |
 
-  @before
-  @after
+  @enabledFeatures
   @smoke
-    @rega
+  @rega
   @NewUserRegistration_C36189_Euroset
   Сценарий: Регистрация нового пользователя через Евросеть
 
@@ -134,7 +138,7 @@
       | Электронная почта | EMAIL         |
       | Телефон           | PHONE         |
       | Фамилия           | LASTNAME      |
-      | Имя               | FIRSTNAME     |
+      | Имя               | DIFFFIRSTNAME |
       | Отчество          | PATERNALNAME  |
       | Дата рождения     | BIRTH_DATE    |
       | Место рождения    | BIRTHLOCATION |

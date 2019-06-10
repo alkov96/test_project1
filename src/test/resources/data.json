@@ -8,7 +8,7 @@
     "USER": "testingsto+86@mail.ru",
     "USER_CHROME": "testingsto+86@mail.ru",
     "USER_FIREFOX": "user_for_firefox@mailinator.com",
-    "PASSWORD": "Acer0808",
+    "PASSWORD": "Acer0808!",
     "PASSWORD_TSUPIS": "Acer0808",
     "PASS": "Parol123",
     "PHONE": "79088767878",
@@ -61,7 +61,7 @@
     "SWAGGER":"http://192.168.14.100"
   },
     "DEV_GAMEBET": {
-      "ESB_URL": "http://dev-bet-esb3.dev.bet.orglot.office:8663",
+      "ESB_URL": "http://dev-bet-esb.dev.bet.orglot.office:8660",
       "MAIN_URL": "https://dev.gamebet.ru",
       "ADMIN_URL": "http://dev-bet-dbproca.dev.bet.orglot.office/admin",
       "MOBILE_URL": "https://dev-mobile.gamebet.ru",
