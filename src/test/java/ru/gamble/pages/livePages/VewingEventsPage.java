@@ -424,5 +424,45 @@ public class VewingEventsPage extends AbstractPage {
             }
         }
     }
+    @ActionTitle("проверяем что фильтр по видео")
+    public void checkDisplayedFilterVideo(String trigger)
+    {
+        int haveTrig=trigger.equals("отображается")?1:0;
+        By byFilterVideo = By.xpath("//div[@class='left-menu-filters__item left-menu-filters__item_video']");
+        new WebDriverWait(driver,15)
+                .withMessage("Ожидалось что фильтр по видео " + trigger + ", но размер списка с этим триггером = " + driver.findElements(byFilterVideo).size())
+                .until(ExpectedConditions.numberOfElementsToBe(byFilterVideo,haveTrig));
+    }
 
+    @ActionTitle("проверяем что для игр с видео есть матч-центр")
+    public void videoInMatchCenter(){
+        LOG.info("Включаем фильтр по видео");
+        setExpandCollapseMenusButton(true);
+        if (!driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).getAttribute("class").contains("active")) {//включим ильтр видео если ищем игру с видео
+            driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).click();
+            CommonStepDefs.workWithPreloader();
+        }
+        LOG.info("Выбираем первую игру с видео. Проверяем что в центральной области есть матч-центр и включаем его");
+        String xpathMainCategoriesOfEvents = "//li[contains (@id,'sport')]";
+        String xpathGamesWithVideo = "//li[contains(@class,'left-menu__list-item-games')]";
+
+        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents));
+        if (!list.get(0).getAttribute("class").contains("active")) {
+            LOG.info("Меню спорта было свёрнуто. Раскрываем.");
+            list.get(0).click();
+        }
+        List<WebElement> gameList = driver.findElements(By.xpath(xpathGamesWithVideo)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+        Assert.assertFalse("Нет игр с видео. проверка окончена",gameList.isEmpty());
+        gameList.get(0).click();
+
+        LOG.info("Включаем матч-центр");
+        WebElement matchSlider = driver.findElement(By.xpath("//div[contains(@class,'switcher-block')]//div[contains(@class,'game-container__match-center-switch')]//span[@class='switch__slider']"));
+        if (matchSlider.findElement(By.xpath("./preceding-sibling::input")).getAttribute("checked")==null){
+            matchSlider.click();
+        }
+        LOG.info("Проверяем что есть блок видео в матч-центре");
+        new WebDriverWait(driver,10)
+                .withMessage("Нет блока с видео")
+                .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'game-video__container')]"),0));
+    }
 }

@@ -118,4 +118,21 @@ public class AuthenticationMainPage extends AbstractPage {
 //            CouponPage.balanceIsOK("бонусов");
 //        }
 //    }
+
+    @ActionTitle("проверяем что рядом с горячими ставками отображается")
+    public void bannerOrWidget(String type){
+        By byWidget = By.xpath("//div[@class='bets-widget nearestBroadcasts']");
+        By byBanner = By.xpath("//div[contains(@class,'index-widgets__container_right')]//div[@class='flickity-slider']");
+        WebDriverWait wait = new WebDriverWait(driver,10);
+        switch (type){
+            case "виджет":
+                wait.withMessage("Нет виджета ближайших трансляции!")
+                        .until(ExpectedConditions.numberOfElementsToBeMoreThan(byWidget,0));
+                break;
+            case "баннер":
+                wait.withMessage("Нет правого баннера!")
+                        .until(ExpectedConditions.numberOfElementsToBeMoreThan(byBanner,0));
+                break;
+        }
+    }
 }
