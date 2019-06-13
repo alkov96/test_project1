@@ -1,0 +1,44 @@
+INFO  CommonStepDefs:2365 - возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'
+INFO  CommonStepDefs:2338 - [identification_with_wave] = true
+INFO  CommonStepDefs:2341 - [identification_with_skype_only] = false
+INFO  CommonStepDefs:2341 - [video_identification_in_mobile_app] = false
+INFO  CommonStepDefs:2338 - [betradar_widgets_mob] = true
+INFO  CommonStepDefs:2338 - [use_bet_history_subscription] = true
+INFO  CommonStepDefs:2341 - [identification_with_euroset] = false
+INFO  CommonStepDefs:2341 - [identification_with_courier] = false
+INFO  CommonStepDefs:2341 - [disable_results_page] = false
+INFO  CommonStepDefs:2338 - [enable_sendsay] = true
+INFO  CommonStepDefs:2338 - [bets_races_mobile] = true
+INFO  CommonStepDefs:2338 - [express_bonus] = true
+INFO  CommonStepDefs:2338 - [bc_stat_link] = true
+INFO  CommonStepDefs:2338 - [betconstruct_translations] = true
+INFO  CommonStepDefs:2338 - [betradar_widgets_prematch] = true
+INFO  CommonStepDefs:2341 - [hide_bonus_money] = false
+INFO  CommonStepDefs:2338 - [counter_offer] = true
+INFO  CommonStepDefs:2341 - [fast_registration] = false
+INFO  CommonStepDefs:2338 - [coefficients_rounding] = true
+INFO  CommonStepDefs:2341 - [identification_with_contact] = false
+INFO  CommonStepDefs:2338 - [twitch_translations] = true
+INFO  CommonStepDefs:2338 - [white_mode] = true
+INFO  CommonStepDefs:2338 - [remove_limits_btn] = true
+INFO  CommonStepDefs:2341 - [bet_from_left_menu] = false
+INFO  CommonStepDefs:2338 - [betradar_widgets] = true
+INFO  CommonStepDefs:2338 - [multimarkets_enable] = true
+INFO  CommonStepDefs:2338 - [change_basic_parameter] = true
+INFO  CommonStepDefs:2338 - [online_chat] = true
+INFO  CommonStepDefs:2338 - [bets_races] = true
+INFO  CommonStepDefs:2341 - [white_mode_mobile] = false
+INFO  CommonStepDefs:2338 - [races_mobile] = true
+INFO  CommonStepDefs:2338 - [edit_personal_data_btn] = true
+INFO  CommonStepDefs:2338 - [video_chat_identification_status] = true
+INFO  CommonStepDefs:2338 - [races] = true
+INFO  CommonStepDefs:2338 - [show_bonus_rubles] = true
+INFO  CommonStepDefs:2338 - [identification_with_video] = true
+INFO  CommonStepDefs:2341 - [back_call] = false
+INFO  CommonStepDefs:2338 - [announcements] = true
+INFO  CommonStepDefs:2338 - [favorite] = true
+INFO  CommonStepDefs:2338 - [coupon_progressbar] = true
+INFO  CommonStepDefs:921 - SQL-request [{identification_with_wave=1, identification_with_skype_only=0, video_identification_in_mobile_app=0, betradar_widgets_mob=1, use_bet_history_subscription=1, identification_with_euroset=0, identification_with_courier=0, disable_results_page=0, enable_sendsay=1, bets_races_mobile=1, express_bonus=1, bc_stat_link=1, betconstruct_translations=1, betradar_widgets_prematch=1, hide_bonus_money=0, counter_offer=1, fast_registration=0, coefficients_rounding=1, identification_with_contact=0, twitch_translations=1, white_mode=1, remove_limits_btn=1, bet_from_left_menu=0, betradar_widgets=1, multimarkets_enable=1, change_basic_parameter=1, online_chat=1, bets_races=1, white_mode_mobile=0, races_mobile=1, edit_personal_data_btn=1, video_chat_identification_status=1, races=1, show_bonus_rubles=1, identification_with_video=1, back_call=0, announcements=1, favorite=1, coupon_progressbar=1}]
+INFO  CommonStepDefs:2352 - Вернули активные опции сайта [{identification_with_wave=1, identification_with_skype_only=0, video_identification_in_mobile_app=0, betradar_widgets_mob=1, use_bet_history_subscription=1, identification_with_euroset=0, identification_with_courier=0, disable_results_page=0, enable_sendsay=1, bets_races_mobile=1, express_bonus=1, bc_stat_link=1, betconstruct_translations=1, betradar_widgets_prematch=1, hide_bonus_money=0, counter_offer=1, fast_registration=0, coefficients_rounding=1, identification_with_contact=0, twitch_translations=1, white_mode=1, remove_limits_btn=1, bet_from_left_menu=0, betradar_widgets=1, multimarkets_enable=1, change_basic_parameter=1, online_chat=1, bets_races=1, white_mode_mobile=0, races_mobile=1, edit_personal_data_btn=1, video_chat_identification_status=1, races=1, show_bonus_rubles=1, identification_with_video=1, back_call=0, announcements=1, favorite=1, coupon_progressbar=1}]
+INFO  SetupSteps:147 - Webdriver sharing is processing...
+INFO  TagWebDriver:363 - Checking any alert opened
