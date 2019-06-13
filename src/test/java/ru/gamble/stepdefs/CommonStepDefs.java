@@ -9,6 +9,9 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.ru.Когда;
 import io.qameta.allure.Allure;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Link;
+import io.restassured.response.Response;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
@@ -25,6 +28,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.utility.DBUtils;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
@@ -38,20 +42,14 @@ import ru.sbtqa.tag.pagefactory.exceptions.PageInitializationException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 import ru.sbtqa.tag.stepdefs.GenericStepDefs;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLContext;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.io.*;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -67,10 +65,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
 import static ru.gamble.pages.AbstractPage.preloaderOnPage;
-
+import static ru.gamble.pages.mainPages.FooterPage.opensNewTabAndChecksPresenceOFElement;
+import static ru.gamble.pages.prematchPages.EventViewerPage.onTriggerPeriod;
+import static ru.gamble.pages.userProfilePages.FavouritePage.clearFavouriteGames;
 import static ru.gamble.utility.Constants.*;
 import static ru.gamble.utility.Generators.generateDateForGard;
-import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 
 public class CommonStepDefs extends GenericStepDefs {
@@ -189,7 +188,7 @@ public class CommonStepDefs extends GenericStepDefs {
         }
 
         if (value.equals(RANDOME_EMAIL)) {
-            value = "testregistrator" + Stash.getValue("PHONE") + "@mailintor.com";
+            value = "testregistrator" + Stash.getValue("PHONE") + "@mailinator.com";
         }
 
         if (value.split(" ")[0].equals(RANDOM)) {
@@ -246,7 +245,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @Когда("^разлогиниваем пользователя$")
     public void logOut() throws AWTException {
         LOG.info("Переход на главную страницу");
-        goToMainPage("admin");
+        goToMainPage("site");
         cleanCookies();
         descktopSiteLogOut(driver);
 
@@ -278,8 +277,8 @@ public class CommonStepDefs extends GenericStepDefs {
             }
 
 
-           // LOG.info("COORDINATE:" + MouseInfo.getPointerInfo().getLocation() + driver.findElement(By.id("log-out-button")).getLocation());
-         //   new Actions(driver).moveToElement(driver.findElement(By.id("log-out-button")),10,0).click().build().perform();
+            // LOG.info("COORDINATE:" + MouseInfo.getPointerInfo().getLocation() + driver.findElement(By.id("log-out-button")).getLocation());
+            //   new Actions(driver).moveToElement(driver.findElement(By.id("log-out-button")),10,0).click().build().perform();
 
 //            driver.findElement(By.id("log-out-button")).click();
             try {
@@ -288,7 +287,7 @@ public class CommonStepDefs extends GenericStepDefs {
                 e.printStackTrace();
             }
             driver.navigate().refresh();
-        LOG.info("Обновили страницу на всякий случай");
+            LOG.info("Обновили страницу на всякий случай");
             wait
                     .withMessage("Разлогинивали-разлогинивали, да не ралогинили. На сайте все еще кто-то авторизован")
                     .until(ExpectedConditions.numberOfElementsToBe(By.id("user-icon"),0));
@@ -307,6 +306,21 @@ public class CommonStepDefs extends GenericStepDefs {
         }
     }
 
+    private void mobileSiteLogOut(WebDriver driver) {
+        try {
+            LOG.info("Ищем наличие ссылки депозита.");
+            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/private/balance/deposit']")));
+            WebElement menuSwitchButton = driver.findElement(By.xpath("//label[@class='header__button header__menu-switch']"));
+            LOG.info("Нажимаем на кнопку 'MenuSwitch'");
+            menuSwitchButton.click();
+            Thread.sleep(500);
+            LOG.info("Ищем кнопку 'Выход' нажимаем и обновляем страницу");
+            driver.findElement(By.xpath("//span[contains(.,'Выход')]")).click();
+            driver.navigate().refresh();
+        } catch (Exception e) {
+            LOG.info("На сайте никто не авторизован");
+        }
+    }
 
 
     // Метод перехода на главную страницу
@@ -338,6 +352,9 @@ public class CommonStepDefs extends GenericStepDefs {
                 case "admin":
                     currentUrl = JsonLoader.getData().get(STARTING_URL).get("ADMIN_URL").getValue();
                     break;
+                case "registr":
+                    currentUrl = JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
+                    break;
                 default:
                     currentUrl = siteUrl;
                     break;
@@ -350,8 +367,41 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
+    /**
+     * Генератор e-mail
+     *
+     * @param key - ключ по которому сохраняем е-mail в памяти.
+     */
+    @Когда("^генерим email в \"([^\"]*)\"$")
+    public static void generateEmailAndSave(String key) {
+        String value = "testregistrator" + System.currentTimeMillis() + "@mailinator.com";
+        LOG.info("Сохраняем в память key[" + key + "] <== value[" + value + "]");
+        Stash.put(key, value);
+    }
+
+    @Когда("^определяем \"([^\"]*)\" пользователя \"([^\"]*)\"$")
+    public static void getUserID(String key, String keyEmail) {
+        String sqlRequest = "SELECT id FROM gamebet. `user` WHERE email='" + Stash.getValue(keyEmail) + "'";
+        String id = workWithDBgetResult(sqlRequest, "id");
+        Stash.put(key, id);
+    }
 
 
+    @Когда("^подтверждаем видеорегистрацию \"([^\"]*)\"$")
+    public void confirmVidochat(String param) {
+        String sqlRequest = "UPDATE gamebet.`user` SET personality_confirmed = TRUE, registration_stage_id = 19 WHERE `email` = '" + Stash.getValue(param) + "'";
+        workWithDB(sqlRequest);
+        LOG.info("Подтвердили видеорегистрацию");
+
+    }
+
+    @Когда("^подтверждаем от ЦУПИС \"([^\"]*)\"$")
+    public static void confirmTSUPIS(String param) {
+        String sqlRequest = "UPDATE gamebet.`user` SET registered_in_tsupis = TRUE, identified_in_tsupis = TRUE, identState = 1 WHERE `email` ='" + Stash.getValue(param) + "'";
+        workWithDB(sqlRequest);
+        LOG.info("Подтвердили регистрацию от ЦУПИС");
+
+    }
 
     private static void workWithDB(String sqlRequest) {
         Connection con = DBUtils.getConnection();
@@ -369,7 +419,6 @@ public class CommonStepDefs extends GenericStepDefs {
             DBUtils.closeAll(con, ps, null);
         }
     }
-
 
 
     /**
@@ -444,7 +493,6 @@ public class CommonStepDefs extends GenericStepDefs {
         int count = num;
         try {
             do {
-                //todo del . soup
                 System.out.println(count);
                 LOG.debug("List size is " + list.size());
                 for (WebElement preloader : list) {
@@ -495,7 +543,7 @@ public class CommonStepDefs extends GenericStepDefs {
      */
     public static String stringParse(String oldName) {
         String nameGame;
-        Pattern p = Pattern.compile("(?u)[^а-яА-Я0-9a-zA-Z]");
+        Pattern p = Pattern.compile("(?u)[^а-яА-Ясa-zA-Z]");
         Matcher m = p.matcher(oldName);
         nameGame = m.replaceAll("");
         return nameGame;
@@ -637,22 +685,6 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     /**
-     * открытие новой вкладки по адресу URl из входного параметра
-     *
-     * @param newUrl - URl, который нужноввести в этой новой вкладке
-     */
-    public static void newWindow(String newUrl) {
-        Set<String> currentHandles = driver.getWindowHandles();
-        ((ChromeDriver) driver).executeScript("window.open()");
-        Set<String> windows = driver.getWindowHandles();
-        windows.removeAll(currentHandles);
-        String newWindow = windows.toArray()[0].toString();
-        driver.switchTo().window(newWindow);
-        driver.get(newUrl);
-        new WebDriverWait(driver, 10).until(ExpectedConditions.urlToBe(newUrl));
-    }
-
-    /**
      * функиця, которая ждет пока элмент станет доступным. ждет, но не кликает
      *
      * @param element
@@ -675,21 +707,25 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^проверка ответа API из \"([^\"]*)\":$")
-    public void checkresponceAPI(String keyStash, DataTable dataTable) {
+    public void checkresponceAPI22(String keyStash, DataTable dataTable) {
+        RestApi.checkResponse(keyStash,dataTable);
+    }
+
+    @Когда("^проверка вариантного ответа API из \"([^\"]*)\":$")
+    public void checkresponceAPIor(String keyStash, DataTable dataTable) {
         Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash)).replaceAll(" ","");
-        String expected = table.get("exepted").replaceAll(" ","");
-        assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
+        Response response = Stash.getValue(keyStash);
+        String actual = response.getBody().asString();
+        String expected = table.get("exepted");
+        boolean actualsOk = actual.contains(expected.split("or")[0].trim()) || actual.contains(expected.split("or")[1].trim());
+        Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|", actualsOk);
         LOG.info("|" + expected + "| содержится в |" + actual + "|");
     }
 
+
     @Когда("^проверка ответа API из \"([^\"]*)\", значение берем из памяти$")
     public void checkresponceAPI2(String keyStash, DataTable dataTable) {
-        Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        String expected = Stash.getValue(table.get("exepted"));
-        assertThat(actual).as("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|").contains(expected);
-        LOG.info("|" + expected + "| содержится в |" + actual + "|");
+        RestApi.checkResponse(keyStash,dataTable,true);
     }
 
 
@@ -697,7 +733,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void selectOneDateInResponce(String keyResponce, String keyDate, String keyId) throws ParseException {
         SimpleDateFormat oldFormat = new SimpleDateFormat("dd.MM.yyyy kk:mm");
         SimpleDateFormat newFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
-        String actual = JSONValue.toJSONString(Stash.getValue(keyResponce));
+        String actual = ((Response) Stash.getValue(keyResponce)).getBody().asString();
         actual = actual.replace("{\"code\":0,\"data\":", "").replace("}", "");
         String[] linesResponce = actual.split("swarmUserId");
         int i = 1 + new Random().nextInt(linesResponce.length - 1);
@@ -733,7 +769,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверка что в ответе \"([^\"]*)\" нет юзера с \"([^\"]*)\"$")
     public void checkResponceNotConains(String keyResponce, String keyId) {
-        String actual = JSONValue.toJSONString(Stash.getValue(keyResponce));
+        String actual = ((Response) Stash.getValue(keyResponce)).getBody().asString();
         String userId = Stash.getValue(keyId);
         Assert.assertFalse("В ответе есть пользователь " + userId + ", хотя он не вписывается в заданные ts и ts_end:" + Stash.getValue("PARAMS"),
                 actual.contains("\"swarmUserId\":" + userId));
@@ -742,7 +778,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверка что в ответе \"([^\"]*)\" верные даты  \"([^\"]*)\":$")
     public void checkResponceAPIgoodDate(String keyStash, String keyParams) throws ParseException {
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
+        String actual = ((Response) Stash.getValue(keyStash)).getBody().asString();
         String params = Stash.getValue(keyParams).toString();
         SimpleDateFormat formatTS = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         SimpleDateFormat formatResponse = new SimpleDateFormat("dd.MM.yyy hh:mm");
@@ -771,23 +807,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^проверка что ответ \"([^\"]*)\" \"([^\"]*)\"$")
     public void checkResponceFill(String keyStash, String isEmpty) throws ParseException {
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        actual = actual.replace("{\"code\":0,\"data\":", "").replace("}", "");
-        boolean expectedEmpty = isEmpty.equals("пустой");
-        Assert.assertTrue("Ожидалось что результат будет " + isEmpty + ", но это не так.\n" + actual,
-                actual.equals("[]") == expectedEmpty);
-        LOG.info("Да, RESPONCE действительно " + isEmpty);
-    }
-
-
-    @Когда("^проверка вариантного ответа API из \"([^\"]*)\":$")
-    public void checkresponceAPIor(String keyStash, DataTable dataTable) {
-        Map<String, String> table = dataTable.asMap(String.class, String.class);
-        String actual = JSONValue.toJSONString(Stash.getValue(keyStash));
-        String expected = table.get("exepted");
-        boolean actualsOk = actual.contains(expected.split("or")[0].trim()) || actual.contains(expected.split("or")[1].trim());
-        Assert.assertTrue("ОШИБКА! Ожидался ответ |" + expected + "| в |" + actual + "|", actualsOk);
-        LOG.info("|" + expected + "| содержится в |" + actual + "|");
+        RestApi.checkResponceByEmpty(keyStash, isEmpty);
     }
 
     @Когда("^проверим что время \"([^\"]*)\" уменьшилось в \"([^\"]*)\"$")
@@ -817,10 +837,19 @@ public class CommonStepDefs extends GenericStepDefs {
         String tmp;
         Object valueFingingParams, retMap = null;
         ObjectMapper mapper = new ObjectMapper();
+        String resp;
+        if (Stash.getValue(sourceString).getClass().getName().contains("List")){
+            List<Object> list = Stash.getValue(sourceString);
+            resp=list.get(list.size()-1).toString();
+        }
+        else {
+            Response response = Stash.getValue(sourceString);
+            resp=response.getBody().asString();
+        }
 
         //Преобразуем в строку JSON-объект в зависимости от его структуры
-        if (JSONValue.isValidJson(Stash.getValue(sourceString).toString())) {
-            tmp = Stash.getValue(sourceString).toString();
+        if (JSONValue.isValidJson(resp)) {
+            tmp = resp;
         } else {
             tmp = JSONValue.toJSONString(Stash.getValue(sourceString));
         }
@@ -1046,6 +1075,14 @@ public class CommonStepDefs extends GenericStepDefs {
         return result;
     }
 
+     @Before(value = "@api")
+     public void disposeDriver(){
+        try{
+            driver.close();
+        }
+        catch (Exception e)
+        {e.printStackTrace();}
+     }
 
     @Before(value = "@ChangePassword_C1043")
     public void saveCurrentPassword() throws DataException {
@@ -1082,6 +1119,7 @@ public class CommonStepDefs extends GenericStepDefs {
     @After(value = "@LeftMenuTriggersPrematch_C1057")
     public void offMultigames(){
         LOG.info("!!!АФТЕР!!!");
+        EventViewerPage.multiGamesOnOff("выключает");
     }
 
     @After(value = "@LandingAppFavourite_C1065,@AddBetToCouponFromFavourite_С1050,@Search_C1053,@TriggerPeriodPrematch_C1057,@LinkGameFromFavourite_C1050")
@@ -1089,6 +1127,7 @@ public class CommonStepDefs extends GenericStepDefs {
         LOG.info("!!!АФТЕР!!!");
         PageFactory.getDriver().findElement(By.id("prematch")).click();
         workWithPreloader();
+        onTriggerPeriod("Выберите время");
     }
 
 
@@ -1121,7 +1160,8 @@ public class CommonStepDefs extends GenericStepDefs {
             StringBuilder fullPath = new StringBuilder();
             fullPath.append(JsonLoader.getData().get(STARTING_URL).get("ESB_URL").getValue() + "/" + path);
             LOG.info("Строчка запроса: " + fullPath);
-            requestByHTTP(fullPath.toString(), keyStash, dataTable, "POST");
+            Response response = RestApi.requestAndResponse("POST",fullPath.toString(),dataTable);
+            Stash.put(keyStash,response);
         } catch (DataException e) {
             e.printStackTrace();
         }
@@ -1137,6 +1177,25 @@ public class CommonStepDefs extends GenericStepDefs {
         Stash.put(keyEmailCode, code);
         Stash.put("userIdKey", userId);
         LOG.info("Получили код подтверждения почты: " + code);
+    }
+
+
+    @Когда("^проверка что в БД есть код для восстановления пароля \"([^\"]*)\"$")
+    public static void checkCodeFromResetPassword(String keyEmail) {
+        String email = Stash.getValue(keyEmail);
+        String sqlRequest = "SELECT id FROM gamebet.`user` WHERE email='" + email + "'";
+        String userId = workWithDBgetResult(sqlRequest, "id");
+        sqlRequest = "SELECT token FROM gamebet.`userpasswordresettoken` WHERE user_id=" + userId;
+        try {
+            String token = workWithDBgetResult(sqlRequest, "token");
+            LOG.info("Раз тест не упал, значит в БД есть токен для смены пароля: " + token);
+        }
+        catch (Exception e)
+        {
+            LOG.info("в БД нет токена дял восстановления пароля");
+            e.printStackTrace();
+        }
+
     }
 
     @Когда("^определяем валидную и невалидную дату выдачи паспорта \"([^\"]*)\" \"([^\"]*)\"$")
@@ -1169,21 +1228,16 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^добавляем данные в JSON объект \"([^\"]*)\" сохраняем в память:$")
     public void addDataToJSONObjectStoredInMemory(String keyJSONObject, DataTable dataTable) {
-
-        Object jSONString = collectParametersInJSONString(dataTable);
-        Stash.put(keyJSONObject, jSONString);
-        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jSONString) + ")");
-
+        Object params = RestApi.collectParams(dataTable);
+        Stash.put(keyJSONObject,params);
     }
 
     @Когда("^добавляем данные в JSON массив \"([^\"]*)\" сохраняем в память:$")
     public void addDataToJSONArrayStoredInMemory(String keyJSONObject, DataTable dataTable) {
-
-        Object jSONString = collectParametersInJSONString(dataTable);
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.add(jSONString);
-        Stash.put(keyJSONObject, jsonArray);
-        LOG.info("Сохранили в память key::(" + keyJSONObject + ") |==> value::(" + String.valueOf(jsonArray.get(0)) + ")");
+        Object params = RestApi.collectParams(dataTable);
+        JSONArray authArray = new JSONArray();
+        authArray.add(params);
+        Stash.put(keyJSONObject,authArray);
     }
 
     @Когда("^приводим дату к формату год-месяц-день \"([^\"]*)\"$")
@@ -1214,17 +1268,18 @@ public class CommonStepDefs extends GenericStepDefs {
             key = entry.getKey();
             if (entry.getValue().matches("^[A-Z_]+$")) {
                 value = Stash.getValue(entry.getValue());
-            } else {
-                value = entry.getValue();
             }
-            if (entry.getValue().matches("^[/(][A-Z]+[/)]")){
-                value = String.valueOf(value).replace("(","").replace(")","");
+            else if (entry.getValue().matches("^[/(][A-Z]+[/)]")){
+                value = String.valueOf(entry.getValue()).replace("(","").replace(")","");
                 JSONObject asd = Stash.getValue( String.valueOf(value));
                 JSONObject[] dfg = {Stash.getValue( String.valueOf(value))};
                 jsonObject.put(key,dfg);
             }
+            else {
+                value = entry.getValue();
+            }
             //Если попадются числовые значения, в JSON объект кладём как строку
-            else if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
+            if (value instanceof String && !StringUtils.isBlank((String) value) && ((String) value).matches("[0-9]+")) {
                 String str = (String) value;
                 jsonObject.put(key, value);
             } else {
@@ -1468,7 +1523,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
 
     @Когда("^поиск акаунта со статуом регистрации \"([^\"]*)\" \"([^\"]*)\"$")
-    public void searchUserStatus2(String status, String keyEmail) {
+    public void searchUserStatus(String status, String keyEmail) {
         //  String sqlRequest = "SELECT * FROM gamebet.`user` WHERE (email LIKE 'testregistrator+7933%' OR email LIKE 'testregistrator+7111%') AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id DESC";
         String sqlRequest = "SELECT * FROM gamebet.`user` WHERE email LIKE 'testregistrator%mailinator.com' AND registration_stage_id" + status + " AND tsupis_status=3 AND offer_state=3 ORDER BY id";
         searchUser(keyEmail, sqlRequest);
@@ -1713,20 +1768,27 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
-    public void requestToAPI(String path, String keyStash, DataTable dataTable) {
+    public void requestToAPI2(String path, String keyStash, DataTable dataTable) {
         String fullPath = collectQueryString(path);
-        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+        Response response = RestApi.requestAndResponse("POST",fullPath,dataTable);
+        Stash.put(keyStash, response);
     }
 
 
     @Когда("^неудачный запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestToAPIEr(String path, String keyStash, DataTable dataTable) {
         String fullPath = collectQueryString(path);
+        Response response;
         try {
-            requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+            response = RestApi.requestAndResponse("POST", fullPath,dataTable);
         }
         catch (AutotestError e){
             LOG.info("Ожидали ошибку - получили ошибку:" + e.getMessage());
+            return;
+        }
+        if (response.getStatusCode()>=400){
+
+            LOG.info("Ожидали ошибку - получили ошибку:статус ответва " + response.getStatusCode());
             return;
         }
         Assert.fail("Ожидали ошибку, но ее не было");
@@ -1734,7 +1796,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^запрос по прямому адресу \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
     public void requestTo(String fullPath, String keyStash, DataTable dataTable) {
-        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+        RestApi.requestAndResponse(  "POST", fullPath,dataTable);
     }
 
 
@@ -1743,21 +1805,12 @@ public class CommonStepDefs extends GenericStepDefs {
         int index = fullPath.indexOf("}");
         String url = fullPath.substring(1,index);
         fullPath = JsonLoader.getData().get(STARTING_URL).get(url).getValue() + fullPath.substring(index+1);
-        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
+        Map<String,String> headers = new HashMap<>();
+        headers.put("mst","edadcc8f-4c06-412e-801a-e574ad33b58f");
+        Stash.put("headers",headers);
+        Response response = RestApi.requestAndResponse("POST", fullPath,dataTable);
+        Stash.put(keyStash,response);
     }
-
-    @Когда("^запрос к API \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
-    public void requestToAPI(String path, String keyStash) {
-        String fullPath = collectQueryString(path);
-        requestByHTTPS(fullPath, keyStash, "GET", null);
-    }
-
-    @Когда("^запрос к IMG \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
-    public void requestToIMGAndSaveIn(String path, String keyStash) {
-        String fullPath = (Stash.getValue(path)).toString().replaceAll("\\\\", "");
-        requestByHTTPS(fullPath, keyStash, "GET", null);
-    }
-
 
     @Когда("^запрос типа COLLECT \"([^\"]*)\" c параметрами \"([^\"]*)\" и сохраняем в \"([^\"]*)\"$")
     public void requestCollect(String path, String keyParams, String keyStash) {
@@ -1766,25 +1819,20 @@ public class CommonStepDefs extends GenericStepDefs {
             fullPath.append(JsonLoader.getData().get(STARTING_URL).get("ESB_URL").getValue() + "/" + path);
             fullPath.append("?" + Stash.getValue(keyParams));
             LOG.info("Строчка запроса: " + fullPath);
-            requestByHTTPGet(fullPath.toString(), keyStash);
+            Response response = RestApi.requestAndResponse("GET",fullPath.toString(),null);
+            Stash.put(keyStash,response);
         } catch (DataException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * формирование запроса GET.
-     * если ключ = data - значит берем значение из datajson
-     * если ключ = string - значит такое значнеие и используем. это просто строка
-     * если кдюч = stash - значит значение берем из памяти
-     * @param dataTable
-     */
     @Когда("^запрос типа GET, результат сохраняем в \"([^\"]*)\"$")
     public void endpointCollect(String keyStash, DataTable dataTable) throws DataException {
         List<List<String>> table = dataTable.raw();
         StringBuilder path = new StringBuilder();
         String value = new String();
         String key = new String();
+        Map<String,String> headers = new HashMap<>();
         LOG.info("Сначала формируем строку запроса");
         for (List<String> entry : table) {
             key = entry.get(0);
@@ -1796,11 +1844,21 @@ public class CommonStepDefs extends GenericStepDefs {
                 case "stash":
                     value = Stash.getValue(value);
                     break;
+//                case "header":
+//                    headers.put(key,value);
+//                    break;
             }
             path.append(value+"/");
         }
-        LOG.info("Теперь посылаем GET запрос " + path);
-        requestByHTTPGet(path.toString(), keyStash);
+
+        headers.put("mst","edadcc8f-4c06-412e-801a-e574ad33b58f");
+        Stash.put("headers",headers);
+
+        int i = path.lastIndexOf("/");
+        LOG.info("Теперь посылаем GET запрос " + path.toString().substring(0,i));
+
+        Response response = RestApi.requestAndResponse("GET",path.toString().substring(0,i),null);
+        Stash.put(keyStash, response);
     }
 
 
@@ -1813,7 +1871,7 @@ public class CommonStepDefs extends GenericStepDefs {
         Long br = Long.valueOf(balance);
         if (br<amount) {
             LOG.info("Баланс рублей недостаточен для ставки. Пополним баланс");
-            refill("refillResponce", dataTable);
+            refill(dataTable);
         }else {
             LOG.info("Пополнение средств не требуется");
         }
@@ -1831,7 +1889,7 @@ public class CommonStepDefs extends GenericStepDefs {
         Long bb = Long.valueOf(bonuses);
         if (bb<amount){
             LOG.info("Баланс бонусов недостаточен для ставки. Пополним бонусы");
-            refill("refillResponce", dataTable);
+            refill(dataTable);
         }else {
             LOG.info("Пополнение бонусов не требуется");
         }
@@ -1893,182 +1951,6 @@ public class CommonStepDefs extends GenericStepDefs {
         return requestFull;
     }
 
-
-    protected void requestByHTTPGet(String requestFull, String keyStash) {
-
-        HttpURLConnection connect = null;
-        try {
-            connect = (HttpURLConnection) new URL(requestFull).openConnection();
-            connect.setRequestMethod("GET");
-            connect.setUseCaches(false);
-            connect.setConnectTimeout(500);
-            connect.setReadTimeout(500);
-            connect.connect();
-
-            StringBuilder jsonString = new StringBuilder();
-            if (HttpURLConnection.HTTP_OK == connect.getResponseCode()) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
-                String line;
-                while ((line = in.readLine()) != null) {
-                    jsonString.append(line);
-                    jsonString.append("\n");
-                }
-                LOG.info(jsonString.toString());
-                Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
-            } else {
-                LOG.info("fail" + connect.getResponseCode() + ", " + connect.getResponseMessage());
-                Stash.put(keyStash, JSONValue.parse(connect.getResponseMessage()));
-            }
-            jsonString.toString();
-        } catch (Throwable cause) {
-            cause.printStackTrace();
-        } finally {
-            if (connect != null) {
-                connect.disconnect();
-            }
-        }
-    }
-
-
-    protected void requestByHTTP(String requestFull, String keyStash, DataTable dataTable, String method) {
-
-        if (!(null == dataTable)) {
-            Map<String, String> table = dataTable.asMap(String.class, String.class);
-        }
-        Object params = null;
-        URL url;
-
-        LOG.info("Собираем параметы в JSON строку");
-        JSONObject jsonObject = new JSONObject();
-        if (!(null == dataTable)) {
-            params = collectParametersInJSONString(dataTable);
-        }
-
-        try {
-
-            HostnameVerifier allHostsValid = (hostname, session) -> true;
-            url = new URL(requestFull);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setRequestMethod(method);
-            con.setRequestProperty("Accept", "application/json");
-            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
-            //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
-
-
-            byte[] postData = String.valueOf(params).getBytes(StandardCharsets.UTF_8);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-
-            wr.write(postData);
-            wr.close();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            StringBuffer jsonString = new StringBuffer();
-            String line;
-            while ((line = br.readLine()) != null) {
-                jsonString.append(line);
-            }
-            br.close();
-            con.disconnect();
-            LOG.info("Получаем ответ и записываем в память [" + jsonString.toString() + "]");
-            if (StringUtils.isNoneEmpty(jsonString)) {
-                Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
-            } else {
-                throw new AutotestError("ОШИБКА! Пустая строка JSON");
-            }
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void requestByHTTPS(String requestFull, String keyStash, String method, DataTable dataTable){
-        if (!(null == dataTable)) {
-            Map<String, String> table = dataTable.asMap(String.class, String.class);
-        }
-        Object params = null;
-        URL url;
-
-        LOG.info("Собираем параметы в JSON строку");
-        JSONObject jsonObject = new JSONObject();
-        if (!(null == dataTable)) {
-            params = collectParametersInJSONString(dataTable);
-        }
-
-        //************Этот код нужен для соединения по HTTPS
-        TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
-
-                    public void checkClientTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-
-                    public void checkServerTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                }
-        };
-
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-
-            HostnameVerifier allHostsValid = (hostname, session) -> true;
-            //************
-            HttpURLConnection con;
-            url = new URL(requestFull);
-            if (requestFull.contains("https:")) {
-                con = (HttpsURLConnection) url.openConnection();
-            } else {
-                con = (HttpURLConnection) url.openConnection();
-            }
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setRequestMethod(method);
-            con.setRequestProperty("Accept", "application/json");
-            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-
-            //стрчока внизу - это чтоб не было редиректа на мабильную версию (потмоу что при редирексте POST меняеallureтся на GET)
-            //   con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
-
-            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), StandardCharsets.UTF_8);
-            if (!(null == dataTable)) {
-                writer.write(String.valueOf(params));
-            }
-            writer.close();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            StringBuffer jsonString = new StringBuffer();
-            String line;
-            while ((line = br.readLine()) != null) {
-                jsonString.append(line);
-            }
-            br.close();
-            con.disconnect();
-            LOG.info("Получаем ответ и записываем в память [" + jsonString.toString() + "]");
-            if (StringUtils.isNoneEmpty(jsonString)) {
-                Stash.put(keyStash, JSONValue.parse(jsonString.toString()));
-            } else {
-                throw new AutotestError("ОШИБКА! Пустая строка JSON");
-            }
-        }
-            catch (IOException e2){
-            throw new AutotestError(e2.getMessage());
-        } catch (Exception e1) {
-            LOG.error(e1.getMessage(), e1);
-        }
-    }
-
     @Когда("^обновим значение минимальной суммы вывода в рублях для вызова инкассатора \"([^\"]*)\"$")
     public void updateMinCash(String value) {
         String sqlRequest = "UPDATE gamebet.`params` SET VALUE=" + value + " WHERE NAME='MIN_DEPOSIT_CASH_AMOUNT'";
@@ -2121,7 +2003,7 @@ public class CommonStepDefs extends GenericStepDefs {
 
     @Когда("^смотрим какое время обновления баннера \"([^\"]*)\"$")
     public void delayGromBanner(String keyDelay) {
-        String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='index_main_default'";
+        String sqlRequest = "SELECT delay FROM gamebet.`bannerslider` WHERE NAME='slider_desktop_index_main_default'";
         String delay = workWithDBgetResult(sqlRequest, "delay");
         Stash.put(keyDelay, delay);
     }
@@ -2164,17 +2046,10 @@ public class CommonStepDefs extends GenericStepDefs {
         throw new AutotestError("Unable to return to the previously opened page: " + title);
     }
 
-    @Когда("^эмулируем регистрацию через терминал Wave \"([^\"]*)\" и сохраняем в \"([^\"]*)\":$")
-    public void emulationRegistrationFromTerminalWave(String path, String keyStash, DataTable dataTable) {
-        String fullPath = collectQueryString(path);
-        requestByHTTPS(fullPath, keyStash, "POST", dataTable);
-    }
-
-
     /**
      * это когда активне опции сайта в отдельной таблице
      */
-    @Before(value = "@before or @api")
+    @Before(value = "@enabledFeatures or @api")
     public void saveRegistrationValue2() {
         rememberEnabledFeatures("ACTIVE_SITE_OPTIONS");
     }
@@ -2283,7 +2158,7 @@ public class CommonStepDefs extends GenericStepDefs {
      *
      * @param scenario
      */
-    @After(value = "@after")
+    @After(value = "@enabledFeatures or @api")
     public void returnRegistrationValueWithScreenshot(Scenario scenario) {
         LOG.info("возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'");
         revertEnabledFeatures("ACTIVE_SITE_OPTIONS");
@@ -2433,10 +2308,10 @@ public class CommonStepDefs extends GenericStepDefs {
         if (jsonObject.get("sport").toString().equals("{}")){
             throw new AutotestError("Ошибка! По WSS получили[" + jsonObject.get("sport").toString() + "]");
         }
-            Stash.put(keyStash, result);
-            Integer size_res = result.split("sport").length;
-            Stash.put("key_size", size_res);
-        }
+        Stash.put(keyStash, result);
+        Integer size_res = result.split("sport").length;
+        Stash.put("key_size", size_res);
+    }
 
 
 
@@ -2670,13 +2545,14 @@ public class CommonStepDefs extends GenericStepDefs {
             String xpath = "//*[contains(text(),'" + expectedText + "')]";
             LOG.info("Переходим по клику на элемент " + linkTitle);
             try {
+                opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
                 Thread.sleep(500);
             } catch (TimeoutException e) {
                 LOG.info("С первого раза ссылка " + linkTitle + " не открылась, попробуем второй раз");
                 driver.close();
                 driver.switchTo().window(currentHandle);
                 driver.navigate().refresh();
-
+                opensNewTabAndChecksPresenceOFElement(linkTitle, currentHandle, xpath);
             } catch (InterruptedException e2) {
                 e2.printStackTrace();
             }
@@ -2750,6 +2626,12 @@ public class CommonStepDefs extends GenericStepDefs {
 
     }
 
+    @Когда("^очищаем избранное$")
+    public void clearFavourite() throws Exception {
+        clearFavouriteGames();
+        Stash.remove("nameGameKey");
+        Stash.remove("typeGameKey");
+    }
 
     @Когда("^нажимает кнопку НАЗАД$")
     public void backToPage() {
@@ -2975,6 +2857,7 @@ public class CommonStepDefs extends GenericStepDefs {
     public void clearCouponAfter(Scenario scenario) throws InterruptedException {
         getScreenshot(scenario);
         goToMainPage("site");
+        workWithPreloader();
         driver.findElement(By.id("prematch")).click(); //переходим в прематч
         driver.navigate().refresh();
         workWithPreloader();
@@ -3006,11 +2889,11 @@ public class CommonStepDefs extends GenericStepDefs {
     }
 
     @Когда("^запрос в swagger на пополнение баланса рублей/бонусов \"([^\"]*)\"$")
-    public void refill(String responseKey, DataTable dataTable) throws DataException {
+    public void refill(DataTable dataTable) throws DataException {
         String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
         path=path+"/refill";
         LOG.info("path:" + path);
-        requestByHTTPS(path,responseKey,"POST",dataTable);
+        RestApi.requestAndResponse("POST",path,dataTable);
     }
 
     @Когда("^запрос в swagger для получения getHolds \"([^\"]*)\" \"([^\"]*)\"$")
@@ -3018,7 +2901,8 @@ public class CommonStepDefs extends GenericStepDefs {
         String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
         path=path+"/getHolds";
         LOG.info("path:" + path);
-        requestByHTTPS(path,"RESPONSE_SWAGGER","POST",dataTable);
+        Response response = RestApi.requestAndResponse("POST",path,dataTable);
+        Stash.put("RESPONSE_SWAGGER",response);
         LOG.info("Теперь запоминаем сколько захолдировано средств");
         fingingAndSave("DATA","RESPONSE_SWAGGER");
         List<HashMap> dataMap = Stash.getValue("DATA");
@@ -3049,7 +2933,8 @@ public class CommonStepDefs extends GenericStepDefs {
         String path = JsonLoader.getData().get(STARTING_URL).get("SWAGGER").getValue();
         path=path+"/createPacket";
         LOG.info("path:" + path);
-        requestByHTTPS(path,responseKey,"POST",dataTable);
+        Response response = RestApi.requestAndResponse("POST",path,dataTable);
+        Stash.put(responseKey,response);
     }
 
 
@@ -3059,8 +2944,8 @@ public class CommonStepDefs extends GenericStepDefs {
         String value = new String();
         Date dateNow = new Date();
         for (String param : bodyRequest.keySet()) {
-                value = String.valueOf(dateNow.getTime());
-                Stash.put(bodyRequest.get(param),value);
+            value = String.valueOf(dateNow.getTime());
+            Stash.put(bodyRequest.get(param),value);
         }
     }
 
@@ -3073,18 +2958,57 @@ public class CommonStepDefs extends GenericStepDefs {
     }
     @Когда("^проверим что \"([^\"]*)\" больше \"([^\"]*)\" на \"([^\"]*)\"$")
     public void checkDifferenceBetweenNumbers(String keyNum1,String keyNum2,String diff){
-         long firstN = Long.parseLong(String.valueOf(Stash.getValue(keyNum1).toString()));
-         long secondN = Long.parseLong(String.valueOf(Stash.getValue(keyNum2).toString()));
-         String difference = diff.replace("-","");
-         long diffLong = diff.matches("-*[A-Z]*")
-                 ?Integer.valueOf(Stash.getValue(diff.replace("-","")))
-                 :Integer.valueOf(diff.replace("-",""));
-         if (diff.contains("-")){
+        long firstN = Long.parseLong(String.valueOf(Stash.getValue(keyNum1).toString()));
+        long secondN = Long.parseLong(String.valueOf(Stash.getValue(keyNum2).toString()));
+        String difference = diff.replace("-","");
+        long diffLong = diff.matches("-*[A-Z]*")
+                ?Integer.valueOf(Stash.getValue(diff.replace("-","")))
+                :Integer.valueOf(diff.replace("-",""));
+        if (diff.contains("-")){
             diffLong=0-diffLong;
-         }
-         Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
-                 firstN-diffLong,secondN);
-         LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
+        }
+        Assert.assertEquals("Разница между числами не такая, как ожидалось: " + firstN + "  " + secondN,
+                firstN-diffLong,secondN);
+        LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
+    }
+
+    @Когда("^проверим что в БД сохранены правильные значения$")
+    public void checkDataInDB(DataTable dataTable){
+        Map <String,String> table = dataTable.asMap(String.class,String.class);
+        StringBuilder sqlRequest = new StringBuilder();
+        String whereOne = new String();
+        SimpleDateFormat stashFormat = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat DBFormat = new SimpleDateFormat("yyyy-MM-dd");
+        sqlRequest.append("SELECT * from gamebet.`user` WHERE ");
+        for(Map.Entry<String, String> entry : table.entrySet()){
+            whereOne = entry.getValue().matches("[_A-Z]*")?Stash.getValue(entry.getValue()):entry.getValue();
+            if (whereOne.matches("[0-9]+[.]+[0-9]+[.]+[0-9]+")){
+                whereOne = newFormatDate(stashFormat,DBFormat,whereOne);
+            }
+            whereOne = entry.getKey() + "='" + whereOne + "' AND ";
+            sqlRequest.append(whereOne);
+        }
+        int i = sqlRequest.toString().lastIndexOf(" AND ");
+        sqlRequest.delete(i,sqlRequest.length());
+        LOG.info("SQL: \n" + sqlRequest);
+        Assert.assertFalse("В БД сохранены неправильные данные",workWithDBgetResult(sqlRequest.toString()).isEmpty());
+    }
+
+    @Когда("^ждем пока для пользователя \"([^\"]*)\" станет \"([^\"]*)\"$")
+    public void waitDB(String email,String expectedValue) throws InterruptedException {
+        if (email.matches("[A-Z]*")){
+            email=Stash.getValue(email).toString();
+        }
+        String sql = "SELECT id FROM gamebet.`user` WHERE email='" + email + "' AND " + expectedValue;
+        int count = 20;
+        while(count>0){
+            if (!workWithDBgetResult(sql).isEmpty()) return;
+            Thread.sleep(500);
+            LOG.info("Пока в БД не то, что ожидали. Повторим запрос");
+            count--;
+        }
+        String expectField = expectedValue.replaceAll("=[0-9]*","");
+        Assert.fail("не дождались за 10 секунд: " + expectField + " = " + workWithDBgetResult("SELECT " + expectField + " FROM gamebet.`user` WHERE email='" + email + "'"));
     }
 
     @Когда("^выставляем следующие параметры для АБ-тестирования \"([^\"]*)\"$")
