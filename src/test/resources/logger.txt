@@ -1,0 +1,3 @@
+INFO  CommonStepDefs:2812 - fail? false
+INFO  CommonStepDefs:363 - Перешли на страницу [https://dev.gamebet.ru]
+INFO  CommonStepDefs:2865 - Перешли в прематч и сейчас будет чистить купон
