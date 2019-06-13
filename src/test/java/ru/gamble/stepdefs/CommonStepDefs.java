@@ -3086,5 +3086,30 @@ public class CommonStepDefs extends GenericStepDefs {
                  firstN-diffLong,secondN);
          LOG.info("Разница между между числами " + firstN + "," + secondN + " совпадает с ожиданием <" + diffLong + ">");
     }
+
+    @Когда("^выставляем следующие параметры для АБ-тестирования \"([^\"]*)\"$")
+    public void putParams(String keyParams,DataTable dataTable){
+        Map<String,String> table = dataTable.asMap(String.class,String.class);
+        String params = Stash.getValue(keyParams).toString();
+        String value = new String();
+        String sqlRequest = new String();
+        int index,index2 = 0;
+        for (Map.Entry<String,String> entry : table.entrySet()){
+            index = params.indexOf(entry.getValue());
+            index += params.substring(index).indexOf("=")+1;
+            index2 = index + params.substring(index).indexOf("&");
+            value=params.substring(index,index2).replace("T"," ");
+            sqlRequest = "UPDATE gamebet.`params` SET value='" + value + "' WHERE name='" + entry.getKey() + "'";
+            workWithDB(sqlRequest);
+        }
+    }
+
+    @Когда("^находим пользователя с id \"([^\"]*)\" \"([^\"]*)\"$")
+    public void findUserByParity(String parity,String keyEmail){
+        int odd = parity.equalsIgnoreCase("четным")?0:1;
+        String sqlRequest = "SELECT email FROM gamebet.`user` WHERE registration_stage_id=2 AND email LIKE 'testregistrator%' AND id%2=" + odd;
+        String email = workWithDBgetResult(sqlRequest, "email");
+        Stash.put(keyEmail, email);
+    }
 }
 
