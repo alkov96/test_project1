@@ -51,6 +51,7 @@ public class Constants {
     public static final String PATERNALNAME = "Отчество";
     public static final String AMOUNT = "СУММА";
     public static final String PAYMENT_METHOD = "Способ";
+    public static final String PHONE_PATTERN = "7933";
 
     public static final List<String> cities = Arrays.asList("Москва","Санкт-Петербург","Новосибирск","Екатеринбург","Нижний Новгород","Казань","Челябинск","Омск","Самара","Ростов-на-Дону","Уфа","Красноярск","Пермь","Воронеж","Волгоград");
     public static final List<String> sex = Arrays.asList("Мужской","Женский");

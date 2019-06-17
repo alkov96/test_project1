@@ -47,6 +47,7 @@
     "MAIN_URL": "https://test-int-bet-site1.tsed.orglot.office",
     "MOBILE_URL": "https://test-int-bet-mobile-site1.tsed.orglot.office",
     "REGISTRATION_URL": "https://test-int-bet-site1.tsed.orglot.office/test_registration/",
+    "ESB_URL":"test-int-bet-esb.tsed.orglot.office:8660",
     "USER": "testregistrator+71110023368@inbox.ru",
     "PASSWORD": "Acer0808",
     "PASSWORD_TSUPIS": "Acer0808",
@@ -87,7 +88,7 @@
   "TEST-FUNC": {
     "MAIN_URL": "https://test-func.gamebet.ru",
     "MOBILE_URL": "https://test-func-mobile.gamebet.ru",
-    "ESB_URL": "http://test-func-bet-dbproca.tsed.orglot.office:8660",
+    "ESB_URL": "http://test-func-bet-esb.tsed.orglot.office:8660",
     "ADMIN_URL": "http://test-func-bet-dbproca.tsed.orglot.office/admin",
     "REGISTRATION_URL": "https://test-func-bet-site.tsed.orglot.office/test_registration",
     "USER": "chrome-test-shmest@mailinator.com",

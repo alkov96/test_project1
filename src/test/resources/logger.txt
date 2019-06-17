@@ -1,3 +1,43 @@
-INFO  CommonStepDefs:2812 - fail? false
-INFO  CommonStepDefs:363 - Перешли на страницу [https://dev.gamebet.ru]
-INFO  CommonStepDefs:2865 - Перешли в прематч и сейчас будет чистить купон
+INFO  CommonStepDefs:2163 - РІРѕР·РІСЂР°С‰Р°РµРј Р·РЅР°С‡РµРЅРёРµ Р°РєС‚РёРІРЅС‹С… РѕРїС†РёР№ СЃР°Р№С‚Р° РёР· РїР°РјСЏС‚Рё РїРѕ РєР»СЋС‡Сѓ 'ACTIVE_SITE_OPTIONS'
+INFO  CommonStepDefs:2136 - [identification_with_wave] = true
+INFO  CommonStepDefs:2139 - [identification_with_skype_only] = false
+INFO  CommonStepDefs:2136 - [video_identification_in_mobile_app] = true
+INFO  CommonStepDefs:2136 - [betradar_widgets_mob] = true
+INFO  CommonStepDefs:2136 - [use_bet_history_subscription] = true
+INFO  CommonStepDefs:2139 - [identification_with_euroset] = false
+INFO  CommonStepDefs:2136 - [identification_with_courier] = true
+INFO  CommonStepDefs:2139 - [disable_results_page] = false
+INFO  CommonStepDefs:2136 - [enable_sendsay] = true
+INFO  CommonStepDefs:2136 - [bets_races_mobile] = true
+INFO  CommonStepDefs:2136 - [express_bonus] = true
+INFO  CommonStepDefs:2136 - [bc_stat_link] = true
+INFO  CommonStepDefs:2139 - [sportradar_game_stat_links] = false
+INFO  CommonStepDefs:2136 - [betconstruct_translations] = true
+INFO  CommonStepDefs:2136 - [betradar_widgets_prematch] = true
+INFO  CommonStepDefs:2139 - [hide_bonus_money] = false
+INFO  CommonStepDefs:2136 - [counter_offer] = true
+INFO  CommonStepDefs:2136 - [fast_registration] = true
+INFO  CommonStepDefs:2136 - [coefficients_rounding] = true
+INFO  CommonStepDefs:2139 - [identification_with_contact] = false
+INFO  CommonStepDefs:2136 - [twitch_translations] = true
+INFO  CommonStepDefs:2136 - [white_mode] = true
+INFO  CommonStepDefs:2136 - [remove_limits_btn] = true
+INFO  CommonStepDefs:2139 - [bet_from_left_menu] = false
+INFO  CommonStepDefs:2136 - [betradar_widgets] = true
+INFO  CommonStepDefs:2136 - [multimarkets_enable] = true
+INFO  CommonStepDefs:2136 - [change_basic_parameter] = true
+INFO  CommonStepDefs:2136 - [online_chat] = true
+INFO  CommonStepDefs:2136 - [bets_races] = true
+INFO  CommonStepDefs:2139 - [white_mode_mobile] = false
+INFO  CommonStepDefs:2136 - [races_mobile] = true
+INFO  CommonStepDefs:2136 - [edit_personal_data_btn] = true
+INFO  CommonStepDefs:2136 - [video_chat_identification_status] = true
+INFO  CommonStepDefs:2136 - [races] = true
+INFO  CommonStepDefs:2136 - [show_bonus_rubles] = true
+INFO  CommonStepDefs:2139 - [identification_with_video] = false
+INFO  CommonStepDefs:2136 - [back_call] = true
+INFO  CommonStepDefs:2136 - [announcements] = true
+INFO  CommonStepDefs:2136 - [favorite] = true
+INFO  CommonStepDefs:2136 - [coupon_progressbar] = true
+INFO  CommonStepDefs:897 - SQL-request [{identification_with_wave=1, identification_with_skype_only=0, video_identification_in_mobile_app=1, betradar_widgets_mob=1, use_bet_history_subscription=1, identification_with_euroset=0, identification_with_courier=1, disable_results_page=0, enable_sendsay=1, bets_races_mobile=1, express_bonus=1, bc_stat_link=1, sportradar_game_stat_links=0, betconstruct_translations=1, betradar_widgets_prematch=1, hide_bonus_money=0, counter_offer=1, fast_registration=1, coefficients_rounding=1, identification_with_contact=0, twitch_translations=1, white_mode=1, remove_limits_btn=1, bet_from_left_menu=0, betradar_widgets=1, multimarkets_enable=1, change_basic_parameter=1, online_chat=1, bets_races=1, white_mode_mobile=0, races_mobile=1, edit_personal_data_btn=1, video_chat_identification_status=1, races=1, show_bonus_rubles=1, identification_with_video=0, back_call=1, announcements=1, favorite=1, coupon_progressbar=1}]
+INFO  CommonStepDefs:2150 - Р’РµСЂРЅСѓР»Рё Р°РєС‚РёРІРЅС‹Рµ РѕРїС†РёРё СЃР°Р№С‚Р° [{identification_with_wave=1, identification_with_skype_only=0, video_identification_in_mobile_app=1, betradar_widgets_mob=1, use_bet_history_subscription=1, identification_with_euroset=0, identification_with_courier=1, disable_results_page=0, enable_sendsay=1, bets_races_mobile=1, express_bonus=1, bc_stat_link=1, sportradar_game_stat_links=0, betconstruct_translations=1, betradar_widgets_prematch=1, hide_bonus_money=0, counter_offer=1, fast_registration=1, coefficients_rounding=1, identification_with_contact=0, twitch_translations=1, white_mode=1, remove_limits_btn=1, bet_from_left_menu=0, betradar_widgets=1, multimarkets_enable=1, change_basic_parameter=1, online_chat=1, bets_races=1, white_mode_mobile=0, races_mobile=1, edit_personal_data_btn=1, video_chat_identification_status=1, races=1, show_bonus_rubles=1, identification_with_video=0, back_call=1, announcements=1, favorite=1, coupon_progressbar=1}]

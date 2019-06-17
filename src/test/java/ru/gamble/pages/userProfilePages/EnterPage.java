@@ -116,7 +116,7 @@ public class EnterPage extends AbstractPage {
                 login = Stash.getValue("EMAIL");
                 break;
             default:
-                login = login = data.get(LOGIN).matches("[A-Z_]*")?Stash.getValue(data.get(LOGIN)):data.get(LOGIN);
+                login = data.get(LOGIN).matches("[A-Z_]*")?Stash.getValue(data.get(LOGIN)):data.get(LOGIN);
                 break;
         }
 
