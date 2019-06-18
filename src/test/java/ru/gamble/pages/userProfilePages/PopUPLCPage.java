@@ -34,6 +34,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "Мини Личный Кабинет")
 public class PopUPLCPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(PopUPLCPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @ElementTitle("адрес почты")
     @FindBy(id = "user-profile")
@@ -71,14 +72,12 @@ public class PopUPLCPage extends AbstractPage {
 
 
     public PopUPLCPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(exitButton));
     }
 
     @ActionTitle("вводит крупную сумму для вывода")
     public void bigSummWithdraw() {
-        WebDriver driver = PageFactory.getDriver();
         withdraw_field.click();
         withdraw_field.clear();
         withdraw_field.sendKeys("9999999");
@@ -86,7 +85,6 @@ public class PopUPLCPage extends AbstractPage {
 
     @ActionTitle("проверяет появление сообщения о недостаточном количестве средств на балансе")
     public void excessOfLimit() {
-        WebDriver driver = PageFactory.getDriver();
         try{
             driver.findElement(By.xpath("//div[@class='money-in-out__messages']/div[contains(@class, 'money-in-out__message money-in-out__message-error')]")).isDisplayed();
             LOG.info("Предупреждение о превышении лимита отображается. Кнопка вывода средств неактивна");
@@ -98,7 +96,6 @@ public class PopUPLCPage extends AbstractPage {
 
     @ActionTitle("вводит крупную сумму, превышающую текущее значение баланса на 1")
     public void summWithdraw1() {
-        WebDriver driver = PageFactory.getDriver();
         AuthenticationMainPage.rememberBalnce("рубли");
         float balance1 = Float.parseFloat(Stash.getValue("balanceKey"));
         int balance;
@@ -110,7 +107,6 @@ public class PopUPLCPage extends AbstractPage {
 
     @ActionTitle("вводит сумму меньше минимальной и проверяем для каждого способа")
     public void summMin(){
-        WebDriver driver = PageFactory.getDriver();
         withdraw_field.click();
         withdraw_field.clear();
         withdraw_field.sendKeys("1");
@@ -137,7 +133,6 @@ public class PopUPLCPage extends AbstractPage {
 
     @ActionTitle("проверяет, что при нажатии на сумму-ссылку появляется НДФЛ и бонусы")
     public void summLink() throws Exception {
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> minSumElements = Stash.getValue("minSumElementsKey");
         String ndfl;
         String linkBalance;
@@ -188,7 +183,6 @@ public class PopUPLCPage extends AbstractPage {
 
    @ActionTitle("переходит на страницу 'ЦУПИС'")
    public void goToPageTSUPIS(){
-        WebDriver driver = PageFactory.getWebDriver();
        Set<String> allHandles = driver.getWindowHandles();
        LOG.info("Переходим на страницу ЦУПИС");
        driver.switchTo().window(allHandles.toArray()[1].toString());
@@ -196,7 +190,6 @@ public class PopUPLCPage extends AbstractPage {
 
     @ActionTitle("открывает попап через кнопку 'Внести депозит'")
     public void deposit() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         LOG.info("Обновляем страницу");
         driver.navigate().refresh();
         CommonStepDefs.workWithPreloader();

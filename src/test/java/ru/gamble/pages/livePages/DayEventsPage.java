@@ -34,20 +34,19 @@ import static org.openqa.selenium.By.xpath;
 @PageEntry(title = "События дня")
 public class DayEventsPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(DayEventsPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//table[@class='full_width bets-widget-table']")
     private WebElement widget;
 
 
     public DayEventsPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(widget));
     }
 
     @ActionTitle("добавляет событие с баннера в купон и сохраняет в память")
     public void addEventToCouponFromBanner(String keyTeam1, String keyTeam2, String keyKoef){
-        WebDriver driver = PageFactory.getDriver();
         CommonStepDefs.workWithPreloader();
         String xpathEvent = "//div[@class='event-widget-coef']/div[3]/span[2]";
         CommonStepDefs.workWithPreloader();
@@ -73,7 +72,6 @@ public class DayEventsPage extends AbstractPage {
 
     @ActionTitle("проверяет, совпадают ли названия событий на кнопках на баннере и сверху c")
     public void teamsOnBanner(String keyTeam1, String keyTeam2){
-        WebDriver driver = PageFactory.getDriver();
         String teamname1 = driver.findElement(By.xpath("//div[@class='event-widget-full-info']//div[contains(@ng-bind,'team1_name')]")).getAttribute("innerText"); //Имя команды на банере в окошке
         String teamname2 = driver.findElement(By.xpath("//div[@class='event-widget-full-info']//div[contains(@ng-bind,'team2_name')]")).getAttribute("innerText"); //Имя команды на банере в окошке
         String team1 = Stash.getValue(keyTeam1);
@@ -86,7 +84,6 @@ public class DayEventsPage extends AbstractPage {
 
     @ActionTitle("кликает на три вида спорта и проверяет, что игры соответвтвуют выбранному виду")
     public void typesSportClick(){
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> typesSport = driver.findElements(By.xpath("//div[@class='bets-widget__sports']//ul[contains(@class,'bets-widget__sports-list ng-scope')]//li"));//создаём список все видов спорта в события дня
         int counter = 0;
         String iconSport;
@@ -108,14 +105,14 @@ public class DayEventsPage extends AbstractPage {
 
     @ActionTitle("добавляет событие в избранное")
     public void addEventToFavourite() throws Exception {
-        WebDriver driver = PageFactory.getDriver();
         FavouritePage.clearFavouriteGames();
-        List<WebElement> stars = driver.findElements(By.xpath("//tr[@class='bets-widget-table__bets ng-scope']/td[10]//span[contains(@class,'favorite-icon-dashboard')]"));
-        List<WebElement> team1 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who1']//span[contains(@class,'market-info-b market-name-j')]"));//название 1 команды в списке
+        List<WebElement> stars = driver.findElements(By.xpath("//tr[contains(@class,'bets-widget-table__bets')]//span[contains(@class,'favorite-icon-dashboard')]/i"));
+        List<WebElement> team1 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who1']//span[contains(@class,'market-info')]"));//название 1 команды в списке
+        List<WebElement> team2 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who2']//span[contains(@class,'market-info')]"));//название 2 команды в списке
+
         if(team1.size() > 0 && stars.size() > 0) {
             String team1name = team1.get(0).getAttribute("title");
             Stash.put("team1nameKey", team1name);
-            List<WebElement> team2 = driver.findElements(By.xpath("//td[@class='bets-widget-table__bets-item bets-widget-table__bets-item_who2']//span[contains(@class,'market-info-b market-name-j')]"));//название 2 команды в списке
             String team2name = team2.get(0).getAttribute("title");
             Stash.put("team2nameKey", team2name);
             LOG.info("Все иконки избранного на странице обнаружены");
@@ -128,15 +125,19 @@ public class DayEventsPage extends AbstractPage {
 
     @ActionTitle("проверяет, добавилось ли событие в избранное")
     public void checkIsEventAddToFav() throws Exception {
-        WebDriver driver = PageFactory.getDriver();
-        driver.findElement(By.id("elected")).click();
-        Thread.sleep(5000);
-        if (!driver.findElement(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]")).isDisplayed()){
+        driver.findElement(By.id("elected")).click();//нажали на избранное
+
+        try {
+            new WebDriverWait(driver, 10)
+                    .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'elected__teams ellipsis-text')]"), 0));
+            LOG.info("События добавились в Избранное");
+            driver.findElement(By.id("elected")).click();
+        }
+        catch (Exception e){
             LOG.info("Событие не добавилось в избранное, попробуем ещё раз.");
             addEventToFavourite();
         }
-        else LOG.info("События добавились в Избранное");
-        driver.findElement(By.id("elected")).click();
+
     }
 
 
@@ -144,9 +145,8 @@ public class DayEventsPage extends AbstractPage {
         addEventsToCouponF(6);
     }
     public static void addEventsToCouponF (int countBet) throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         int counter = 0;
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         List<WebElement> allEvents = driver.findElements(xpath("//div[@class='bets-widget bets-widget_wide liveNow']//table[@class='full_width bets-widget-table']//tr/td[5]/div/span")).
                 stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
         if(allEvents.size() > 0){

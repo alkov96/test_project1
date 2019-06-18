@@ -1,6 +1,7 @@
 package ru.gamble.pages.livePages;
 
 import cucumber.api.DataTable;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -29,14 +30,14 @@ import static org.openqa.selenium.By.xpath;
 @PageEntry(title = "Лайв просмотр событий")
 public class VewingEventsPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(VewingEventsPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//a[@class='ulTransBorder__link active']")
     private WebElement pageTitle;
 
-    private static By xpathForSports = By.xpath("//li[contains(@id,'sport-') and not(contains(@class,'hide')) and not(contains(@id,'sport--'))]");
+    private static By xpathForSports = By.xpath("//li[contains(@id,'sport-') and not(contains(@class,'hide')) and not(contains(@id,'sport--'))]/a[not(contains(@title,'iiiii'))]/..");
 
     public VewingEventsPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -50,20 +51,26 @@ public class VewingEventsPage extends AbstractPage {
      */
     @ActionTitle("находит игру по фильтру видео")
     public void searchGameLiveVideo(String video, String adding) {
-        boolean add = adding.equals("и добавляет в избранное");
+        List list = Stash.getValue("nameGameKey");
+        int nameInMemory = list==null?0:list.size();
         try {
             gameLiveVideo(video.equals("с видео"), adding.equals("и добавляет в избранное"));
         } catch (Exception e) {
             e.printStackTrace();
         }
+        list = Stash.getValue("nameGameKey");
+        int nameInMemory2 = list==null?0:list.size();
+        if (nameInMemory==nameInMemory2){
+            Assertions.fail("Игра не найдена");
+        }
         LOG.info("Игра " + video + " найдена: " + Stash.getValue("nameGameKey"));
     }
 
     public void gameLiveVideo(boolean withVideo, boolean adding){
-        WebDriver driver = PageFactory.getDriver();
-        LOG.info("Переходим в лайв");
-        driver.findElement(By.id("live")).click();
-        CommonStepDefs.workWithPreloader();
+        int sizeFavourite = driver.findElements(By.xpath("//ul[@class='left-menu__favorite-list']/li")).size();
+//        LOG.info("Переходим в лайв");
+//        driver.findElement(By.id("live")).click();
+//        CommonStepDefs.workWithPreloader();
 
 //если меню свернуто - разворачиваем
 
@@ -95,38 +102,45 @@ public class VewingEventsPage extends AbstractPage {
         for (int sportCategory = 0; sportCategory < sportsInLiveCount; sportCategory++) {
             LOG.info("Разворачиваем вид спорта");
             driver.findElements(xpathForSports).get(sportCategory).click();
-            String pathToNameGame = ".//*[contains(@class,'left-menu__list-item-games-teams')]";
+            String pathToNameGame = ".//li[contains(@class,'left-menu__list-item-games')]";
             String pathToStarGame = ".//*[contains(@class,'item-games-fav-game-star')]";
             int gamesInSportCount = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).size();
             LOG.info("Ищем игру у которой видео-трансляция " + withVideo);
             int gameNumber = hasVideo(sportCategory, gamesInSportCount, withVideo);
             //если в этом спорте есть игра с видео и мы еще не добавляли в избранное - добавляем.
             if (gameNumber != -1 && !gameIsAdding) {
-                String nameGamefull = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).get(gameNumber).getAttribute("innerText");
-                CommonStepDefs.addStash("nameGameKey",nameGamefull);
+                String nameGamefull = driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToNameGame)).get(gameNumber).findElement(By.xpath(".//div[contains(@class,'left-menu__list-item-games-names')]")).getAttribute("innerText");
+                if (nameGamefull.equals("") || nameGamefull==null){
+                    continue; //игра надена, но она без названия. как ее потом првоерять? такая игра нам не нужна, идем дальше
+                }
+                CommonStepDefs.addStash("nameGameKey",nameGamefull.replaceAll("\n",""));
                 CommonStepDefs.addStash("typeGameKey",typeGame);
+                LOG.info("разворачиваем регион, чтобы было видно игру");
+                if (!driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).isDisplayed()){
+                    driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).findElement(By.xpath("./ancestor::div[contains(@class,'poup-sports')]/preceding-sibling::h4")).click();
+                }
                 if (adding) {
                     LOG.info("Нужная игра найдена. Добавляем ее в Избранное.");
-                    if (!driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).isDisplayed()){
-                        driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).findElement(By.xpath("./ancestor::div[contains(@class,'poup-sports')]/preceding-sibling::h4")).click();
-                    }
                     driver.findElements(xpathForSports).get(sportCategory).findElements(By.xpath(pathToStarGame)).get(gameNumber).click();
+                    new WebDriverWait(driver,10)
+                            .withMessage("Игра в избранное не добавилась!!")
+                            .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//ul[@class='left-menu__favorite-list']/li"),sizeFavourite));
                 }
                 gameIsAdding = true;
             }
+            if (gameIsAdding) break;
             //сворачиваем снова все виды спорта, чтобы все они помещались на экран. иначе, если не видно элемента (не помещается) на странице он не найдется
             LOG.info("Сворачиваем все виды спорта.");
             if (!menu.getAttribute("class").contains("collapsed")) menu.click();
             closeSports();
-            if (gameIsAdding) break;
+
 
         }
         if (!menu.getAttribute("class").contains("collapsed")) menu.click();
         if (driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).getAttribute("class").contains("active")) { //прежде чем выйти из это функции вернем все к первоналчальному стостоянию
-            driver.findElement(By.xpath("//div[@id='video-filter-toggler']/i")).click();//т.е. выключим на всякий лучай ильтр по видео
+            driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).click();//т.е. выключим на всякий лучай ильтр по видео
             CommonStepDefs.workWithPreloader();
         }
-
     }
 
     /**
@@ -137,7 +151,6 @@ public class VewingEventsPage extends AbstractPage {
      * @return метод возвращает либо номер игры, для которой выполняется условие withVideo, либо -1 - если игры удовлетворяющих условию не найдено
      */
     public int hasVideo(int sportNumber, int gameNumber, boolean withVideo) {
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> allGameInSport = driver.findElements(xpathForSports).get(sportNumber).findElements(By.xpath(".//div[contains(@class,'icon-video')]"));
         for (int count = 0; count < gameNumber; count++) {
             if (allGameInSport.get(count).getAttribute("class").contains("hide")!=withVideo) {
@@ -153,7 +166,6 @@ public class VewingEventsPage extends AbstractPage {
      */
     @ActionTitle("выставляет фильтр по видео на")
     public void onTriggerVideo(String onoff){
-        WebDriver driver = PageFactory.getDriver();
         String active = driver.findElement(By.xpath("//div[contains(@class,'left-menu-filters__item_video')]")).getAttribute("class");
         if (onoff.equals("включен")!=active.contains("active")) {
             driver.findElement(By.id("video-filter-toggler")).click();
@@ -170,7 +182,6 @@ public class VewingEventsPage extends AbstractPage {
      * @param team1Name   - название игры, на которую перешли
      */
     public static boolean pageLive(String team1Name, boolean filterVideo, boolean isFavorit) {
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
 
         //если меню свернуто - разворачиваем
@@ -186,16 +197,16 @@ public class VewingEventsPage extends AbstractPage {
         }
         else {
             String nameOnLeftMenu =
-                    driver.findElement(xpath("//li[contains(@class,'left-menu__list-item-games') and contains(@class,'active')]" +
-                            "//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");
+                    driver.findElement(xpath("//li[contains(@class,'left-menu__list-item-games')]/div[contains(@class,'active')]//div[@class='left-menu__list-item-games-names']")).getAttribute("innerText");
             Assert.assertTrue(
                     "В левом меню выделена желтым неправильная игра. Вместо " + team1Name + " выделена " +nameOnLeftMenu,
                     CommonStepDefs.stringParse(nameOnLeftMenu).equals(team1Name));
         }
 
         LOG.info("Проверка что в центральной части окна открыта нужная игра");
-        List<WebElement> team = driver.findElements(By.xpath("//div[@class='live-game-summary__game-content']/div[1]/ng-include[1]/div[1]/div/div/p"));
-        String nameOnPage = CommonStepDefs.stringParse(team.get(0).getAttribute("title").trim() + " - " + team.get(1).getAttribute("title").trim());
+        String[] team = driver.findElements(By.xpath("//div[contains(@class,'game-score')]")).get(0).getAttribute("innerText").split("\n\n");//не спрашивай...
+        String nameOnPage = team.length==1?team[0]:team[0].trim() + " - " + team[2].trim();
+        LOG.info("На странице открыта игра " + nameOnPage);
         if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameOnPage))) {
             flag=false;
             LOG.error("В лайв открылась неправильная игра. " + nameOnPage + " вместо " + team1Name);
@@ -213,17 +224,16 @@ public class VewingEventsPage extends AbstractPage {
      * Проверка что нужная игра есть в Избранном в левом меню и выделена там желтым
      */
     public static boolean inLeftMenuGameSelected(String team1Name){
-
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
+        StringBuilder nameActiveGame = new StringBuilder();
         LOG.info("Смотрим что нужная игра выделена желтым в левом меню в Моих Играх (если эта игра есть в Избранном)");
-        List<WebElement> favouriteGames = driver.findElements(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li")); // избранные игры, отображаемые в левом меню
+        List<WebElement> favouriteGames = driver.findElements(By.xpath("//*[@id='sports-list-container']//li[contains(@class,'left-menu__favorite-list-item')]")); // избранные игры, отображаемые в левом меню
         for (int count = 0; count < favouriteGames.size(); count++) {
-            String nameFavouriteGame = favouriteGames.get(count).findElement(By.xpath("div[1]/div[1]/p[1]")).getAttribute("title");
+            String nameFavouriteGame = favouriteGames.get(count).findElement(By.xpath(".//div[@class='left-menu__list-item-games-names']")).getAttribute("innerText");
             nameFavouriteGame = CommonStepDefs.stringParse(nameFavouriteGame);
             if (team1Name.equals(nameFavouriteGame)) {
                 LOG.info("В лайве открыта игра " + nameFavouriteGame);
-                if (!driver.findElement(By.xpath("//*[@id='sports-list-container']/ul[1]/ng-include[1]/li[1]/ul[1]/li[" + (count + 1) + "]")).getAttribute("class").contains("active")) {
+                if (!driver.findElement(By.xpath("//*[@id='sports-list-container']//li[contains(@class,'left-menu__favorite-list-item') and position()=" + (count +1) + "]")).getAttribute("class").contains("active")) {
                     flag=false;
                     LOG.error("В лайв открытая игра из Избранного не выделена активной в левом меню");
                 }
@@ -231,10 +241,12 @@ public class VewingEventsPage extends AbstractPage {
             }
         }
         LOG.info("Смотрим что нужная игра выделена желтым в левом меню в общем списке игр");
-        String nameActiveGame = driver.findElement(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");////название активной игр
-        if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameActiveGame))){
+        //String nameActiveGame = driver.findElement(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).getAttribute("innerText");////название активной игр
+        nameActiveGame.setLength(0);
+        driver.findElements(xpath("//li[contains(@class,'left-menu__favorite-list-item') and contains(@class,'active')]//p[contains(@class,'left-menu__list-item-games-teams')]")).forEach(el->nameActiveGame.append(el.getAttribute("innerText")));
+        if (!CommonStepDefs.stringParse(team1Name).equals(CommonStepDefs.stringParse(nameActiveGame.toString()))){
             flag=false;
-            LOG.error("В ЛАЙВе игра на которую перешли не выделена активной в левом меню. Название активной игры:" + CommonStepDefs.stringParse(nameActiveGame) + ", а ожидалось" + CommonStepDefs.stringParse(team1Name));
+            LOG.error("В ЛАЙВе игра на которую перешли не выделена активной в левом меню. Название активной игры:" + CommonStepDefs.stringParse(nameActiveGame.toString()) + ", а ожидалось" + CommonStepDefs.stringParse(team1Name));
         }
         return flag;
     }
@@ -247,7 +259,6 @@ public class VewingEventsPage extends AbstractPage {
      */
     @ActionTitle("проверяет в свёрнутом левом меню иконок видов спорта больше")
     public void checksMinimizedLeftMenuPresenceIconsSports (String number){
-        WebDriver driver = PageFactory.getWebDriver();
         String xpathLeftMenu = "//div[contains(@class,'menu-toggler')]";
         String xpathTypeOfSports = "//a[contains(@class,'list-item-sport-link')]";
         WebElement leftMenu = driver.findElement(By.xpath(xpathLeftMenu));
@@ -270,7 +281,6 @@ public class VewingEventsPage extends AbstractPage {
      */
     @ActionTitle("проверяет, что при развёрнутом левом меню есть элементы с")
     public void checksThatWhenLeftMenuIsExpandedThereAreItemsWith (DataTable listItems){
-        WebDriver driver = PageFactory.getWebDriver();
         WebElement menuToggler = driver.findElement(By.id("menu-toggler"));
         if(menuToggler.getAttribute("title").contains("Показать всё")){
             LOG.info("Левое меню оказалось свёрнутым. Разворачиваем.");
@@ -341,7 +351,6 @@ public class VewingEventsPage extends AbstractPage {
 //        }else {
 //            LOG.info("Нет ни одной строки с видом спорта!");
 //        }
-        WebDriver driver =  PageFactory.getWebDriver();
         LOG.info("Сначала убедимся что в Лайве вообще есть игры");
         List<WebElement> games = driver.findElements(By.xpath("//div[@class='left-menu__list-item-games-row']"));
         Assert.assertFalse("Нет игр в ЛАЙВЕ", games.isEmpty());
@@ -383,7 +392,6 @@ public class VewingEventsPage extends AbstractPage {
 
     @ActionTitle("проверяет что при активном фильтре 'С видео' у игр есть иконка в виде монитора со треугольником внутри")
     public void checkWorkFilterWithVideo(){
-        WebDriver driver = PageFactory.getWebDriver();
         String xpathFilter = "//div[contains(@class,'left-menu-filters__item_video')]";
         String xpathMainCategoriesOfEvents = "//li[contains (@id,'sport')]";
         String xpathGamesWithVideo = "//li[contains(@class,'left-menu__list-item-games')]";
@@ -416,5 +424,45 @@ public class VewingEventsPage extends AbstractPage {
             }
         }
     }
+    @ActionTitle("проверяем что фильтр по видео")
+    public void checkDisplayedFilterVideo(String trigger)
+    {
+        int haveTrig=trigger.equals("отображается")?1:0;
+        By byFilterVideo = By.xpath("//div[@class='left-menu-filters__item left-menu-filters__item_video']");
+        new WebDriverWait(driver,15)
+                .withMessage("Ожидалось что фильтр по видео " + trigger + ", но размер списка с этим триггером = " + driver.findElements(byFilterVideo).size())
+                .until(ExpectedConditions.numberOfElementsToBe(byFilterVideo,haveTrig));
+    }
 
+    @ActionTitle("проверяем что для игр с видео есть матч-центр")
+    public void videoInMatchCenter(){
+        LOG.info("Включаем фильтр по видео");
+        setExpandCollapseMenusButton(true);
+        if (!driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).getAttribute("class").contains("active")) {//включим ильтр видео если ищем игру с видео
+            driver.findElement(By.xpath("//div[@id='video-filter-toggler']")).click();
+            CommonStepDefs.workWithPreloader();
+        }
+        LOG.info("Выбираем первую игру с видео. Проверяем что в центральной области есть матч-центр и включаем его");
+        String xpathMainCategoriesOfEvents = "//li[contains (@id,'sport')]";
+        String xpathGamesWithVideo = "//li[contains(@class,'left-menu__list-item-games')]";
+
+        List<WebElement> list = PageFactory.getWebDriver().findElements(By.xpath(xpathMainCategoriesOfEvents));
+        if (!list.get(0).getAttribute("class").contains("active")) {
+            LOG.info("Меню спорта было свёрнуто. Раскрываем.");
+            list.get(0).click();
+        }
+        List<WebElement> gameList = driver.findElements(By.xpath(xpathGamesWithVideo)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
+        Assert.assertFalse("Нет игр с видео. проверка окончена",gameList.isEmpty());
+        gameList.get(0).click();
+
+        LOG.info("Включаем матч-центр");
+        WebElement matchSlider = driver.findElement(By.xpath("//div[contains(@class,'switcher-block')]//div[contains(@class,'game-container__match-center-switch')]//span[@class='switch__slider']"));
+        if (matchSlider.findElement(By.xpath("./preceding-sibling::input")).getAttribute("checked")==null){
+            matchSlider.click();
+        }
+        LOG.info("Проверяем что есть блок видео в матч-центре");
+        new WebDriverWait(driver,10)
+                .withMessage("Нет блока с видео")
+                .until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//div[contains(@class,'game-video__container')]"),0));
+    }
 }

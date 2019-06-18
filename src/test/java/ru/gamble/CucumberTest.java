@@ -1,6 +1,7 @@
 package ru.gamble;
 
 import cucumber.api.CucumberOptions;
+import cucumber.api.Scenario;
 import cucumber.api.junit.Cucumber;
 import io.qameta.allure.Attachment;
 import org.junit.AfterClass;
@@ -10,11 +11,14 @@ import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import javax.mail.Session;
+import java.util.logging.FileHandler;
+
+import static java.rmi.server.RemoteServer.getLog;
+
 //del /q C:\Workspace\autotests-888-m\allure-results
 @RunWith(Cucumber.class)
 @CucumberOptions(
@@ -22,15 +26,13 @@ import java.nio.file.Paths;
         glue = {"ru.gamble.stepdefs", "ru.sbtqa.tag.stepdefs.ru"},
         features = {"src/test/resources/features/"},
         plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm","pretty"},
-        tags = {"@smoke, @regress"})
+        tags = {"@regress"})
 
 public class CucumberTest {
     private static final Logger LOG = LoggerFactory.getLogger(CucumberTest.class);
 
     @Rule
     public TestWatcher watchman = new TestWatcher() {
-        String fileName;
-
         @Override
         protected void failed(Throwable e, Description description) {
             screenshot();
@@ -51,6 +53,11 @@ public class CucumberTest {
     @AfterClass
     public static void afterScenario(){
         PageFactory.dispose();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
 

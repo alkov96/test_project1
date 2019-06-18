@@ -17,6 +17,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Лайв")
 public class LivePage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(LivePage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @ElementTitle("Лайв-обзор")
     @FindBy(id = "live-overview")
@@ -31,7 +32,6 @@ public class LivePage extends AbstractPage {
     private WebElement multimonitorLink;
 
     public LivePage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(liveOverviewLink));
     }

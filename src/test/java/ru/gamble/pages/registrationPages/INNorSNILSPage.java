@@ -22,6 +22,7 @@ import java.util.Random;
 @PageEntry(title = "ИНН или СНИЛС")
 public class INNorSNILSPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(INNorSNILSPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//*[text()='ИНН или СНИЛС']")
     private WebElement pageTitle;
@@ -38,11 +39,7 @@ public class INNorSNILSPage extends AbstractPage {
     @FindBy(id = "next_step")
     private WebElement continueButton;
 
-
-
-
     public INNorSNILSPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }

@@ -4,15 +4,14 @@ import com.google.common.base.Strings;
 import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.sbtqa.tag.datajack.Stash;
 
 import javax.mail.*;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static ru.gamble.utility.EmailParameters.*;
 
@@ -25,15 +24,17 @@ public class MailSearcher {
         String link;
         String linkSpam;
 
-
         for (int i = 1; i >= 0; i--) {
+            LOG.info("INBOX");
             link = linkSearcher(mail, properties, "INBOX");
+            LOG.info("SPAM");
             linkSpam = linkSearcher(mail, properties, "Спам");
             if (link != null || linkSpam != null) {
                 LOG.info("Письмо найдено в папке " + link==null?"Спам":"INBOX");
                 return link==null?linkSpam:link;
             } else {
                 LOG.info("Connect to email. Remained attempts : " + i);
+
             }
         }
         LOG.error("Время ожидания истекло. Письмо не было доставлено.");
@@ -64,6 +65,7 @@ public class MailSearcher {
                     LOG.info("Время ожидания истекло. Письмо не было доставлено.");
                     return null;
                 }
+                LOG.info("SIZE FOLDER:" + inbox.getMessages().length);
                 LOG.info("Нет новых писем. Количество попыток : " + count);
                 Thread.sleep(5000);
                 count--;
@@ -74,7 +76,12 @@ public class MailSearcher {
                 message = inbox.getMessage(i);
                 if (message.getHeader("To")[0].contains(mail)) {
                     LOG.info("Письмо получено");
-                    link = getVerifyLink(message);
+                    LOG.info("NEW MAIL DETECTED");
+                    link = getFullLink(message).replace("amp;","");//
+                    Stash.put("fullLink",link);
+                    LOG.info("Ссылка полностью : " + link);
+                    LOG.info("!!!!!!!!!!!!!!!!!!!!!!!!!! LINK !!!!!!!!!!!!!!!!!!!!!! : " + link);
+                    link = getVerifyLink(link);
                     if (!Strings.isNullOrEmpty(link)) {
                         LOG.info("Параметр для аутентификации : " + link);
                         message.setFlag(Flags.Flag.DELETED, true);
@@ -95,24 +102,25 @@ public class MailSearcher {
         return link;
     }
 
-    private String getVerifyLink(Message box) throws Exception {
+    private String getVerifyLink(String line){
 
-        LOG.info("Поиск ссылки в письме");
-        InputStream stream = box.getInputStream();
-        BufferedInputStream bis = new BufferedInputStream(stream);
-        InputStreamReader streamReader = new InputStreamReader(bis);
-        BufferedReader buffer = new BufferedReader(streamReader);
+//        LOG.info("Поиск ссылки в письме");
+//        InputStream stream = box.getInputStream();
+//        BufferedInputStream bis = new BufferedInputStream(stream);
+//        InputStreamReader streamReader = new InputStreamReader(bis);
+//        BufferedReader buffer = new BufferedReader(streamReader);
+//
+//        String line;
+//
+//        while ((line = buffer.readLine()) != null) {
+//            if (line.contains("verify"))
+//                break;
+//        }
+//        if (line == null) {
+//            LOG.error("Line is null");
+//            throw new IllegalArgumentException("Line is null");
+//        }
 
-        String line;
-
-        while ((line = buffer.readLine()) != null) {
-            if (line.contains("verify"))
-                break;
-        }
-        if (line == null) {
-            LOG.error("Line is null");
-            throw new IllegalArgumentException("Line is null");
-        }
         Pattern pattern = Pattern.compile("(code=[0-9_a-zA-Z]*)");
         Matcher matcher = pattern.matcher(line);
 
@@ -121,5 +129,34 @@ public class MailSearcher {
             Assertions.fail("Something is wrong. Maybe regular expression did not work.\n Line: " + line + "\nPattern: " + pattern);
         }
         return matcher.group(0);
+    }
+
+    private String getFullLink(Message box) throws IOException, MessagingException {
+        LOG.info("Поиск ссылки в письме");
+        InputStream stream = box.getInputStream();
+        BufferedInputStream bis = new BufferedInputStream(stream);
+        InputStreamReader streamReader = new InputStreamReader(bis);
+        BufferedReader buffer = new BufferedReader(streamReader);
+
+        String line = new String();
+
+
+        while (!buffer.ready()){
+            line = buffer.readLine();
+            LOG.info(line.substring(0,10));
+            if (line.contains("confirm") || line.contains("verify"))
+                break;
+        }
+//        while ((line = buffer.readLine()) != null ) {
+//            if (line.contains("confirm") || line.contains("verify"))
+//                break;
+//        }
+        if (line == null) {
+            LOG.error("Line is null");
+            throw new IllegalArgumentException("Line is null");
+        }
+        int index = line.indexOf(Stash.getValue("MAIN_URL"));
+        int index2 = line.substring(index).indexOf("\"");
+        return line.substring(index,index+index2);
     }
 }

@@ -20,12 +20,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Результаты")
 public class ResultsPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(ResultsPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='results-today']")
     private WebElement resultsToday;
 
     public ResultsPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(resultsToday));
     }

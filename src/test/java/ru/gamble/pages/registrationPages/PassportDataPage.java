@@ -31,9 +31,22 @@ import static ru.gamble.utility.Constants.*;
 @PageEntry(title = "Паспортные данные")
 public class PassportDataPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(PassportDataPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//*[text()='Паспортные данные']")
     private WebElement pageTitle;
+
+    @ElementTitle("Фамилия")
+    @FindBy(id = "surname")
+    private WebElement inputSurname;
+
+    @ElementTitle("Имя")
+    @FindBy(id = "first_name")
+    private WebElement inputName;
+
+    @ElementTitle("Отчество")
+    @FindBy(id = "middleName")
+    private WebElement inputPatronymic;
 
     @ElementTitle("Серия")
     @FindBy(id = "passpserial")
@@ -44,16 +57,16 @@ public class PassportDataPage extends AbstractPage {
     private WebElement passpNumberInput;
 
     @ElementTitle("Кем выдан")
-    @FindBy(id = "passportIssuer")
+    @FindBy(id = "issuePlace")
     private WebElement issuedByInput;
 
     @ElementTitle("Код подразделения")
-    @FindBy(id = "passportIssuerCode")
+    @FindBy(id = "codePlace")
     private WebElement unitCodeInput;
 
 
     @ElementTitle("Место рождения")
-    @FindBy(id = "birthPlace")
+    @FindBy(id = "birthplace")
     private WebElement placeOfBirthInput;
 
     @ElementTitle("Регион")
@@ -73,7 +86,7 @@ public class PassportDataPage extends AbstractPage {
     private WebElement houseInput;
 
     @ElementTitle("Строение")
-    @FindBy(id = "building")
+    @FindBy(id = "construction")
     private WebElement buildingInput;
 
     @ElementTitle("Корпус")
@@ -85,7 +98,7 @@ public class PassportDataPage extends AbstractPage {
     private WebElement blockInput;
 
     @ElementTitle("Квартира")
-    @FindBy(id = "apartment")
+    @FindBy(id = "flat")
     private WebElement flatInput;
 
     @ElementTitle("Отправить")
@@ -94,11 +107,9 @@ public class PassportDataPage extends AbstractPage {
 
 
     public PassportDataPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(fieldYear));
+        new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
-
 
     @ActionTitle("заполняет паспорт с")
     public void fillsPassportDate(DataTable dataTable){
@@ -111,9 +122,48 @@ public class PassportDataPage extends AbstractPage {
             value = aData.get(VALUE);
             saveVariable = aData.get(SAVE_VALUE);
 
+            if (value.matches("[_A-Z]*")){
+                value=Stash.getValue(value);
+            }
+
+            if (inputField.contains(LASTNAME)) {
+                if (value.contains(RANDOM)) {
+                    fillField(inputSurname, Generators.randomString(25));
+                } else {
+                    fillField(inputSurname, value);
+                }
+                Stash.put(saveVariable, inputSurname.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + inputSurname.getAttribute("value") + "]");
+            }
+            if (inputField.contains(NAME)) {
+                if (value.contains(RANDOM)) {
+                    fillField(inputName, Generators.randomString(25));
+                } else {
+                    fillField(inputName, value);
+                }
+                Stash.put(saveVariable, inputName.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + inputName.getAttribute("value") + "]");
+            }
+            if (inputField.contains(PATERNALNAME)) {
+                if (value.contains(RANDOM)) {
+                    fillField(inputPatronymic, Generators.randomString(25));
+                } else {
+                    fillField(inputPatronymic, value);
+                }
+                Stash.put(saveVariable, inputPatronymic.getAttribute("value"));
+                LOG.info(saveVariable + "<==[" + inputPatronymic.getAttribute("value") + "]");
+            }
+
+            if (inputField.contains(DATEOFBIRTH)) {
+                date = value;
+                enterDate(date,DATEOFBIRTH);
+                Stash.put(saveVariable, date);
+                LOG.info(saveVariable + "<==[" + date + "]");
+            }
+
             if (inputField.contains(DATEISSUE)) {
-                date = Stash.getValue(value);
-                enterDate(date);
+                date = value;
+                enterDate(date,DATEISSUE);
                 Stash.put(saveVariable, date);
                 LOG.info(saveVariable + "<==[" + date + "]");
             }

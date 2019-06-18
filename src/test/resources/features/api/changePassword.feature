@@ -35,7 +35,7 @@
       | devId       | DEVID     |
       | authToken   | AUTHTOKEN |
       | source      | SOURCE    |
-      | oldPassword | PASSWORD      |
+      | oldPassword | PASSWORD  |
       | newPassword | NEW_PASS  |
 
     * проверка ответа API из "RESPONCE_API":

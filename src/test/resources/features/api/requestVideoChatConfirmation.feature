@@ -73,7 +73,7 @@
       | SNILS | 37487545236 |
 
 
-    * запрос к API "api/mobile/v3/sendPhoneCode" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/sendPhoneCode" и сохраняем в "RESPONCE_API":
       | devId | DEVID |
       | phone | PHONE |
 
@@ -82,7 +82,7 @@
 
     * получаем и сохраняем в память код подтверждения "CODE" телефона "PHONE" ""
 
-    * запрос к API "api/mobile/v3/createUser" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/createUser" и сохраняем в "RESPONCE_API":
       |  devId                 | DEVID      |
       |  source                | SOURCE     |
       |  first_name            | FIRSTNAME  |
@@ -99,7 +99,7 @@
 
     * получаем и сохраняем в память код "CODEEMAIL" подтверждения почты "EMAIL"
 
-    * запрос к API "api/mobile/v3/confirmEmail" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/confirmEmail" и сохраняем в "RESPONCE_API":
       | code   | CODEEMAIL |
       | source | SOURCE        |
 
@@ -108,7 +108,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "status":10 |
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID |
       | email  | EMAIL |
       | pass   | PASSWORD  |
@@ -122,34 +122,6 @@
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
     * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
-
-
-
-    * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
-      | gender                  | GENDER         |
-      | birthplace              | BIRTHPLACE     |
-      | region                  | Москва         |
-      | locality                | CITY           |
-      | street                  | STREET         |
-      | house                   | HOUSE          |
-      | construction            |                |
-      | housing                 |                |
-      | flat                    | FLAT           |
-      | docNum                  | DOCNUM         |
-      | docSeries               | DOCSERIES      |
-      | issueDate               | INVALIDISSUEDATE |
-      | issuePlace              | ISSUEPLACE     |
-      | codePlace               | 123-456        |
-
-    * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
-      | devId                   | DEVID        |
-      | authToken               | AUTHTOKEN    |
-      | source                  | SOURCE       |
-      | personalData            | PERSONALDATA |
-
-    * проверка ответа API из "RESPONCE_API":
-      | exepted | "code":27 |
-
 
     * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
       | gender                  | GENDER         |
@@ -168,7 +140,7 @@
       | issuePlace              | ISSUEPLACE     |
       | codePlace               | 123-456        |
 
-    * запрос к API "api/mobile/v3/submitPersonalData" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitPersonalData" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | SOURCE       |
@@ -181,7 +153,7 @@
       |video_identification_in_mobile_app|true|
       |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID    |
       | email  | EMAIL    |
       | pass   | PASSWORD |
@@ -189,7 +161,7 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v3/getIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/getIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | SOURCE           |
@@ -197,7 +169,7 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * запрос к API "api/mobile/v3/submitIdentType" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/submitIdentType" и сохраняем в "RESPONCE_API":
       | devId                   | DEVID        |
       | authToken               | AUTHTOKEN    |
       | source                  | SOURCE           |
@@ -206,9 +178,26 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":0 |
 
-    * поиск акаунта со статуом регистрации "=17" "EMAIL"
+    * запрос к API "api/mobile/v6/submitInnSnils" и сохраняем в "RESPONCE_API":
+      | authToken               | AUTHTOKEN        |
+      | source                  | 16               |
+      | snilsNumber             | 000-000-000 00   |
+      | innNumber               |                  |
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":0 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "status":16 |
+
+    * запрос к API "api/mobile/v6/getUserStatus" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID        |
+      | authToken               | AUTHTOKEN    |
+      | source                  | 16           |
+
+    * проверка вариантного ответа API из "RESPONCE_API":
+      | exepted     | "status":16 |
+
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
       | source    | SOURCE    |
@@ -224,6 +213,39 @@
   @api
   @requestVideoChatConfirmation
   @incorrect
+  Сценарий: Запрос на видеоидентификацию с устаревше версии(v4 и ниже)
+
+    * поиск акаунта со статуом регистрации "=17" "EMAIL"
+
+    * редактируем некоторые активные опции сайта
+      |video_identification_in_mobile_app|true|
+      |identification_with_video|true|
+
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
+      | devId  | DEVID   |
+      | email  | EMAIL    |
+      | pass   | PASSWORD    |
+      | source | SOURCE  |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    #этот запрос только для версий >=v6. на версии 3 - должна быть ошибка
+    * неудачный запрос к API "api/mobile/v3/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+      | devId     | DEVID     |
+      | authToken | AUTHTOKEN |
+      | source    | SOURCE    |
+
+    * неудачный запрос к API "api/mobile/v4/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+      | devId     | DEVID     |
+      | authToken | AUTHTOKEN |
+      | source    | SOURCE    |
+
+
+
+
+  @api
+  @requestVideoChatConfirmation
+  @incorrect
   Сценарий: Запрос на видеоидентификацию с неправильного устройства
 
     * поиск акаунта со статуом регистрации "=17" "EMAIL"
@@ -232,7 +254,7 @@
       |video_identification_in_mobile_app|true|
       |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | EMAIL    |
       | pass   | PASSWORD    |
@@ -240,15 +262,13 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
       | source    | 42    |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":45 |
-
-
 
   @api
   @requestVideoChatConfirmation
@@ -261,7 +281,7 @@
       |video_identification_in_mobile_app|false|
       |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | EMAIL    |
       | pass   | PASSWORD    |
@@ -269,10 +289,38 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
-      | source    | 42    |
+      | source    | SOURCE    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted | "code":44 |
+
+
+  @api
+  @requestVideoChatConfirmation
+  @incorrect
+  Сценарий: Запрос на видеоидентификацию при выключенной настройке2
+
+    * поиск акаунта со статуом регистрации "=17" "EMAIL"
+
+    * редактируем некоторые активные опции сайта
+      |video_identification_in_mobile_app|true|
+      |identification_with_video|false|
+
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
+      | devId  | DEVID   |
+      | email  | EMAIL    |
+      | pass   | PASSWORD    |
+      | source | SOURCE  |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+      | devId     | DEVID     |
+      | authToken | AUTHTOKEN |
+      | source    | SOURCE    |
 
     * проверка ответа API из "RESPONCE_API":
       | exepted | "code":44 |
@@ -287,8 +335,9 @@
 
     * редактируем некоторые активные опции сайта
       |video_identification_in_mobile_app|true|
+      |identification_with_video|true|
 
-    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/login" и сохраняем в "RESPONCE_API":
       | devId  | DEVID   |
       | email  | EMAIL    |
       | pass   | PASSWORD    |
@@ -296,7 +345,7 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v5/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
+    * запрос к API "api/mobile/v6/requestVideoChatConfirmation" и сохраняем в "RESPONCE_API":
       | devId     | DEVID     |
       | authToken | AUTHTOKEN |
       | source    | SOURCE    |

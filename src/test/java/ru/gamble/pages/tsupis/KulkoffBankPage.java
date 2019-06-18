@@ -17,7 +17,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "АО Кулькофф Банк")
 public class KulkoffBankPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(KulkoffBankPage.class);
-
+    static WebDriver driver = PageFactory.getDriver();
 
         @FindBy(xpath = "//form[contains(.,'АО Кулькофф Банк')]")
         private WebElement pageTitle;
@@ -29,7 +29,6 @@ public class KulkoffBankPage extends AbstractPage {
 
 
         public KulkoffBankPage() {
-            WebDriver driver = PageFactory.getDriver();
             PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
             new WebDriverWait(driver, 20).until(ExpectedConditions.visibilityOf(pageTitle));
         }

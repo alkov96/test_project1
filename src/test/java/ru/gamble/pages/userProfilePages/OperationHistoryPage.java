@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.gamble.pages.AbstractPage;
+import ru.gamble.stepdefs.CommonStepDefs;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -35,6 +36,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "История операций")
 public class OperationHistoryPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(OperationHistoryPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='history__table']")
     private WebElement historyTable;
@@ -44,7 +46,6 @@ public class OperationHistoryPage extends AbstractPage {
     private WebElement searchInput;
 
     public OperationHistoryPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(historyTable));
@@ -57,11 +58,12 @@ public class OperationHistoryPage extends AbstractPage {
      * @return
      */
     private boolean pageUpdate(List<String> id) throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         Thread.sleep(1000);
         List<WebElement> newList = driver.findElements(By.xpath("//span[@class='history__id']")).stream()
-                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут")).collect(Collectors.toList());
-        //этот фильтр убирает операции кэшаута из списка. потмоу что у ставки и кэшаута будут одинаковые id. поэтому кэшаут будеим просто не учитывать
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут"))
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Выигрыш пари"))
+                .collect(Collectors.toList());
+        //этот фильтр убирает операции кэшаута и выигрыша из списка. потмоу что у ставки и кэшаута/выигрыша будут одинаковые id. поэтому будем их просто не учитывать
         newList.forEach(element -> {
             if (id.contains(element.getAttribute("innerText"))) {
                 id.add("idbad");
@@ -72,7 +74,6 @@ public class OperationHistoryPage extends AbstractPage {
     }
 
     private boolean changePage(WebElement page) throws Exception {
-        WebDriver driver = PageFactory.getDriver();
         Integer currentPage;
         Integer newPage;
         boolean result;
@@ -82,13 +83,16 @@ public class OperationHistoryPage extends AbstractPage {
 
         id.clear();
 
-//этот фильтр убирает операции кэшаута из списка. потмоу что у ставки и кэшаута будут одинаковые id. поэтому кэшаут будеим просто не учитывать
+//этот фильтр убирает операции кэшаута и выигрыша из списка. потмоу что у ставки и кэшаута/выигрыша будут одинаковые id. поэтому будем их просто не учитывать
         operationsId = driver.findElements(By.xpath("//span[@class='history__id']")).stream()
-                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут")).collect(Collectors.toList());
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Кэшаут"))
+                .filter(element -> !element.findElement(By.xpath("preceding-sibling::span")).getAttribute("innerText").contains("Выигрыш пари"))
+                .collect(Collectors.toList());
         operationsId.forEach(element -> id.add(element.getAttribute("innerText")));
 
         currentPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         page.click();
+        CommonStepDefs.workWithPreloader();
 
         newPage = Integer.valueOf(driver.findElement(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and contains(@class,'active')]")).getAttribute("innerText"));
         LOG.info("Перешли на страницу  [" + newPage + "]");
@@ -102,9 +106,11 @@ public class OperationHistoryPage extends AbstractPage {
 
     @ActionTitle("проверяет пролистывание страниц")
     public void pagesCheck() throws Exception {
-        WebDriver driver = PageFactory.getDriver();
-
         List<WebElement> pages = driver.findElements(By.xpath("//div[@class='pagination']/div[contains(@class,'pagination-page ng-binding') and not(contains(@class,'active'))]"));//неактивные стрницы(без стрелок)
+        if (pages.size()<3){
+            LOG.info("Нет страниц вообще, некуда листать.");
+            return;
+        }
         LOG.info("Листаем на последнюю из видимых страниц");
         assertTrue(changePage(pages.get(pages.size() - 1)));
         LOG.info("Листаем влево");
@@ -116,7 +122,6 @@ public class OperationHistoryPage extends AbstractPage {
 
     @ActionTitle("проверяет сортировку по дате")
     public void sortDate() throws ParseException, InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         boolean sortList;
 
         Locale local = new Locale("ru", "RU");
@@ -147,7 +152,6 @@ public class OperationHistoryPage extends AbstractPage {
 
     @ActionTitle("проверяет сортировку по балансу")
     public void sortBal() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         boolean sortList;
 
         String xpath = "//td[contains(@class,'history__cell-balance table__body-cell')]"; //путь до суммы баланса
@@ -170,7 +174,6 @@ public class OperationHistoryPage extends AbstractPage {
 
     @ActionTitle("проверяет поиск")
     public void checkSearch(){
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = true;
 //        WebElement search = driver.findElement(By.xpath("//div[contains(@class,'input-search__wrapper_history')]/input")); //поле поиска
         searchInput.clear();
@@ -210,7 +213,6 @@ public class OperationHistoryPage extends AbstractPage {
     @ActionTitle("вводит в поиск ID ставки и проверяет что баланс после нее изменился правильно")
     public void searchIdAndCheckBalance(String keyListBet, DataTable dataTable) throws InterruptedException {
         LOG.info("Достаем из памяти список ставок с разными результатами");
-        WebDriver driver = PageFactory.getDriver();
         Map<String,String> bets = Stash.getValue(keyListBet);
         Map<String, String> table = dataTable.asMap(String.class, String.class);
         String id;
@@ -222,11 +224,15 @@ public class OperationHistoryPage extends AbstractPage {
 
             resultOneBet = entry.getKey();
             id = bets.get(resultOneBet); // достаем из параметров результат ставки и ищем id для этого результата в bets
-            LOG.info("Вводим в поле поиска id = " + id.toString().replace("\n",""));
+            if (id==null){
+                LOG.info("В Моих пари на выбранные даты не было ставок с исходом = '" + resultOneBet + "'. Првоерки совпадени id не будет. \nИдем дальше");
+                continue;
+            }
+            LOG.info("Вводим в поле поиска id = " + id.replace("\n",""));
             searchInput.clear();
             searchInput.sendKeys(id.toString().replace("\n",""));
             Thread.sleep(1500);
-            expectedBet = resultOneBet.equals("Проигрыш")|| resultOneBet.equals("Ожидается")? "Ставка": resultOneBet;
+            expectedBet = resultOneBet.equals("Проигрыш")|| resultOneBet.equals("Ожидается")? "Заключение пари": resultOneBet;
             lineInContainer = driver.findElements(By.xpath("//tr[contains(@class,'repeated-item')]"));
             for (WebElement line:lineInContainer){
                 if (line.getAttribute("innerText").contains(expectedBet)){

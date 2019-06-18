@@ -28,29 +28,30 @@ import java.util.stream.Collectors;
 @PageEntry(title = "Первый ЦУПИС ЛК")
 public class FirstTSUPISLK extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FirstTSUPISLK.class);
+    static WebDriver driver = PageFactory.getDriver();
 
-    @FindBy(xpath = "//div[@class='contract-details-content']")
+    @FindBy(xpath = "//*[@class='panel__header' and contains(.,'БК Фаворит')]")
     private WebElement pageTitle;
 
     @ElementTitle("Номер карты")
     @FindBy(name = "number")
     private WebElement numberCardInput;
 
-    @ElementTitle("ММ")
-    @FindBy(name = "month")
-    private WebElement monthInput;
-
-    @ElementTitle("YY")
-    @FindBy(name = "year")
-    private WebElement yearInput;
+    @ElementTitle("ММ/YY")
+    @FindBy(name = "expirationDate")
+    private WebElement dateInput;
 
     @ElementTitle("Имя и фамилия латиницей")
     @FindBy(name = "name")
     private WebElement nameFamilyLatinInput;
 
     @ElementTitle("Продолжить")
-    @FindBy(xpath = "//input[contains(@value,'Продолжить')]")
+    @FindBy(xpath = "//button[contains(text(),'Продолжить')]")
     private WebElement buttonContinue;
+
+    @ElementTitle("Продолжить и перейти на сайт")
+    @FindBy(xpath = "//*[@id='result-move-start']")
+    private WebElement buttonAndGoContinue;
 
     @ElementTitle("Подтвердить")
     @FindBy(xpath = "//input[contains(@value,'Подтвердить')]")
@@ -61,7 +62,6 @@ public class FirstTSUPISLK extends AbstractPage {
     private WebElement inputSMSCode;
 
     public FirstTSUPISLK() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -80,7 +80,6 @@ public class FirstTSUPISLK extends AbstractPage {
 
     @ActionTitle("нажимает кнопку 'Вернуться к букмекеру'")
     public void pressKeyBackToBookie(){
-        WebDriver driver = PageFactory.getWebDriver();
         new WebDriverWait(driver,60).until(ExpectedConditions.visibilityOfElementLocated(By.id("success")));
         driver.findElement(By.id("success")).click();
         LOG.info("Нажали на кнопку 'Вернуться к букмекеру'");
@@ -109,7 +108,6 @@ public class FirstTSUPISLK extends AbstractPage {
 
     @ActionTitle("заполняем форму банковской карты")
     public void fillOutBankCardForm(DataTable dataTable) {
-        WebDriver driver = PageFactory.getWebDriver();
         if(!driver.findElements(By.name("number")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).isEmpty()) {
             Map<String, String> data = dataTable.asMap(String.class, String.class);
             String key = "", value = "";
@@ -125,11 +123,9 @@ public class FirstTSUPISLK extends AbstractPage {
                     fillField(numberCardInput, value);
                     LOG.info("Ввели номер карты [" + numberCardInput.getAttribute("value") + "]");
                 } else if (key.equals("ММ/YY")) {
-                    String[] tmp = value.split("/");
-                    fillField(monthInput, tmp[0]);
-                    LOG.info("Ввели в дате месяц [" + monthInput.getAttribute("value") + "]");
-                    fillField(yearInput, tmp[1]);
-                    LOG.info("Ввели в дате год [" + yearInput.getAttribute("value") + "]");
+                    String tmp = value.replace("/","");
+                    fillField(dateInput, tmp);
+                    LOG.info("Ввели в дате год [" + dateInput.getAttribute("value") + "]");
                 } else if (key.equals("Имя и фамилия латиницей")) {
                     fillField(nameFamilyLatinInput, value);
                     LOG.info("Ввели Имя и фамилию латиницей [" + nameFamilyLatinInput.getAttribute("value") + "]");

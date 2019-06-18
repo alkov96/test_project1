@@ -28,6 +28,7 @@ import static ru.gamble.utility.Constants.*;
 @PageEntry(title = "Первый ЦУПИС")
 public class TSUPISMainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(TSUPISMainPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @ElementTitle("Телефон")
     @FindBy(id = "form_login_phone")
@@ -42,7 +43,6 @@ public class TSUPISMainPage extends AbstractPage {
     private WebElement buttonEnter;
 
     public TSUPISMainPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         LOG.info("Перешли на страницу [" + driver.getCurrentUrl() + "]");
         new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(inputPhone));
@@ -50,7 +50,6 @@ public class TSUPISMainPage extends AbstractPage {
 
     @ActionTitle("логинится в ЦУПИС с")
     public void loginInTSUPIS(DataTable dataTable){
-        WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
         String phone = "", password = "";
 

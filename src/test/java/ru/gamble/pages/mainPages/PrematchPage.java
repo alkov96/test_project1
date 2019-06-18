@@ -21,6 +21,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Прематч")
 public class PrematchPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(PrematchPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//a[@id='live-calendar']")
     private WebElement menu;
@@ -38,7 +39,6 @@ public class PrematchPage extends AbstractPage {
     private WebElement resultsBottom;
 
     public PrematchPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(menu));
     }

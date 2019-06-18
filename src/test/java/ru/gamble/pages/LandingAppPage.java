@@ -39,20 +39,19 @@ import static org.openqa.selenium.By.xpath;
 @PageEntry(title = "Приложения для iOS и Android")
 public class LandingAppPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(LandingAppPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//h1[text()='\n" +
             "Все события спорта']")
     private WebElement header;
 
     public LandingAppPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
     }
 
     @ActionTitle("проверяет скачивание приложения на ios")
     public void downloadIos() {
-        WebDriver driver = PageFactory.getDriver();
         int x, y;
         y = driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-mac')]")).getLocation().getY() - 100;
         x = driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-mac')]")).getLocation().getX() - 100;
@@ -64,7 +63,6 @@ public class LandingAppPage extends AbstractPage {
 
     @ActionTitle("нажимает на кнопку для загрузки приложения на android")
     public void clickDownloadAndroid(){
-        WebDriver driver = PageFactory.getDriver();
         driver.findElement(xpath("//div[contains(@class,'block-text_first')]//i[contains(@class,'icon-android')]")).click();
     }
 
@@ -74,7 +72,6 @@ public class LandingAppPage extends AbstractPage {
     }
 
     public static void downloadAndroid() throws IOException, InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         Thread.sleep(5000);
         if (!driver.findElement(xpath("//div[@class='modal__android-app-text']")).isDisplayed()) {
             Assert.fail("Не открылся попап на скачивание приложения для андроида");
@@ -117,7 +114,6 @@ public class LandingAppPage extends AbstractPage {
 
     @ActionTitle("проверка блока %Все как любите")
     public void checkBlockAsULike() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         int x, y;
         boolean flag = true;
         y = driver.findElement(xpath("//div[@class='m-landing__inner-block-text-p-links']/p[contains(@class,'active')]")).getLocation().getY() - 100;
@@ -146,8 +142,6 @@ public class LandingAppPage extends AbstractPage {
 
     @ActionTitle("проверка того, что все нужные картинки прогрузились и есть футер")
     public void picsAndFooter() {
-        WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         String fullURL = (Stash.getValue("MAIN_URL") + "/images/landing/mobile_app/").replace("//i","/i");
         List<String> waitingImg = Arrays.asList(
                 "ipad_screen1.png",
@@ -168,20 +162,16 @@ public class LandingAppPage extends AbstractPage {
                     .replace(fullURL, ""));
         });
         if (!allImg.containsAll(waitingImg)) {
-            flag = false;
             Assert.fail("Не все картинки прогрузились. На сайте есть следующие картинки " + allImg);
         }
 
         if (driver.findElements(xpath("//div[contains(@class,'footer')]")).isEmpty()) {
-            flag = false;
             Assert.fail("Нет футера");
         }
     }
 
     @ActionTitle("смотрит ссылку на правила про фрибет")
     public void linkFreeBet() {
-        WebDriver driver = PageFactory.getDriver();
-        boolean flag = true;
         int x, y;
         y = driver.findElement(By.id("app_desctop_freebet_block_btn")).getLocation().getY() - 100;
         x = driver.findElement(By.id("app_desctop_freebet_block_btn")).getLocation().getX() - 100;
@@ -194,7 +184,6 @@ public class LandingAppPage extends AbstractPage {
 
     @ActionTitle("смотрит ссылку на правила про выплаты выигрышей")
     public void linkForPrize() {
-        WebDriver driver = PageFactory.getDriver();
         int x, y;
         y = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getLocation().getY() - 100;
         x = driver.findElement(By.id("app_desctop_advantages_block_link_warranty")).getLocation().getX() - 100;
@@ -205,7 +194,6 @@ public class LandingAppPage extends AbstractPage {
 
     @ActionTitle("смотрит ссылку на правила про НДФЛ")
     public void linkForNDFL() {
-        WebDriver driver = PageFactory.getDriver();
         int x, y;
         y = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getLocation().getY() - 100;
         x = driver.findElement(By.id("app_desctop_advantages_block_link_ndfl")).getLocation().getX() - 100;
@@ -217,7 +205,6 @@ public class LandingAppPage extends AbstractPage {
 
     @ActionTitle("отправляет СМС со страницы лэндинга на телефон")
     public void sendSMS(String phone, String isOk) throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         boolean flag = isOk.equals("ожидаем успех");
         String hintBefore3times = "Мы отправили вам ссылку на скачивание";
         String hintAfter3times = "Ошибка. Повторите попытку через 24 часа";

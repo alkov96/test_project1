@@ -6,7 +6,6 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -35,6 +34,7 @@ import static ru.gamble.utility.Constants.*;
 @PageEntry(title = "Вход")
 public class EnterPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(EnterPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='modal__title' and contains(text(),'Вход')]")
     private WebElement pageTitle;
@@ -52,15 +52,12 @@ public class EnterPage extends AbstractPage {
     private WebElement enterButton;
 
     public EnterPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
 
         for(int j = 0; j < 10; j++) {
             try {
-                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(inputLogin));
-                if (enterButton.isDisplayed()) {
+                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(enterButton));
                     break;
-                }
             } catch (Exception e){
                 driver.navigate().refresh();
                 try {
@@ -76,10 +73,32 @@ public class EnterPage extends AbstractPage {
         }
     }
 
+    private void chooseMethodAutorization(String method){
+        LOG.info("Будем логиниться через method. Для этого выбираем соответсвующую вкладку на попапе авторизации");
+        driver.findElement(By.xpath("//div[@class='modal__tabs']/div[contains(.,'" + method + "')]")).click();
+        new WebDriverWait(driver,10)
+                .withMessage("Попытались переключиться на авторизацию по email, но не получилось")
+                .until(ExpectedConditions.attributeContains(By.xpath("//div[@class='modal__tabs']/div[contains(.,'" + method + "')]"),"class","active"));
+        LOG.info("Выбрали авторизацию через method");
+    }
+
+    /**
+     * Авторизация на сайте. в зависимости от того, чму равен епрвый параметр (телефон или нет) выбирается аворизация по теелфону или по email
+     * @param dataTable - данные с которыми логинимся. телеон+пароль или логин+пароль
+     * @throws DataException
+     */
     @ActionTitle("логинится с")
     public void logIn(DataTable dataTable) throws DataException {
-        WebDriver driver = PageFactory.getWebDriver();
         Map<String, String> data = dataTable.asMap(String.class, String.class);
+
+        if (data.keySet().toArray()[0].toString().toLowerCase().equals("телефон")){
+            chooseMethodAutorization("телефон");
+        }
+        else {
+            chooseMethodAutorization("email");
+        }
+
+        chooseMethodAutorization("email");
         String login, password;
         switch (data.get(LOGIN)) {
             case Constants.DEFAULT:
@@ -97,7 +116,7 @@ public class EnterPage extends AbstractPage {
                 login = Stash.getValue("EMAIL");
                 break;
             default:
-                login = data.get(LOGIN);
+                login = login = data.get(LOGIN).matches("[A-Z_]*")?Stash.getValue(data.get(LOGIN)):data.get(LOGIN);
                 break;
         }
 
@@ -141,6 +160,8 @@ public class EnterPage extends AbstractPage {
 
         }while ((!driver.findElements(By.xpath("//div[contains(.,'Ошибка в адресе электронной почты или пароле')]")).stream().filter(WebElement::isDisplayed).collect(Collectors.toList()).isEmpty()) && count < 3);
         workWithPreloader();
+
+        closePopUpWindowGoToTSUPISIfOpened();
       //***********************
     }
 }

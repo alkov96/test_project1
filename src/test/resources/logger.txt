@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 INFO  CommonStepDefs:2365 - возвращаем значение активных опций сайта из памяти по ключу 'ACTIVE_SITE_OPTIONS'
 INFO  CommonStepDefs:2338 - [identification_with_wave] = true
 INFO  CommonStepDefs:2341 - [identification_with_skype_only] = false
@@ -42,3 +43,8 @@ INFO  CommonStepDefs:921 - SQL-request [{identification_with_wave=1, identificat
 INFO  CommonStepDefs:2352 - Вернули активные опции сайта [{identification_with_wave=1, identification_with_skype_only=0, video_identification_in_mobile_app=0, betradar_widgets_mob=1, use_bet_history_subscription=1, identification_with_euroset=0, identification_with_courier=0, disable_results_page=0, enable_sendsay=1, bets_races_mobile=1, express_bonus=1, bc_stat_link=1, betconstruct_translations=1, betradar_widgets_prematch=1, hide_bonus_money=0, counter_offer=1, fast_registration=0, coefficients_rounding=1, identification_with_contact=0, twitch_translations=1, white_mode=1, remove_limits_btn=1, bet_from_left_menu=0, betradar_widgets=1, multimarkets_enable=1, change_basic_parameter=1, online_chat=1, bets_races=1, white_mode_mobile=0, races_mobile=1, edit_personal_data_btn=1, video_chat_identification_status=1, races=1, show_bonus_rubles=1, identification_with_video=1, back_call=0, announcements=1, favorite=1, coupon_progressbar=1}]
 INFO  SetupSteps:147 - Webdriver sharing is processing...
 INFO  TagWebDriver:363 - Checking any alert opened
+=======
+INFO  CommonStepDefs:2812 - fail? false
+INFO  CommonStepDefs:363 - Перешли на страницу [https://dev.gamebet.ru]
+INFO  CommonStepDefs:2865 - Перешли в прематч и сейчас будет чистить купон
+>>>>>>> 6fbc4f90194efd00f97dc7cfef740f1a5a929e98

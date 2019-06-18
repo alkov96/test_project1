@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 @PageEntry(title = "Новости")
 public class NewsPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(NewsPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='g-row newslist']")
     private WebElement newslist;
 
     public NewsPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(newslist));
     }
@@ -51,7 +51,6 @@ public class NewsPage extends AbstractPage {
 
     @ActionTitle("проверяет наличие дайжеста новостей на имеющихся вкладках")
     public void checksForNewsDigestsOnExistingTabs(){
-        WebDriver driver = PageFactory.getDriver();
         String xpathTabs = "//div/a[contains(@class,'newslist-categories')]";
         String xpathButtonMore = "//div[contains(@class,'categories__add-box')]";
         String xpathDigests = "//a[contains(@class,'newslist__title')]";
@@ -81,6 +80,5 @@ public class NewsPage extends AbstractPage {
             // Так-как элементы перерисовываются
             tabsNews = driver.findElements(By.xpath(xpathTabs));
         }
-
     }
 }

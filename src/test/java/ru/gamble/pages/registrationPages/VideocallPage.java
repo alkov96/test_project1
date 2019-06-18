@@ -17,6 +17,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Видеозвонок")
 public class VideocallPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(INNorSNILSPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//*[text()='Видеозвонок']")
     private WebElement pageTitle;
@@ -25,9 +26,7 @@ public class VideocallPage extends AbstractPage {
     @FindBy(id = "continue-registration")
     private WebElement continueRegistrtationButton;
 
-
     public VideocallPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }

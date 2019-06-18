@@ -8,7 +8,8 @@
     "USER": "testingsto+86@mail.ru",
     "USER_CHROME": "testingsto+86@mail.ru",
     "USER_FIREFOX": "user_for_firefox@mailinator.com",
-    "PASSWORD": "Acer0808",
+    "PASSWORD": "Acer0808!",
+    "PASSWORD_TSUPIS": "Acer0808",
     "PASS": "Parol123",
     "PHONE": "79088767878",
     "PHONE_FIREFOX": "70010020701",
@@ -29,6 +30,7 @@
     "USER_CHROME": "ironman@mailinator.com",
     "USER_FIREFOX": "new_firefox@mailinator.com",
     "PASSWORD": "Acer0808",
+    "PASSWORD_TSUPIS": "Acer0808",
     "PASS": "Parol123",
     "PHONE":"70010020718",
     "PHONE_FIREFOX": "70010020704",
@@ -38,7 +40,8 @@
       "DB_URL": "jdbc:mysql://main-demo.wd.orglot.office:3306",
       "DB_USER": "stoloto_main",
       "DB_PASSWORD": "lizByr4WO#"
-    }
+    },
+    "SWAGGER":"http://192.168.11.6"
   },
   "TEST_INT": {
     "MAIN_URL": "https://test-int-bet-site1.tsed.orglot.office",
@@ -46,6 +49,7 @@
     "REGISTRATION_URL": "https://test-int-bet-site1.tsed.orglot.office/test_registration/",
     "USER": "testregistrator+71110023368@inbox.ru",
     "PASSWORD": "Acer0808",
+    "PASSWORD_TSUPIS": "Acer0808",
     "PASS": "Parol123",
     "MERCHANT":"favorit_test_int",
     "WS_SWARM":"wss://swarm-int.betfavorit.cf:8443/",
@@ -53,7 +57,8 @@
       "DB_URL": "jdbc:mysql://test-int-bet-dbproc.tsed.orglot.office:3306",
       "DB_USER": "gamebet_dml",
       "DB_PASSWORD": "kahcheezao6fa=hfai3Ae"
-    }
+    },
+    "SWAGGER":"http://192.168.14.100"
   },
     "DEV_GAMEBET": {
       "ESB_URL": "http://dev-bet-esb.dev.bet.orglot.office:8660",
@@ -64,7 +69,8 @@
       "USER": "testingsto+86@mail.ru",
       "USER_CHROME": "testingsto+86@mail.ru",
       "USER_FIREFOX": "user_for_firefox@mailinator.com",
-      "PASSWORD": "Acer0808",
+      "PASSWORD": "Acer0808!",
+      "PASSWORD_TSUPIS": "Acer0808",
       "PASS": "Parol123",
       "PHONE": "79088767878",
       "PHONE_FIREFOX": "70010020701",
@@ -74,19 +80,21 @@
         "DB_URL": "jdbc:mysql://dev-bet-dbproc.dev.bet.orglot.office:3306",
         "DB_USER": "webdev_user",
         "DB_PASSWORD": "hahmuKoC8cha4Poo"
-      }
+      },
+      "SWAGGER":"http://192.168.11.4"
     },
 
   "TEST-FUNC": {
     "MAIN_URL": "https://test-func.gamebet.ru",
     "MOBILE_URL": "https://test-func-mobile.gamebet.ru",
     "ESB_URL": "http://test-func-bet-dbproca.tsed.orglot.office:8660",
-    "ADMIN_URL": "http://test-func-bet-dbproca.dev.bet.orglot.office/admin",
+    "ADMIN_URL": "http://test-func-bet-dbproca.tsed.orglot.office/admin",
     "REGISTRATION_URL": "https://test-func-bet-site.tsed.orglot.office/test_registration",
     "USER": "chrome-test-shmest@mailinator.com",
     "USER_CHROME": "chrome-test-shmest@mailinator.com",
     "USER_FIREFOX": "user_for_firefox@mailinator.com",
-    "PASSWORD": "Acer0808",
+    "PASSWORD": "Acer0808!",
+    "PASSWORD_TSUPIS": "Acer0808",
     "PASS": "Parol123",
     "PHONE": "73330018162",
     "PHONE_FIREFOX": "70010020701",
@@ -96,6 +104,7 @@
       "DB_URL": "jdbc:mysql://test-func-bet-dbproc.tsed.orglot.office:3306",
       "DB_USER": "gamebet_test",
       "DB_PASSWORD": "hRFhiFGDpf9qosY4"
-    }
+    },
+    "SWAGGER":"http://192.168.11.2"
   }
 }

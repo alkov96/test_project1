@@ -20,12 +20,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Статистика")
 public class StatisticPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(StatisticPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
-    @FindBy(xpath = "//div[@class='large-12 iblock columns']")
+    @FindBy(xpath = "//li[normalize-space(@class)='menuitem' and normalize-space(text())='Домашняя']")
     private WebElement iblock;
 
     public StatisticPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(iblock));
     }

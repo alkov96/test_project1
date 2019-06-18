@@ -20,12 +20,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Как пополнить баланс")
 public class HowToFillBalancePage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(HowToFillBalancePage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//b[text()='Пополнение баланса']")
     private WebElement header;
 
     public HowToFillBalancePage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
     }

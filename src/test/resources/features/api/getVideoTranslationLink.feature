@@ -24,7 +24,8 @@
 
     * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
 
-    * запрос к API "api/mobile/v4/getVideoTranslationList" и сохраняем в "RESPONCE_API"
+    * запрос к API "api/mobile/v4/getVideoTranslationList" и сохраняем в "RESPONCE_API":
+    |||
 
     * находим и сохраняем "DATA" из "RESPONCE_API"
 

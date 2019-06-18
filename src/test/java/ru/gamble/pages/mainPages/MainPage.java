@@ -38,6 +38,7 @@ import static ru.gamble.utility.Constants.DIRECTION;
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(MainPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[contains(@class,'main-slider__wrapper')]")
     private WebElement slider;
@@ -76,7 +77,6 @@ public class MainPage extends AbstractPage {
     private WebElement announceButton;
 
     public MainPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(By.xpath("//div[contains(@class,'main-slider__wrapper')]"),3, 5);
         workWithPreloader();
@@ -94,7 +94,6 @@ public class MainPage extends AbstractPage {
                 break;
         }
 
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         CommonStepDefs.waitOfPreloader();
@@ -124,7 +123,6 @@ public class MainPage extends AbstractPage {
      */
     @ActionTitle("ищет игру на БТ")
     public  void searchVideoGameBT(String param){
-        WebDriver driver = PageFactory.getDriver();
         boolean haveButton = param.equals("с кнопкой Смотреть");
         String ngclick;
         List<WebElement> games;
@@ -158,7 +156,7 @@ public class MainPage extends AbstractPage {
             games = driver.findElements(By.xpath("//div[@class='bets-widget nearestBroadcasts']/div[2]/div[1]/table[1]/tbody/tr/td[position()=1 and @ng-click]"));
             haveButton = !haveButton;
         }else {
-            LOG.info("Игра " + param + " найдена ");
+            LOG.info("Игра " + param + " найдена: " + games.get(0).getAttribute("innerText") + games.get(0).findElement(By.xpath("ancestor::tr")).getAttribute("inenrText"));
         }
         Stash.put("gameBT",games.get(0).findElement(By.xpath("ancestor::tr")));
         Stash.put("haveButtonKey",haveButton);
@@ -167,14 +165,13 @@ public class MainPage extends AbstractPage {
     //переходит на игру нажатием на название первой команды в виджете
     @ActionTitle("переходит на игру из виджета БТ")
     public void lala(){
-        WebDriver driver = PageFactory.getDriver();
         WebElement selectGame = Stash.getValue("gameBT");
         //запоминаем названия команд
         String team1 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).getAttribute("title").trim();
         String team2 = selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who2')]/div[1]")).getAttribute("title").trim();
         String sportName = selectGame.findElement(By.xpath("ancestor::div[contains(@class,'bets-widget-table__inner active')]")).getAttribute("class").split("active-")[1].toLowerCase();
         LOG.info("Игра, на которой будем проверять переход из виджета БТ: " + team1 + " - " + team2 + ". Спорт - " + sportName);
-        selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]/div[1]")).click();
+        selectGame.findElement(By.xpath("td[contains(@class,'bets-item_who1')]")).click();
         Stash.put("team1BTkey",team1);
         Stash.put("team2BTkey",team2);
         Stash.put("sportKey",sportName);
@@ -204,7 +201,6 @@ public class MainPage extends AbstractPage {
                 path = "//div[contains(@class,'nearestBroadcasts')]";
                 break;
         }
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> games;
         List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете
         int number = 0;
@@ -242,7 +238,6 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("осуществляет переход на страницу, проверяет, что открылась нужная страница")
     public void widgetsOnMain(){
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> attr = driver.findElements(By.xpath("//div[@class='benef__item']/a"));
         for (WebElement element : attr) {
             String link = element.getAttribute("href");
@@ -264,7 +259,6 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("ищет доступные коэффиценты на Главной")
     public void findAvailableCoef() {
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> coeff = driver.findElements(By.cssSelector("div.bets-widget-table__link"));
             if (coeff.size() == 0) {
                 LOG.error("Нет доступных коэффициентов в разделе 'Горячие ставки'");
@@ -281,16 +275,15 @@ public class MainPage extends AbstractPage {
     }
     @ActionTitle("переходит в настройки и меняет коэффицент на Главной")
     public void changePreferencesCoeff() throws InterruptedException {
-        WebDriver driver = PageFactory.getDriver();
         LOG.info("переходит в настройки и меняет коэффицент");
         preferences.click();
         String previous;
-        List<WebElement> list = driver.findElements(By.cssSelector("span.prefs__key"));
+        List<WebElement> list = driver.findElements(By.xpath("//li[contains(@class,'prefs__li_opt')]/span[contains(@class,'prefs__val')]/preceding-sibling::span[contains(@class,'prefs__key')]"));
         WebElement coeff = Stash.getValue("coeffKey");
-        for (int i = 1; i < 6; i++) {
+        for (int i = list.size()-1; i >0; i--) {
             previous = coeff.getAttribute("innerText");
-            LOG.info("Переключаемся на '" + list.get((i*3)%7-1).getAttribute("innerText") + "' формат отображения"); // рандомно берёт 1 тип из 6
-            list.get((i*3)%7-1).click();
+            LOG.info("Переключаемся на '" + list.get(i).getAttribute("innerText") + "' формат отображения"); // рандомно берёт 1 тип из 6
+            list.get(i).click();
             LOG.info("Текущее значение коэффициента : " + coeff.getAttribute("innerText"));
             Thread.sleep(350);
             if (previous.equals(coeff.getAttribute("innerText"))){
@@ -298,13 +291,12 @@ public class MainPage extends AbstractPage {
                 Assertions.fail("Формат отображения коэффициентов не изменился: " + previous +" " + coeff.getAttribute("innerText"));
             }
         }
-        list.get(0).click();
+       // list.get(0).click();
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
 
     @ActionTitle("проверяет смену цвета точек при нажатии на кнопку c")
     public void checksChangeColorDotsWhenButtonPressed(DataTable dataTable){
-        WebDriver driver = PageFactory.getWebDriver();
         List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
         String direction, buttonName;
 
@@ -365,9 +357,8 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("ищет подходящий спорт в Горячих ставках")
     public void findSportHB(){
-        WebDriver driver = PageFactory.getDriver();
-        WebDriverWait wait = new WebDriverWait(driver,10);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        WebDriverWait wait = new WebDriverWait(driver,15);
+        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
         List<String> sportsLanding = new ArrayList<>();
         driver.findElements(By.xpath("//div[@class='footer6__block footer6__block-forecast']//a[@class='f_menu-link']")).forEach(element->
@@ -378,7 +369,7 @@ public class MainPage extends AbstractPage {
         int index = -1;
         for (WebElement sport : allSport){
             //index = sportsLanding.indexOf(sport.getAttribute("title").toLowerCase().trim());
-            for (String subSportName: allSport.get(0).getAttribute("title").toLowerCase().trim().split(" ")){
+            for (String subSportName: sport.getAttribute("title").toLowerCase().trim().split(" ")){
                 index = sportsLanding.indexOf(subSportName);
                 if (index!=-1) break;
             }
@@ -399,7 +390,6 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("переходит на лендинг вида спорта")
     public void openLandingSport(){
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver,10);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         int index=0;
@@ -420,9 +410,7 @@ public class MainPage extends AbstractPage {
 
     @ActionTitle("переходит на игру из Горячих ставок со ставкой Исход и запоминает id игры")
     public void goToGameFromHBandRememberID(String keyGameId){
-
         String path = "//div[contains(@class,'lastMinutesBets')]";
-        WebDriver driver = PageFactory.getDriver();
         List<WebElement> games;
         List<WebElement> allSport = driver.findElements(By.xpath(path + "//li[contains(@class,'sport-tabs__item')]"));//все вид спортов на виджете
         int number = 0;

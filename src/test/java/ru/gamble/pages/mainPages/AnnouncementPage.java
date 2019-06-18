@@ -23,19 +23,18 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @PageEntry(title = "Анонсы")
 public class AnnouncementPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(AnnouncementPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='g-text-container']//h1")
     private WebElement pageTitle;
 
     public AnnouncementPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
 
     @ActionTitle("проверяет наличие анонсов")
     public void checksForAnnouncements(){
-        WebDriver driver = PageFactory.getDriver();
         String xpathDigests = "//a[contains(@class,'newslist__title')]";
         String actualText;
 

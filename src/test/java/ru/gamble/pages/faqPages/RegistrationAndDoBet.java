@@ -20,12 +20,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Регистрация и заключение пари")
 public class RegistrationAndDoBet extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationAndDoBet.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//h1[contains(text(), 'Регистрация и')]")
     private WebElement header;
 
     public RegistrationAndDoBet() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
     }

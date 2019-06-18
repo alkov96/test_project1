@@ -4,6 +4,8 @@
   @bad
   @regress
   @ChangeTypeOfCoefficientCoupon_C1066
+  @coupon
+
   Сценарий: Изменение типа отображения коэффицентов в купоне
 
     * разлогиниваем пользователя

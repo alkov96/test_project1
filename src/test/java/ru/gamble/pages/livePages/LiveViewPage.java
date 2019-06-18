@@ -18,12 +18,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Лайв-обзор")
 public class LiveViewPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(LiveViewPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='centr-market-contain']")
     private WebElement pageTitle;
 
     public LiveViewPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(pageTitle,10, 5);
     }

@@ -7,21 +7,21 @@
     * сохраняем в память
       | PASSWORD  | Default |
     * сохраняем в память
-      | ISSUEPLACER  | random |
+      | ISSUEPLACE  | random |
     * сохраняем в память
-      | CITYR  | random |
+      | CITY  | random |
     * сохраняем в память
-      | STREETR  | random |
+      | STREET  | random |
     * сохраняем в память
-      | BIRTHPLACER | random |
+      | BIRTHPLACE | random |
     * сохраняем в память
-      | HOUSER  | randomNumber 2 |
+      | HOUSE  | randomNumber 2 |
     * сохраняем в память
-      | DOCNUMR  | randomNumber 6 |
+      | DOCNUM  | randomNumber 6 |
     * сохраняем в память
-      | DOCSERIESR  | randomNumber 4 |
+      | DOCSERIES  | randomNumber 4 |
     * сохраняем в память
-      | FLATR  | randomNumber 2 |
+      | FLAT  | randomNumber 2 |
     * сохраняем в память
       | GENDER | randomSex |
     * сохраняем в память
@@ -127,8 +127,8 @@
   @correct
   Сценарий: Проверка доступных способов вывода пользователя, вводившего ПД, но не совпавшие с данными из ЦУПИС(full,alternative)
 
-    * поиск пользователя проходившего ускоренную регистрацию "ALLROWS"
-
+    * поиск пользователя проходившего ускоренную регистрацию "EMAIL"
+    * запоминаем дату рождения пользователя "BIRTHDATE" "EMAIL"
     * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
 
     * обновляем поля в БД для пользователя "EMAIL":
@@ -159,18 +159,18 @@
 
     * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
       | gender                  | GENDER          |
-      | birthplace              | BIRTHPLACER      |
+      | birthplace              | BIRTHPLACE      |
       | region                  | Москва           |
-      | locality                | CITYR            |
-      | street                  | STREETR          |
-      | house                   | HOUSER           |
+      | locality                | CITY            |
+      | street                  | STREET          |
+      | house                   | HOUSE           |
       | construction            |                  |
       | housing                 |                  |
-      | flat                    | FLATR            |
-      | docNum                  | DOCNUMR          |
-      | docSeries               | DOCSERIESR       |
+      | flat                    | FLAT            |
+      | docNum                  | DOCNUM          |
+      | docSeries               | DOCSERIES       |
       | issueDate               | VALIDISSUEDATE       |
-      | issuePlace              | ISSUEPLACER      |
+      | issuePlace              | ISSUEPLACE      |
       | codePlace               | 123-456          |
 
 
@@ -295,5 +295,82 @@
     * проверка ответа API из "RESPONCE_API":
       | exepted     | "code":0 |
 
+
+  @api
+  @canWithdraw
+  @correct
+  Сценарий: Проверка доступных способов вывода пользователя full,alternative ver8
+
+    * поиск пользователя проходившего ускоренную регистрацию "EMAIL"
+    * запоминаем дату рождения пользователя "BIRTHDATE" "EMAIL"
+
+    * определяем валидную и невалидную дату выдачи паспорта "VALIDISSUEDATE" "INVALIDISSUEDATE"
+
+    * обновляем поля в БД для пользователя "EMAIL":
+      | registration_stage_id         | 2             |
+
+    * запрос к API "api/mobile/v3/login" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | email       | EMAIL |
+      | pass        | PASSWORD  |
+      | source      | 16    |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * находим и сохраняем "AUTHTOKEN" из "RESPONCE_API"
+
+    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID     |
+      | authToken   | AUTHTOKEN |
+      | source      | 16        |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "withdrawStatus":1 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * добавляем данные в JSON объект "PERSONALDATA" сохраняем в память:
+      | gender                  | GENDER           |
+      | birthplace              | BIRTHPLACE       |
+      | region                  | Москва           |
+      | locality                | CITY             |
+      | street                  | STREET           |
+      | house                   | HOUSE            |
+      | construction            |                  |
+      | housing                 |                  |
+      | flat                    | FLAT             |
+      | docNum                  | DOCNUM           |
+      | docSeries               | DOCSERIES        |
+      | issueDate               | VALIDISSUEDATE   |
+      | issuePlace              | ISSUEPLACE       |
+      | codePlace               | 123-456          |
+      | citizenship             | rus              |
+      | docType                 | 1                |
+      | middleName              | PARONIMYC       |
+      | name                    | FIRSTNAME        |
+      | surname                 | LASTNAME          |
+      | regionKLADR             | 77               |
+
+
+
+    * запрос к API "api/mobile/v8/submitAndCheckPersonalData" и сохраняем в "RESPONCE_API":
+      | devId                   | DEVID            |
+      | authToken               | AUTHTOKEN        |
+      | source                  | 16               |
+      | personalData            | PERSONALDATA     |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
+
+    * запрос к API "api/mobile/v3/canWithdraw" и сохраняем в "RESPONCE_API":
+      | devId       | DEVID |
+      | authToken   | AUTHTOKEN |
+      | source      | 16 |
+
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "withdrawStatus":2 |
+    * проверка ответа API из "RESPONCE_API":
+      | exepted     | "code":0 |
 
 

@@ -27,12 +27,12 @@ import java.util.concurrent.TimeUnit;
 @PageEntry(title = "Лэндинг спорта")
 public class LandingSport extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(LandingSport.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//h1[contains(@class,'landing-sports-section__h')]")
     private WebElement header;
 
     public LandingSport() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
     }
@@ -40,7 +40,6 @@ public class LandingSport extends AbstractPage {
 
     @ActionTitle("проверяет наличие на станице лендинга блока Горячие ставки")
     public void checkHBandAdd() {
-        WebDriver driver = PageFactory.getDriver();
         WebDriverWait wait = new WebDriverWait(driver, 15);
         driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
         //смотрим что есть заголовок Горячие ставки
@@ -63,7 +62,6 @@ public class LandingSport extends AbstractPage {
 
     @ActionTitle("добавляет игру в купон со страницы лендинга, с блока Горячие ставки")
     public void AddBetToCoupon(DataTable dataTable){
-        WebDriver driver = PageFactory.getDriver();
         List<String> table = dataTable.asList(String.class);
         String team1key = table.get(0);
         String team2key = table.get(1);
@@ -85,7 +83,6 @@ public class LandingSport extends AbstractPage {
 
     @ActionTitle("прощелкивает все виды спорта лэндинга")
     public void checkkAllSportsInLanding(){
-        WebDriver driver = PageFactory.getDriver();
         String nameSport;
         String hrefSport;
         WebDriverWait wait = new WebDriverWait(driver,10);

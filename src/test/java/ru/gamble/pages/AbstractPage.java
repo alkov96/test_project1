@@ -2,7 +2,6 @@ package ru.gamble.pages;
 
 import cucumber.api.DataTable;
 import cucumber.api.Scenario;
-import cucumber.api.java.ru.Когда;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
@@ -15,12 +14,12 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.stepdefs.CommonStepDefs;
 import ru.gamble.utility.Generators;
 import ru.gamble.utility.JsonLoader;
 import ru.gamble.utility.YandexPostman;
 import ru.sbtqa.tag.datajack.Stash;
-import ru.sbtqa.tag.datajack.exceptions.DataException;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
 import ru.sbtqa.tag.pagefactory.annotations.ActionTitle;
@@ -47,7 +46,9 @@ public abstract class AbstractPage extends Page{
 
     public static By xpathListBets = xpath("//div[contains(@class,'coupon-bet') and not(contains(@class,'coupon-bet_offer'))]/ul");
 
-    public static By preloaderOnPage = By.xpath("//div[contains(@class,'preloader__container')]");
+    public static By preloaderOnPage = By.xpath("//div[contains(@class,'preloader__container') and not(contains(@class,'hide'))]");
+    static WebDriver driver = PageFactory.getDriver();
+
 
     @ElementTitle("Вход")
     @FindBy(id = "log-in")
@@ -65,17 +66,11 @@ public abstract class AbstractPage extends Page{
     @FindBy(id = "service-list")
     protected WebElement burgerBottom;
 
-    @ElementTitle("День")
-    @FindBy(className = "inpD")
-    protected WebElement fieldDay;
+    protected String fieldDay = "//*[@class='inpD']";
 
-    @ElementTitle("Месяц")
-    @FindBy(xpath = "//div[contains(@class,'dateInput')]/div[@class='inpM']")
-    protected WebElement fieldMonth;
+    protected String fieldMonth = "//div[contains(@class,'dateInput')]/div[@class='inpM']";
 
-    @ElementTitle("Год")
-    @FindBy(className = "inpY")
-    protected WebElement fieldYear;
+    protected String fieldYear = "//*[@class='inpY']";
 
     @ElementTitle("Настройки")
     @FindBy(id = "preferences")
@@ -93,9 +88,9 @@ public abstract class AbstractPage extends Page{
 
     @ElementTitle("Очистить всё")
     @FindBy(xpath = "//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']")
-    protected WebElement clearCoupon;
+    protected static WebElement clearCoupon;
 
-    protected By pathToclearCoupon = By.xpath("//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']");
+    public static By pathToclearCoupon = By.xpath("//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']");
 
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg active')]")
@@ -116,6 +111,9 @@ public abstract class AbstractPage extends Page{
     @ElementTitle("Подвал")
     @FindBy (xpath = "//div[@class='footer__pin']")
     private WebElement podval;
+
+    @FindBy(xpath = "//div[contains(@class,'menu-toggler')]")
+    private WebElement expandCollapseMenusButton;
 
 
     @ActionTitle("открывает Избранное")
@@ -203,7 +201,7 @@ public abstract class AbstractPage extends Page{
      * @param key - ключ по которому получаем е-mail из памяти.
      */
     @ActionTitle("завершает регистрацию перейдя по ссылке в")
-    public void endRegistrationByEmailLink(String key) throws InterruptedException {
+    public static void endRegistrationByEmailLink(String key) throws InterruptedException {
         WebDriver driver = getWebDriver();
         String email = Stash.getValue(key);
         String link = "";
@@ -224,11 +222,9 @@ public abstract class AbstractPage extends Page{
             new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
         }
         LOG.info("Переходим по ссылке из e-mail");
+        LOG.info("GO TO LINK");
         driver.get(url + "/registration/email/verify?" + link);
 
-        if(url.contains("mobile")){
-           return;
-        }else {
             LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
             Thread.sleep(5000);
             if (!driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).isDisplayed()) {
@@ -237,8 +233,17 @@ public abstract class AbstractPage extends Page{
             LOG.info("Закрываем уведомление об успешном подтверждении почты");
             driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
         }
-    }
 
+    @ActionTitle("завершает регистрацию перейдя по ссылке для БД")
+    public static void endRegistrationByEmailLinkDB(){
+
+        String url = Stash.getValue("MAIN_URL");
+        String code = Stash.getValue("CODEEMAIL");
+        String userId = Stash.getValue("userIdKey");
+        driver.get(url + "/registration/email/verify?code=" + code + "_" + userId);
+        LOG.info("Закрываем уведомление об успешном подтверждении почты");
+        driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
+    }
     /**
      * Открывает выпадающий список и выбирает оттуда пункт случайным образом
      *
@@ -246,32 +251,37 @@ public abstract class AbstractPage extends Page{
      * @param select - выбираемый пункт меню.
      */
     protected void selectMenu(WebElement element, int select) {
+        new WebDriverWait(driver,10)
+                .until(ExpectedConditions.elementToBeClickable(element.findElement(By.xpath("custom-select"))));
         element.findElement(By.xpath("custom-select")).click();
+        new WebDriverWait(driver,10)
+                .until(ExpectedConditions.elementToBeClickable(element.findElement(By.xpath("custom-select/div[2]/div[contains(.,'" + select + "')]"))));
         element.findElement(By.xpath("custom-select/div[2]/div[contains(.,'" + select + "')]")).click();
     }
     protected void selectMenu(WebElement element) {
         selectMenu(element, 0);
     }
 
-    protected String enterDate(String value) {
+    protected String enterDate(String value,String nameDate) {
         StringBuilder date = new StringBuilder();
         String day, month, year;
             String[] tmp = value.split("-");
             LOG.info("Вводим дату");
-            selectMenu(fieldYear, Integer.parseInt(tmp[0]));
-            selectMenu(fieldMonth, Integer.parseInt(tmp[1]));
-            selectMenu(fieldDay, Integer.parseInt(tmp[2]));
+            selectMenu(driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldYear)), Integer.parseInt(tmp[0]));
+            selectMenu(driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldMonth )), Integer.parseInt(tmp[1]));
+            selectMenu(driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldDay)), Integer.parseInt(tmp[2]));
 
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        day = fieldDay.getAttribute("innerText");
-        month = fieldMonth.getAttribute("innerText");
-        year = fieldYear.getAttribute("innerText");
+        day = driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldDay)).getAttribute("innerText");
+        month = driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldMonth)).getAttribute("innerText");
+        year = driver.findElement(By.xpath("//label[text()='" + nameDate + "']//ancestor-or-self::tr" + fieldYear)).getAttribute("innerText");
         return date.append(year).append("-").append(month).append("-").append(day).toString();
     }
+
 
     /**
      * В выбранном поле вводит один символ и если появляется выпадающий список - выбирает первый пункт из него.
@@ -343,14 +353,15 @@ public abstract class AbstractPage extends Page{
         MatcherAssert.assertThat(false, equalTo(checkCloseServiceMessage(closeServiceMessage)));
     }
 
-    public void fillCouponFinal(int count, String ifForExperss, By findCoeffs) throws InterruptedException {
+    public void fillCouponFinal(int count, String ifForExperss) throws InterruptedException {
+        String findCoeffs = "//div[contains(@class,'livecal-table__coefficient') and not(contains(@class,'no-link'))]";
         if (ifForExperss.equals("correct")) {
             List<WebElement> eventsInCoupon;
             List<WebElement> correctMarkets;
             Thread.sleep(3000);
-            waitForElementPresent(findCoeffs, 10);
-            correctMarkets = getWebDriver().findElements(findCoeffs)
-                    .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) >= 1.260)
+            waitForElementPresent(By.xpath(findCoeffs), 10);
+            correctMarkets = getWebDriver().findElements(By.xpath(findCoeffs))
+                    .stream().filter(e -> e.isDisplayed() && Double.parseDouble(e.getAttribute("innerText")) >= 1.260)
                     .limit(count + 10).collect(Collectors.toList());
             for (WebElement coefficient : correctMarkets) {
                 tryToClick(coefficient);
@@ -365,13 +376,13 @@ public abstract class AbstractPage extends Page{
         if (ifForExperss.equals("incorrect")) {
             List<WebElement> eventsInCoupon;
             List<WebElement> inCorrectMarkets = null;
-            waitForElementPresent(findCoeffs, 10);
+            waitForElementPresent(By.xpath(findCoeffs), 10);
             List<WebElement> allDaysPages = PageFactory.getWebDriver().findElements(By.cssSelector("span.livecal-days__weekday.ng-binding"));
             int tryPage = 0;
             int counter = 10;
             do {
                 try {
-                    inCorrectMarkets = getWebDriver().findElements(findCoeffs)
+                    inCorrectMarkets = getWebDriver().findElements(By.xpath(findCoeffs))
                             .stream().filter(e -> e.isDisplayed() && !e.getAttribute("innerText").contains("-") && Double.parseDouble(e.getAttribute("innerText")) < 1.25)
                             .limit(count + 3).collect(Collectors.toList());
                 } catch (StaleElementReferenceException e) {
@@ -468,7 +479,7 @@ public abstract class AbstractPage extends Page{
     }
 
     @ActionTitle("очищает купон")
-    public void clearCoupon(){
+    public static void clearCoupon(){
 //        if (clearCoupon.isDisplayed()){
 //            clearCoupon.click();
 //        }
@@ -595,74 +606,21 @@ public abstract class AbstractPage extends Page{
         } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
 
         LOG.info("Копируем смс-код для подтверждения телефона");
-
-        //Начало кода для получения СМС
-        String currentHandle = driver.getWindowHandle();
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-
-        String registrationUrl = "";
+        String code = CommonStepDefs.getSMSCode(phone);
 
         try {
-            registrationUrl =  JsonLoader.getData().get(STARTING_URL).get("REGISTRATION_URL").getValue();
-        } catch (DataException e) {
-            LOG.error(e.getMessage());
+            new WebDriverWait(driver, 70).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
+        }catch (Exception e){
+            e.getMessage();
+            throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
         }
 
-        js.executeScript("registration_window = window.open('" + registrationUrl + "')");
+        LOG.info("Вводим SMS-код::" + code);
+        fillField(cellFoneConformationInput,code);
 
-        Set<String> windows = driver.getWindowHandles();
-        windows.remove(currentHandle);
-        String newWindow = windows.toArray()[0].toString();
-
-        driver.switchTo().window(newWindow);
-
-        String xpath = "//li/a[contains(text(),'" + phone + "')]";
-        WebElement numberSring = null;
-        int x = 0;
-
-        LOG.info("Пытаемся найти код подтверждения телефона");
-        for(int y = 0; y < 5; y++) {
-
-            try {
-                LOG.info("Ожидаем 2 сек. для сервера TEST_INT");
-                Thread.sleep(2000);
-                new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h3[contains(text(),'Статус регистрации пользователя')]")));
-                if (driver.findElements(By.xpath(xpath)).isEmpty()){
-                    driver.navigate().refresh();
-                }
-                else {
-                    numberSring = driver.findElements(By.xpath(xpath)).get(0);
-                    break;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            x++;
-        }
-
-        if(numberSring != null && !numberSring.getAttribute("innerText").isEmpty()) {
-            String code = numberSring.getAttribute("innerText").split(" - ")[1];
-            driver.switchTo().window(currentHandle);
-            js.executeScript("registration_window.close()");
-
-            try {
-                new WebDriverWait(driver, 70).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
-            }catch (Exception e){
-                e.getMessage();
-                throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
-            }
-
-            LOG.info("Вводим SMS-код::" + code);
-            fillField(cellFoneConformationInput,code);
-
-            Stash.put("PHONE_NUMBER",phone ) ;
-            LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
-        }else {
-            throw new AutotestError("Ошибка! SMS-код не найден.[" + x + "] раз обновили страницу [" + driver.getCurrentUrl() + "] не найдя номер[" +  phone + "]");
-        }
-
+        Stash.put("PHONE_NUMBER",phone ) ;
+        LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
     }
-
 
     @ActionTitle("нажимает в поле ввода")
     public void clickInputField(String inputFieldName) {
@@ -713,10 +671,28 @@ public abstract class AbstractPage extends Page{
      */
     public void closeSports(){
         WebDriver driver = PageFactory.getDriver();
-        if (driver.findElement(By.id("sports-toggler-opened")).isDisplayed()){
-            driver.findElement(By.id("sports-toggler-opened")).click();
-        }else if (driver.findElement(By.id("sports-toggler")).isDisplayed()){
-            driver.findElement(By.id("sports-toggler")).click();
+        if (!driver.findElement(By.id("sports-toggler")).getAttribute("class").contains("hide")){
+            clickIfVisible(driver.findElement(By.id("sports-toggler")));
+        }
+
+    }
+
+    public void clickIfVisible(WebElement element){
+        checkMenuIsOpen(true);
+        new WebDriverWait(PageFactory.getDriver(),10)
+                .withMessage("Левое меню не развернулось")
+                .until(ExpectedConditions.attributeContains(expandCollapseMenusButton,"class","collapsed"));
+        element.click();
+    }
+
+    /**
+     * открытие/закрытие левого меню
+     * @param openorclose = true - если нужно открыть. false - если нужно закрыть
+     */
+    public void checkMenuIsOpen(boolean openorclose){
+        if(expandCollapseMenusButton.getAttribute("class").contains("collapsed")!=openorclose){
+            expandCollapseMenusButton.click();
+            workWithPreloader();
         }
     }
 
@@ -732,10 +708,10 @@ public abstract class AbstractPage extends Page{
         if (menu.getAttribute("class").contains("collapsed")!=collapsOrNot){
             menu.click();
             CommonStepDefs.workWithPreloader();
-            if (!driver.findElements(preloaderOnPage).isEmpty()){
-                driver.navigate().refresh();
-                CommonStepDefs.workWithPreloader();
-            }
+//            if (!driver.findElements(preloaderOnPage).isEmpty()){
+//                driver.navigate().refresh();
+//                CommonStepDefs.workWithPreloader();
+//            }
         }
 
         if (collapsOrNot) {
@@ -760,7 +736,7 @@ public abstract class AbstractPage extends Page{
             phone = browserName.contains("chrome") ?
                     JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue() :
                     JsonLoader.getData().get(STARTING_URL).get("PHONE_FIREFOX").getValue();
-            password = JsonLoader.getData().get(STARTING_URL).get("PASSWORD").getValue();
+            password = JsonLoader.getData().get(STARTING_URL).get("PASSWORD_TSUPIS").getValue();
 
             LOG.info("Пытаемся найти поле для ввода номера телефона по id[form_login_phone]");
             new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("form_login_phone")));
@@ -771,7 +747,7 @@ public abstract class AbstractPage extends Page{
         LOG.info("Перешли на страницу [" + driver.getCurrentUrl() + "]");
 
         WebElement inputPhone = driver.findElement(By.id("form_login_phone"));
-        WebElement inputPassword = driver.findElement(By.id("form_login_password"));
+        WebElement inputPassword = driver.findElement(By.name("password"));
 
         slowFillField(inputPhone, phone, 250);
         String actual = inputPhone.getAttribute("value").replaceAll("\\D","");
@@ -854,8 +830,8 @@ public abstract class AbstractPage extends Page{
         driver.findElement(By.xpath("//*[contains(@value,'"+table.get("button")+"')]")).click();
         value = table.get("textis");
         new WebDriverWait(driver,10).until(attributeContains(By.xpath("//body"),"innerText",value));
-        driver.close();
-        driver.quit();
+//        driver.close();
+//        driver.quit();
     }
 
 

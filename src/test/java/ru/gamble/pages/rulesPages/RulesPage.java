@@ -24,6 +24,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 @PageEntry(title = "Основные положения")
 public class RulesPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(RulesPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//span[@class='static-menu__link static-menu__link_active']")
     private WebElement header;
@@ -35,7 +36,6 @@ public class RulesPage extends AbstractPage {
     }
 
     public RulesPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
     }

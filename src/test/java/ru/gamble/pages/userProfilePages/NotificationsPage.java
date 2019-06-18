@@ -22,12 +22,12 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "Настройка уведомлений")
 public class NotificationsPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationsPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='user-profile__tab-wraper ng-scope']")
     private WebElement tabWraper;
 
     public NotificationsPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(tabWraper));

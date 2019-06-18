@@ -51,6 +51,16 @@ public class Generators {
     }
 
     /**
+     * Случайная строка 16-го числа
+     *
+     * @return возвращает получившуюся строку
+     */
+    public static String randomStringHex() {
+
+        return Long.toHexString(Double.doubleToLongBits(Math.random())).substring(0,12);
+    }
+
+    /**
      * @return Возвращает случайно строку с полом Мужским или Женским
      */
     public static String randomSex(){
@@ -71,7 +81,7 @@ public class Generators {
      */
     @ActionTitle("генерит email в")
     public void generateEmailAndSave(String key){
-        String value = "testregistrator+" + System.currentTimeMillis() + "@inbox.ru";
+        String value = "testregistrator" + System.currentTimeMillis() + "@mailinator.com";
         LOG.info("Сохраняем в память (ключ):" + key + ":(значение)::" + value);
         Stash.put(key,value);
     }

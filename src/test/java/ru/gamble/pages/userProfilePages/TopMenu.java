@@ -23,6 +23,7 @@ import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
 @PageEntry(title = "верхнее меню")
 public class TopMenu extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(TopMenu.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='user-profile__tabs clearfix']")
     private WebElement topMenu;
@@ -48,7 +49,6 @@ public class TopMenu extends AbstractPage {
     private WebElement notificationsButton;
 
     public TopMenu() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         workWithPreloader();
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(topMenu));

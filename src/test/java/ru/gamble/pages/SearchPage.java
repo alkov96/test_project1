@@ -32,12 +32,12 @@ import static ru.gamble.stepdefs.CommonStepDefs.stringParse;
 @PageEntry(title = "Поиск в левом меню")
 public class SearchPage extends AbstractPage{
     private static final Logger LOG = LoggerFactory.getLogger(EventViewerPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(id = "search-bar")
     private WebElement searchField;
 
     public SearchPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(PageFactory.getDriver(), 10).until(ExpectedConditions.elementToBeClickable(searchField));
 
@@ -59,7 +59,6 @@ public class SearchPage extends AbstractPage{
      * @throws Exception
      */
     public int checkTypeGameOnSearch(int numberRes) {
-        WebDriver driver = PageFactory.getDriver();
         int typeGame;//1-live; 0-prematch
         new WebDriverWait(driver,15)
                 .withMessage("Нет вообще никаких результатов поиска. Ни правильнх, ни неправильных")
@@ -118,8 +117,6 @@ public class SearchPage extends AbstractPage{
 
     @ActionTitle("ищет игру в результатах поиска")
     public void searchByName (String type, String keyIndex) {
-
-
         int number = searchByNameStep(type,0);
         LOG.info("В результатх поиска нужная игра на позиции " + number);
         Stash.put(keyIndex,number); //в стэш положим порядковый номер результата в поиске, по которому нужная игра
@@ -132,7 +129,6 @@ public class SearchPage extends AbstractPage{
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
-        WebDriver driver = PageFactory.getDriver();
         waitForElementPresent(xpath("//dl[contains(@class,'search-result-item')]/dd"),10);
         int typeGame = type.contains("Live")?1:0;
         List<WebElement> searchResult = driver.findElements(xpath("//dl[contains(@class,'search-result-item')]/dd"));//список игр в результате поиска
@@ -180,7 +176,6 @@ public class SearchPage extends AbstractPage{
 
     @ActionTitle("выбирает пункт из результата поиска")
     public void clickOnResultSearchByIndex(String keyIndex){
-        WebDriver driver = PageFactory.getDriver();
         int index = Stash.getValue(keyIndex);
         driver.findElements(xpath("//dl[contains(@class,'search-result-item')]/dd")).get(index).click();
         LOG.info("Нажимаем на пункт " + (index+1) + " в результатх поиска");
@@ -203,7 +198,7 @@ public class SearchPage extends AbstractPage{
                 Assert.assertTrue("Неполадки при переходе на лайв-игру",VewingEventsPage.pageLive(gameName,  false,false));
                 break;
             case "PrematchVnePeriod":
-                Assert.assertTrue("Неполадки при переходе на прематч-игру",EventViewerPage.pagePrematch(gameName, "Любое время",false));
+                Assert.assertTrue("Неполадки при переходе на прематч-игру",EventViewerPage.pagePrematch(gameName, "Выберите время",false));
                 break;
             case "PrematchInPeriod":
                 Assert.assertTrue("Неполадки при переходе на прематч-игру",EventViewerPage.pagePrematch(gameName,  "2 часа",false));
@@ -212,9 +207,6 @@ public class SearchPage extends AbstractPage{
                 LOG.error("Непонятно что за игра(с видео или нет). Проверять не буду");
                 break;
         }
-
     }
-
-
 }
 

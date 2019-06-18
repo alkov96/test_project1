@@ -36,6 +36,7 @@ import static ru.gamble.utility.Constants.*;
 @PageEntry(title = "Подвал сайта")
 public class FooterPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(FooterPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//*[contains(@class,'f_logo')]")
     private WebElement pageTitle;
@@ -114,7 +115,6 @@ public class FooterPage extends AbstractPage {
 
 
     public FooterPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(pageTitle));
     }
@@ -129,10 +129,7 @@ public class FooterPage extends AbstractPage {
      * @param xpath - поисковая строка для требуемоего элемента
      */
     public static void opensNewTabAndChecksPresenceOFElement(String linkTitle, String currentHandle, String xpath) {
-        WebDriver driver = PageFactory.getWebDriver();
         String link = "";
-
-
         try {
             Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
             String browserName = caps.getBrowserName();
@@ -178,7 +175,6 @@ public class FooterPage extends AbstractPage {
      * @param xpath - поисковая строка для требуемоего элемента
      */
     public static void goTabAndChecksPresenceOFElement(String linkTitle, String currentHandle, String xpath) {
-        WebDriver driver = PageFactory.getWebDriver();
         WebElement element = null;
         try {
             element = PageFactory.getInstance().getCurrentPage().getElementByTitle(linkTitle);
@@ -196,7 +192,6 @@ public class FooterPage extends AbstractPage {
 
 
     public static void checkPageByText(String xpath){
-        WebDriver driver = PageFactory.getWebDriver();
         List <WebElement> requiredElements;
 
         // Цикл обновления страницы в случае неудачи её прогрузки
@@ -228,7 +223,6 @@ public class FooterPage extends AbstractPage {
 
     @ActionTitle("проверяет что число платёжных систем")
     public void checkNumberPaymentSystem(String number){
- //       WebDriver driver = PageFactory.getWebDriver();
  /*       if (!driver.findElement(By.xpath("//div[contains(@class,'footer_collapsible')]")).getAttribute("class").contains("open")){
             driver.findElement(By.xpath("//div[@class='footer__pin']")).click();
             LOG.info("Футер закрыт, раскроем его");

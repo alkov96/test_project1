@@ -21,12 +21,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "ЦУПИС")
 public class TsupisPage extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(TsupisPage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//h1[text()='ЦУПИС']")
     private WebElement header;
 
     public TsupisPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(header));
     }

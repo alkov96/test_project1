@@ -27,8 +27,8 @@ import java.util.*;
 
 @PageEntry(title = "Главный Баннер")
 public class MainBannerPage extends AbstractPage{
-
     private static final Logger LOG = LoggerFactory.getLogger(ru.gamble.pages.mainPages.LivePage.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @ElementTitle("Точки на галвном баннере")
     @FindBy(xpath = "//div[@class='main-slider__wrapper ng-scope']//ol[@class='flickity-page-dots']")
@@ -38,14 +38,12 @@ public class MainBannerPage extends AbstractPage{
     private WebElement top_banner; //Топ-баннер на главной
 
     public MainBannerPage() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
-        tryingLoadPage(dotsOnBanner,5, 10);
+        tryingLoadPage(top_banner,5, 10);
     }
 
 @ActionTitle("запоминает состояние главного баннера")
 public void rememberPositionSlider(){
-    WebDriver driver = PageFactory.getDriver();
     LOG.info("Запрашиваем положение отображаемого баннера");
     String position = top_banner.getAttribute("style");
     LOG.info("позиция сейчас " + position);
@@ -55,7 +53,6 @@ public void rememberPositionSlider(){
 
 @ActionTitle("сравнивает текущее состояние баннера со старым")
 public void ckeckPositionSlider() {
-    WebDriver driver = PageFactory.getDriver();
     LOG.info("Запрашиваем положение отображаемого баннера");
     String position = top_banner.getAttribute("style");
     LOG.info("позиция новая " + position);
@@ -66,7 +63,6 @@ public void ckeckPositionSlider() {
 
 @ActionTitle("ищет баннер с коэффициентами")
 public void findBannerWithCoeffs(DataTable dataTable){
-    WebDriver driver = PageFactory.getDriver();
     String sep = "%";
     Map<String, String> data = dataTable.asMap(String.class, String.class);
     WebElement activeBanner;
@@ -132,8 +128,5 @@ public void findBannerWithCoeffs(DataTable dataTable){
     new WebDriverWait(driver,10)
             .withMessage("На станице все еще виден главный баннер, значит переход на игру не удался")
             .until(ExpectedConditions.numberOfElementsToBe(By.xpath("//div[contains(@class,'main-slider__wrapper')]"),0));
-
-
-
 }
 }

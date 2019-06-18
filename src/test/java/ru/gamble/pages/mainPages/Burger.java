@@ -22,6 +22,7 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 @PageEntry(title = "Бургер")
 public class Burger extends AbstractPage {
     private static final Logger LOG = LoggerFactory.getLogger(Burger.class);
+    static WebDriver driver = PageFactory.getDriver();
 
     @FindBy(xpath = "//div[@class='subMenuArea subMenuArea_burger subMenuArea_fullwidth active']")
     private WebElement subMenuArea;
@@ -112,7 +113,6 @@ public class Burger extends AbstractPage {
     private WebElement faqBottom;
 
     public Burger() {
-        WebDriver driver = PageFactory.getDriver();
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOf(subMenuArea));
     }
