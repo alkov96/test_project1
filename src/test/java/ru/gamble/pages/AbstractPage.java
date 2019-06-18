@@ -87,10 +87,10 @@ public abstract class AbstractPage extends Page{
     protected WebElement quickBetFlag;
 
     @ElementTitle("Очистить всё")
-    @FindBy(xpath = "//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']")
+    @FindBy(xpath = "//div[contains(@class,'coupon__button-group_bet')]//button[normalize-space(text())='Очистить купон']")
     protected static WebElement clearCoupon;
 
-    public static By pathToclearCoupon = By.xpath("//*[@class='btn btn_full-width' and normalize-space(text())='Очистить купон']");
+    public static By pathToclearCoupon = By.xpath("//div[contains(@class,'coupon__button-group_bet')]//button[normalize-space(text())='Очистить купон']");
 
     @ElementTitle("Сервисное сообщение")
     @FindBy(xpath = "//div[contains(@class,'tech-msg active')]")
