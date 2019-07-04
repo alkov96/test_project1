@@ -1,24 +1,18 @@
 package ru.gamble.pages;
 
-import cucumber.api.DataTable;
-import cucumber.api.Scenario;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
-import org.openqa.selenium.*;
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.gamble.pages.prematchPages.EventViewerPage;
 import ru.gamble.stepdefs.CommonStepDefs;
-import ru.gamble.utility.Generators;
-import ru.gamble.utility.JsonLoader;
-import ru.gamble.utility.YandexPostman;
 import ru.sbtqa.tag.datajack.Stash;
 import ru.sbtqa.tag.pagefactory.Page;
 import ru.sbtqa.tag.pagefactory.PageFactory;
@@ -27,17 +21,15 @@ import ru.sbtqa.tag.pagefactory.annotations.ElementTitle;
 import ru.sbtqa.tag.pagefactory.exceptions.PageException;
 import ru.sbtqa.tag.qautils.errors.AutotestError;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.openqa.selenium.By.xpath;
 import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
-import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.RANDOM;
-import static ru.gamble.utility.Constants.STARTING_URL;
-import static ru.gamble.utility.Generators.randomString;
 import static ru.sbtqa.tag.pagefactory.PageFactory.getWebDriver;
 
 
@@ -151,7 +143,6 @@ public abstract class AbstractPage extends Page{
         String link = page.getElementByTitle(param).getAttribute("href");
         PageFactory.getWebDriver().get(link);
         LOG.info("Получили и перешли по ссылке::" + link);
-        workWithPreloader();
     }
 
     public static void clickElement(final WebElement element) {
@@ -195,44 +186,7 @@ public abstract class AbstractPage extends Page{
         }
     }
 
-    /**
-     * Метод получения письма и перехода по ссылке для завершения регистрации на сайте
-     *
-     * @param key - ключ по которому получаем е-mail из памяти.
-     */
-    @ActionTitle("завершает регистрацию перейдя по ссылке в")
-    public static void endRegistrationByEmailLink(String key) throws InterruptedException {
-        WebDriver driver = getWebDriver();
-        String email = Stash.getValue(key);
-        String link = "";
-        String url = "";
-        Scenario scenario;
-        try {
-            url = Stash.getValue("MAIN_URL");
-            link = YandexPostman.getLinkForAuthentication(email);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new AutotestError("Ошибка! Не смогли получить ссылку для аутентификации.");
-        }
 
-        if(url.contains("mobile")){
-            new WebDriverWait(driver,10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(.,'Продолжить')]")));
-            driver.findElement(By.xpath("//a[contains(.,'Продолжить')]")).click();
-        }else {
-            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Войти')]")));
-        }
-        LOG.info("Переходим по ссылке из e-mail");
-        LOG.info("GO TO LINK");
-        driver.get(url + "/registration/email/verify?" + link);
-
-            LOG.info("Ожидаем диалогового окна с надписью 'Спасибо!'");
-            Thread.sleep(5000);
-            if (!driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).isDisplayed()) {
-                Assert.fail("Ошибка! Не появилось диалоговое окно с надписью 'Спасибо!'");
-            }
-            LOG.info("Закрываем уведомление об успешном подтверждении почты");
-            driver.findElement(By.cssSelector("a.modal__closeBtn.closeBtn")).click();
-        }
 
     @ActionTitle("завершает регистрацию перейдя по ссылке для БД")
     public static void endRegistrationByEmailLinkDB(){
@@ -283,43 +237,8 @@ public abstract class AbstractPage extends Page{
     }
 
 
-    /**
-     * В выбранном поле вводит один символ и если появляется выпадающий список - выбирает первый пункт из него.
-     * Иначе либо заново вводит символ и ждет список, либо заполняет поле рандомной последовательностью
-     *
-     * @param field    - поле, которое заполняем
-     * @param authFill - булев параметр, говорит о том обязательно ли выбирать из списка (true), или можно заполнить рандомом (false)
-     */
-    public void fillAddress(WebElement field, boolean authFill) {
-        WebDriver driver = PageFactory.getWebDriver();
-        List<WebElement> list;
-        int count = 10;
-        do {
-            field.clear();
-            StringBuilder n = new StringBuilder();
-            n.append((char) ('А' + new Random().nextInt(64)));
-            field.sendKeys(n);
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-                list = field.findElements(By.xpath("../ul[1]/li"));
-            count--;
-            if(count<=0){ break;}
-        } while (list.isEmpty() && authFill);
 
-        if (field.findElements(By.xpath("../ul[1]/li")).isEmpty()) {
-            field.clear();
-            field.sendKeys(randomString(20));
-        } else
-            field.findElement(By.xpath("../ul[1]/li[" + (new Random().nextInt(list.size()) + 1) + "]")).click();
 
-        if (field.getAttribute("value").length() == 0) {
-            LOG.info("ОШИБКА. Нажали на пункт в выпадающем списке для города,а знчение не выбралось!!");
-            field.sendKeys(randomString(20));
-        }
-    }
 
     @ActionTitle("проверяет присутствие текста")
     public void checksPresenceOfText(String text) {
@@ -537,145 +456,7 @@ public abstract class AbstractPage extends Page{
         }
     }
 
-    /**
-     * Метод ввода поле номера телефона
-     *
-     * @param value вводимое значение
-     */
-    protected void enterSellphone(String value, WebElement cellFoneInput, WebElement cellFoneConformationInput){
-        WebDriver driver = PageFactory.getWebDriver();
-        String phone;
-        int count = 1;
-        do {
-            if(value.contains(RANDOM)) {
-                phone = "0" + Generators.randomNumber(9);
-                LOG.info("Вводим случайный номер телефона::+7[" + phone + "]");
-                fillField(cellFoneInput,phone);
-            } else {
-                phone = (value.matches("^[A-Z_]+$")) ? Stash.getValue(value) : value;
-                LOG.info("Вводим номер телефона без первой 7-ки [" + phone.substring(1,11) + "]");
-                fillField(cellFoneInput,phone.substring(1,11));
-            }
 
-            LOG.info("Попыток ввести номер::" + count);
-            if (count > 5) {
-                throw new AutotestError("Использовано 5 попыток ввода номера телефона");
-            }
-            ++count;
-
-        } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
-
-
-        LOG.info("Копируем смс-код для подтверждения телефона");
-        try {
-            new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
-        }catch (Exception e){
-            e.getMessage();
-            throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
-        }
-
-        String sQLRequest = "SELECT CODE FROM gamebet.`phoneconfirmationcode` WHERE  phone = '" + phone + "' ORDER BY creation_date DESC LIMIT 1";
-		String code = CommonStepDefs.returnCode(sQLRequest);
-		LOG.info("Вводим SMS-код [" + code + "]");
-		fillField(cellFoneConformationInput,code);
-        Stash.put("PHONE_NUMBER", phone) ;
-        LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
-    }
-
-    protected void enterSellphoneForOrtax(String value, WebElement cellFoneInput, WebElement cellFoneConformationInput){
-        WebDriver driver = PageFactory.getWebDriver();
-        String phone;
-        int count = 1;
-        do {
-            if(value.contains(RANDOM)) {
-                phone = "0" + Generators.randomNumber(9);
-                LOG.info("Вводим случайный номер телефона::+7[" + phone + "]");
-                fillField(cellFoneInput,phone);
-            } else {
-                phone = (value.matches("^[A-Z_]+$")) ? Stash.getValue(value) : value;
-                LOG.info("Вводим номер телефона без первой 7-ки [" + phone.substring(1,11) + "]");
-                fillField(cellFoneInput,phone.substring(1,11));
-            }
-
-            LOG.info("Попыток ввести номер::" + count);
-            if (count > 5) {
-                throw new AutotestError("Использовано 5 попыток ввода номера телефона");
-            }
-            ++count;
-
-        } while (!driver.findElements(By.xpath("//div[contains(@class,'inpErrTextError')]")).isEmpty());
-
-        LOG.info("Копируем смс-код для подтверждения телефона");
-        String code = CommonStepDefs.getSMSCode(phone);
-
-        try {
-            new WebDriverWait(driver, 70).until(ExpectedConditions.visibilityOf(cellFoneConformationInput));
-        }catch (Exception e){
-            e.getMessage();
-            throw new AutotestError("Ошибка! Не появилось окно для ввода SMS");
-        }
-
-        LOG.info("Вводим SMS-код::" + code);
-        fillField(cellFoneConformationInput,code);
-
-        Stash.put("PHONE_NUMBER",phone ) ;
-        LOG.info("Сохранили в память key [PHONE_NUMBER] <== value [" + phone + "]");
-    }
-
-    @ActionTitle("нажимает в поле ввода")
-    public void clickInputField(String inputFieldName) {
-        pressButtonAP(inputFieldName);
-    }
-
-    /**
-     * В выбранном поле вводит один символ и если появляется выпадающий список - выбирает первый пункт из него.
-     * Иначе либо заново вводит символ и ждет список, либо заполняет поле рандомной последовательностью
-     *
-     * @param field    - поле, которое заполняем
-     * @param authFill - булев параметр, говорит о том обязательно ли выбирать из списка (true), или можно заполнить рандомом (false)
-     */
-    public void fillAddressForMobile(WebElement field, boolean authFill) {
-        WebDriver driver = PageFactory.getWebDriver();
-        List<WebElement> list;
-        String xpath = "//div[@class='form-input-menu__item']";
-        int count = 10;
-        do {
-            field.clear();
-            StringBuilder n = new StringBuilder();
-            n.append((char) ('А' + new Random().nextInt(32)));
-            field.sendKeys(n);
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-                list = field.findElements(By.xpath(xpath)).stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-                count--;
-            if(count<=0){ break;}
-        } while (list.isEmpty() && authFill);
-
-        if (field.findElements(By.xpath(xpath)).isEmpty()) {
-            field.clear();
-            field.sendKeys(randomString(20));
-        } else
-            field.findElements(By.xpath(xpath)).get(new Random().nextInt(list.size())).click();
-
-        if (field.getAttribute("value").length() == 0) {
-            LOG.info("ОШИБКА. Нажали на пункт в выпадающем списке для города,а знчение не выбралось!!");
-            field.sendKeys(randomString(20));
-        }
-    }
-
-    /**
-     * сворачивание всех видов спорта
-     */
-    public void closeSports(){
-        WebDriver driver = PageFactory.getDriver();
-        if (!driver.findElement(By.id("sports-toggler")).getAttribute("class").contains("hide")){
-            clickIfVisible(driver.findElement(By.id("sports-toggler")));
-        }
-
-    }
 
     public void clickIfVisible(WebElement element){
         checkMenuIsOpen(true);
@@ -692,7 +473,6 @@ public abstract class AbstractPage extends Page{
     public void checkMenuIsOpen(boolean openorclose){
         if(expandCollapseMenusButton.getAttribute("class").contains("collapsed")!=openorclose){
             expandCollapseMenusButton.click();
-            workWithPreloader();
         }
     }
 
@@ -707,7 +487,6 @@ public abstract class AbstractPage extends Page{
         WebElement menu = driver.findElement(By.id("menu-toggler"));
         if (menu.getAttribute("class").contains("collapsed")!=collapsOrNot){
             menu.click();
-            CommonStepDefs.workWithPreloader();
 //            if (!driver.findElements(preloaderOnPage).isEmpty()){
 //                driver.navigate().refresh();
 //                CommonStepDefs.workWithPreloader();
@@ -722,46 +501,6 @@ public abstract class AbstractPage extends Page{
             wait.withMessage("Не удалось свернуть левое меню");
             wait.until(ExpectedConditions.not(attributeContains(By.id("menu-toggler"), "class", "collapsed")));
         }
-    }
-
-    @ActionTitle("при необходимости логинимся в 'Первый ЦУПИС'")
-    public void loginInTSUPIS(){
-        WebDriver driver = PageFactory.getDriver();
-        goToThisPage("23bet-pay");
-
-        String phone = "", password = "";
-        try {
-            Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
-            String browserName = caps.getBrowserName();
-            phone = browserName.contains("chrome") ?
-                    JsonLoader.getData().get(STARTING_URL).get("PHONE").getValue() :
-                    JsonLoader.getData().get(STARTING_URL).get("PHONE_FIREFOX").getValue();
-            password = JsonLoader.getData().get(STARTING_URL).get("PASSWORD_TSUPIS").getValue();
-
-            LOG.info("Пытаемся найти поле для ввода номера телефона по id[form_login_phone]");
-            new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(By.id("form_login_phone")));
-
-        }catch (Exception e){
-         return;
-        }
-        LOG.info("Перешли на страницу [" + driver.getCurrentUrl() + "]");
-
-        WebElement inputPhone = driver.findElement(By.id("form_login_phone"));
-        WebElement inputPassword = driver.findElement(By.name("password"));
-
-        slowFillField(inputPhone, phone, 250);
-        String actual = inputPhone.getAttribute("value").replaceAll("\\D","");
-        AssertionsForClassTypes.assertThat(actual).as("ОШИБКА! Вводимый номер [" + phone + "] не соответсвует [" + actual + "]").contains(phone);
-        LOG.info("В поле [Телефон] ввели [" + actual  +"]");
-
-        slowFillField(inputPassword, password, 250);
-        LOG.info("В поле [Пароль] ввели [" + password  +"]");
-
-        WebElement buttonEnter = driver.findElement(By.id("btn_authorization_enter"));
-        LOG.info("Нажимаем кнопку [Войти]");
-        buttonEnter.click();
-
-
     }
 
     protected void goToThisPage(String peaceURL){
@@ -794,54 +533,5 @@ public abstract class AbstractPage extends Page{
         }
     }
 
-    @ActionTitle("завершает регу в Евросети с")
-    public void EuroReg(DataTable dataTable){
-        LOG.info("sdf");
-        Map<String,String> table = dataTable.asMap(String.class, String.class);
-        WebDriver driver = Stash.getValue("driver");
-        String key = null;
-        String value = null;
-        String tagField = null;
-        StringBuilder asd = new StringBuilder();
-        WebElement field;
-        int aa = 0;
-        for (Map.Entry<String, String> entry : table.entrySet()) {
-            key=entry.getKey();
-            value = entry.getValue();
-            if (value.matches("[A-Z]*")){
-                value=Stash.getValue(value);
-            }
-
-            if (driver.findElements(By.xpath("//*[contains(text(),'"+key+"')]/following-sibling::*")).isEmpty()){
-                continue;
-            }
-            field = driver.findElements(By.xpath("//*[contains(text(),'"+key+"')]/following-sibling::*")).get(0);
-            tagField = field.getTagName();
-            asd.append(tagField);
-
-            if (tagField.equals("input")) {
-                field.clear();
-                field.sendKeys(value);
-            } else if (tagField.equals("select")) {
-                Select select = new Select(field);
-                select.selectByVisibleText(value);
-            }
-        }
-        driver.findElement(By.xpath("//*[contains(@value,'"+table.get("button")+"')]")).click();
-        value = table.get("textis");
-        new WebDriverWait(driver,10).until(attributeContains(By.xpath("//body"),"innerText",value));
-//        driver.close();
-//        driver.quit();
-    }
-
-
-    @ActionTitle("запоминает смс-код для подтверждения вывода средств")
-    public void rememberSMSforWithdraw(String keyPhone, String keyCode){
-        WebDriver driver = Stash.getValue("driver");
-        LOG.info("Ищем и запоминаем смс-код подтверждения вывода");
-        TestingServicePage.userSearchesForLastSentSMSByNumberAndRemembersIn(keyPhone,keyCode,driver);
-        driver.close();
-        driver.quit();
-    }
 }
 

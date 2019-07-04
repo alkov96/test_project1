@@ -3,7 +3,6 @@ package ru.gamble.pages.mainPages;
 
 import cucumber.api.DataTable;
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -25,15 +24,12 @@ import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static ru.gamble.stepdefs.CommonStepDefs.workWithPreloader;
-import static ru.gamble.utility.Constants.BUTTON;
-import static ru.gamble.utility.Constants.DIRECTION;
+
 
 @PageEntry(title = "Главная страница")
 public class MainPage extends AbstractPage {
@@ -79,7 +75,6 @@ public class MainPage extends AbstractPage {
     public MainPage() {
         PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(driver)), this);
         tryingLoadPage(By.xpath("//div[contains(@class,'main-slider__wrapper')]"),3, 5);
-        workWithPreloader();
     }
 
     @ActionTitle("переключение видов спорта")
@@ -147,7 +142,6 @@ public class MainPage extends AbstractPage {
             if(allSport.get(0).getAttribute("innerText").contains("Подходящих игр не найдено")){throw new AutotestError("Ошибка! Подходящих игр не найденою");}
             allSport.get(number).click();
 
-            CommonStepDefs.workWithPreloader();
 
             number++;
         } while (number <= allSport.size() - 1);
@@ -215,7 +209,6 @@ public class MainPage extends AbstractPage {
 
             allSport.get(number).click();
 
-            CommonStepDefs.workWithPreloader();
 
             number++;
 
@@ -229,7 +222,6 @@ public class MainPage extends AbstractPage {
         LOG.info("Коэффициент победы первой команды = " + p1);
         selectGame.findElement(By.xpath("td[contains(@class,'bets-item_k1')]/div[1]/span")).click();
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
-        CommonStepDefs.workWithPreloader();
         Stash.put(team1key,bannerTeam1);
         Stash.put(team2key,bannerTeam2);
         Stash.put(ishodKey,bannerTeam1);//мы выбирали победу первой команды, поэтому и в купоне название ихода должно совпадать с первой командой
@@ -264,7 +256,6 @@ public class MainPage extends AbstractPage {
                 LOG.error("Нет доступных коэффициентов в разделе 'Горячие ставки'");
                 LOG.info("Переходим в прематч");
                 prematchButton.click();
-                CommonStepDefs.workWithPreloader();
                 coeff = driver.findElements(By.cssSelector("div.bets-block__bet-cell"));
                 if (coeff.size() == 0) {
                     Assertions.fail("Нет доступных коэффициентов");
@@ -295,64 +286,7 @@ public class MainPage extends AbstractPage {
         LOG.info("Смена форматов отображения коэффицентов прошла успешно");
     }
 
-    @ActionTitle("проверяет смену цвета точек при нажатии на кнопку c")
-    public void checksChangeColorDotsWhenButtonPressed(DataTable dataTable){
-        List<Map<String, String>> table = dataTable.asMaps(String.class, String.class);
-        String direction, buttonName;
 
-        LOG.info("Ищем навигационные точки под слайдером новостей");
-         List<WebElement> dots = driver.findElements(By.xpath("//*[contains(@class,'news-widget')]//li[contains(@class,'dot')]"))
-                 .stream().filter(WebElement::isDisplayed).collect(Collectors.toList());
-         LOG.info("Всего точек::" + dots.size());
-
-        for (Map<String, String> aTable : table) {
-            direction = aTable.get(DIRECTION);
-            buttonName = aTable.get(BUTTON);
-
-
-            if (direction.contains("Вправо")) {
-                LOG.info("Нажимаем на самую левую точку");
-                dots.get(0).click();
-                for (int j = 0; j < dots.size(); j++) {
-                    if (dots.get(j).getAttribute("class").contains("is-selected")) {
-                        LOG.info("Нажимаем на::" + buttonName);
-                        pressButtonAP(buttonName);
-                        if (j == (dots.size() - 1)) {
-                            assertThat(dots.get(0).getAttribute("class").contains("is-selected"))
-                                    .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
-                            LOG.info("Первая точка [1] закрашена");
-
-                        } else {
-                            assertThat(dots.get(j + 1).getAttribute("class").contains("is-selected"))
-                                    .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
-                            LOG.info("Следующая точка [" + (j + 2) + "] закрашена");
-                            verifiesThatNewsDigestsNotEmpty();
-                        }
-                    }
-                }
-            } else if (direction.contains("Влево")) {
-                LOG.info("Нажимаем на самую правую точку");
-                dots.get(dots.size() - 1).click();
-                for (int k = dots.size() - 1; k >= 0; k--) {
-                    if (dots.get(k).getAttribute("class").contains("is-selected")) {
-                        LOG.info("Нажимаем на::" + buttonName);
-                        pressButtonAP(buttonName);
-                        if (k == 0) {
-                            assertThat(dots.get(dots.size() - 1).getAttribute("class").contains("is-selected"))
-                                    .as("Ошибка! Следующая точка не стала закрашенной").isTrue();
-                            LOG.info("Последняя точка [" + dots.size() + "] закрашена");
-
-                        } else {
-                            assertThat(dots.get(k - 1).getAttribute("class").contains("is-selected"))
-                                    .as("Ошибка!Предыдующая точка не стала закрашенной").isTrue();
-                            LOG.info("Предыдущая точка [" + (k) + "] закрашена");
-                            verifiesThatNewsDigestsNotEmpty();
-                        }
-                    }
-                }
-            }
-        }
-    }
 
 
     @ActionTitle("ищет подходящий спорт в Горячих ставках")
@@ -424,7 +358,6 @@ public class MainPage extends AbstractPage {
             }
             allSport.get(number).click();
 
-            CommonStepDefs.workWithPreloader();
 
             number++;
 
@@ -435,7 +368,6 @@ public class MainPage extends AbstractPage {
         LOG.info("Переход на игру из Горячих ставок " + selectGame.getAttribute("innerText"));
         selectGame.click();
         new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.id("menu-toggler")));
-        CommonStepDefs.workWithPreloader();
 
 
         String game = driver.getCurrentUrl().split("game=")[1];
